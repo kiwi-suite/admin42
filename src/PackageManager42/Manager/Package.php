@@ -6,7 +6,7 @@ use Zend\EventManager\EventManagerInterface;
 use Zend\ModuleManager\ModuleEvent;
 use PackageManager42\Router\Router;
 use Zend\Mvc\MvcEvent;
-use Core42\Application\Registry;
+
 class Package implements ListenerAggregateInterface
 {
     /**
@@ -61,7 +61,7 @@ class Package implements ListenerAggregateInterface
     
     public function onRoute(MvcEvent $e)
     {
-        $applicationConfig = Registry::get('ApplicationConfig');
+        $applicationConfig = $e->getApplication()->getServiceManager()->get('ApplicationConfig');
         
         $routeMatch = $e->getRouteMatch();
         if (in_array($routeMatch->getParam('package'), $applicationConfig['package_options']['packages'])) {
