@@ -1,0 +1,7 @@
+{
+    "name": "fruit42/admin42",
+    "require": {
+        "php": ">=5.3.3",
+        "fruit42/core42": "*"
+    }
+}
