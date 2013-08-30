@@ -1,7 +1,11 @@
 {
     "name": "fruit42/admin42",
+    "type": "fruit42-module",
     "require": {
         "php": ">=5.3.3",
         "fruit42/core42": "*"
+    },
+    "extra": {
+        "installer-name": "Admin42"
     }
 }
