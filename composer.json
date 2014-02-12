@@ -2,13 +2,16 @@
     "name": "fruit42/admin42",
     "type": "fruit42-module",
     "require": {
-        "php": ">=5.3.3",
-        "fruit42/core42": "*"
+        "php": ">=5.3.3"
     },
     "require-dev": {
         "twbs/bootstrap-sass": "3.1.*@dev"
     },
     "extra": {
-        "installer-name": "Admin42"
+        "installer-name": "Admin42",
+        "assets": {
+            "dir": "public",
+            "target": "public/static/admin/"
+        }
     }
 }
