@@ -5,6 +5,9 @@
         "php": ">=5.3.3",
         "fruit42/core42": "*"
     },
+    "require-dev": {
+        "twbs/bootstrap-sass": "=3.1.x-dev"
+    },
     "extra": {
         "installer-name": "Admin42"
     }
