@@ -1,17 +1,22 @@
 require 'bootstrap-sass'
+require 'fileutils'
 
-http_path = "../"
-css_dir = "../public/css"
+css_dir = "dist/css"
 sass_dir = "sass"
-images_dir = "../public/img"
-generated_images_dir = "../public/img"
-http_images_path = "../img"
-http_generated_images_path = "../img"
+images_dir = "dist/images"
+javascripts_dir = "javascripts"
+fonts_dir = "dist/fonts"
 sprite_load_path = "sprites"
-javascripts_dir = "../public/js"
-fonts_dir = "fonts"
-http_fonts_path = "../fonts"
+generated_images_dir = "dist/images/gen"
 
-output_style = :compressed #:expanded or :nested or :compact or :compressed
+output_style = :compressed
 relative_assets = true
 line_comments = false
+
+on_stylesheet_saved do |file|
+  if File.exists?(file)
+    filename = File.basename(file, File.extname(file))
+    File.rename(file, css_dir + "/" + filename + ".min" + File.extname(file))
+    puts "#{filename}#{File.extname(file)} renamed to #{filename}.min#{File.extname(file)}"
+  end
+end

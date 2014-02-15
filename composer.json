@@ -4,13 +4,10 @@
     "require": {
         "php": ">=5.3.3"
     },
-    "require-dev": {
-        "twbs/bootstrap-sass": "3.1.*@dev"
-    },
     "extra": {
         "installer-name": "Admin42",
         "assets": {
-            "dir": "public",
+            "dir": "assests/dist",
             "target": "public/static/admin/"
         }
     }

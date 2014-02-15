@@ -12,7 +12,10 @@ class Module implements ConfigProviderInterface,
      */
     public function getConfig()
     {
-        return require_once __DIR__ . '/../../config/module.config.php';
+        return array_merge(
+            include __DIR__ . '/../../config/module.config.php',
+            include __DIR__ . '/../../config/routing.config.php'
+        );
     }
 
     /**
