@@ -1,7 +1,7 @@
 {
-    "name": "raum42-fe-boilerplate",
+    "name": "fruit42-admin",
     "version": "1.0.0",
-    "title": "raum42-fe-boilerplate",
+    "title": "fruit42-admin",
     "devDependencies": {
         "grunt": "~0.4.1",
         "grunt-contrib-concat": "~0.3.0",
