@@ -7,7 +7,7 @@
     "extra": {
         "installer-name": "Admin42",
         "assets": {
-            "dir": "assests/dist",
+            "dir": "assets/dist",
             "target": "public/static/admin/"
         }
     }
