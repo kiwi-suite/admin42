@@ -26,4 +26,28 @@ return array(
             'ViewJsonStrategy',
         ),
     ),
+
+    'authentication' => array(
+        'default' => array(
+            'plugins' => array(
+                'Core42\Authentication\Plugin\TableGateway' => array(
+                    'name' => 'Core42\Authentication\Plugin\TableGateway',
+                    'options' => array(
+                        'table_gateway' => 'Admin42\User',
+                        'identity_column' => 'username',
+                        'credential_column' => 'password',
+                    ),
+                ),
+            ),
+            'adapter' => 'Core42\Authentication\Plugin\TableGateway',
+            'storage' => 'Core42\Authentication\Plugin\TableGateway',
+        ),
+        'routes' => array(
+            'admin' => 'default',
+        ),
+    ),
+
+    'tablegateway' => array(
+        'Admin42\UserTableGateway' => 'Admin42\TableGateway\UserTableGateway',
+    ),
 );

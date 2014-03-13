@@ -25,6 +25,27 @@ return array(
                             ),
                         ),
                     ),
+                    'user' => array(
+                        'type' => 'Zend\Mvc\Router\Http\Literal',
+                        'options' => array(
+                            'route' => 'user/',
+                            'defaults' => array(
+                                'controller' => __NAMESPACE__ . '\Controller\User',
+                            ),
+                        ),
+                        'may_terminate' => false,
+                        'child_routes' => array(
+                            'manage' => array(
+                                'type' => 'Zend\Mvc\Router\Http\Literal',
+                                'options' => array(
+                                    'route' => 'manage/',
+                                    'defaults' => array(
+                                        'action' => 'manage',
+                                    ),
+                                ),
+                            ),
+                        ),
+                    ),
                 ),
             ),
         ),

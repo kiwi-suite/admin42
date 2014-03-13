@@ -1,0 +1,55 @@
+<?php
+$this->valueManager()->setValueManager($this->valueManager);
+?>
+<div class="col-md-6 col-md-offset-3">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h1 class="panel-title">
+                <span class="glyphicon glyphicon-user"></span>
+                Manage your Account
+            </h1>
+        </div>
+        <form action="<?= $this->url() ?>" method="post" role="form" class="form-horizontal">
+            <?= $this->valueManager()->render("username", "text") ?>
+            <div class="panel-body">
+                <div class="form-group">
+                    <label for="username" class="col-sm-2 control-label">Username</label>
+                    <div class="col-sm-10">
+                        <input type="text" name="username" class="form-control" id="username" value="thomas" disabled>
+                    </div>
+                </div>
+                <div class="form-group has-error has-feedback">
+                    <label for="email" class="col-sm-2 control-label">Email</label>
+                    <div class="col-sm-10">
+                        <input type="email" name="email" class="form-control" id="email" value="">
+                        <span class="glyphicon glyphicon-warning-sign form-control-feedback"></span>
+                        <span class="help-block">A block ofe.</span>
+                        <span class="help-block">A block of help text that breaks onto a new line and may extend beyond one line.</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="password" class="col-sm-2 control-label">Password</label>
+                    <div class="col-sm-10">
+                        <input type="password" name="password" class="form-control" id="password" placeholder="Password">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="passwordRepeat" class="col-sm-2 control-label">Password (repeat)</label>
+                    <div class="col-sm-10">
+                        <input type="password" name="passwordRepeat" class="form-control" id="passwordRepeat" placeholder="Password (repeat)">
+                    </div>
+                </div>
+            </div>
+            <div class="panel-footer">
+                <div class="form-group">
+                    <div class="col-sm-offset-2 col-sm-2">
+                        <button type="submit" class="btn btn-primary">
+                            <span class="glyphicon glyphicon-ok-sign"></span>
+                            Save
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
