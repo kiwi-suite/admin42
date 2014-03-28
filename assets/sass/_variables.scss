@@ -473,17 +473,17 @@
 //##
 
 //* Tooltip max width
-//$tooltip-max-width:           200px;
+$tooltip-max-width:           400px;
 //* Tooltip text color
-//$tooltip-color:               #fff;
+$tooltip-color:               #000;
 //* Tooltip background color
-//$tooltip-bg:                  #000;
-//$tooltip-opacity:             .9;
+$tooltip-bg:                  #FFF;
+$tooltip-opacity:             .9;
 
 //* Tooltip arrow width
 //$tooltip-arrow-width:         5px;
 //* Tooltip arrow color
-//$tooltip-arrow-color:         $tooltip-bg;
+$tooltip-arrow-color:         $tooltip-color;
 
 //== Popovers
 //
@@ -531,9 +531,9 @@
 //$label-danger-bg:             $brand-danger;
 
 //* Default label text color
-//$label-color:                 #fff;
+$label-color:                 #fff;
 //* Default text color of a linked label
-//$label-link-hover-color:      #fff;
+$label-link-hover-color:      #fff;
 
 //== Modals
 //
@@ -693,7 +693,7 @@
 //
 //##
 
-//$well-bg:                     #f5f5f5;
+$well-bg:                     #FFFFFF;
 //$well-border:                 darken($well-bg, 7%);
 
 //== Badges

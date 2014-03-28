@@ -1,7 +1,7 @@
 {
-    "name": "fruit42-admin",
+    "name": "raum42-admin42",
     "version": "1.0.0",
-    "title": "fruit42-admin",
+    "title": "raum42-admin42",
     "devDependencies": {
         "grunt": "~0.4.1",
         "grunt-contrib-concat": "~0.3.0",
