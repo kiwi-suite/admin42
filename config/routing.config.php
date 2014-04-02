@@ -9,7 +9,7 @@ return array(
                 'options' => array(
                     'route' => '/admin[/]',
                     'defaults' => array(
-                        'controller' => __NAMESPACE__ . '\Controller\User',
+                        'controller' => __NAMESPACE__ . '\User',
                         'action' => 'dashboard',
                     ),
                 ),
@@ -20,8 +20,18 @@ return array(
                         'options' => array(
                             'route' => 'login/',
                             'defaults' => array(
-                                'controller' => __NAMESPACE__ . '\Controller\User',
+                                'controller' => __NAMESPACE__ . '\User',
                                 'action' => 'login',
+                            ),
+                        ),
+                    ),
+                    'logout' => array(
+                        'type' => 'Zend\Mvc\Router\Http\Segment',
+                        'options' => array(
+                            'route' => 'logout/',
+                            'defaults' => array(
+                                'controller' => __NAMESPACE__ . '\User',
+                                'action' => 'logout',
                             ),
                         ),
                     ),
@@ -30,7 +40,7 @@ return array(
                         'options' => array(
                             'route' => 'user/',
                             'defaults' => array(
-                                'controller' => __NAMESPACE__ . '\Controller\User',
+                                'controller' => __NAMESPACE__ . '\User',
                             ),
                         ),
                         'may_terminate' => false,

@@ -6,67 +6,6 @@ use Core42\Model\AbstractModel;
 
 class User extends AbstractModel
 {
-
-    public $inputFilterSpecifications = array(
-        'id' => array(
-            'name' => 'id',
-            'required' => true,
-            'validators' => array(
-                array(
-                    'name' => 'digits',
-                ),
-                array(
-                    'name' => 'notempty',
-                ),
-            ),
-        ),
-        'username' => array(
-            'name' => 'username',
-            'required' => true,
-            'validators' => array(
-                array(
-                    'name' => 'notempty',
-                ),
-            ),
-        ),
-        'password' => array(
-            'name' => 'password',
-            'required' => true,
-            'validators' => array(
-                array(
-                    'name' => 'notempty',
-                ),
-            ),
-        ),
-        'email' => array(
-            'name' => 'email',
-            'required' => true,
-            'validators' => array(
-                array(
-                    'name' => 'notempty',
-                ),
-            ),
-        ),
-        'updated' => array(
-            'name' => 'updated',
-            'required' => true,
-            'validators' => array(
-                array(
-                    'name' => 'notempty',
-                ),
-            ),
-        ),
-        'created' => array(
-            'name' => 'created',
-            'required' => true,
-            'validators' => array(
-                array(
-                    'name' => 'notempty',
-                ),
-            ),
-        ),
-    );
-
     /**
      * @param int $id
      * @return \Admin42\Model\User

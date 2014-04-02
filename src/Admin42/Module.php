@@ -14,6 +14,7 @@ class Module implements ConfigProviderInterface,
     {
         return array_merge(
             include __DIR__ . '/../../config/module.config.php',
+            include __DIR__ . '/../../config/permissions.config.php',
             include __DIR__ . '/../../config/routing.config.php'
         );
     }

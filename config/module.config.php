@@ -2,12 +2,6 @@
 namespace Admin42;
 
 return array(
-    'controllers' => array(
-        'invokables' => array(
-            __NAMESPACE__ . '\Controller\User'              => __NAMESPACE__ . '\Controller\UserController',
-        ),
-    ),
-
     'view_manager' => array(
         'display_not_found_reason'  => true,
         'display_exceptions'        => true,
@@ -28,7 +22,7 @@ return array(
     ),
 
     'authentication' => array(
-        'default' => array(
+        'admin' => array(
             'plugins' => array(
                 'Core42\Authentication\Plugin\TableGateway' => array(
                     'name' => 'Core42\Authentication\Plugin\TableGateway',
@@ -43,11 +37,7 @@ return array(
             'storage' => 'Core42\Authentication\Plugin\TableGateway',
         ),
         'routes' => array(
-            'admin' => 'default',
+            'admin' => 'admin',
         ),
-    ),
-
-    'tablegateway' => array(
-        'Admin42\UserTableGateway' => 'Admin42\TableGateway\UserTableGateway',
     ),
 );
