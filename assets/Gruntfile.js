@@ -18,8 +18,8 @@ module.exports = function(grunt) {
             },
             main: {
                 src: [
-                    '<%= js_src_path %>/jquery/*.js',
-                    '<%= js_src_path %>/bootstrap/*.js',
+                    '<%= js_src_path %>/vendor/jquery/*.js',
+                    '<%= js_src_path %>/vendor/bootstrap/*.js',
                     '<%= js_src_path %>/*.js'
                 ],
                 dest: '<%= js_dest_path %>/<%= pkg.name %>.js'
