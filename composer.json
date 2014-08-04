@@ -1,14 +1,12 @@
 {
     "name": "fruit42/admin42",
-    "type": "fruit42-module",
+    "type": "zend-module",
     "require": {
         "php": ">=5.3.23"
     },
-    "extra": {
-        "installer-name": "Admin42",
-        "assets": {
-            "dir": "assets/dist",
-            "target": "public/static/admin/"
+    "autoload": {
+        "psr-0": {
+            "Admin42": "src/"
         }
     }
 }
