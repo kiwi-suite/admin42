@@ -4,12 +4,12 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="<?= $this->basePath("/static/admin/css/styles.min.css") ?>" rel="stylesheet">
-    <script src="<?= $this->basePath("/static/admin/js/raum42-admin42.min.js") ?>"></script>
+    <link href="<?= $this->basePath("/assets/admin/css/raum42-admin.min.css") ?>" rel="stylesheet">
+    <script src="<?= $this->basePath("/assets/admin/js/raum42-admin.min.js") ?>"></script>
 </head>
 
 <body>
-<?php if ($this->identity()): ?>
+<?php if ($this->auth('Admin42\Authentication')->hasIdentity()): ?>
 <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
 
     <div class="container-fluid">
@@ -26,7 +26,18 @@
         <div class="collapse navbar-collapse" id="navbar-collapse-1">
             <ul class="navbar-right nav navbar-nav">
                 <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown"><?= $this->identity()->getUsername()?>&nbsp;<span class="glyphicon glyphicon-user"></span></a>
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                        <?php
+                        $displayName = $this->auth('Admin42\Authentication')->getIdentity()->getDisplayName();
+                        if (empty($displayName)) {
+                            $displayName = $this->auth('Admin42\Authentication')->getIdentity()->getUsername();
+                        }
+                        if (empty($displayName)) {
+                            $displayName = $this->auth('Admin42\Authentication')->getIdentity()->getEmail();
+                        }
+                        ?>
+                        <?= $displayName ?>&nbsp;<span class="fa fa-user"></span>
+                    </a>
                     <ul class="dropdown-menu">
                         <li><a href="<?= $this->url('admin/user/manage')?>">Einstellungen</a></li>
                         <li><a href="<?= $this->url('admin/logout')?>">Logout</a></li>
@@ -40,10 +51,27 @@
 </nav>
 <?php endif; ?>
 
-<div class="container-fluid">
-        <div id="main-container" class="row">
-            <?= $this->content ?>
+<div id="main-container" class="container-fluid">
+        <div class="row">
+            <?php if ($this->useSidebar === true): ?>
+                <div class="sidebar-control">
+                    <button class="btn btn-link btn-xs" type="button" id="btn-sidebar-show">
+                        <span class="fa fa-arrow-right"></span>
+                    </button>
+                </div>
+                <div class="sidebar col-md-2">
+                    <button class="btn btn-link btn-xs pull-right" type="button" id="btn-sidebar-hide">
+                        <span class="fa fa-arrow-left"></span>
+                    </button>
+                    <div class="clearfix"></div>
+                </div>
 
+                <div class="main col-md-10 col-md-offset-2">
+                    <?= $this->content ?>
+                </div>
+            <?php else: ?>
+                <?= $this->content ?>
+            <?php endif; ?>
         </div>
     </div>
 </body>

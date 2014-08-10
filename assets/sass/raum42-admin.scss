@@ -1,0 +1,228 @@
+@import "variables";
+@import "sprites";
+
+// Core variables and mixins
+@import "../bower_components/bootstrap-sass-official/assets/stylesheets/bootstrap/variables";
+@import "../bower_components/bootstrap-sass-official/assets/stylesheets/bootstrap/mixins";
+
+// Reset and dependencies
+@import "../bower_components/bootstrap-sass-official/assets/stylesheets/bootstrap/normalize";
+@import "../bower_components/bootstrap-sass-official/assets/stylesheets/bootstrap/print";
+@import "../bower_components/bootstrap-sass-official/assets/stylesheets/bootstrap-compass";
+@import "../bower_components/bootstrap-sass-official/assets/stylesheets/bootstrap/glyphicons";
+
+// Core CSS
+@import "../bower_components/bootstrap-sass-official/assets/stylesheets/bootstrap/scaffolding";
+@import "../bower_components/bootstrap-sass-official/assets/stylesheets/bootstrap/type";
+@import "../bower_components/bootstrap-sass-official/assets/stylesheets/bootstrap/code";
+@import "../bower_components/bootstrap-sass-official/assets/stylesheets/bootstrap/grid";
+@import "../bower_components/bootstrap-sass-official/assets/stylesheets/bootstrap/tables";
+@import "../bower_components/bootstrap-sass-official/assets/stylesheets/bootstrap/forms";
+@import "../bower_components/bootstrap-sass-official/assets/stylesheets/bootstrap/buttons";
+
+// Components
+@import "../bower_components/bootstrap-sass-official/assets/stylesheets/bootstrap/component-animations";
+@import "../bower_components/bootstrap-sass-official/assets/stylesheets/bootstrap/dropdowns";
+@import "../bower_components/bootstrap-sass-official/assets/stylesheets/bootstrap/button-groups";
+@import "../bower_components/bootstrap-sass-official/assets/stylesheets/bootstrap/input-groups";
+@import "../bower_components/bootstrap-sass-official/assets/stylesheets/bootstrap/navs";
+@import "../bower_components/bootstrap-sass-official/assets/stylesheets/bootstrap/navbar";
+@import "../bower_components/bootstrap-sass-official/assets/stylesheets/bootstrap/breadcrumbs";
+@import "../bower_components/bootstrap-sass-official/assets/stylesheets/bootstrap/pagination";
+@import "../bower_components/bootstrap-sass-official/assets/stylesheets/bootstrap/pager";
+@import "../bower_components/bootstrap-sass-official/assets/stylesheets/bootstrap/labels";
+@import "../bower_components/bootstrap-sass-official/assets/stylesheets/bootstrap/badges";
+@import "../bower_components/bootstrap-sass-official/assets/stylesheets/bootstrap/jumbotron";
+@import "../bower_components/bootstrap-sass-official/assets/stylesheets/bootstrap/thumbnails";
+@import "../bower_components/bootstrap-sass-official/assets/stylesheets/bootstrap/alerts";
+@import "../bower_components/bootstrap-sass-official/assets/stylesheets/bootstrap/progress-bars";
+@import "../bower_components/bootstrap-sass-official/assets/stylesheets/bootstrap/media";
+@import "../bower_components/bootstrap-sass-official/assets/stylesheets/bootstrap/list-group";
+@import "../bower_components/bootstrap-sass-official/assets/stylesheets/bootstrap/panels";
+@import "../bower_components/bootstrap-sass-official/assets/stylesheets/bootstrap/responsive-embed";
+@import "../bower_components/bootstrap-sass-official/assets/stylesheets/bootstrap/wells";
+@import "../bower_components/bootstrap-sass-official/assets/stylesheets/bootstrap/close";
+
+// Components w/ JavaScript
+@import "../bower_components/bootstrap-sass-official/assets/stylesheets/bootstrap/modals";
+@import "../bower_components/bootstrap-sass-official/assets/stylesheets/bootstrap/tooltip";
+@import "../bower_components/bootstrap-sass-official/assets/stylesheets/bootstrap/popovers";
+@import "../bower_components/bootstrap-sass-official/assets/stylesheets/bootstrap/carousel";
+
+// Utility classes
+@import "../bower_components/bootstrap-sass-official/assets/stylesheets/bootstrap/utilities";
+@import "../bower_components/bootstrap-sass-official/assets/stylesheets/bootstrap/responsive-utilities";
+
+//Font Awesome
+@import "../bower_components/font-awesome/scss/font-awesome";
+
+@import "compass/css3/transition";
+
+body {
+  background-image:url(../images/elements/body.png);
+  background-repeat: repeat;
+}
+
+textarea{
+  resize:vertical;
+}
+
+.green_bg{
+  background-image: url(../images/elements/bar-bg.jpg);
+  background-repeat: repeat;
+}
+
+.pointer{
+  cursor:pointer;
+}
+
+.help{
+  cursor: help;
+}
+
+.navbar-default{
+  background-image: url(../images/elements/header.png);
+  background-position: bottom;
+  background-repeat: repeat-x;
+  background-color:#FFF;
+}
+
+.navbar-default{
+  .navbar-brand{
+    padding:4px 10px;
+    margin:0px;
+  }
+}
+
+.main {
+  @include single-transition(all, .25s, ease-out, 0);
+}
+
+.sidebar{
+  position: fixed;
+  top: 60px;
+  bottom: 0;
+  left: 0;
+  z-index: 1000;
+  display: block;
+  overflow-x: hidden;
+  overflow-y: auto;
+  background-color: #f5f5f5;
+  border-right: 1px solid #dddddd;
+
+  @include single-transition(all, .25s, ease-out, 0);
+}
+
+.sidebar.hide-sidebar {
+  left: -50%;
+}
+
+.sidebar-control {
+  display: none;
+
+  @include single-transition(all, 0s, linear, 2s);
+}
+
+.sidebar-control.hide-sidebar {
+  width: 25px;
+  position: fixed;
+  top: 60px;
+  bottom: 0;
+  left: 0;
+  z-index: 1000;
+  display: block;
+  overflow-x: hidden;
+  overflow-y: auto;
+  background-color: #f5f5f5;
+  border-right: 1px solid #dddddd;
+}
+
+.divider-block{
+  display:block;
+  @extend .green_bg;
+
+  &.horizontal{
+    width:100%;
+    height:10px;
+    clear:both;
+  }
+}
+
+.divider{
+  @extend .clearfix;
+  height:1px;
+  background:#CCCCCC;
+  margin:10px 0px !important;
+}
+
+#main-container{
+  margin-top:60px;
+}
+
+/* Forms */
+.form-group{
+  margin-bottom:13px;
+}
+
+.form-horizontal .control-label, .form-horizontal .radio, .form-horizontal .checkbox, .form-horizontal .radio-inline, .form-horizontal .checkbox-inline{
+  padding-top:4px;
+}
+
+.info-sign{
+  padding-top: 10px;
+  color: #bbd6ff;
+}
+
+/* Login */
+#login{
+  margin-top:100px;
+
+  .panel{
+    border:1px solid #888;
+  }
+  #logo{
+    margin:0 auto 10px;
+  }
+}
+
+.breadcrumb{
+  background:none;
+  padding: 0px 30px 0px;
+  margin-bottom: 10px;
+  li a,
+  li.active{
+    font-size:10px;
+  }
+  >li+li:before {
+    content: "\203A";
+    padding: 0 5px;
+    color: #ccc;
+  }
+}
+
+ul.nav-tabs{
+  margin-bottom:15px;
+}
+
+.tooltip{
+  .tooltip-inner{
+    border: 1px solid #000;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+  }
+}
+
+/* Medium devices (desktops, 992px and up) */
+@media (max-width:$screen-md-min) {
+  #login{
+    margin-top:50px;
+  }
+}
+
+/* Small devices (tablets, 768px and up) */
+@media (max-width:$screen-sm-min) {
+  #login{
+    margin-top:10px;
+  }
+}

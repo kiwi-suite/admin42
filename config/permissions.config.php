@@ -2,6 +2,10 @@
 namespace Admin42;
 
 return array(
+    'permissions' => array(
+        'guards' => array(),
+    ),
+    /*
     'permission' => array(
         //whether enable or disable the permissions
         'enabled' => true,
@@ -34,4 +38,5 @@ return array(
             ),
         ),
     ),
+    */
 );

@@ -21,23 +21,15 @@ return array(
         ),
     ),
 
-    'authentication' => array(
-        'admin' => array(
-            'plugins' => array(
-                'Core42\Authentication\Plugin\TableGateway' => array(
-                    'name' => 'Core42\Authentication\Plugin\TableGateway',
-                    'options' => array(
-                        'table_gateway' => 'Admin42\User',
-                        'identity_column' => 'username',
-                        'credential_column' => 'password',
-                    ),
-                ),
-            ),
-            'adapter' => 'Core42\Authentication\Plugin\TableGateway',
-            'storage' => 'Core42\Authentication\Plugin\TableGateway',
+    'migration' => array(
+        'directory'     => array(
+            __NAMESPACE__ => __DIR__ . '/../data/migrations'
         ),
-        'routes' => array(
-            'admin' => 'admin',
+    ),
+
+    'service_manager' => array(
+        'factories' => array(
+            'Admin42\Authentication'    => 'Admin42\Authentication\Service\AuthenticationServiceFactory',
         ),
     ),
 );

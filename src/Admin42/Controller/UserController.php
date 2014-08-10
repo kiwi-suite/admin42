@@ -1,62 +1,41 @@
 <?php
 namespace Admin42\Controller;
 
-use Admin42\Form\User\LoginForm;
-use Zend\Mvc\Controller\AbstractActionController;
-use Zend\View\Model\ViewModel;
+use Admin42\Mvc\Controller\AbstractAdminController;
 
-class UserController extends AbstractActionController
+class UserController extends AbstractAdminController
 {
     public function dashboardAction()
     {
-        /** @var $authService \Core42\Authentication\Authentication */
-        $authService = $this->getServiceLocator()->get('Core42\\Authentication');
 
-        if (!$authService->hasIdentity()) {
-            return $this->redirect()->toRoute('admin/login');
-        }
     }
 
     public function loginAction()
     {
-        /** @var $authService \Core42\Authentication\Authentication */
-        $authService = $this->getServiceLocator()->get('Core42\Authentication');
-
-        if ($authService->hasIdentity()) {
-            return $this->redirect()->toRoute('admin');
-        }
-
-        $form = new LoginForm();
+        $loginForm = $this->getForm('Admin42\User\Login');
 
         if ($this->getRequest()->isPost()) {
-            $form->setData($this->getRequest()->getPost()->toArray());
+            $formCmd = $this->getFormCommand();
 
-            /** @var $cmd \Admin42\Command\User\LoginCommand */
-            $cmd = $this->getServiceLocator()->get('Command')->get('Admin42\User\Login');
-            $cmd->setForm($form)
+            $formCmd->setForm($loginForm)
+                ->setCommand($this->getCommand('Admin42\User\Login'))
                 ->run();
-
-            if (!$cmd->hasErrors()) {
-                return $this->redirect()->toRoute('admin');
-            }
         }
 
-        return new ViewModel(array(
-            'loginForm' => $form,
-        ));
+        return array(
+            'loginForm' => $loginForm,
+        );
     }
 
     public function logoutAction()
     {
-        /** @var $authService \Core42\Authentication\Authentication */
-        $authService = $this->getServiceLocator()->get('Core42\Authentication');
+        $this->getCommand('Admin42\User\Logout')->run();
 
-        $authService->clearIdentity();
-
-        return $this->redirect()->toRoute('admin');
+        return $this->redirect()->toRoute('admin/login');
     }
 
     public function manageAction()
     {
+        $this->layout()->useSidebar = true;
     }
 }

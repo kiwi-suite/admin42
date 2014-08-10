@@ -18,8 +18,8 @@ module.exports = function(grunt) {
             },
             main: {
                 src: [
-                    '<%= js_src_path %>/vendor/jquery/*.js',
-                    '<%= js_src_path %>/vendor/bootstrap/*.js',
+                    'bower_components/jquery/dist/jquery.js',
+                    'bower_components/bootstrap-sass-official/assets/javascripts/bootstrap.js',
                     '<%= js_src_path %>/*.js'
                 ],
                 dest: '<%= js_dest_path %>/<%= pkg.name %>.js'
@@ -45,7 +45,7 @@ module.exports = function(grunt) {
                 src: [ '<%= img_dest_path %>/**/*.*', '!<%= img_dest_path %>/**/*.{png,jpg,gif,jpeg,svg}', '!<%= img_gen_path %>' ]
             },
             fonts: {
-                src: [ '<%= font_path %>/**/*.*', '!<%= font_path %>/**/*.{eot,svg,ttf,woff}' ]
+                src: [ '<%= font_path %>/**/*.*', '!<%= font_path %>/**/*.{eot,svg,ttf,woff,otf}' ]
             }
         },
         compass: {
@@ -53,6 +53,30 @@ module.exports = function(grunt) {
                 options: {
                     config: 'config.rb'
                 }
+            }
+        },
+        copy: {
+            bootstrap: {
+                files: [
+                    {
+                        expand: true,
+                        flatten: true,
+                        src: ['bower_components/bootstrap-sass-official/assets/fonts/bootstrap/*'],
+                        dest: 'dist/fonts/',
+                        filter: 'isFile'
+                    }
+                ]
+            },
+            fontawesome: {
+                files: [
+                    {
+                        expand: true,
+                        flatten: true,
+                        src: ['bower_components/font-awesome/fonts/*'],
+                        dest: 'dist/fonts/',
+                        filter: 'isFile'
+                    }
+                ]
             }
         },
         watch: {
@@ -67,7 +91,7 @@ module.exports = function(grunt) {
         }
     });
 
-    grunt.registerTask('default', ['concat', 'uglify', 'compass', 'clean']);
+    grunt.registerTask('default', ['copy', 'concat', 'uglify', 'compass', 'clean']);
 
     require('load-grunt-tasks')(grunt);
 };

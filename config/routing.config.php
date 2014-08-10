@@ -16,7 +16,7 @@ return array(
                 'may_terminate' => true,
                 'child_routes' => array(
                     'login' => array(
-                        'type' => 'Zend\Mvc\Router\Http\Segment',
+                        'type' => 'Zend\Mvc\Router\Http\Literal',
                         'options' => array(
                             'route' => 'login/',
                             'defaults' => array(
@@ -26,7 +26,7 @@ return array(
                         ),
                     ),
                     'logout' => array(
-                        'type' => 'Zend\Mvc\Router\Http\Segment',
+                        'type' => 'Zend\Mvc\Router\Http\Literal',
                         'options' => array(
                             'route' => 'logout/',
                             'defaults' => array(

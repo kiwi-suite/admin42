@@ -6,6 +6,9 @@ use Core42\Model\AbstractModel;
 
 class User extends AbstractModel
 {
+    const STATUS_ACTIVE = 'active';
+    const STATUS_INACTIVE = 'inactive';
+
     /**
      * @param int $id
      * @return \Admin42\Model\User
@@ -79,6 +82,57 @@ class User extends AbstractModel
     }
 
     /**
+     * @return string|null
+     */
+    public function getDisplayName()
+    {
+        return $this->get('displayName');
+    }
+
+    /**
+     * @param string|null $displayName
+     * @return \Admin42\Model\User
+     */
+    public function setDisplayName($displayName)
+    {
+        return $this->set('displayName', $displayName);
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getHash()
+    {
+        return $this->get('hash');
+    }
+
+    /**
+     * @param string $hash
+     * @return \Admin42\Model\User
+     */
+    public function setHash($hash)
+    {
+        return $this->set('hash', $hash);
+    }
+
+    /**
+     * @param string $status
+     * @return \Admin42\Model\User
+     */
+    public function setStatus($status)
+    {
+        return $this->set('status', $status);
+    }
+
+    /**
+     * @return string
+     */
+    public function getStatus()
+    {
+        return $this->get('status');
+    }
+
+    /**
      * @param \DateTime $updated
      * @return \Admin42\Model\User
      */
@@ -114,6 +168,21 @@ class User extends AbstractModel
         return $this->get('created');
     }
 
+    /**
+     * @param \DateTime|null $lastLogin
+     * @return AbstractModel
+     */
+    public function setLastLogin($lastLogin)
+    {
+        return $this->set('lastLogin', $lastLogin);
+    }
 
+    /**
+     * @return \DateTime|null
+     */
+    public function getLastLogin()
+    {
+        return $this->get('lastLogin');
+    }
 }
 

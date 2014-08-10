@@ -1,15 +1,24 @@
 <?php
 namespace Admin42\Command\User;
 
-use Core42\Command\AbstractCommand;
-use Zend\Authentication\AuthenticationServiceInterface;
+use Admin42\Authentication\AuthenticationService;
+use Admin42\Model\User;
+use Core42\Command\Migration\AbstractCommand;
+use Zend\Authentication\Result;
+use Zend\Crypt\Password\Bcrypt;
+use Zend\Validator\EmailAddress;
 
 class LoginCommand extends AbstractCommand
 {
     /**
+     * @var AuthenticationService
+     */
+    private $authenticationService;
+
+    /**
      * @var string
      */
-    private $username;
+    private $identity;
 
     /**
      * @var string
@@ -17,17 +26,30 @@ class LoginCommand extends AbstractCommand
     private $password;
 
     /**
-     * @var AuthenticationServiceInterface
+     * @var string
      */
-    private $authService;
+    private $identityType;
 
-    public function setUsername($username)
+    /**
+     * @var User
+     */
+    private $user;
+
+    /**
+     * @param string $identity
+     * @return $this
+     */
+    public function setIdentity($identity)
     {
-        $this->username = $username;
+        $this->identity = $identity;
 
         return $this;
     }
 
+    /**
+     * @param string $password
+     * @return $this
+     */
     public function setPassword($password)
     {
         $this->password = $password;
@@ -35,34 +57,80 @@ class LoginCommand extends AbstractCommand
         return $this;
     }
 
-    protected function extractForm()
+    /**
+     * @param array $values
+     */
+    public function hydrate(array $values)
     {
-        $data = $this->getForm()->getData();
-        $this->setUsername($data['username'])
-                ->setPassword($data['password']);
+        $this->setPassword((isset($values['password'])) ? $values['password'] : null);
+        $this->setIdentity((isset($values['identity'])) ? $values['identity'] : null);
     }
 
+    /**
+     *
+     */
     protected function preExecute()
     {
-        if ($this->hasErrors()) {
-            return ;
+        $this->authenticationService = $this->getServiceManager()->get('Admin42\Authentication');
+
+        if (empty($this->identity)) {
+            $this->addError('identity', "Can't be empty");
         }
 
-        $this->authService = $this->getServiceManager()->get('Core42\Authentication');
+        if (empty($this->password)) {
+            $this->addError("password", "Can't be empty");
+        }
 
-        $this->authService->getAdapter()
-            ->setIdentity($this->username)
-            ->setCredential($this->password);
+        $emailValidator = new EmailAddress();
+        $this->identityType = ($emailValidator->isValid($this->identity)) ? 'email' : 'username';
 
-        $authResult = $this->authService->authenticate();
-        if (!$authResult->isValid()) {
-            $this->addErrors(array("username" => $authResult->getMessages()));
+        $userTableGateway = $this->getTableGateway('Admin42\User');
+
+        $resultSet = $userTableGateway->select(array(
+            $this->identityType => $this->identity
+        ));
+
+        $bCrypt = new Bcrypt();
+
+        if ($resultSet->count() != 1) {
+            $bCrypt->create("test");
+
+            $this->addError("identity", "Invalid username or password");
+
             return;
         }
+
+        /** @var User $user */
+        $user = $resultSet->current();
+        if (!$bCrypt->verify($this->password, $user->getPassword())) {
+            $this->addError("identity", "Invalid username or password");
+
+            return;
+        }
+
+        if (!in_array($user->getStatus(), array(User::STATUS_ACTIVE))) {
+            $this->addError("identity", "Invalid username or password");
+
+            return;
+        }
+
+        $this->user = $user;
     }
 
+    /**
+     *
+     */
     protected function execute()
     {
-        //TODO LoginLog and last_login DateTime
+        $authResult = new Result(
+            Result::SUCCESS,
+            $this->user->getId()
+        );
+
+        $this->authenticationService->setAuthResult($authResult);
+        $this->authenticationService->authenticate();
+
+        $this->user->setLastLogin(new \DateTime());
+        $this->getTableGateway('Admin42\User')->update($this->user);
     }
 }

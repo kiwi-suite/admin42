@@ -1,51 +1,25 @@
 <?php
 namespace Admin42\Form\User;
 
+use Zend\Form\Element\Csrf;
+use Zend\Form\Element\Password;
+use Zend\Form\Element\Text;
 use Zend\Form\Form;
-use Zend\InputFilter\InputFilterProviderInterface;
 
-class LoginForm extends Form implements InputFilterProviderInterface
+class LoginForm extends Form
 {
     public function __construct()
     {
         parent::__construct();
 
-        $this->add(array(
-            'name' => 'username',
-            'type' => 'text',
-        ));
+        $this->add(new Csrf("csrf"));
 
-        $this->add(array(
-            'name' => 'password',
-            'type' => 'password'
-        ));
-    }
+        $username = new Text("identity");
+        $username->setLabel("Email or Username");
+        $this->add($username);
 
-    /**
-     * Should return an array specification compatible with
-     * {@link Zend\InputFilter\Factory::createInputFilter()}.
-     *
-     * @return array
-     */
-    public function getInputFilterSpecification()
-    {
-        return array(
-            'username' => array(
-                'required' => true,
-                'filters' => array(
-                    array(
-                        'name' => 'Zend\Filter\StringTrim'
-                    ),
-                ),
-            ),
-            'password' => array(
-                'required' => true,
-                'filters' => array(
-                    array(
-                        'name' => 'Zend\Filter\StringTrim'
-                    ),
-                ),
-            ),
-        );
+        $password = new Password("password");
+        $password->setLabel("Password");
+        $this->add($password);
     }
 }
