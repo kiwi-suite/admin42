@@ -2,8 +2,7 @@
     "name": "fruit42/admin42",
     "type": "zend-module",
     "require": {
-        "php": ">=5.3.23",
-        "zf-commons/zfc-rbac": "~2.4"
+        "php": ">=5.3.23"
     },
     "autoload": {
         "psr-0": {

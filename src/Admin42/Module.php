@@ -42,5 +42,15 @@ class Module implements ConfigProviderInterface, BootstrapListenerInterface
             $sm = $e->getApplication()->getServiceManager();
             $sm->get('Core42\Form\ThemeManager')->setDefaultThemeName(strtolower(__NAMESPACE__));
         }, 100);
+
+        /* @var \Zend\Mvc\Application $application */
+        $application    = $e->getTarget();
+        $serviceManager = $application->getServiceManager();
+        $eventManager   = $application->getEventManager();
+
+        $guards = $serviceManager->get('Core42\Permission')->getGuards('admin42');
+        foreach ($guards as $_guard) {
+            $eventManager->attachAggregate($_guard);
+        }
     }
 }

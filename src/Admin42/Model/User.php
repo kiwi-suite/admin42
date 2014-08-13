@@ -82,6 +82,23 @@ class User extends AbstractModel
     }
 
     /**
+     * @param string $role
+     * @return \Admin42\Model\User
+     */
+    public function setRole($role)
+    {
+        return $this->set('role', $role);
+    }
+
+    /**
+     * @return string
+     */
+    public function getRole()
+    {
+        return $this->get('role');
+    }
+
+    /**
      * @return string|null
      */
     public function getDisplayName()

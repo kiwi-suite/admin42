@@ -10,6 +10,7 @@ class Migration20140804110052
   `username` VARCHAR(255) CHARACTER SET 'utf8' COLLATE 'utf8_bin' NULL,
   `password` VARCHAR(255) NOT NULL,
   `email` VARCHAR(255) NOT NULL,
+  `role` VARCHAR(255) NULL,
   `displayName` VARCHAR(255) NULL,
   `hash` VARCHAR(255) NULL,
   `status` ENUM('inactive', 'active', 'locked') NOT NULL,

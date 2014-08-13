@@ -3,40 +3,41 @@ namespace Admin42;
 
 return array(
     'permissions' => array(
-        'guards' => array(),
-    ),
-    /*
-    'permission' => array(
-        //whether enable or disable the permissions
-        'enabled' => true,
-        //default role for unauthenticated users
-        'default_unauthenticated_role' => 'guest',
-        //default role for authenticated users (used when no role is provided by the identity provider)
-        'default_authenticated_role' => 'user',
 
-        // provider to receive the identity of the (authenticated) user
-        'identity_provider' => 'Core42\Authentication',
-        // authentication service to check if the user ist authenticated
-        'authentication_service' => 'Core42\Authentication',
+        'service' => array(
+            'admin42' => array(
+                'identity_role_provider' => 'Admin42\IdentityRoleProvider',
 
-        'role_provider' => 'Core42\Permission\Provider\Role\Array',
+                'guest_role' => 'guest',
 
-        'guards' => array(
+                'role_provider' => array(
+                    'name' => 'InMemoryRoleProvider',
+                    'options' => array(
+                        'admin' => array(
+                            'permissions' => array(
+                                'route/admin*'
+                            ),
+                        ),
+                        'guest' => array(
+                            'permissions' => array(
+                                'route/admin/login'
+                            ),
+                        ),
+                    ),
+                ),
 
-        ),
+                'guards' => array(
+                    'RouteGuard' => array(),
+                ),
 
-        'roles' => array(
-            'guest' => array(
-                'options' => array(),
-                'rules' => array(
-
+                'redirect_strategy' => array(
+                    'redirect_when_connected' => false,
+                    'redirect_to_route_connected' => 'home',
+                    'redirect_to_route_disconnected' => 'admin/login',
+                    'append_previous_uri' => true,
+                    'previous_uri_query_key' => 'redirectTo'
                 ),
             ),
-            'user' => array(
-                'options' => array(),
-                'rules' => array(),
-            ),
         ),
     ),
-    */
 );

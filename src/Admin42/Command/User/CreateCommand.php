@@ -42,6 +42,11 @@ class CreateCommand extends AbstractCommand implements ConsoleAwareInterface
     private $email;
 
     /**
+     * @var string
+     */
+    private $role;
+
+    /**
      * @param $username
      * @return $this
      */
@@ -97,12 +102,37 @@ class CreateCommand extends AbstractCommand implements ConsoleAwareInterface
     }
 
     /**
+     * @param string $role
+     * @return $this
+     */
+    public function setRole($role)
+    {
+        $this->role = $role;
+
+        return $this;
+    }
+
+    public function hydrate(array $values)
+    {
+        $this->setUsername(array_key_exists('username', $values) ? $values['username'] : null);
+        $this->setPassword(array_key_exists('password', $values) ? $values['password'] : null);
+        $this->setEmail(array_key_exists('email', $values) ? $values['email'] : null);
+        $this->setStatus(array_key_exists('status', $values) ? $values['status'] : null);
+        $this->setDisplayName(array_key_exists('displayName', $values) ? $values['displayName'] : null);
+        $this->setRole(array_key_exists('role', $values) ? $values['role'] : null);
+    }
+
+    /**
      *
      */
     protected function preExecute()
     {
         if (empty($this->email)) {
             $this->addError("email", "email can't be empty");
+        }
+
+        if (empty($this->role)) {
+            $this->addError("role", "invalid role");
         }
 
         if (!in_array($this->status, array(User::STATUS_INACTIVE, User::STATUS_ACTIVE))) {
@@ -142,6 +172,7 @@ class CreateCommand extends AbstractCommand implements ConsoleAwareInterface
                 ->setPassword($this->cryptedPassword)
                 ->setEmail($this->email)
                 ->setDisplayName($this->displayName)
+                ->setRole($this->role)
                 ->setStatus($this->status)
                 ->setUpdated($dateTime)
                 ->setCreated($dateTime);
@@ -158,11 +189,14 @@ class CreateCommand extends AbstractCommand implements ConsoleAwareInterface
      */
     public function consoleSetup(Route $route)
     {
-        $this->setUsername($route->getMatchedParam("username"));
-        $this->setPassword($route->getMatchedParam("password"));
-        $this->setEmail($route->getMatchedParam("email"));
-        $this->setStatus($route->getMatchedParam("status"));
-        $this->setDisplayName($route->getMatchedParam("displayName"));
+        $this->hydrate(array(
+            'username' => $route->getMatchedParam("username"),
+            'password' => $route->getMatchedParam("password"),
+            'email' => $route->getMatchedParam("email"),
+            'status' => $route->getMatchedParam("status"),
+            'displayName' => $route->getMatchedParam("displayName"),
+            'role' => $route->getMatchedParam("role"),
+        ));
     }
 }
 

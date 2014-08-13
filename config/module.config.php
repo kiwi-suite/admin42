@@ -30,6 +30,8 @@ return array(
     'service_manager' => array(
         'factories' => array(
             'Admin42\Authentication'    => 'Admin42\Authentication\Service\AuthenticationServiceFactory',
+
+            'Admin42\IdentityRoleProvider' => 'Admin42\Permission\Rbac\Service\IdentityRoleProviderFactory'
         ),
     ),
 );

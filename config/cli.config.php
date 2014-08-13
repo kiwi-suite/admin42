@@ -3,7 +3,7 @@
 return array(
     'cli' => array(
         'create-user' => array(
-            'route'                     => 'create-user --email='
+            'route'                     => 'create-user --email= --role='
                 .' [--password=] [--username=] [--status=] [--displayName=]',
             'command-name'              => 'Admin42\User\Create',
             'description'               => 'Creates an user',
