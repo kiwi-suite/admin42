@@ -5,6 +5,7 @@ use Admin42\Command\Mail\SendCommand;
 use Admin42\Model\User;
 use Core42\Command\AbstractCommand;
 use Core42\Command\ConsoleAwareInterface;
+use Core42\View\Model\MailModel;
 use Zend\Crypt\Password\Bcrypt;
 use Zend\Validator\EmailAddress;
 use Zend\View\Model\ViewModel;
@@ -208,21 +209,21 @@ class CreateCommand extends AbstractCommand implements ConsoleAwareInterface
         $this->consoleOutput("<info>User {$this->email} created</info>");
 
         if ($this->enablePasswordEmail === true) {
-            $mailViewModel = new ViewModel(array(
+            $httpRouter = $this->getServiceManager()->get('HttpRouter');
+
+            $mailViewModel = new MailModel(array(
                 'username' => $this->email,
                 'password' => $this->password,
+                'loginUrl' => $httpRouter->assemble(array(), array('name' => 'admin/login')),
             ));
-            $mailPlainViewModel = clone $mailViewModel;
-            $mailViewModel->setTemplate("mail/admin42/scripts/create-account.html.phtml");
-            $mailPlainViewModel->setTemplate("mail/admin42/scripts/create-account.plain.phtml");
+            $mailViewModel->setHtmlTemplate("mail/admin42/scripts/create-account.html.phtml");
+            $mailViewModel->setPlainTemplate("mail/admin42/scripts/create-account.plain.phtml");
 
             /** @var SendCommand $mailSending */
             $mailSending = $this->getCommand('Admin42\Mail\Send');
             $mailSending->setSubject('Account created')
                 ->addTo($this->email)
-                ->addFrom('developer@raum42.at')
-                ->setBodyHtml($mailViewModel)
-                ->setBodyPlain($mailPlainViewModel)
+                ->setBody($mailViewModel)
                 ->run();
         }
 

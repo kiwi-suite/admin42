@@ -1,7 +1,14 @@
 <h3>Account created</h3>
 <p>
-Username: <strong><?= $this->username ?></strong>
+    Username: <strong><?= $this->username ?></strong>
 </p>
 <p>
-Password: <strong><?= $this->password ?></strong>
+    Password: <strong><?= $this->password ?></strong>
 </p>
+<table>
+    <tr>
+        <td class="padding">
+            <p><a href="<?= $this->projectBaseUrl ?><?= $this->loginUrl?>" class="btn-primary">Login</a></p>
+        </td>
+    </tr>
+</table>
