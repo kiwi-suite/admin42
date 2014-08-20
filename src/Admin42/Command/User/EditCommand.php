@@ -149,7 +149,7 @@ class EditCommand extends AbstractCommand
     }
 
     /**
-     *
+     * @return User
      */
     protected function execute()
     {
@@ -163,6 +163,8 @@ class EditCommand extends AbstractCommand
 
 
         $this->getServiceManager()->get('TableGateway')->get('Admin42\User')->update($this->user);
+
+        return $this->user;
     }
 }
 

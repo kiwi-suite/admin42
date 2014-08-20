@@ -186,7 +186,7 @@ class CreateCommand extends AbstractCommand implements ConsoleAwareInterface
     }
 
     /**
-     *
+     * @return User
      */
     protected function execute()
     {
@@ -225,6 +225,8 @@ class CreateCommand extends AbstractCommand implements ConsoleAwareInterface
                 ->setBodyPlain($mailPlainViewModel)
                 ->run();
         }
+
+        return $user;
     }
 
     /**

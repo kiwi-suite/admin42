@@ -57,15 +57,16 @@ class UserController extends AbstractAdminController
             }
 
             $formCommand = $this->getFormCommand();
-            $formCommand->setForm($createEditForm)
+            $user = $formCommand->setForm($createEditForm)
                             ->setProtectedData(array('password', 'status'))
                             ->setCommand($cmd)
                             ->setData($prg)
                             ->run();
             if (!$formCommand->hasErrors()) {
                 $this->flashMessenger()->addSuccessMessage("Success");
+
+                return $this->redirect()->toRoute('admin/user/edit', array('id' => $user->getId()));
             } else {
-                var_dump($formCommand->getErrors());
                 $this->flashMessenger()->addErrorMessage("Error");
             }
         } else {
