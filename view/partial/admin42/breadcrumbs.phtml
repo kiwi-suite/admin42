@@ -1,0 +1,22 @@
+<?php
+if (iterator_count($this->iterator) == 0) {
+    echo '<p>&nbsp;</p>';
+    return;
+}
+echo '<ol class="breadcrumb">';
+
+/** @var \Core42\Navigation\Page\Page $page */
+foreach ($this->iterator as $page){
+    echo '<li>';
+
+    $href = $this->navigation->getHref($page);
+    if (!empty($href)) {
+        echo '<a href="'.$href.'">' . $page->getOption("label") . '</a>';
+    } else {
+        echo $page->getOption("label");
+    }
+
+    echo '</li>';
+}
+
+echo '</ol>';
