@@ -3,6 +3,7 @@ namespace Admin42\Permission\Rbac\Identity;
 
 use Admin42\Authentication\AuthenticationService;
 use Core42\Permission\Rbac\Identity\IdentityRoleProviderInterface;
+use Core42\Permission\Rbac\Role\RoleInterface;
 
 class IdentityRoleProvider implements IdentityRoleProviderInterface
 {
@@ -20,7 +21,7 @@ class IdentityRoleProvider implements IdentityRoleProviderInterface
     }
 
     /**
-     * @return null|string[]|\Rbac\Role\RoleInterface[]
+     * @return null|string[]|RoleInterface[]
      */
     public function getRoles()
     {

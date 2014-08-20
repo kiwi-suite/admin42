@@ -13,7 +13,16 @@ return array(
                 'role_provider' => array(
                     'name' => 'InMemoryRoleProvider',
                     'options' => array(
+                        'user' => array(
+                            'permissions' => array(
+                                'route/admin/user/manage',
+                                'route/admin/logout'
+                            ),
+                        ),
                         'admin' => array(
+                            'children' => array(
+                                'user'
+                            ),
                             'permissions' => array(
                                 'route/admin*'
                             ),
