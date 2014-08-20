@@ -16,10 +16,11 @@ module.exports = function(grunt) {
             options: {
                 separator: ';'
             },
-            main: {
+            js: {
                 src: [
                     'bower_components/jquery/dist/jquery.js',
                     'bower_components/bootstrap-sass-official/assets/javascripts/bootstrap.js',
+                    'bower_components/datatables/media/js/jquery.dataTables.js',
                     '<%= js_src_path %>/*.js'
                 ],
                 dest: '<%= js_dest_path %>/<%= pkg.name %>.js'
@@ -30,7 +31,7 @@ module.exports = function(grunt) {
                 banner: '<%= banner %>'
             },
             main: {
-                src: ['<%= concat.main.dest %>'],
+                src: ['<%= concat.js.dest %>'],
                 dest: '<%= js_dest_path %>/<%= pkg.name %>.min.js'
             }
         },
@@ -53,6 +54,15 @@ module.exports = function(grunt) {
                 options: {
                     config: 'config.rb'
                 }
+            }
+        },
+        cssmin: {
+            files: {
+                '<%= css_dest_path %>/raum42-admin.css': ['<%= css_dest_path %>/style.css']
+            },
+            minify: {
+                src: '<%= css_dest_path %>/raum42-admin.css',
+                dest: '<%= css_dest_path %>/raum42-admin.min.css'
             }
         },
         copy: {
@@ -82,16 +92,16 @@ module.exports = function(grunt) {
         watch: {
             js: {
                 files: ['<%= js_src_path %>/**/*.js'],
-                tasks: ['concat', 'uglify', 'clean:js']
+                tasks: ['concat:js', 'uglify', 'clean:js']
             },
             sass: {
                 files: ['<%= sass_path %>/**/*.scss', '<%= sprites_path %>',  '<%= img_dest_path %>/**/*.{png,jpg,gif,jpeg,svg}', '!<%= img_gen_path %>/**'],
-                tasks: ['compass', 'clean:css', 'clean:img']
+                tasks: ['compass', 'cssmin', 'clean:css', 'clean:img']
             }
         }
     });
 
-    grunt.registerTask('default', ['copy', 'concat', 'uglify', 'compass', 'clean']);
+    grunt.registerTask('default', ['copy', 'compass', 'concat', 'uglify', 'cssmin', 'clean']);
 
     require('load-grunt-tasks')(grunt);
 };
