@@ -36,7 +36,9 @@ return array(
                 ),
 
                 'guards' => array(
-                    'RouteGuard' => array(),
+                    'RouteGuard' => array(
+                        'protected_route' => 'admin'
+                    ),
                 ),
 
                 'redirect_strategy' => array(
