@@ -29,7 +29,9 @@ return array(
                         ),
                         'guest' => array(
                             'permissions' => array(
-                                'route/admin/login'
+                                'route/admin/login',
+                                'route/admin/lost-password',
+                                'route/admin/recover-password',
                             ),
                         ),
                     ),

@@ -25,6 +25,26 @@ return array(
                             ),
                         ),
                     ),
+                    'lost-password' => array(
+                        'type' => 'Zend\Mvc\Router\Http\Literal',
+                        'options' => array(
+                            'route' => 'lost-password/',
+                            'defaults' => array(
+                                'controller' => __NAMESPACE__ . '\User',
+                                'action' => 'lost-password',
+                            ),
+                        ),
+                    ),
+                    'recover-password' => array(
+                        'type' => 'Zend\Mvc\Router\Http\Segment',
+                        'options' => array(
+                            'route' => 'recover-password/:email/:hash/',
+                            'defaults' => array(
+                                'controller' => __NAMESPACE__ . '\User',
+                                'action' => 'recover-password',
+                            ),
+                        ),
+                    ),
                     'logout' => array(
                         'type' => 'Zend\Mvc\Router\Http\Literal',
                         'options' => array(

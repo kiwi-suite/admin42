@@ -161,6 +161,73 @@ class UserController extends AbstractAdminController
         return $this->redirect()->toRoute('admin/login');
     }
 
+    public function lostPasswordAction()
+    {
+        /** @var AuthenticationService $authenticationService */
+        $authenticationService = $this->getServiceLocator()->get('Admin42\Authentication');
+        if ($authenticationService->hasIdentity()) {
+            return $this->redirect()->toRoute('admin/user/manage');
+        }
+
+        $prg = $this->prg();
+        if ($prg instanceof Response) {
+            return $prg;
+        }
+
+        $lostPasswordForm = $this->getForm('Admin42\User\LostPassword');
+
+        if ($prg !== false) {
+            $lostPasswordCommand = $this->getCommand('Admin42\User\LostPassword');
+
+            $formCmd = $this->getFormCommand();
+            $formCmd->setForm($lostPasswordForm)
+                    ->setCommand($lostPasswordCommand)
+                    ->setData($prg)
+                    ->run();
+        }
+
+        return array(
+            'lostPasswordForm' => $lostPasswordForm,
+        );
+    }
+
+    public function recoverPasswordAction()
+    {
+        /** @var AuthenticationService $authenticationService */
+        $authenticationService = $this->getServiceLocator()->get('Admin42\Authentication');
+        if ($authenticationService->hasIdentity()) {
+            return $this->redirect()->toRoute('admin/user/manage');
+        }
+
+        $recoverPasswordForm = $this->getForm('Admin42\User\RecoverPassword');
+
+        $prg = $this->prg();
+        if ($prg instanceof Response) {
+            return $prg;
+        }
+
+        if ($prg !== false) {
+            $recoverPassowordCommand = $this->getCommand('Admin42\User\RecoverPassword');
+            $recoverPassowordCommand->setEmail(urldecode($this->params()->fromRoute('email')));
+            $recoverPassowordCommand->setHash($this->params()->fromRoute("hash"));
+
+            $formCmd = $this->getFormCommand();
+            $formCmd->setForm($recoverPasswordForm)
+                ->setCommand($recoverPassowordCommand)
+                ->setData($prg)
+                ->setProtectedData(array('email', 'hash'))
+                ->run();
+
+            if (!$formCmd->hasErrors()) {
+                return $this->redirect()->toRoute("admin/login");
+            }
+        }
+
+        return array(
+            'recoverPasswordForm' => $recoverPasswordForm,
+        );
+    }
+
     public function manageAction()
     {
         $prg = $this->prg();
