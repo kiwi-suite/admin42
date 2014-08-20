@@ -125,6 +125,12 @@ class UserController extends AbstractAdminController
 
     public function loginAction()
     {
+        /** @var AuthenticationService $authenticationService */
+        $authenticationService = $this->getServiceLocator()->get('Admin42\Authentication');
+        if ($authenticationService->hasIdentity()) {
+            return $this->redirect()->toRoute('admin/user/manage');
+        }
+
         $loginForm = $this->getForm('Admin42\User\Login');
 
         if ($this->getRequest()->isPost()) {
