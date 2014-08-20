@@ -18,6 +18,7 @@ class Module implements ConfigProviderInterface, BootstrapListenerInterface
             include __DIR__ . '/../../config/permissions.config.php',
             include __DIR__ . '/../../config/assets.config.php',
             include __DIR__ . '/../../config/form.config.php',
+            include __DIR__ . '/../../config/navigation.config.php',
             include __DIR__ . '/../../config/routing.config.php'
         );
     }

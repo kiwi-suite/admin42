@@ -24,6 +24,7 @@
         </div>
 
         <div class="collapse navbar-collapse" id="navbar-collapse-1">
+            <?= $this->menu('partial/admin42/main-menu', 'admin42')->setMaxDepth(1) ?>
             <ul class="navbar-right nav navbar-nav">
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">
@@ -64,13 +65,26 @@
                         <span class="fa fa-arrow-left"></span>
                     </button>
                     <div class="clearfix"></div>
+                    <div class="box">
+                        <?= $this->sidebar ?>
+                    </div>
                 </div>
 
                 <div class="main col-md-10 col-md-offset-2">
+                    <?php if ($this->auth('Admin42\Authentication')->hasIdentity()): ?>
+                    <?= $this->breadcrumbs('partial/admin42/breadcrumbs', 'admin42') ?>
+                    <?php endif; ?>
+                    <?= $this->partial('partial/admin42/alerts') ?>
                     <?= $this->content ?>
                 </div>
             <?php else: ?>
-                <?= $this->content ?>
+                <div class="col-md-12">
+                    <?php if ($this->auth('Admin42\Authentication')->hasIdentity()): ?>
+                    <?= $this->breadcrumbs('partial/admin42/breadcrumbs', 'admin42') ?>
+                    <?php endif; ?>
+                    <?= $this->partial('partial/admin42/alerts') ?>
+                    <?= $this->content ?>
+                </div>
             <?php endif; ?>
         </div>
     </div>

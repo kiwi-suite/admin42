@@ -20,6 +20,11 @@ return array(
             'ViewJsonStrategy',
         ),
     ),
+    'view_helpers' => array(
+        'invokables' => array(
+            'dataTable' => 'Admin42\View\Helper\DataTable',
+        ),
+    ),
 
     'migration' => array(
         'directory'     => array(
@@ -31,7 +36,20 @@ return array(
         'factories' => array(
             'Admin42\Authentication'    => 'Admin42\Authentication\Service\AuthenticationServiceFactory',
 
-            'Admin42\IdentityRoleProvider' => 'Admin42\Permission\Rbac\Service\IdentityRoleProviderFactory'
+            'Admin42\IdentityRoleProvider' => 'Admin42\Permission\Rbac\Service\IdentityRoleProviderFactory',
+
+            'Admin42\Navigation\Listener\RbacListener' => 'Admin42\Navigation\Listener\RbacListenerFactory',
+
+            'Admin42\DataTable' => 'Admin42\DataTable\Service\DataTableFactory',
+        ),
+        'shared' => array(
+            'Admin42\DataTable' => false,
+        ),
+    ),
+
+    'form_elements' => array(
+        'factories' => array(
+            'role' => 'Admin42\FormElements\Service\RoleFactory'
         ),
     ),
 );

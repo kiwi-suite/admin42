@@ -1,11 +1,13 @@
 <?php
 namespace Admin42\Command\User;
 
+use Admin42\Command\Mail\SendCommand;
 use Admin42\Model\User;
 use Core42\Command\AbstractCommand;
 use Core42\Command\ConsoleAwareInterface;
 use Zend\Crypt\Password\Bcrypt;
 use Zend\Validator\EmailAddress;
+use Zend\View\Model\ViewModel;
 use ZF\Console\Route;
 
 
@@ -45,6 +47,11 @@ class CreateCommand extends AbstractCommand implements ConsoleAwareInterface
      * @var string
      */
     private $role;
+
+    /**
+     * @var bool
+     */
+    private $enablePasswordEmail = true;
 
     /**
      * @param $username
@@ -112,6 +119,17 @@ class CreateCommand extends AbstractCommand implements ConsoleAwareInterface
         return $this;
     }
 
+    /**
+     * @param bool $enablePasswordEmail
+     * @return $this
+     */
+    public function setEnablePasswordEmail($enablePasswordEmail)
+    {
+        $this->enablePasswordEmail = (bool) $enablePasswordEmail;
+
+        return $this;
+    }
+
     public function hydrate(array $values)
     {
         $this->setUsername(array_key_exists('username', $values) ? $values['username'] : null);
@@ -135,15 +153,22 @@ class CreateCommand extends AbstractCommand implements ConsoleAwareInterface
             $this->addError("role", "invalid role");
         }
 
-        if (!in_array($this->status, array(User::STATUS_INACTIVE, User::STATUS_ACTIVE))) {
+        if ($this->status === null) {
+            $this->status = User::STATUS_ACTIVE;
+        } elseif (!in_array($this->status, array(User::STATUS_INACTIVE, User::STATUS_ACTIVE))) {
             $this->addError("status", "invalid status '{$this->status}'");
         }
 
         $this->username = (empty($this->username)) ? null : $this->username;
         $this->displayName = (empty($this->displayName)) ? null : $this->displayName;
 
+        $emailValidator = new EmailAddress();
+
+        if (!$emailValidator->isValid($this->email)) {
+            $this->addError("email", "invalid email address");
+        }
+
         if (!empty($this->username)) {
-            $emailValidator = new EmailAddress();
             if ($emailValidator->isValid($this->username)) {
                 $this->addError("username", "Username can't be an email");
             }
@@ -152,7 +177,7 @@ class CreateCommand extends AbstractCommand implements ConsoleAwareInterface
         if (empty($this->password)) {
             $set = 'abcdefghjkmnpqrstuvwxyzABCDEFGHJKMNPQRSTUVWXYZ0123456789!@#$%&*?';
             for ($i = 0; $i < 12; $i++) {
-                $this->password .= array_rand(str_split($set));
+                $this->password .= $set[array_rand(str_split($set))];
             }
         }
 
@@ -181,6 +206,25 @@ class CreateCommand extends AbstractCommand implements ConsoleAwareInterface
         $this->getServiceManager()->get('TableGateway')->get('Admin42\User')->insert($user);
 
         $this->consoleOutput("<info>User {$this->email} created</info>");
+
+        if ($this->enablePasswordEmail === true) {
+            $mailViewModel = new ViewModel(array(
+                'username' => $this->email,
+                'password' => $this->password,
+            ));
+            $mailPlainViewModel = clone $mailViewModel;
+            $mailViewModel->setTemplate("mail/admin42/scripts/create-account.html.phtml");
+            $mailPlainViewModel->setTemplate("mail/admin42/scripts/create-account.plain.phtml");
+
+            /** @var SendCommand $mailSending */
+            $mailSending = $this->getCommand('Admin42\Mail\Send');
+            $mailSending->setSubject('Account created')
+                ->addTo($this->email)
+                ->addFrom('developer@raum42.at')
+                ->setBodyHtml($mailViewModel)
+                ->setBodyPlain($mailPlainViewModel)
+                ->run();
+        }
     }
 
     /**

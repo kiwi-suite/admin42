@@ -1,0 +1,35 @@
+<form class="form-horizontal" role="form" action="<?= $this->url(null, array(), array(), true) ?>" method="post">
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h1 class="panel-title">
+                <span class="fa fa-user"></span>
+                <?= $this->params()->fromRoute('isEditMode') == true ? 'Edit user' : 'Add user'?>
+            </h1>
+        </div>
+        <div class="panel-body">
+            <?= $this->formRender($this->createEditForm)?>
+        </div>
+        <div class="panel-footer">
+            <div class="form-group">
+                <div class="col-sm-offset-2 col-md-10">
+                    <button type="submit" class="btn btn-primary">
+                        <span class="fa fa-save"></span>
+                        Save
+                    </button>
+
+                    <?php if($this->params()->fromRoute('isEditMode') == true): ?>
+                    <button
+                        type="button"
+                        class="btn btn-danger dynamic-form-submit"
+                        data-action="<?= $this->url('admin/user/delete')?>"
+                        data-form-id="<?= $this->params()->fromRoute('id') ?>">
+                        <span class="fa fa-trash-o"></span>
+                        Delete
+                    </button>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
