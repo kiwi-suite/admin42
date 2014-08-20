@@ -40,8 +40,16 @@
                         <?= $displayName ?>&nbsp;<span class="fa fa-user"></span>
                     </a>
                     <ul class="dropdown-menu">
-                        <li><a href="<?= $this->url('admin/user/manage')?>">Einstellungen</a></li>
-                        <li><a href="<?= $this->url('admin/logout')?>">Logout</a></li>
+                        <li>
+                            <a href="<?= $this->url('admin/user/manage')?>">
+                                <span class="fa fa-gear" style="width: 16px;"></span> Profile
+                            </a>
+                        </li>
+                        <li>
+                            <a href="<?= $this->url('admin/logout')?>">
+                                <span class="fa fa-power-off" style="width: 16px;"></span> Logout
+                            </a>
+                        </li>
                     </ul>
                 </li>
             </ul>

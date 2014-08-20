@@ -7,7 +7,7 @@ return array(
                 'settings' => array(
                     'options' => array(
                         'label' => 'Settings',
-                        'icon' => 'fa fa-cog'
+                        'icon' => 'fa fa-gears'
                     ),
                     'pages' => array(
                         'user' => array(
