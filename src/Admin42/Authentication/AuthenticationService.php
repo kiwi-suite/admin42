@@ -44,7 +44,7 @@ class AuthenticationService extends \Core42\Authentication\AuthenticationService
     /**
      * Returns the authenticated identity or null if no identity is available
      *
-     * @return mixed|null
+     * @return User|null
      */
     public function getIdentity()
     {
@@ -81,5 +81,20 @@ class AuthenticationService extends \Core42\Authentication\AuthenticationService
     {
         parent::clearIdentity();
         $this->identity = null;
+    }
+
+    /**
+     * Returns true if and only if an identity is available
+     *
+     * @return bool
+     */
+    public function hasIdentity()
+    {
+        $storageCheck = !$this->getStorage()->isEmpty();
+        if (!$storageCheck) {
+            return false;
+        }
+
+        return ($this->getIdentity() instanceof User);
     }
 }
