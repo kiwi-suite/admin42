@@ -16,6 +16,7 @@ return array(
                 'checkbox'    => 'form/admin42/elements/checkbox',
                 'multi_checkbox'    => 'form/admin42/elements/multi_checkbox',
                 'submit'    => 'form/admin42/elements/submit',
+                'select'    => 'form/admin42/elements/select',
             ),
         ),
     ),
