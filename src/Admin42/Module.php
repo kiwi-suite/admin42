@@ -43,7 +43,7 @@ class Module implements ConfigProviderInterface, BootstrapListenerInterface
         $e->getApplication()->getEventManager()->getSharedManager()->attach(
             'Zend\Mvc\Controller\AbstractController',
             'dispatch',
-            function($e) {
+            function ($e) {
                 $controller      = $e->getTarget();
                 $controllerClass = get_class($controller);
                 $moduleNamespace = substr($controllerClass, 0, strpos($controllerClass, '\\'));

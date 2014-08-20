@@ -11,6 +11,11 @@ namespace Admin42\DataTable\Mutator;
 
 class DateTimeMutator
 {
+    /**
+     * @param $value
+     * @param $row
+     * @return string
+     */
     public function __invoke($value, $row)
     {
         if (!($value instanceof \DateTime)) {
