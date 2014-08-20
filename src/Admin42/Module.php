@@ -1,4 +1,12 @@
 <?php
+/**
+ * admin42 (www.raum42.at)
+ *
+ * @link http://www.raum42.at
+ * @copyright Copyright (c) 2010-2014 raum42 OG (http://www.raum42.at)
+ *
+ */
+
 namespace Admin42;
 
 use Zend\EventManager\EventInterface;
@@ -32,18 +40,23 @@ class Module implements ConfigProviderInterface, BootstrapListenerInterface
      */
     public function onBootstrap(EventInterface $e)
     {
-        $e->getApplication()->getEventManager()->getSharedManager()->attach('Zend\Mvc\Controller\AbstractController', 'dispatch', function($e) {
-            $controller      = $e->getTarget();
-            $controllerClass = get_class($controller);
-            $moduleNamespace = substr($controllerClass, 0, strpos($controllerClass, '\\'));
+        $e->getApplication()->getEventManager()->getSharedManager()->attach(
+            'Zend\Mvc\Controller\AbstractController',
+            'dispatch',
+            function($e) {
+                $controller      = $e->getTarget();
+                $controllerClass = get_class($controller);
+                $moduleNamespace = substr($controllerClass, 0, strpos($controllerClass, '\\'));
 
-            if (__NAMESPACE__ !== $moduleNamespace) {
-                return;
-            }
+                if (__NAMESPACE__ !== $moduleNamespace) {
+                    return;
+                }
 
-            $sm = $e->getApplication()->getServiceManager();
-            $sm->get('Core42\Form\ThemeManager')->setDefaultThemeName(strtolower(__NAMESPACE__));
-        }, 100);
+                $sm = $e->getApplication()->getServiceManager();
+                $sm->get('Core42\Form\ThemeManager')->setDefaultThemeName(strtolower(__NAMESPACE__));
+            },
+            100
+        );
 
         /* @var \Zend\Mvc\Application $application */
         $application    = $e->getTarget();

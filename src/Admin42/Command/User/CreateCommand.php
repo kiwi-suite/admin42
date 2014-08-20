@@ -1,4 +1,12 @@
 <?php
+/**
+ * admin42 (www.raum42.at)
+ *
+ * @link http://www.raum42.at
+ * @copyright Copyright (c) 2010-2014 raum42 OG (http://www.raum42.at)
+ *
+ */
+
 namespace Admin42\Command\User;
 
 use Admin42\Command\Mail\SendCommand;
@@ -10,7 +18,6 @@ use Zend\Crypt\Password\Bcrypt;
 use Zend\Validator\EmailAddress;
 use Zend\View\Model\ViewModel;
 use ZF\Console\Route;
-
 
 class CreateCommand extends AbstractCommand implements ConsoleAwareInterface
 {
@@ -131,6 +138,9 @@ class CreateCommand extends AbstractCommand implements ConsoleAwareInterface
         return $this;
     }
 
+    /**
+     * @param array $values
+     */
     public function hydrate(array $values)
     {
         $this->setUsername(array_key_exists('username', $values) ? $values['username'] : null);
@@ -246,4 +256,3 @@ class CreateCommand extends AbstractCommand implements ConsoleAwareInterface
         ));
     }
 }
-

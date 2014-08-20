@@ -1,4 +1,12 @@
 <?php
+/**
+ * admin42 (www.raum42.at)
+ *
+ * @link http://www.raum42.at
+ * @copyright Copyright (c) 2010-2014 raum42 OG (http://www.raum42.at)
+ *
+ */
+
 namespace Admin42\Command\User;
 
 use Admin42\Model\User;
@@ -61,6 +69,9 @@ class RecoverPasswordCommand extends AbstractCommand
         return $this;
     }
 
+    /**
+     * @param array $values
+     */
     public function hydrate(array $values)
     {
         $this->setPassword(array_key_exists('password', $values) ? $values['password'] : null);
@@ -83,7 +94,7 @@ class RecoverPasswordCommand extends AbstractCommand
             $this->addError("password", "invalid password");
         }
 
-        if ($this->hasErrors()){
+        if ($this->hasErrors()) {
             return;
         }
 

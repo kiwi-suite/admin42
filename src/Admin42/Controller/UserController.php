@@ -1,4 +1,12 @@
 <?php
+/**
+ * admin42 (www.raum42.at)
+ *
+ * @link http://www.raum42.at
+ * @copyright Copyright (c) 2010-2014 raum42 OG (http://www.raum42.at)
+ *
+ */
+
 namespace Admin42\Controller;
 
 use Admin42\Authentication\AuthenticationService;
@@ -10,7 +18,9 @@ use Zend\View\Model\ViewModel;
 
 class UserController extends AbstractAdminController
 {
-
+    /**
+     * @return array|mixed
+     */
     public function indexAction()
     {
         $list = $this->getSelector('Admin42\DataTable\Userlist');
@@ -23,6 +33,9 @@ class UserController extends AbstractAdminController
         );
     }
 
+    /**
+     * @return mixed|ViewModel
+     */
     public function indexSidebarAction()
     {
         $list = $this->getSelector('Admin42\DataTable\UserlistSidebar');
@@ -37,6 +50,10 @@ class UserController extends AbstractAdminController
         return $viewModel;
     }
 
+    /**
+     * @return array
+     * @throws \Exception
+     */
     public function detailAction()
     {
         $isEditMode = $this->params()->fromRoute("isEditMode");
@@ -91,6 +108,9 @@ class UserController extends AbstractAdminController
         );
     }
 
+    /**
+     * @return \Zend\Http\Response
+     */
     public function deleteAction()
     {
         if ($this->getRequest()->isDelete()) {
@@ -118,11 +138,18 @@ class UserController extends AbstractAdminController
         return $this->redirect()->toRoute('admin/user');
     }
 
+    /**
+     *
+     */
     public function dashboardAction()
     {
 
     }
 
+    /**
+     * @return array|\Zend\Http\Response
+     * @throws \Exception
+     */
     public function loginAction()
     {
         /** @var AuthenticationService $authenticationService */
@@ -154,6 +181,10 @@ class UserController extends AbstractAdminController
         );
     }
 
+    /**
+     * @return \Zend\Http\Response
+     * @throws \Exception
+     */
     public function logoutAction()
     {
         $this->getCommand('Admin42\User\Logout')->run();
@@ -161,6 +192,10 @@ class UserController extends AbstractAdminController
         return $this->redirect()->toRoute('admin/login');
     }
 
+    /**
+     * @return array
+     * @throws \Exception
+     */
     public function lostPasswordAction()
     {
         /** @var AuthenticationService $authenticationService */
@@ -191,6 +226,10 @@ class UserController extends AbstractAdminController
         );
     }
 
+    /**
+     * @return array|\Zend\Http\Response
+     * @throws \Exception
+     */
     public function recoverPasswordAction()
     {
         /** @var AuthenticationService $authenticationService */
@@ -228,6 +267,10 @@ class UserController extends AbstractAdminController
         );
     }
 
+    /**
+     * @return array
+     * @throws \Exception
+     */
     public function manageAction()
     {
         $prg = $this->prg();

@@ -1,4 +1,12 @@
 <?php
+/**
+ * admin42 (www.raum42.at)
+ *
+ * @link http://www.raum42.at
+ * @copyright Copyright (c) 2010-2014 raum42 OG (http://www.raum42.at)
+ *
+ */
+
 namespace Admin42\DataTable;
 
 use Admin42\DataTable\Column\Column;
@@ -37,6 +45,9 @@ class DataTable implements \Countable, \Iterator
         'serverSide' => false,
     );
 
+    /**
+     * @param RouteStackInterface $router
+     */
     public function __construct(RouteStackInterface $router)
     {
         $this->router = $router;
@@ -161,6 +172,11 @@ class DataTable implements \Countable, \Iterator
         $this->addColumn($column);
     }
 
+    /**
+     * @param string $routeName
+     * @param array $matchParams
+     * @throws \Exception
+     */
     public function addDeleteButton($routeName, array $matchParams)
     {
         $column = new Column();
@@ -198,6 +214,11 @@ class DataTable implements \Countable, \Iterator
         return $this->columns[$position];
     }
 
+    /**
+     * @param string $route
+     * @param array $extraParams
+     * @return $this
+     */
     public function setAjax($route, array $extraParams = array())
     {
         $url = $this->router->assemble($extraParams, array('name' => $route));

@@ -1,4 +1,12 @@
 <?php
+/**
+ * admin42 (www.raum42.at)
+ *
+ * @link http://www.raum42.at
+ * @copyright Copyright (c) 2010-2014 raum42 OG (http://www.raum42.at)
+ *
+ */
+
 namespace Admin42\Command\User;
 
 use Admin42\Command\Mail\SendCommand;
@@ -89,11 +97,15 @@ class LostPasswordCommand extends AbstractCommand
         do {
             $hash = sha1($this->user->getPassword() . $this->user->getId() . uniqid());
             $found = $this->getTableGateway('Admin42\User')->select(array('hash' => $hash))->count() > 0;
-        } while($found);
+        } while ($found);
 
         $this->hash = $hash;
     }
 
+    /**
+     * @return mixed|void
+     * @throws \Exception
+     */
     protected function execute()
     {
         $this->user->setHash($this->hash)

@@ -29,7 +29,7 @@ foreach ($this->iterator as $page){
 
     $icon = "";
     if (strlen($page->getOption("icon"))) {
-        $icon = '<span class="'.$page->getOption("icon").'"></span>&nbsp;';
+        $icon = '<span style="width:16px;" class="'.$page->getOption("icon").'"></span>&nbsp;';
     }
 
     if($page->hasChildren() && $prevDepth == $this->minDepth) {

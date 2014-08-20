@@ -4,20 +4,21 @@ return array(
     'navigation' => array(
         'containers' => array(
             'admin42' => array(
-                array(
+                'settings' => array(
                     'options' => array(
                         'label' => 'Settings',
                         'icon' => 'fa fa-cog'
                     ),
                     'pages' => array(
-                        array(
+                        'user' => array(
                             'options' => array(
                                 'label' => 'User',
                                 'route' => 'admin/user',
                                 'icon' => 'fa fa-users',
+                                'order' => 100,
                             ),
                             'pages' => array(
-                                array(
+                                'add' => array(
                                     'options' => array(
                                         'label' => 'Add User',
                                         'route' => 'admin/user/add',
@@ -27,7 +28,7 @@ return array(
                                         )
                                     ),
                                 ),
-                                array(
+                                'edit' => array(
                                     'options' => array(
                                         'label' => 'Edit User',
                                         'route' => 'admin/user/edit',

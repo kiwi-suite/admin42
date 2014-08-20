@@ -1,4 +1,12 @@
 <?php
+/**
+ * admin42 (www.raum42.at)
+ *
+ * @link http://www.raum42.at
+ * @copyright Copyright (c) 2010-2014 raum42 OG (http://www.raum42.at)
+ *
+ */
+
 namespace Admin42\Selector\DataTable;
 
 use Admin42\DataTable\AbstractDataTableSelector;
@@ -13,6 +21,9 @@ use Zend\Db\Sql\Sql;
 
 class UserListSelector extends AbstractTableGatewaySelector
 {
+    /**
+     * @var string
+     */
     protected $tableGateway = 'Admin42\User';
 
     /**
