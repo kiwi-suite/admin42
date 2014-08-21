@@ -18,7 +18,7 @@ $this->loginForm->prepare();
                         </div>
                     <?php else: ?>
                         <p class="text-center">
-                            Enter username and password to continue.
+                            <?= $this->translate('text.login-description', 'admin') ?>
                         </p>
                     <?php endif; ?>
                     <form role="form" class="form-horizontal" method="post" action="<?= $this->url() ?>">
@@ -27,11 +27,11 @@ $this->loginForm->prepare();
                             <div class="col-sm-12">
                                 <div class="input-group">
                                     <span class="input-group-addon">
-                                        <span class="fa fa-user"></span>
+                                        <span class="fa fa-user fa-fw"></span>
                                     </span>
                                     <?= $this->formInput($this->loginForm->get('identity')->setAttributes(array(
                                         'class'         => 'form-control',
-                                        'placeholder'   => $this->loginForm->get('identity')->getLabel()
+                                        'placeholder'   => $this->translate($this->loginForm->get('identity')->getLabel(), 'admin')
                                     ))) ?>
                                 </div>
                                 <?php if (count($this->loginForm->get('identity')->getMessages())): ?>
@@ -49,11 +49,11 @@ $this->loginForm->prepare();
                             <div class="col-sm-12">
                                 <div class="input-group">
                                     <span class="input-group-addon">
-                                        <span class="fa fa-lock" style="width: 11px;"></span>
+                                        <span class="fa fa-lock fa-fw"></span>
                                     </span>
                                     <?= $this->formPassword($this->loginForm->get('password')->setAttributes(array(
                                         'class'         => 'form-control',
-                                        'placeholder'   => $this->loginForm->get('password')->getLabel()
+                                        'placeholder'   => $this->translate($this->loginForm->get('password')->getLabel(), 'admin')
                                     ))) ?>
                                 </div>
                                 <?php if (count($this->loginForm->get('password')->getMessages())): ?>
@@ -70,10 +70,11 @@ $this->loginForm->prepare();
                         <div class="form-group">
                             <div class="col-sm-12">
                                 <button type="submit" class="btn btn-primary pull-left">
-                                    Login
+                                    <span class="fa fa-sign-in"></span>
+                                    <?= $this->translate('button.login', 'admin') ?>
                                 </button>
                                 <a href="<?= $this->url('admin/lost-password')?>" class="btn btn-link pull-right">
-                                    Lost Password?
+                                    <?= $this->translate('button.lost-password', 'admin')?>
                                 </a>
                                 <div class="clearfix"></div>
                             </div>

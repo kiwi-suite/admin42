@@ -2,7 +2,7 @@
     <thead>
         <tr>
             <?php foreach($this->dataTable as $column): ?>
-            <th><?= $column->getLabel() ?></th>
+            <th><?= $this->translate((string)$column->getLabel(), 'admin') ?></th>
             <?php endforeach; ?>
         </tr>
     </thead>

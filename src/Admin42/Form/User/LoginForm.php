@@ -24,11 +24,11 @@ class LoginForm extends Form
         $this->add(new Csrf("csrf"));
 
         $username = new Text("identity");
-        $username->setLabel("Email or Username");
+        $username->setLabel("field.usernameoremail");
         $this->add($username);
 
         $password = new Password("password");
-        $password->setLabel("Password");
+        $password->setLabel("field.password");
         $this->add($password);
     }
 }

@@ -26,24 +26,24 @@ class ManageForm extends Form implements InputFilterProviderInterface
         $this->add(new Csrf('csrf'));
 
         $username = new Text("username");
-        $username->setLabel("Username");
+        $username->setLabel("field.username");
         $this->add($username);
 
         $email = new Email('email');
-        $email->setLabel('Email');
+        $email->setLabel('field.email');
         $email->setAttribute("required", "required");
         $this->add($email);
 
         $password = new Password("password");
-        $password->setLabel("Password");
+        $password->setLabel("field.password");
         $this->add($password);
 
         $passwordRepeat = new Password("passwordRepeat");
-        $passwordRepeat->setLabel("Password (repeat)");
+        $passwordRepeat->setLabel("field.password-repeat");
         $this->add($passwordRepeat);
 
         $displayName = new Text('displayName');
-        $displayName->setLabel('Display Name');
+        $displayName->setLabel('field.display-name');
         $this->add($displayName);
     }
 

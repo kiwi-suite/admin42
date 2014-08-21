@@ -1,13 +1,13 @@
 <div class="panel panel-default">
     <div class="panel-heading">
         <span class="fa fa-users"></span>
-        Users
+        <?= $this->translate('title.users', 'admin') ?>
     </div>
     <?= $this->dataTable($this->dataTable) ?>
     <div class="panel-footer">
         <a class="btn btn-default" href="<?= $this->url('admin/user/add') ?>">
             <span class="fa fa-plus-circle"></span>
-            Add User
+            <?= $this->translate('button.user-add', 'admin') ?>
         </a>
     </div>
 </div>

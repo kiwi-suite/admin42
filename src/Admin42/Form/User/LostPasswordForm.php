@@ -23,7 +23,7 @@ class LostPasswordForm extends Form
         $this->add(new Csrf("csrf"));
 
         $email = new Text("email");
-        $email->setLabel("Email");
+        $email->setLabel("field.email");
         $this->add($email);
     }
 }

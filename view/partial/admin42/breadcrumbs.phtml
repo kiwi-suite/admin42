@@ -10,10 +10,12 @@ foreach ($this->iterator as $page){
     echo '<li>';
 
     $href = $this->navigation->getHref($page);
+    $label = $this->translate($page->getOption('label'), 'admin');
+
     if (!empty($href)) {
-        echo '<a href="'.$href.'">' . $page->getOption("label") . '</a>';
+        echo '<a href="'.$href.'">' . $label . '</a>';
     } else {
-        echo $page->getOption("label");
+        echo $label;
     }
 
     echo '</li>';

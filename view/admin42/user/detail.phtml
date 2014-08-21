@@ -4,7 +4,10 @@
         <div class="panel-heading">
             <h1 class="panel-title">
                 <span class="fa fa-user"></span>
-                <?= $this->params()->fromRoute('isEditMode') == true ? 'Edit user' : 'Add user'?>
+                <?php
+                $label = $this->params()->fromRoute('isEditMode') == true ? 'title.user-edit' : 'title.user-add';
+                ?>
+                <?= $this->translate($label, 'admin') ?>
             </h1>
         </div>
         <div class="panel-body">
@@ -15,7 +18,7 @@
                 <div class="col-sm-offset-2 col-md-10">
                     <button type="submit" class="btn btn-primary">
                         <span class="fa fa-save"></span>
-                        Save
+                        <?= $this->translate('button.save', 'admin') ?>
                     </button>
 
                     <?php if($this->params()->fromRoute('isEditMode') == true): ?>
@@ -25,7 +28,7 @@
                         data-action="<?= $this->url('admin/user/delete')?>"
                         data-form-id="<?= $this->params()->fromRoute('id') ?>">
                         <span class="fa fa-trash-o"></span>
-                        Delete
+                        <?= $this->translate('button.delete', 'admin') ?>
                     </button>
                     <?php endif; ?>
                 </div>

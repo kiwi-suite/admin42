@@ -35,30 +35,30 @@ class UserListSelector extends AbstractTableGatewaySelector
         $dataTable->setAjax('admin/user');
 
         $dataTable->addColumn(array(
-            'label' => 'ID',
+            'label' => 'table.id',
             'match_name' => 'id',
             'sortable' => true,
         ));
         $dataTable->addColumn(array(
-            'label' => 'Email',
+            'label' => 'table.email',
             'match_name' => 'email',
             'sortable' => true,
             'searchable' => true,
         ));
         $dataTable->addColumn(array(
-            'label' => 'Username',
+            'label' => 'table.username',
             'match_name' => 'username',
             'sortable' => true,
             'searchable' => true,
         ));
         $dataTable->addColumn(array(
-            'label' => 'Display Name',
+            'label' => 'table.display-name',
             'match_name' => 'displayName',
             'sortable' => true,
             'searchable' => true,
         ));
         $dataTable->addColumn(array(
-            'label' => 'Role',
+            'label' => 'table.role',
             'match_name' => 'role',
             'sortable' => true,
             'searchable' => true,
@@ -67,7 +67,7 @@ class UserListSelector extends AbstractTableGatewaySelector
             ),
         ));
         $dataTable->addColumn((array(
-            'label' => 'Last Login',
+            'label' => 'table.last-login',
             'match_name' => 'lastLogin',
             'sortable' => true,
             'decorators' => array(
@@ -76,7 +76,7 @@ class UserListSelector extends AbstractTableGatewaySelector
             'mutator' => new DateTimeMutator(),
         )));
         $dataTable->addColumn((array(
-            'label' => 'Created',
+            'label' => 'table.created',
             'match_name' => 'created',
             'sortable' => true,
             'decorators' => array(

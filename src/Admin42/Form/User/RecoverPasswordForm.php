@@ -24,11 +24,11 @@ class RecoverPasswordForm extends Form implements InputFilterProviderInterface
         $this->add(new Csrf('csrf'));
 
         $password = new Password("password");
-        $password->setLabel("Password");
+        $password->setLabel("field.password");
         $this->add($password);
 
         $passwordRepeat = new Password("passwordRepeat");
-        $passwordRepeat->setLabel("Password (repeat)");
+        $passwordRepeat->setLabel("field.password-repeat");
         $this->add($passwordRepeat);
     }
 

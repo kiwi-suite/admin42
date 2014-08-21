@@ -28,6 +28,7 @@ class Module implements ConfigProviderInterface, BootstrapListenerInterface
             include __DIR__ . '/../../config/form.config.php',
             include __DIR__ . '/../../config/navigation.config.php',
             include __DIR__ . '/../../config/project.config.php',
+            include __DIR__ . '/../../config/translation.config.php',
             include __DIR__ . '/../../config/routing.config.php'
         );
     }
@@ -54,6 +55,8 @@ class Module implements ConfigProviderInterface, BootstrapListenerInterface
 
                 $sm = $e->getApplication()->getServiceManager();
                 $sm->get('Core42\Form\ThemeManager')->setDefaultThemeName(strtolower(__NAMESPACE__));
+
+                $sm->get('MvcTranslator')->setLocale('en-US');
             },
             100
         );

@@ -29,15 +29,17 @@ foreach ($this->iterator as $page){
 
     $icon = "";
     if (strlen($page->getOption("icon"))) {
-        $icon = '<span style="width:16px;" class="'.$page->getOption("icon").'"></span>&nbsp;';
+        $icon = '<span class="'.$page->getOption("icon").'"></span>&nbsp;';
     }
+
+    $label = $this->translate($page->getOption('label'), 'admin');
 
     if($page->hasChildren() && $prevDepth == $this->minDepth) {
         echo '<li class="dropdown">';
-        echo '<a href="'.$this->navigation->getHref($page).'" class="dropdown-toggle" data-toggle="dropdown">' . $icon .$page->getOption('label') . '</a>';
+        echo '<a href="'.$this->navigation->getHref($page).'" class="dropdown-toggle" data-toggle="dropdown">' . $icon .$label . '</a>';
     } else {
         echo '<li>';
-        echo '<a href="'.$this->navigation->getHref($page).'">' . $icon . $page->getOption('label') . '</a>';
+        echo '<a href="'.$this->navigation->getHref($page).'">' . $icon . $label . '</a>';
     }
 
     $prevDepth = $depth;
