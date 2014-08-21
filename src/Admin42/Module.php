@@ -9,6 +9,7 @@
 
 namespace Admin42;
 
+use Admin42\Mvc\Controller\AbstractAdminController;
 use Zend\EventManager\EventInterface;
 use Zend\ModuleManager\Feature\BootstrapListenerInterface;
 use Zend\ModuleManager\Feature\ConfigProviderInterface;
@@ -46,10 +47,8 @@ class Module implements ConfigProviderInterface, BootstrapListenerInterface
             'dispatch',
             function ($e) {
                 $controller      = $e->getTarget();
-                $controllerClass = get_class($controller);
-                $moduleNamespace = substr($controllerClass, 0, strpos($controllerClass, '\\'));
 
-                if (__NAMESPACE__ !== $moduleNamespace) {
+                if (!($controller instanceof AbstractAdminController)) {
                     return;
                 }
 
