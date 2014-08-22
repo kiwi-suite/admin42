@@ -2,6 +2,7 @@
 if (iterator_count($this->iterator) == 0) {
     return;
 }
+$html = array();
 $prevDepth = -1;
 
 /** @var \Core42\Navigation\Page\Page $page */
@@ -14,17 +15,17 @@ foreach ($this->iterator as $page){
 
     if ($depth > $prevDepth) {
         if($prevDepth == $this->minDepth) {
-            echo '<ul class="navbar-left nav navbar-nav" id="headerMenu">';
+            $html[] = '<ul class="navbar-left nav navbar-nav" id="headerMenu">';
         } else {
-            echo '<ul class="dropdown-menu">';
+            $html[] = '<ul class="dropdown-menu">';
         }
     } elseif($prevDepth > $depth) {
         for ($i = $prevDepth; $i > $depth; $i--) {
-            echo '</li></ul>';
+            $html[] = '</li></ul>';
         }
-        echo '</li>';
+        $html[] = '</li>';
     } else {
-        echo '</li>';
+        $html[] = '</li>';
     }
 
     $icon = "";
@@ -34,17 +35,21 @@ foreach ($this->iterator as $page){
 
     $label = $this->translate($page->getOption('label'), 'admin');
 
-    if($page->hasChildren() && $prevDepth == $this->minDepth) {
-        echo '<li class="dropdown">';
-        echo '<a href="'.$this->navigation->getHref($page).'" class="dropdown-toggle" data-toggle="dropdown">' . $icon .$label . '</a>';
+    $isActive = $this->navigation->isActive($page);
+
+    if($page->hasChildren()) {
+        $html[] = '<li class="dropdown'.(($isActive) ? " active" : "").'">';
+        $html[] = '<a href="'.$this->navigation->getHref($page).'" class="dropdown-toggle" data-toggle="dropdown">' . $icon .$label . '</a>';
     } else {
-        echo '<li>';
-        echo '<a href="'.$this->navigation->getHref($page).'">' . $icon . $label . '</a>';
+        $html[] = '<li'.(($isActive) ? ' class="active"' : "").'>';
+        $html[] = '<a href="'.$this->navigation->getHref($page).'">' . $icon . $label . '</a>';
     }
 
     $prevDepth = $depth;
 }
 
 for ($i = $prevDepth+1; $i > 0; $i--) {
-    echo '</li></ul>';
+    $html[] = '</li></ul>';
 }
+
+echo implode(PHP_EOL, $html);
