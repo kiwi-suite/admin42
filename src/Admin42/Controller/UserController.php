@@ -23,7 +23,7 @@ class UserController extends AbstractAdminController
      */
     public function indexAction()
     {
-        $list = $this->getSelector('Admin42\DataTable\Userlist');
+        $list = $this->getSelector('Admin42\DataTable\UserList');
         if ($this->getRequest()->isXmlHttpRequest()) {
             return $list->getResult();
         }
@@ -38,7 +38,7 @@ class UserController extends AbstractAdminController
      */
     public function indexSidebarAction()
     {
-        $list = $this->getSelector('Admin42\DataTable\UserlistSidebar');
+        $list = $this->getSelector('Admin42\DataTable\UserListSidebar');
         if ($this->getRequest()->isXmlHttpRequest()) {
             return $list->getResult();
         }
