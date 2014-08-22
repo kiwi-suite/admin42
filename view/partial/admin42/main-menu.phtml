@@ -36,13 +36,14 @@ foreach ($this->iterator as $page){
     $label = $this->translate($page->getOption('label'), 'admin');
 
     $isActive = $this->navigation->isActive($page);
+    $href = $this->navigation->getHref($page);
 
-    if($page->hasChildren()) {
+    if($page->hasChildren() && $depth == 0 && empty($href)) {
         $html[] = '<li class="dropdown'.(($isActive) ? " active" : "").'">';
-        $html[] = '<a href="'.$this->navigation->getHref($page).'" class="dropdown-toggle" data-toggle="dropdown">' . $icon .$label . '</a>';
+        $html[] = '<a href="'.$href.'" class="dropdown-toggle" data-toggle="dropdown">' . $icon .$label . '</a>';
     } else {
         $html[] = '<li'.(($isActive) ? ' class="active"' : "").'>';
-        $html[] = '<a href="'.$this->navigation->getHref($page).'">' . $icon . $label . '</a>';
+        $html[] = '<a href="'.$href.'">' . $icon . $label . '</a>';
     }
 
     $prevDepth = $depth;
