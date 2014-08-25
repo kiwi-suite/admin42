@@ -21,6 +21,13 @@ module.exports = function(grunt) {
                     'bower_components/jquery/dist/jquery.js',
                     'bower_components/bootstrap-sass-official/assets/javascripts/bootstrap.js',
                     'bower_components/datatables/media/js/jquery.dataTables.js',
+                    'bower_components/jquery-ui/ui/core.js',
+                    'bower_components/jquery-ui/ui/widget.js',
+                    'bower_components/jquery-ui/ui/mouse.js',
+                    'bower_components/jquery-ui/ui/position.js',
+                    'bower_components/jquery-ui/ui/draggable.js',
+                    'bower_components/jquery-ui/ui/droppable.js',
+                    'bower_components/jquery-ui/ui/sortable.js',
                     '<%= js_src_path %>/*.js'
                 ],
                 dest: '<%= js_dest_path %>/<%= pkg.name %>.js'
