@@ -30,17 +30,14 @@ return array(
                         'guest' => array(
                             'permissions' => array(
                                 'route/admin/login',
-                                'route/admin/lost-password',
-                                'route/admin/recover-password',
+                                'route/home'
                             ),
                         ),
                     ),
                 ),
 
                 'guards' => array(
-                    'RouteGuard' => array(
-                        'protected_route' => 'admin'
-                    ),
+                    'RouteGuard' => array(),
                 ),
 
                 'redirect_strategy' => array(
