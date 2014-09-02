@@ -10,10 +10,10 @@
 namespace Admin42\Command\Mail;
 
 use Core42\Command\AbstractCommand;
-use Zend\Mail\Header\ContentType;
+use Core42\View\Model\MailModel;
 use Zend\Mail\Message;
+use Zend\Mime\Mime;
 use Zend\Mime\Part;
-use Zend\View\Model\ViewModel;
 use Zend\View\Renderer\PhpRenderer;
 
 class SendCommand extends AbstractCommand
@@ -24,19 +24,24 @@ class SendCommand extends AbstractCommand
     private $mailMessage;
 
     /**
-     * @var ViewModel
+     * @var MailModel
      */
     private $layout;
 
     /**
-     * @var ViewModel|string
+     * @var MailModel
      */
-    private $bodyHtml;
+    private $body;
 
     /**
-     * @var ViewModel|string
+     * @var array
      */
-    private $bodyPlain;
+    private $parts = array();
+
+    /**
+     * @var string
+     */
+    private $subject;
 
     /**
      *
@@ -45,7 +50,18 @@ class SendCommand extends AbstractCommand
     {
         $this->mailMessage = new Message();
 
-        $this->layout = new ViewModel();
+        $this->layout = new MailModel();
+        $this->layout->setHtmlTemplate("mail/admin42/layout.html.phtml");
+        $this->layout->setPlainTemplate("mail/admin42/layout.plain.phtml");
+
+        $this->parts = array(
+            'plain' => array(
+                'type' => Mime::TYPE_TEXT,
+            ),
+            'html' => array(
+                'type' => Mime::TYPE_HTML,
+            ),
+        );
     }
 
     /**
@@ -54,7 +70,7 @@ class SendCommand extends AbstractCommand
      */
     public function setSubject($subject)
     {
-        $this->mailMessage->setSubject($subject);
+        $this->subject = $subject;
 
         return $this;
     }
@@ -120,27 +136,53 @@ class SendCommand extends AbstractCommand
     }
 
     /**
-     * @param ViewModel|string $bodyHtml
+     * @param MailModel $body
      * @return $this
      */
-    public function setBodyHtml($bodyHtml)
+    public function setBody(MailModel $body)
     {
-        $this->bodyHtml = $bodyHtml;
+        $this->body = $body;
 
         return $this;
     }
 
     /**
-     * @param ViewModel|string $bodyPlain
-     * @return $this
+     *
      */
-    public function setBodyPlain($bodyPlain)
+    protected function preExecute()
     {
-        $this->bodyPlain = $bodyPlain;
+        if (!($this->body instanceof MailModel)) {
+            $this->addError("body", "invalid body");
 
-        return $this;
+            return;
+        }
+
+        $config = $this->getServiceManager()->get('config');
+        $config = $config['project'];
+
+        $this->body->setVariables(array(
+            'projectBaseUrl' => $config['project_base_url'],
+            'projectName' => $config['project_name'],
+        ));
+
+        $this->layout->setVariables(array(
+            'projectBaseUrl' => $config['project_base_url'],
+            'projectName' => $config['project_name'],
+        ));
+
+
+        $this->subject = $config['email_subject_prefix'] . $this->subject;
+        $this->mailMessage->setSubject($this->subject);
+
+        if ($this->mailMessage->getFrom()->count() == 0) {
+            $this->mailMessage->addFrom($config['email_from']);
+        }
     }
 
+    /**
+     * @return void
+     * @throws \Exception
+     */
     protected function execute()
     {
         $viewResolver = $this->getServiceManager()->get('ViewResolver');
@@ -148,50 +190,34 @@ class SendCommand extends AbstractCommand
         $phpRenderer = new PhpRenderer();
         $phpRenderer->setResolver($viewResolver);
 
-        $parts = array();
+        $body = new \Zend\Mime\Message();
 
-        if ($this->bodyHtml !== null) {
-            if ($this->bodyHtml instanceof ViewModel) {
-                $this->bodyHtml = $phpRenderer->render($this->bodyHtml);
+        foreach ($this->parts as $type => $options) {
+            if (!$this->body->hasTemplate($type)) {
+                continue;
             }
-            $this->layout->setVariable('content', $this->bodyHtml);
+            $this->body->useTemplate($type);
+            $this->layout->useTemplate($type);
+            $this->layout->setVariable('content', $phpRenderer->render($this->body));
 
-            $this->layout->setTemplate('mail/admin42/layout.html.phtml');
-
-            $htmlPart = new Part($phpRenderer->render($this->layout));
-            $htmlPart->type = 'text/html';
-            $htmlPart->charset = 'UFT-8';
-            $htmlPart->encoding = \Zend\Mime\Mime::ENCODING_QUOTEDPRINTABLE;
-            $parts[] = $htmlPart;
-            $this->layout->clearVariables();
+            $part = new Part($phpRenderer->render($this->layout));
+            $part->type = $options['type'];
+            $part->encoding = Mime::ENCODING_QUOTEDPRINTABLE;
+            $part->charset = "UTF-8";
+            $body->addPart($part);
         }
 
-        if ($this->bodyPlain !== null) {
-            if ($this->bodyPlain instanceof ViewModel) {
-                $this->bodyPlain = $phpRenderer->render($this->bodyPlain);
-            }
-            $this->layout->setVariable('content', $this->bodyPlain);
-
-            $this->layout->setTemplate('mail/admin42/layout.plain.phtml');
-
-            $plainPart = new Part($phpRenderer->render($this->layout));
-            $plainPart->type = 'text/plain';
-            $parts[] = $plainPart;
-            $this->layout->clearVariables();
-        }
-
-        if (empty($parts)) {
+        if (count($body->getParts()) == 0) {
             return;
         }
 
-        $parts = array_reverse($parts);
-
-        $body = new \Zend\Mime\Message();
-        $body->setParts($parts);
 
         $this->mailMessage->setBody($body);
-
-        $this->mailMessage->getHeaders()->get('content-type')->setType('multipart/alternative');
+        $this->mailMessage->setEncoding('UTF-8');
+        $this->mailMessage
+            ->getHeaders()
+            ->get('content-type')
+            ->setType(Mime::MULTIPART_ALTERNATIVE);
 
         $transport = $this->getServiceManager()->get('Core42\Mail\Transport');
         $transport->send($this->mailMessage);
