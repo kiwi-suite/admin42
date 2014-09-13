@@ -10,6 +10,7 @@
 namespace Admin42;
 
 use Admin42\Mvc\Controller\AbstractAdminController;
+use Core42\Console\Console;
 use Zend\EventManager\EventInterface;
 use Zend\ModuleManager\Feature\BootstrapListenerInterface;
 use Zend\ModuleManager\Feature\ConfigProviderInterface;
@@ -59,6 +60,10 @@ class Module implements ConfigProviderInterface, BootstrapListenerInterface
             },
             100
         );
+
+        if (Console::isConsole()) {
+            return;
+        }
 
         /* @var \Zend\Mvc\Application $application */
         $application    = $e->getTarget();
