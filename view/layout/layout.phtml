@@ -4,8 +4,11 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="<?= $this->basePath("/assets/admin/css/raum42-admin.min.css") ?>" rel="stylesheet">
-    <script src="<?= $this->basePath("/assets/admin/js/raum42-admin.min.js") ?>"></script>
+
+    <?= $this->headLink() ?>
+
+    <?= $this->headScript() ?>
+
 </head>
 
 <body>
@@ -113,6 +116,7 @@
             </div>
         </div>
     </div>
+
 </body>
 
 </html>

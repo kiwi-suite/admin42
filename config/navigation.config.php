@@ -7,7 +7,8 @@ return array(
                 'settings' => array(
                     'options' => array(
                         'label' => 'label.settings',
-                        'icon' => 'fa fa-gears fa-fw'
+                        'icon' => 'fa fa-gears fa-fw',
+                        'order' => 1000,
                     ),
                     'pages' => array(
                         'user' => array(

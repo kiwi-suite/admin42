@@ -14,6 +14,7 @@ use Core42\Console\Console;
 use Zend\EventManager\EventInterface;
 use Zend\ModuleManager\Feature\BootstrapListenerInterface;
 use Zend\ModuleManager\Feature\ConfigProviderInterface;
+use Zend\Mvc\MvcEvent;
 
 class Module implements ConfigProviderInterface, BootstrapListenerInterface
 {
@@ -45,7 +46,7 @@ class Module implements ConfigProviderInterface, BootstrapListenerInterface
     {
         $e->getApplication()->getEventManager()->getSharedManager()->attach(
             'Zend\Mvc\Controller\AbstractController',
-            'dispatch',
+            MvcEvent::EVENT_DISPATCH,
             function ($e) {
                 $controller      = $e->getTarget();
 
@@ -53,10 +54,21 @@ class Module implements ConfigProviderInterface, BootstrapListenerInterface
                     return;
                 }
 
+                $controller->layout()->setTemplate("admin/layout/layout");
+
                 $sm = $e->getApplication()->getServiceManager();
                 $sm->get('Core42\Form\ThemeManager')->setDefaultThemeName(strtolower(__NAMESPACE__));
 
                 $sm->get('MvcTranslator')->setLocale('en-US');
+
+                $viewHelperManager = $sm->get('viewHelperManager');
+
+                $headScript = $viewHelperManager->get('headScript');
+                $headLink = $viewHelperManager->get('headLink');
+                $basePath = $viewHelperManager->get('basePath');
+
+                $headScript->appendFile($basePath('/assets/admin/core/js/raum42-admin.min.js'));
+                $headLink->appendStylesheet($basePath('/assets/admin/core/css/raum42-admin.min.css'));
             },
             100
         );
