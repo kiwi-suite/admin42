@@ -1,0 +1,36 @@
+<?php
+$uniqueId =  uniqid('editor_');
+?>
+<div class="form-group<?= ($this->hasErrors) ? ' has-error has-feedback' : ''?>">
+    <label for="<?= $this->element->getName() ?>" class="col-sm-2 control-label">
+        <?= $this->translate($this->element->getLabel(), 'admin') ?>
+        <?php if($this->element->hasAttribute('required')): ?>
+            <abbr title="required">*</abbr>
+        <?php endif; ?>
+    </label>
+    <div class="col-sm-10">
+        <?= $this->formTextarea($this->element->setAttributes(array(
+            'id'            => $uniqueId,
+        ))) ?>
+        <script type="application/javascript">
+            CKEDITOR.replace('<?= $uniqueId ?>', {
+                toolbar: [
+                    { name: 'clipboard', items: [ 'Cut', 'Copy', 'Paste', 'PasteText', 'PasteFromWord', '-', 'Undo', 'Redo' ] },
+                    { name: 'basicstyles', items: [ 'Bold', 'Italic', 'Underline', 'Strike', 'Subscript', 'Superscript' ] },
+                    { name: 'htmlelements', items: [ 'NumberedList', 'BulletedList', 'SpecialChar', 'Format' ] }
+                ],
+                uiColor: '#FAFAFA',
+                removeButtons: '',
+                format_tags: 'p;h1;h2;h3'
+            });
+        </script>
+        <?php if ($this->hasErrors): ?>
+            <span class="glyphicon glyphicon-warning-sign form-control-feedback"></span>
+            <ul class="list-unstyled text-danger">
+                <?php foreach($this->element->getMessages() as $message): ?>
+                    <li><?= $message ?></li>
+                <?php endforeach; ?>
+            </ul>
+        <?php endif; ?>
+    </div>
+</div>

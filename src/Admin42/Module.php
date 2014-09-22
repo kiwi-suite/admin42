@@ -68,6 +68,7 @@ class Module implements ConfigProviderInterface, BootstrapListenerInterface
                 $basePath = $viewHelperManager->get('basePath');
 
                 $headScript->appendFile($basePath('/assets/admin/core/js/raum42-admin.min.js'));
+                $headScript->appendFile($basePath('/assets/admin/core/ckeditor/ckeditor.js'));
                 $headLink->appendStylesheet($basePath('/assets/admin/core/css/raum42-admin.min.css'));
             },
             100

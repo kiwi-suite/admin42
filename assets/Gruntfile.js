@@ -94,6 +94,16 @@ module.exports = function(grunt) {
                         filter: 'isFile'
                     }
                 ]
+            },
+            ckeditor: {
+                files: [
+                    {
+                        expand: true,
+                        cwd: 'bower_components/ckeditor/',
+                        src: ["*.*", "**/*.*"],
+                        dest: 'dist/ckeditor/'
+                    }
+                ]
             }
         },
         watch: {
