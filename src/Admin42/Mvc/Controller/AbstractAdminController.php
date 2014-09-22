@@ -10,12 +10,14 @@
 namespace Admin42\Mvc\Controller;
 
 use Core42\Mvc\Controller\AbstractActionController;
+use Zend\View\Model\ViewModel;
 
 abstract class AbstractAdminController extends AbstractActionController
 {
     /**
      * @param string $forwardController
      * @param array $params
+     * @return ViewModel
      */
     protected function addSidebar($forwardController, array $params = array())
     {
@@ -27,5 +29,9 @@ abstract class AbstractAdminController extends AbstractActionController
             $this->forward()->dispatch($forwardController, $params),
             'sidebar'
         );
+
+        $sidebar = $this->layout()->getChildrenByCaptureTo('sidebar');
+
+        return $sidebar[0];
     }
 }
