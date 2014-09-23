@@ -143,7 +143,7 @@ class UserController extends AbstractAdminController
      */
     public function dashboardAction()
     {
-
+        return $this->redirect()->toRoute('admin/login');
     }
 
     /**
