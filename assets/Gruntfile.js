@@ -28,6 +28,7 @@ module.exports = function(grunt) {
                     'bower_components/jquery-ui/ui/draggable.js',
                     'bower_components/jquery-ui/ui/droppable.js',
                     'bower_components/jquery-ui/ui/sortable.js',
+                    'bower_components/select2/select2.js',
                     '<%= js_src_path %>/*.js'
                 ],
                 dest: '<%= js_dest_path %>/<%= pkg.name %>.js'
@@ -47,7 +48,7 @@ module.exports = function(grunt) {
                 src: [ '<%= js_dest_path %>/**/*.*', '!<%= js_dest_path %>/**/*.min.js' ]
             },
             css : {
-                src: [ '<%= css_dest_path %>/**/*.*', '!<%= css_dest_path %>/**/*.min.css' ]
+                src: [ '<%= css_dest_path %>/**/*.*', '!<%= css_dest_path %>/**/*.min.css', '!<%= css_dest_path %>/**/*.{png,jpg,gif,jpeg,svg}' ]
             },
             img : {
                 src: [ '<%= img_dest_path %>/**/*.*', '!<%= img_dest_path %>/**/*.{png,jpg,gif,jpeg,svg}', '!<%= img_gen_path %>' ]
@@ -64,8 +65,10 @@ module.exports = function(grunt) {
             }
         },
         cssmin: {
-            files: {
-                '<%= css_dest_path %>/raum42-admin.css': ['<%= css_dest_path %>/style.css']
+            combine: {
+                files: {
+                    '<%= css_dest_path %>/raum42-admin.css': ['<%= css_dest_path %>/raum42-admin.css', 'bower_components/select2/select2.css', 'bower_components/select2/select2-bootstrap.css']
+                }
             },
             minify: {
                 src: '<%= css_dest_path %>/raum42-admin.css',
@@ -102,6 +105,16 @@ module.exports = function(grunt) {
                         cwd: 'bower_components/ckeditor/',
                         src: ["*.*", "**/*.*"],
                         dest: 'dist/ckeditor/'
+                    }
+                ]
+            },
+            select2: {
+                files: [
+                    {
+                        expand: true,
+                        cwd: 'bower_components/select2/',
+                        src: ["*.gif", "*.png"],
+                        dest: '<%= css_dest_path %>'
                     }
                 ]
             }

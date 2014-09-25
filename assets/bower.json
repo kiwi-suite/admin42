@@ -19,6 +19,7 @@
     "font-awesome": "~4.1.0",
     "datatables": "~1.10.2",
     "jquery-ui": "~1.11.1",
-    "ckeditor": "~4.4.4"
+    "ckeditor": "~4.4.4",
+    "select2": "~3.5.1"
   }
 }
