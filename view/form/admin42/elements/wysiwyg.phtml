@@ -17,12 +17,19 @@ $uniqueId =  uniqid('editor_');
                 toolbar: [
                     { name: 'clipboard', items: [ 'Cut', 'Copy', 'Paste', 'PasteText', 'PasteFromWord', '-', 'Undo', 'Redo' ] },
                     { name: 'basicstyles', items: [ 'Bold', 'Italic', 'Underline', 'Strike', 'Subscript', 'Superscript' ] },
+                    { name: 'specialelements', items: [ 'Image', 'Link' ] },
                     { name: 'htmlelements', items: [ 'NumberedList', 'BulletedList', 'SpecialChar', 'Format' ] }
                 ],
                 uiColor: '#FAFAFA',
                 removeButtons: '',
                 extraPlugins : 'divarea',
-                format_tags: 'p;h1;h2;h3'
+                format_tags: 'p;h1;h2;h3',
+                filebrowserBrowseUrl : '/browser/browse/type/all',
+                //filebrowserUploadUrl : '/browser/upload/type/all',
+                filebrowserImageBrowseUrl : '<?= $this->url('admin/file') ?>',
+                //filebrowserImageUploadUrl : '/browser/upload/type/image',
+                filebrowserWindowWidth  : 800,
+                filebrowserWindowHeight : 500
             });
         </script>
         <?php if ($this->hasErrors): ?>
