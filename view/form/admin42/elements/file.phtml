@@ -1,1 +1,11 @@
 <?php
+$id = 'upload_'.uniqid();
+?>
+<span class="btn btn-primary fileinput-button">
+    <span class="fa fa-fw fa-upload"></span>
+    <span>Upload files</span>
+    <?php echo $this->formFile($this->element->setAttribute("id", $id)); ?>
+</span>
+<script>
+    $('#<?= $id ?>').fileupload();
+</script>
