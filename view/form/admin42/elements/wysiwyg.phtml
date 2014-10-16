@@ -18,13 +18,13 @@ $uniqueId =  uniqid('editor_');
                     { name: 'clipboard', items: [ 'Cut', 'Copy', 'Paste', 'PasteText', 'PasteFromWord', '-', 'Undo', 'Redo' ] },
                     { name: 'basicstyles', items: [ 'Bold', 'Italic', 'Underline', 'Strike', 'Subscript', 'Superscript' ] },
                     { name: 'specialelements', items: [ 'Image', 'Link' ] },
-                    { name: 'htmlelements', items: [ 'NumberedList', 'BulletedList', 'SpecialChar', 'Format' ] }
+                    { name: 'htmlelements', items: [ 'NumberedList', 'BulletedList', 'SpecialChar', 'Format', 'FontSize', 'TextColor' ] }
                 ],
                 uiColor: '#FAFAFA',
                 removeButtons: '',
-                extraPlugins : 'divarea',
+                extraPlugins : 'divarea,colorbutton,font',
                 format_tags: 'p;h1;h2;h3',
-                filebrowserBrowseUrl : '/browser/browse/type/all',
+                filebrowserBrowseUrl : '<?= $this->url('admin/file') ?>',
                 //filebrowserUploadUrl : '/browser/upload/type/all',
                 filebrowserImageBrowseUrl : '<?= $this->url('admin/file') ?>',
                 //filebrowserImageUploadUrl : '/browser/upload/type/image',
