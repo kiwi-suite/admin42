@@ -19,7 +19,6 @@ return array(
                 'select'    => 'form/admin42/elements/select',
                 'textarea'  => 'form/admin42/elements/textarea',
                 'wysiwyg'   => 'form/admin42/elements/wysiwyg',
-                'file'      => 'form/admin42/elements/file',
             ),
         ),
     ),
