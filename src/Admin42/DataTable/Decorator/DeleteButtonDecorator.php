@@ -19,6 +19,6 @@ class DeleteButtonDecorator
      */
     public function __invoke(Column $column)
     {
-        $column->addAttribute("render", new Expr("dth.deleteButton"));
+        return new Expr("dataTableHelper.deleteButton");
     }
 }

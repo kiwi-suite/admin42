@@ -10,6 +10,7 @@
 namespace Admin42\View\Helper;
 
 use Zend\Form\View\Helper\AbstractHelper;
+use Zend\Json\Expr;
 
 class DataTable extends AbstractHelper
 {
@@ -30,6 +31,7 @@ class DataTable extends AbstractHelper
 
     /**
      * @param \Admin42\DataTable\DataTable $dataTable
+     * @param string $partial
      * @return $this
      */
     public function __invoke(\Admin42\DataTable\DataTable $dataTable = null, $partial = null)
@@ -80,6 +82,16 @@ class DataTable extends AbstractHelper
         $hash = spl_object_hash($this->dataTable);
 
         return $this->dataTableMap[$hash];
+    }
+
+    public function setColumnDecorator($columnName, $decorator)
+    {
+        $column = $this->dataTable->getColumn($columnName);
+        if ($column !== null) {
+            if (is_string($decorator)) {
+                $column->setDecorator(new Expr($decorator));
+            }
+        }
     }
 
     /**

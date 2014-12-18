@@ -16,9 +16,10 @@ class RoleDecorator
 {
     /**
      * @param Column $column
+     * @return Expr
      */
     public function __invoke(Column $column)
     {
-        $column->addAttribute("render", new Expr("dth.role"));
+        return new Expr("dataTableHelper.role");
     }
 }

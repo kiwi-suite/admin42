@@ -39,14 +39,14 @@ class Column extends AbstractOptions
     private $mutator;
 
     /**
-     * @var array
+     * @var callable
      */
-    private $attributes = array();
+    private $decorator;
 
     /**
      * @var array
      */
-    private $decorators = array();
+    private $attributes = array();
 
     /**
      * @return string
@@ -154,37 +154,18 @@ class Column extends AbstractOptions
     }
 
     /**
-     * @return array
+     * @return callable
      */
-    public function getDecorators()
+    public function getDecorator()
     {
-        return $this->decorators;
-    }
-
-    /**
-     * @param array $decorators
-     */
-    public function setDecorators($decorators)
-    {
-        $this->decorators = $decorators;
+        return $this->decorator;
     }
 
     /**
      * @param callable $decorator
      */
-    public function addDecorator($decorator)
+    public function setDecorator($decorator)
     {
-        $this->decorators[] = $decorator;
-    }
-
-    /**
-     *
-     */
-    public function applyDecorators()
-    {
-        foreach ($this->decorators as $decorator)
-        {
-            $decorator($this);
-        }
+        $this->decorator = $decorator;
     }
 }

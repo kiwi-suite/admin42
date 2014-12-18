@@ -7,14 +7,16 @@
         </tr>
     </thead>
 </table>
-<script>
+<script type="application/javascript">
     <?php
     $settings = $this->dataTable->getAttributes();
+
     /** @var \Admin42\DataTable\Column\Column $column */
     foreach ($this->dataTable as $column) {
         $columnSettings = array(
             'searchable' => $column->isSearchable(),
-            'sortable' => $column->isSortable()
+            'sortable' => $column->isSortable(),
+            'name' => $column->getLabel()
         );
         foreach ($column->getAttributes() as $attrName => $attrValue) {
             $columnSettings[$attrName] = $attrValue;
@@ -23,8 +25,12 @@
         $settings['columns'][] = $columnSettings;
     }
     ?>
-    $('#<?= $this->name ?>').dataTable(<?= \Zend\Json\Json::encode(
-        $settings,
-        false,
-        array('enableJsonExprFinder' => true))?>);
+
+    $('#<?= $this->name ?>').dataTable(<?= \Zend\Json\Json::prettyPrint(
+        \Zend\Json\Json::encode(
+            $settings,
+            false,
+            array('enableJsonExprFinder' => true)
+        ),
+        array('indent' => '    ') )?>);
 </script>

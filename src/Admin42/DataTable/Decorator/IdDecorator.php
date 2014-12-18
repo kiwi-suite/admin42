@@ -16,11 +16,13 @@ class IdDecorator
 {
     /**
      * @param Column $column
+     * @return Expr|null
      */
     public function __invoke(Column $column)
     {
         if ($column->getMatchName() == 'id') {
-            $column->addAttribute("render", new Expr("dth.id"));
+            return new Expr("dataTableHelper.id");
         }
+        return null;
     }
 }

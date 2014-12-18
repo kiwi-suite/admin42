@@ -28,6 +28,11 @@ class DataTable implements \Countable, \Iterator
     protected $columns = array();
 
     /**
+     * @var array
+     */
+    protected $columnsByName = array();
+
+    /**
      * @var int
      */
     protected $internPosition = 0;
@@ -139,6 +144,34 @@ class DataTable implements \Countable, \Iterator
         }
 
         $this->columns[] = $column;
+        $this->columnsByName[$column->getMatchName()] = $column;
+    }
+
+    /**
+     * @param string $matchName
+     * @return Column|null
+     */
+    public function getColumn($matchName)
+    {
+        if (!array_key_exists($matchName, $this->columnsByName)) {
+            return null;
+        }
+
+        return $this->columnsByName[$matchName];
+    }
+
+    /**
+     * @param int $position
+     * @return Column|null
+     */
+    public function getColumnAtPosition($position)
+    {
+        $position = (int) $position;
+        if (!array_key_exists($position, $this->columns)) {
+            return null;
+        }
+
+        return $this->columns[$position];
     }
 
     /**
@@ -167,7 +200,7 @@ class DataTable implements \Countable, \Iterator
             );
         });
 
-        $column->addDecorator(new EditButtonDecorator());
+        $column->setDecorator(new EditButtonDecorator());
 
         $this->addColumn($column);
     }
@@ -196,22 +229,9 @@ class DataTable implements \Countable, \Iterator
                 'params' => http_build_query($deleteParams),
             );
         });
-        $column->addDecorator(new DeleteButtonDecorator());
+        $column->setDecorator(new DeleteButtonDecorator());
 
         $this->addColumn($column);
-    }
-
-    /**
-     * @param int $position
-     * @return Column|null
-     */
-    public function getColumnAtPosition($position)
-    {
-        if (!array_key_exists($position, $this->columns)) {
-            return null;
-        }
-
-        return $this->columns[$position];
     }
 
     /**
@@ -237,10 +257,30 @@ class DataTable implements \Countable, \Iterator
     public function applyDecorators()
     {
         foreach ($this as $column) {
+            $render = null;
             foreach ($this->defaultDecorators as $_decorator) {
-                $_decorator($column);
+                if (is_callable($_decorator)) {
+                    $render = $_decorator($column);
+                } else {
+                    $render = $_decorator;
+                }
+
             }
-            $column->applyDecorators();
+            $decorator = $column->getDecorator();
+            if ($decorator !== null) {
+                if (is_callable($decorator)) {
+                    $tmpRender = $decorator($column);
+                } else {
+                    $tmpRender = $decorator;
+                }
+
+                if ($tmpRender !== null) {
+                    $render = $tmpRender;
+                }
+            }
+            if ($render !== null) {
+                $column->addAttribute('render', $render);
+            }
         }
     }
 

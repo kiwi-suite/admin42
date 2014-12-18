@@ -19,6 +19,6 @@ class DateTimeDecorator
      */
     public function __invoke(Column $column)
     {
-        $column->addAttribute("render", new Expr("dth.small"));
+        return new Expr("dataTableHelper.small");
     }
 }

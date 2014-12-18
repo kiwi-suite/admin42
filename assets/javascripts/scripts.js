@@ -1,4 +1,4 @@
-var dth = {
+var dataTableHelper = {
     small: function(data, type, row) {
         if (data === null) {
             return "";

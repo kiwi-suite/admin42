@@ -16,9 +16,10 @@ class EditButtonDecorator
 {
     /**
      * @param Column $column
+     * @return Expr
      */
     public function __invoke(Column $column)
     {
-        $column->addAttribute("render", new Expr("dth.editButton"));
+        return new Expr("dataTableHelper.editButton");
     }
 }
