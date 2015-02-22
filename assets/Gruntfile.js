@@ -29,14 +29,17 @@ module.exports = function(grunt) {
                     'bower_components/jquery-ui/ui/droppable.js',
                     'bower_components/jquery-ui/ui/sortable.js',
                     'bower_components/select2/select2.js',
-                    '<%= js_src_path %>/*.js'
+                    'bower_components/angular/angular.js',
+                    '<%= js_src_path %>/*.js',
+                    '<%= js_src_path %>/**/*.js'
                 ],
                 dest: '<%= js_dest_path %>/<%= pkg.name %>.js'
             }
         },
         uglify: {
             options: {
-                banner: '<%= banner %>'
+                banner: '<%= banner %>',
+                mangle: false
             },
             main: {
                 src: ['<%= concat.js.dest %>'],

@@ -3,8 +3,8 @@ namespace Admin42;
 
 return array(
     'view_manager' => array(
-        'display_not_found_reason'  => true,
-        'display_exceptions'        => true,
+        'display_not_found_reason'  => false,
+        'display_exceptions'        => false,
         'not_found_template'        => 'admin/error/404',
         'exception_template'        => 'admin/error/index',
         'layout'                    => 'admin/layout/layout',
@@ -22,6 +22,9 @@ return array(
         ),
     ),
     'view_helpers' => array(
+        'factories' => array(
+            'admin' => 'Admin42\View\Helper\Service\AdminFactory'
+        ),
         'invokables' => array(
             'dataTable' => 'Admin42\View\Helper\DataTable',
         ),
