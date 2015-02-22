@@ -2,12 +2,12 @@
 
 return array(
     'cli' => array(
-        'create-user' => array(
-            'route'                     => 'create-user --email= --role='
+        'admin-create-user' => array(
+            'route'                     => 'admin-create-user --email= --role='
                 .' [--password=] [--username=] [--status=] [--displayName=]',
             'command-name'              => 'Admin42\User\Create',
-            'description'               => 'Creates an user',
-            'short_description'         => 'Creates an user',
+            'description'               => 'Creates an admin user',
+            'short_description'         => 'Creates an admin user',
             'defaults' => array(
                 'status' => 'active',
             ),
