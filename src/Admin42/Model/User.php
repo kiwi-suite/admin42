@@ -1,211 +1,53 @@
 <?php
-/**
- * admin42 (www.raum42.at)
- *
- * @link http://www.raum42.at
- * @copyright Copyright (c) 2010-2014 raum42 OG (http://www.raum42.at)
- *
- */
-
 namespace Admin42\Model;
 
 use Core42\Model\AbstractModel;
 
+/**
+ * @method User setId() setId(int $id)
+ * @method int getId() getId()
+ * @method User setUsername() setUsername(string $username)
+ * @method string getUsername() getUsername()
+ * @method User setPassword() setPassword(string $password)
+ * @method string getPassword() getPassword()
+ * @method User setEmail() setEmail(string $email)
+ * @method string getEmail() getEmail()
+ * @method User setRole() setRole(string $role)
+ * @method string getRole() getRole()
+ * @method User setDisplayName() setDisplayName(string $displayName)
+ * @method string getDisplayName() getDisplayName()
+ * @method User setHash() setHash(string $hash)
+ * @method string getHash() getHash()
+ * @method User setStatus() setStatus(string $status)
+ * @method string getStatus() getStatus()
+ * @method User setLastLogin() setLastLogin(\DateTime $lastLogin)
+ * @method \DateTime getLastLogin() getLastLogin()
+ * @method User setUpdated() setUpdated(\DateTime $updated)
+ * @method \DateTime getUpdated() getUpdated()
+ * @method User setCreated() setCreated(\DateTime $created)
+ * @method \DateTime getCreated() getCreated()
+ */
 class User extends AbstractModel
 {
-    const STATUS_ACTIVE = 'active';
-    const STATUS_INACTIVE = 'inactive';
+    const STATUS_ACTIVE = "active";
+    const STATUS_INACTIVE = "inactive";
 
     /**
-     * @param int $id
-     * @return \Admin42\Model\User
+     * @var array
      */
-    public function setId($id)
-    {
-        $this->set('id', $id);
-        return $this;
-    }
+    protected $properties = array(
+        'id',
+        'username',
+        'password',
+        'email',
+        'role',
+        'displayName',
+        'hash',
+        'status',
+        'lastLogin',
+        'updated',
+        'created'
+    );
 
-    /**
-     * @return int
-     */
-    public function getId()
-    {
-        return $this->get('id');
-    }
 
-    /**
-     * @param string $username
-     * @return \Admin42\Model\User
-     */
-    public function setUsername($username)
-    {
-        $this->set('username', $username);
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getUsername()
-    {
-        return $this->get('username');
-    }
-
-    /**
-     * @param string $password
-     * @return \Admin42\Model\User
-     */
-    public function setPassword($password)
-    {
-        $this->set('password', $password);
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getPassword()
-    {
-        return $this->get('password');
-    }
-
-    /**
-     * @param string $email
-     * @return \Admin42\Model\User
-     */
-    public function setEmail($email)
-    {
-        $this->set('email', $email);
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getEmail()
-    {
-        return $this->get('email');
-    }
-
-    /**
-     * @param string $role
-     * @return \Admin42\Model\User
-     */
-    public function setRole($role)
-    {
-        return $this->set('role', $role);
-    }
-
-    /**
-     * @return string
-     */
-    public function getRole()
-    {
-        return $this->get('role');
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getDisplayName()
-    {
-        return $this->get('displayName');
-    }
-
-    /**
-     * @param string|null $displayName
-     * @return \Admin42\Model\User
-     */
-    public function setDisplayName($displayName)
-    {
-        return $this->set('displayName', $displayName);
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getHash()
-    {
-        return $this->get('hash');
-    }
-
-    /**
-     * @param string $hash
-     * @return \Admin42\Model\User
-     */
-    public function setHash($hash)
-    {
-        return $this->set('hash', $hash);
-    }
-
-    /**
-     * @param string $status
-     * @return \Admin42\Model\User
-     */
-    public function setStatus($status)
-    {
-        return $this->set('status', $status);
-    }
-
-    /**
-     * @return string
-     */
-    public function getStatus()
-    {
-        return $this->get('status');
-    }
-
-    /**
-     * @param \DateTime $updated
-     * @return \Admin42\Model\User
-     */
-    public function setUpdated($updated)
-    {
-        $this->set('updated', $updated);
-        return $this;
-    }
-
-    /**
-     * @return \DateTime
-     */
-    public function getUpdated()
-    {
-        return $this->get('updated');
-    }
-
-    /**
-     * @param \DateTime $created
-     * @return \Admin42\Model\User
-     */
-    public function setCreated($created)
-    {
-        $this->set('created', $created);
-        return $this;
-    }
-
-    /**
-     * @return \DateTime
-     */
-    public function getCreated()
-    {
-        return $this->get('created');
-    }
-
-    /**
-     * @param \DateTime|null $lastLogin
-     * @return AbstractModel
-     */
-    public function setLastLogin($lastLogin)
-    {
-        return $this->set('lastLogin', $lastLogin);
-    }
-
-    /**
-     * @return \DateTime|null
-     */
-    public function getLastLogin()
-    {
-        return $this->get('lastLogin');
-    }
 }
