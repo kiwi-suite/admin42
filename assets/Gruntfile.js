@@ -1,91 +1,76 @@
 module.exports = function(grunt) {
     grunt.initConfig({
-        pkg: grunt.file.readJSON('package.json'),
-        banner: '/*! <%= pkg.name %> <%= grunt.template.today("dd-mm-yyyy") %> */\n',
+        vendor_dir: 'bower_components',
+        dist: 'dist',
 
-        js_src_path: 'javascripts',
-        js_dest_path: 'dist/js',
-        css_dest_path: 'dist/css',
-        img_dest_path: 'dist/images',
-        img_gen_path: 'dist/images/gen',
-        sass_path: 'sass',
-        font_path: 'dist/fonts',
-        sprites_path: 'sprites',
+        bower: {
+            install: {
+                options: {
+                    copy: false
+                }
+            }
+        },
+
+        concurrent: {
+            all: ['compile-vendor-js', 'compile-app-js', 'less:app', 'copy']
+        },
 
         concat: {
             options: {
                 separator: ';'
             },
-            js: {
+            vendor: {
                 src: [
-                    'bower_components/jquery/dist/jquery.js',
-                    'bower_components/bootstrap-sass-official/assets/javascripts/bootstrap.js',
-                    'bower_components/datatables/media/js/jquery.dataTables.js',
-                    'bower_components/jquery-ui/ui/core.js',
-                    'bower_components/jquery-ui/ui/widget.js',
-                    'bower_components/jquery-ui/ui/mouse.js',
-                    'bower_components/jquery-ui/ui/position.js',
-                    'bower_components/jquery-ui/ui/draggable.js',
-                    'bower_components/jquery-ui/ui/droppable.js',
-                    'bower_components/jquery-ui/ui/sortable.js',
-                    'bower_components/select2/select2.js',
-                    'bower_components/angular/angular.js',
-                    '<%= js_src_path %>/*.js',
-                    '<%= js_src_path %>/**/*.js'
+                    '<%= vendor_dir %>/jquery/dist/jquery.js',
+                    '<%= vendor_dir %>/angular/angular.js',
+                    '<%= vendor_dir %>/angular-bootstrap/ui-bootstrap.js',
+                    '<%= vendor_dir %>/angular-bootstrap/ui-bootstrap-tpls.js',
+                    '<%= vendor_dir %>/screenfull/dist/screenfull.js'
                 ],
-                dest: '<%= js_dest_path %>/<%= pkg.name %>.js'
+                dest: '<%= dist %>/js/vendor.js'
+            },
+            app: {
+                src: [
+                    'javascripts/*.js'
+                ],
+                dest: '<%= dist %>/js/admin42.js'
             }
         },
+
         uglify: {
             options: {
-                banner: '<%= banner %>',
                 mangle: false
             },
-            main: {
-                src: ['<%= concat.js.dest %>'],
-                dest: '<%= js_dest_path %>/<%= pkg.name %>.min.js'
+            vendor: {
+                src: '<%= dist %>/js/vendor.js',
+                dest: '<%= dist %>/js/vendor.min.js'
+            },
+            app: {
+                src: '<%= dist %>/js/admin42.js',
+                dest: '<%= dist %>/js/admin42.min.js'
             }
         },
-        clean: {
-            js : {
-                src: [ '<%= js_dest_path %>/**/*.*', '!<%= js_dest_path %>/**/*.min.js' ]
+
+        less: {
+            options: {
+                compress: true,
+                cleancss: true
             },
-            css : {
-                src: [ '<%= css_dest_path %>/**/*.*', '!<%= css_dest_path %>/**/*.min.css', '!<%= css_dest_path %>/**/*.{png,jpg,gif,jpeg,svg}' ]
-            },
-            img : {
-                src: [ '<%= img_dest_path %>/**/*.*', '!<%= img_dest_path %>/**/*.{png,jpg,gif,jpeg,svg}', '!<%= img_gen_path %>' ]
-            },
-            fonts: {
-                src: [ '<%= font_path %>/**/*.*', '!<%= font_path %>/**/*.{eot,svg,ttf,woff,otf}' ]
-            }
-        },
-        compass: {
-            dist: {
-                options: {
-                    config: 'config.rb'
-                }
-            }
-        },
-        cssmin: {
-            combine: {
+            app: {
                 files: {
-                    '<%= css_dest_path %>/raum42-admin.css': ['<%= css_dest_path %>/raum42-admin.css', 'bower_components/select2/select2.css', 'bower_components/select2/select2-bootstrap.css']
+                    '<%= dist %>/css/admin42.min.css': 'less/main.less'
                 }
-            },
-            minify: {
-                src: '<%= css_dest_path %>/raum42-admin.css',
-                dest: '<%= css_dest_path %>/raum42-admin.min.css'
             }
         },
+
         copy: {
             bootstrap: {
                 files: [
                     {
                         expand: true,
                         flatten: true,
-                        src: ['bower_components/bootstrap-sass-official/assets/fonts/bootstrap/*'],
-                        dest: 'dist/fonts/',
+                        src: ['<%= vendor_dir %>/bootstrap/fonts/*'],
+                        dest: '<%= dist %>/fonts/',
                         filter: 'isFile'
                     }
                 ]
@@ -95,46 +80,55 @@ module.exports = function(grunt) {
                     {
                         expand: true,
                         flatten: true,
-                        src: ['bower_components/font-awesome/fonts/*'],
-                        dest: 'dist/fonts/',
+                        src: ['<%= vendor_dir %>/font-awesome/fonts/*'],
+                        dest: '<%= dist %>/fonts/',
                         filter: 'isFile'
                     }
                 ]
             },
-            ckeditor: {
+            images: {
                 files: [
                     {
                         expand: true,
-                        cwd: 'bower_components/ckeditor/',
-                        src: ["*.*", "**/*.*"],
-                        dest: 'dist/ckeditor/'
-                    }
-                ]
-            },
-            select2: {
-                files: [
-                    {
-                        expand: true,
-                        cwd: 'bower_components/select2/',
-                        src: ["*.gif", "*.png"],
-                        dest: '<%= css_dest_path %>'
+                        cwd: 'images/',
+                        src: '**',
+                        dest: '<%= dist %>/images/'
                     }
                 ]
             }
         },
+
+        clean: {
+            all: ['<%= dist %>/fonts/', '<%= dist %>/css/', '<%= dist %>/js/', '<%= dist %>/images/'],
+
+            vendorjs: ['<%= dist %>/js/vendor.js'],
+            appjs: ['<%= dist %>/js/admin42.js']
+        },
+
         watch: {
-            js: {
-                files: ['<%= js_src_path %>/**/*.js'],
-                tasks: ['concat:js', 'uglify', 'clean:js']
+            grunt: {
+                files: ['Gruntfile.js', 'bower.json'],
+                tasks: ['default']
+
             },
-            sass: {
-                files: ['<%= sass_path %>/**/*.scss', '<%= sprites_path %>',  '<%= img_dest_path %>/**/*.{png,jpg,gif,jpeg,svg}', '!<%= img_gen_path %>/**'],
-                tasks: ['compass', 'cssmin', 'clean:css', 'clean:img']
+            js: {
+                files: ['javascripts/*.js'],
+                tasks: ['compile-app-js']
+            },
+            less: {
+                files: ['less/*.less', 'less/**/*.less'],
+                tasks: ['compile-css']
             }
         }
     });
 
-    grunt.registerTask('default', ['copy', 'compass', 'concat', 'uglify', 'cssmin', 'clean']);
+    grunt.registerTask('default', ['bower', 'concurrent:all']);
+    grunt.registerTask('compile-vendor-js', ['concat:vendor', 'uglify:vendor', 'clean:vendorjs']);
+    grunt.registerTask('compile-app-js', ['concat:app', 'uglify:app', 'clean:appjs']);
+    grunt.registerTask('compile-css', ['less:app']);
+    grunt.registerTask('clear', ['clean:all']);
+
+
 
     require('load-grunt-tasks')(grunt);
 };

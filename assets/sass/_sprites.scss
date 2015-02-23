@@ -1,9 +1,0 @@
-/* LOGOS
-class="logo-lg-t"
--lg: Size of Logo (lg, md, sm)
--t: With text or icon only (t,i)
- */
-$logo-layout:smart;
-@import "logo/*.png";
-@include all-logo-sprites(true);
-
