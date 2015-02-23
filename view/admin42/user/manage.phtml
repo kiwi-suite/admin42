@@ -1,24 +1,26 @@
-<form class="form-horizontal" role="form" action="<?= $this->url() ?>" method="post">
+<div class="wrapper-md bg-light b-b">
+    <h1 class="m-n font-thin h3">
+        <span class="fa fa-user"></span>
+        <?= $this->translate('title.user-manage', 'admin')?>
+    </h1>
+</div>
+<div class="wrapper-md">
+    <form class="form-horizontal" role="form" action="<?= $this->url() ?>" method="post">
 
-    <div class="panel panel-default">
-        <div class="panel-heading">
-            <h1 class="panel-title">
-                <span class="fa fa-user"></span>
-                <?= $this->translate('title.user-manage', 'admin')?>
-            </h1>
-        </div>
-        <div class="panel-body">
-            <?= $this->formRender($this->manageForm)?>
-        </div>
-        <div class="panel-footer">
-            <div class="form-group">
-                <div class="col-sm-offset-2 col-sm-2">
-                    <button type="submit" class="btn btn-primary">
-                        <span class="fa fa-save"></span>
-                        <?= $this->translate('button.save', 'admin') ?>
-                    </button>
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <?= $this->formRender($this->manageForm)?>
+            </div>
+            <div class="panel-footer">
+                <div class="form-group">
+                    <div class="col-sm-offset-2 col-sm-2">
+                        <button type="submit" class="btn btn-primary">
+                            <span class="fa fa-save"></span>
+                            <?= $this->translate('button.save', 'admin') ?>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-</form>
+    </form>
+</div>

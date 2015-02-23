@@ -14,24 +14,5 @@ use Zend\View\Model\ViewModel;
 
 abstract class AbstractAdminController extends AbstractActionController
 {
-    /**
-     * @param string $forwardController
-     * @param array $params
-     * @return ViewModel
-     */
-    protected function addSidebar($forwardController, array $params = array())
-    {
-        $this->layout()->useSidebar = true;
 
-        $params = array_merge($this->params()->fromRoute(), $params);
-
-        $this->layout()->addChild(
-            $this->forward()->dispatch($forwardController, $params),
-            'sidebar'
-        );
-
-        $sidebar = $this->layout()->getChildrenByCaptureTo('sidebar');
-
-        return $sidebar[0];
-    }
 }

@@ -34,23 +34,6 @@ class UserController extends AbstractAdminController
     }
 
     /**
-     * @return mixed|ViewModel
-     */
-    public function indexSidebarAction()
-    {
-        $list = $this->getSelector('Admin42\DataTable\UserListSidebar');
-        if ($this->getRequest()->isXmlHttpRequest()) {
-            return $list->getResult();
-        }
-
-        $viewModel = new ViewModel(array(
-            'dataTable' => $list->getDataTable(),
-        ));
-
-        return $viewModel;
-    }
-
-    /**
      * @return array
      * @throws \Exception
      */
@@ -100,8 +83,6 @@ class UserController extends AbstractAdminController
                 ));
             }
         }
-
-        $this->addSidebar('Admin42\User', array('action' => 'index-sidebar'));
 
         return array(
             'createEditForm' => $createEditForm,

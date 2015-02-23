@@ -9,6 +9,7 @@
 
 namespace Admin42\View\Helper;
 
+use Admin42\Model\User;
 use Zend\View\Helper\AbstractHelper;
 
 class Admin extends AbstractHelper
@@ -26,6 +27,26 @@ class Admin extends AbstractHelper
         $this->config = $config;
     }
 
+    /**
+     * @param User $user
+     * @return string
+     */
+    public function getUserDisplayName(User $user)
+    {
+        $displayName = $user->getDisplayName();
+        if (empty($displayName)) {
+            $displayName = $user->getUsername();
+        }
+        if (empty($displayName)) {
+            $displayName = $user->getEmail();
+        }
+
+        return $displayName;
+    }
+
+    /**
+     * @return string
+     */
     public function angularBootstrap()
     {
         return "angular.element(document).ready(function(){"

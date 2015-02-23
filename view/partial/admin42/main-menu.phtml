@@ -15,9 +15,9 @@ foreach ($this->iterator as $page){
 
     if ($depth > $prevDepth) {
         if($prevDepth == $this->minDepth) {
-            $html[] = '<ul class="navbar-left nav navbar-nav" id="headerMenu">';
+            $html[] = '<ul class="nav">';
         } else {
-            $html[] = '<ul class="dropdown-menu">';
+            $html[] = '<ul class="nav nav-sub dk">';
         }
     } elseif($prevDepth > $depth) {
         for ($i = $prevDepth; $i > $depth; $i--) {
@@ -28,9 +28,9 @@ foreach ($this->iterator as $page){
         $html[] = '</li>';
     }
 
-    $icon = "";
+    $icon = '<i class="icon text-success"></i>';
     if (strlen($page->getOption("icon"))) {
-        $icon = '<span class="'.$page->getOption("icon").'"></span>&nbsp;';
+        $icon = '<i class="icon text-success '.$page->getOption("icon").'"></i>';
     }
 
     $label = $this->translate($page->getOption('label'), 'admin');
@@ -39,11 +39,18 @@ foreach ($this->iterator as $page){
     $href = $this->navigation->getHref($page);
 
     if($page->hasChildren() && $depth == 0 && empty($href)) {
-        $html[] = '<li class="dropdown'.(($isActive) ? " active" : "").'">';
-        $html[] = '<a href="'.$href.'" class="dropdown-toggle" data-toggle="dropdown">' . $icon .$label . '</a>';
+        $html[] = '<li class="'.(($isActive) ? " active" : "").'">';
+        $html[] = '<a>';
+        $html[] = '<span class="pull-right text-muted">';
+        $html[] = '<i class="fa fa-fw fa-angle-right text"></i>';
+        $html[] = '<i class="fa fa-fw fa-angle-down text-active"></i>';
+        $html[] = '</span>';
+        $html[] = $icon;
+        $html[] = '<span class="font-bold">'.$label.'</span>';
+        $html[] = '</a>';
     } else {
         $html[] = '<li'.(($isActive) ? ' class="active"' : "").'>';
-        $html[] = '<a href="'.$href.'">' . $icon . $label . '</a>';
+        $html[] = '<a href="'.$href.'"><span>' . $label . '</span></a>';
     }
 
     $prevDepth = $depth;

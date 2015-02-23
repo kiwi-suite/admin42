@@ -6,7 +6,7 @@ class Migration20140804110052
     public function up(Zend\ServiceManager\ServiceManager $serviceManager)
     {
         $sql = "CREATE TABLE `admin42_user` (
-  `id` INT NOT NULL AUTO_INCREMENT,
+  `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
   `username` VARCHAR(255) CHARACTER SET 'utf8' COLLATE 'utf8_bin' NULL,
   `password` VARCHAR(255) NOT NULL,
   `email` VARCHAR(255) NOT NULL,

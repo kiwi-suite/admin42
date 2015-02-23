@@ -10,11 +10,29 @@
     <?= $this->headScript() ?>
 
     <script>
-        <?//= $this->admin()->angularBootstrap() ?>
+        <?= $this->admin()->angularBootstrap() ?>
     </script>
 </head>
 
-<body>
+<body ng-controller="AppController">
+
+<div class="app app-header-fixed app-aside-fixed" id="app" ng-class="{'app-aside-folded':app.settings.asideFolded}">
+
+    <?= $this->partial('partial/admin42/topbar') ?>
+
+    <?= $this->partial('partial/admin42/sidebar') ?>
+
+
+
+    <div class="app-content">
+        <div ui-butterbar></div>
+        <a href class="off-screen-toggle hide" ui-toggle-class="off-screen" data-target=".app-aside" ></a>
+        <div class="app-content-body fade-in-up">
+            <?= $this->content ?>
+        </div>
+    </div>
+</div>
+<?php if (false): ?>
 <?php if ($this->auth('Admin42\Authentication')->hasIdentity()): ?>
 <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
 
@@ -119,7 +137,7 @@
             </div>
         </div>
     </div>
-
+<?php endif; ?>
 </body>
 
 </html>
