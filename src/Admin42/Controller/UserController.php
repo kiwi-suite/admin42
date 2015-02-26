@@ -14,7 +14,6 @@ use Admin42\Model\User;
 use Admin42\Mvc\Controller\AbstractAdminController;
 use Core42\View\Model\JsonModel;
 use Zend\Http\PhpEnvironment\Response;
-use Zend\View\Model\ViewModel;
 
 class UserController extends AbstractAdminController
 {

@@ -25,6 +25,8 @@ module.exports = function(grunt) {
                     '<%= vendor_dir %>/angular/angular.js',
                     '<%= vendor_dir %>/angular-bootstrap/ui-bootstrap.js',
                     '<%= vendor_dir %>/angular-bootstrap/ui-bootstrap-tpls.js',
+                    '<%= vendor_dir %>/angular-animate/angular-animate.js',
+                    '<%= vendor_dir %>/angular-ui-utils/ui-utils.js',
                     '<%= vendor_dir %>/screenfull/dist/screenfull.js'
                 ],
                 dest: '<%= dist %>/js/vendor.js'
@@ -58,7 +60,7 @@ module.exports = function(grunt) {
             },
             app: {
                 files: {
-                    '<%= dist %>/css/admin42.min.css': 'less/main.less'
+                    '<%= dist %>/css/admin42.min.css': ['<%= vendor_dir %>/animate.css/animate.css', 'less/main.less']
                 }
             }
         },

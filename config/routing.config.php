@@ -118,6 +118,45 @@ return array(
                             ),
                         ),
                     ),
+                    'api' => array(
+                        'type' => 'Zend\Mvc\Router\Http\Literal',
+                        'options' => array(
+                            'route' => 'api/',
+                        ),
+                        'may_terminate' => true,
+                        'child_routes' => array(
+                            'notification' => array(
+                                'type' => 'Zend\Mvc\Router\Http\Literal',
+                                'options' => array(
+                                    'route' => 'notification/',
+                                    'defaults' => array(
+                                        'controller' => __NAMESPACE__ . '\Api\Notification',
+                                    )
+                                ),
+                                'may_terminate' => true,
+                                'child_routes' => array(
+                                    'list' => array(
+                                        'type' => 'Zend\Mvc\Router\Http\Literal',
+                                        'options' => array(
+                                            'route' => 'list/',
+                                            'defaults' => array(
+                                                'action' => 'list',
+                                            ),
+                                        ),
+                                    ),
+                                    'clear' => array(
+                                        'type' => 'Zend\Mvc\Router\Http\Literal',
+                                        'options' => array(
+                                            'route' => 'clear/',
+                                            'defaults' => array(
+                                                'action' => 'clear',
+                                            ),
+                                        ),
+                                    ),
+                                ),
+                            ),
+                        ),
+                    ),
                 ),
             ),
         ),
