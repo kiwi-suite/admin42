@@ -62,6 +62,12 @@ class AuthenticationService extends \Core42\Authentication\AuthenticationService
 
         $identity = parent::getIdentity();
 
+        if (empty($identity)) {
+            $this->clearIdentity();
+
+            return null;
+        }
+
         $identity = $this->tableGateway->selectByPrimary($identity);
         if (!($identity instanceof User)) {
             $this->clearIdentity();

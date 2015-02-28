@@ -9,18 +9,19 @@
 
     <?= $this->headScript() ?>
 
+    <script>
+        <?= $this->admin()->angularBootstrap() ?>
+    </script>
 </head>
 
-<body>
+<body ng-controller="AppController">
 
-<div id="main-container" class="container-fluid">
-    <div class="row">
-            <div class="col-md-12">
-                <?= $this->content ?>
-            </div>
+<div class="app app-header-fixed app-aside-fixed" id="app">
+    <div class="fade-in-right-big smooth">
+        <?= $this->content ?>
+
     </div>
 </div>
-
 </body>
 
 </html>

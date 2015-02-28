@@ -138,6 +138,8 @@ class UserController extends AbstractAdminController
             return $this->redirect()->toRoute('admin/user/manage');
         }
 
+        $this->layout('admin/layout/layout-min');
+
         $loginForm = $this->getForm('Admin42\User\Login');
 
         if ($this->getRequest()->isPost()) {
@@ -184,6 +186,8 @@ class UserController extends AbstractAdminController
             return $this->redirect()->toRoute('admin/user/manage');
         }
 
+        $this->layout('admin/layout/layout-min');
+
         $prg = $this->prg();
         if ($prg instanceof Response) {
             return $prg;
@@ -217,6 +221,8 @@ class UserController extends AbstractAdminController
         if ($authenticationService->hasIdentity()) {
             return $this->redirect()->toRoute('admin/user/manage');
         }
+
+        $this->layout('admin/layout/layout-min');
 
         $recoverPasswordForm = $this->getForm('Admin42\User\RecoverPassword');
 

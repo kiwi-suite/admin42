@@ -1,92 +1,77 @@
 <?php
 $this->loginForm->prepare();
 ?>
-<div class="container-fluid" id="login">
-    <div class="row">
-        <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4 col-sm-offset-3 col-md-offset-4 col-lg-offset-4">
-            <div id="logo" class="logo-lg-t"></div>
+<div class="container w-xxl w-auto-xs">
+    <div class="panel">
+        <div class="panel-body">
+            <form role="form" class="form-horizontal" method="post" action="<?= $this->url() ?>">
+                <?= $this->formElementRender($this->loginForm->get('csrf')) ?>
+                <div class="form-group<?= (count($this->loginForm->get('identity')->getMessages())) ? ' has-error has-feedback' : ''?>">
+                    <div class="col-sm-12">
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                                <span class="fa fa-user fa-fw"></span>
+                            </span>
+                            <?= $this->formInput($this->loginForm->get('identity')->setAttributes(array(
+                                'class'         => 'form-control',
+                                'placeholder'   => $this->translate($this->loginForm->get('identity')->getLabel(), 'admin')
+                            ))) ?>
+                        </div>
+                        <?php if (count($this->loginForm->get('identity')->getMessages())): ?>
+                            <span class="glyphicon glyphicon-warning-sign form-control-feedback"></span>
+                            <ul class="list-unstyled text-danger">
+                                <?php foreach($this->loginForm->get('identity')->getMessages() as $message): ?>
+                                    <li><?= $message ?></li>
+                                <?php endforeach; ?>
+                            </ul>
+                        <?php endif; ?>
+                    </div>
+                </div>
+
+                <div class="form-group<?= (count($this->loginForm->get('password')->getMessages())) ? ' has-error has-feedback' : ''?>">
+                    <div class="col-sm-12">
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                                <span class="fa fa-lock fa-fw"></span>
+                            </span>
+                            <?= $this->formPassword($this->loginForm->get('password')->setAttributes(array(
+                                'class'         => 'form-control',
+                                'placeholder'   => $this->translate($this->loginForm->get('password')->getLabel(), 'admin')
+                            ))) ?>
+                        </div>
+                        <?php if (count($this->loginForm->get('password')->getMessages())): ?>
+                            <span class="glyphicon glyphicon-warning-sign form-control-feedback"></span>
+                            <ul class="list-unstyled text-danger">
+                                <?php foreach($this->loginForm->get('password')->getMessages() as $message): ?>
+                                    <li><?= $message ?></li>
+                                <?php endforeach; ?>
+                            </ul>
+                        <?php endif; ?>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-sm-12">
+                        <button type="submit" class="btn btn-primary btn-block">
+                            <span class="fa fa-sign-in"></span>
+                            <?= $this->translate('button.login', 'admin') ?>
+                        </button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-sm-12 text-center">
+                        <a href="<?= $this->url('admin/lost-password')?>" class="btn btn-link">
+                            <?= $this->translate('button.lost-password', 'admin')?>
+                        </a>
+                    </div>
+                </div>
+
+            </form>
         </div>
-    </div>
-
-    <div class="row">
-        <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4 col-sm-offset-3 col-md-offset-4 col-lg-offset-4">
-            <div class="panel">
-                <div class="panel-body">
-                    <?php if (count($this->loginForm->getMessages()) > 0): ?>
-                        <div class="alert alert-danger" role="alert">
-                            An error occured
-                        </div>
-                    <?php else: ?>
-                        <p class="text-center">
-                            <?= $this->translate('text.login-description', 'admin') ?>
-                        </p>
-                    <?php endif; ?>
-                    <form role="form" class="form-horizontal" method="post" action="<?= $this->url() ?>">
-                        <?= $this->formElementRender($this->loginForm->get('csrf')) ?>
-                        <div class="form-group<?= (count($this->loginForm->get('identity')->getMessages())) ? ' has-error has-feedback' : ''?>">
-                            <div class="col-sm-12">
-                                <div class="input-group">
-                                    <span class="input-group-addon">
-                                        <span class="fa fa-user fa-fw"></span>
-                                    </span>
-                                    <?= $this->formInput($this->loginForm->get('identity')->setAttributes(array(
-                                        'class'         => 'form-control',
-                                        'placeholder'   => $this->translate($this->loginForm->get('identity')->getLabel(), 'admin')
-                                    ))) ?>
-                                </div>
-                                <?php if (count($this->loginForm->get('identity')->getMessages())): ?>
-                                    <span class="glyphicon glyphicon-warning-sign form-control-feedback"></span>
-                                    <ul class="list-unstyled text-danger">
-                                        <?php foreach($this->loginForm->get('identity')->getMessages() as $message): ?>
-                                            <li><?= $message ?></li>
-                                        <?php endforeach; ?>
-                                    </ul>
-                                <?php endif; ?>
-                            </div>
-                        </div>
-
-                        <div class="form-group<?= (count($this->loginForm->get('password')->getMessages())) ? ' has-error has-feedback' : ''?>">
-                            <div class="col-sm-12">
-                                <div class="input-group">
-                                    <span class="input-group-addon">
-                                        <span class="fa fa-lock fa-fw"></span>
-                                    </span>
-                                    <?= $this->formPassword($this->loginForm->get('password')->setAttributes(array(
-                                        'class'         => 'form-control',
-                                        'placeholder'   => $this->translate($this->loginForm->get('password')->getLabel(), 'admin')
-                                    ))) ?>
-                                </div>
-                                <?php if (count($this->loginForm->get('password')->getMessages())): ?>
-                                    <span class="glyphicon glyphicon-warning-sign form-control-feedback"></span>
-                                    <ul class="list-unstyled text-danger">
-                                        <?php foreach($this->loginForm->get('password')->getMessages() as $message): ?>
-                                            <li><?= $message ?></li>
-                                        <?php endforeach; ?>
-                                    </ul>
-                                <?php endif; ?>
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <div class="col-sm-12">
-                                <button type="submit" class="btn btn-primary pull-left">
-                                    <span class="fa fa-sign-in"></span>
-                                    <?= $this->translate('button.login', 'admin') ?>
-                                </button>
-                                <a href="<?= $this->url('admin/lost-password')?>" class="btn btn-link pull-right">
-                                    <?= $this->translate('button.lost-password', 'admin')?>
-                                </a>
-                                <div class="clearfix"></div>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-                <div class="panel-footer">
-                    <small>
-                        &copy; raum42 OG
-                    </small>
-                </div>
-            </div>
+        <div class="panel-footer">
+            <small>
+                &copy; raum42 OG
+            </small>
         </div>
     </div>
 </div>
