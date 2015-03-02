@@ -1,38 +1,39 @@
-<form class="form-horizontal" role="form" action="<?= $this->url(null, array(), array(), true) ?>" method="post">
+<div class="wrapper-md bg-light b-b">
+    <h1 class="m-n font-thin h3">
+        <span class="fa fa-user"></span>
+        <?php
+        $label = $this->params()->fromRoute('isEditMode') == true ? 'title.user-edit' : 'title.user-add';
+        ?>
+        <?= $this->translate($label, 'admin') ?>
+    </h1>
+</div>
+<div class="wrapper-md">
+    <form class="form-horizontal" role="form" action="<?= $this->url(null, array(), array(), true) ?>" method="post">
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <?= $this->formRender($this->createEditForm)?>
+            </div>
+            <div class="panel-footer">
+                <div class="form-group">
+                    <div class="col-sm-offset-2 col-md-10">
+                        <button type="submit" class="btn btn-primary">
+                            <span class="fa fa-save"></span>
+                            <?= $this->translate('button.save', 'admin') ?>
+                        </button>
 
-    <div class="panel panel-default">
-        <div class="panel-heading">
-            <h1 class="panel-title">
-                <span class="fa fa-user"></span>
-                <?php
-                $label = $this->params()->fromRoute('isEditMode') == true ? 'title.user-edit' : 'title.user-add';
-                ?>
-                <?= $this->translate($label, 'admin') ?>
-            </h1>
-        </div>
-        <div class="panel-body">
-            <?= $this->formRender($this->createEditForm)?>
-        </div>
-        <div class="panel-footer">
-            <div class="form-group">
-                <div class="col-sm-offset-2 col-md-10">
-                    <button type="submit" class="btn btn-primary">
-                        <span class="fa fa-save"></span>
-                        <?= $this->translate('button.save', 'admin') ?>
-                    </button>
-
-                    <?php if($this->params()->fromRoute('isEditMode') == true): ?>
-                    <button
-                        type="button"
-                        class="btn btn-danger dynamic-form-submit"
-                        data-action="<?= $this->url('admin/user/delete')?>"
-                        data-form-id="<?= $this->params()->fromRoute('id') ?>">
-                        <span class="fa fa-trash-o"></span>
-                        <?= $this->translate('button.delete', 'admin') ?>
-                    </button>
-                    <?php endif; ?>
+                        <?php if($this->params()->fromRoute('isEditMode') == true): ?>
+                        <button
+                            type="button"
+                            class="btn btn-danger dynamic-form-submit"
+                            data-action="<?= $this->url('admin/user/delete')?>"
+                            data-form-id="<?= $this->params()->fromRoute('id') ?>">
+                            <span class="fa fa-trash-o"></span>
+                            <?= $this->translate('button.delete', 'admin') ?>
+                        </button>
+                        <?php endif; ?>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-</form>
+    </form>
+</div>

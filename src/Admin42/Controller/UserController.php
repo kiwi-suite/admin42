@@ -22,14 +22,7 @@ class UserController extends AbstractAdminController
      */
     public function indexAction()
     {
-        $list = $this->getSelector('Admin42\DataTable\UserList');
-        if ($this->getRequest()->isXmlHttpRequest()) {
-            return $list->getResult();
-        }
 
-        return array(
-            'dataTable' => $list->getDataTable(),
-        );
     }
 
     /**
