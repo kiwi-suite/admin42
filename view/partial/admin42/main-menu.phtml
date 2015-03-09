@@ -30,7 +30,7 @@ foreach ($this->iterator as $page){
 
     $icon = '<i class="icon text-success"></i>';
     if (strlen($page->getOption("icon"))) {
-        $icon = '<i class="icon text-success '.$page->getOption("icon").'"></i>';
+        $icon = '<i class="icon '.$page->getOption("icon").'"></i>';
     }
 
     $label = $this->translate($page->getOption('label'), 'admin');

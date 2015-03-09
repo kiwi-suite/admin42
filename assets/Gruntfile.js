@@ -94,6 +94,17 @@ module.exports = function(grunt) {
                     }
                 ]
             },
+            simpleline: {
+                files: [
+                    {
+                        expand: true,
+                        flatten: true,
+                        src: ['<%= vendor_dir %>/simple-line-icons/fonts/*'],
+                        dest: '<%= dist %>/fonts/',
+                        filter: 'isFile'
+                    }
+                ]
+            },
             images: {
                 files: [
                     {

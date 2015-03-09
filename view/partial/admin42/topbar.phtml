@@ -1,5 +1,5 @@
-<div class="app-header navbar bg-black">
-    <div class="navbar-header {{app.settings.navbarHeaderColor}}">
+<div class="app-header navbar">
+    <div class="navbar-header bg-dark">
         <button class="pull-right visible-xs dk" ui-toggle-class="show" data-target=".navbar-collapse">
             <i class="glyphicon glyphicon-cog"></i>
         </button>
@@ -7,19 +7,15 @@
             <i class="glyphicon glyphicon-align-justify"></i>
         </button>
         <a href="<?= $this->url('admin')?>" class="navbar-brand text-lt">
-            <i class="fa fa-btc"></i>
-            <img src="img/logo.png" alt="." class="hide">
-            <span class="hidden-folded m-l-xs">kiwi42</span>
+            <img src="<?= $this->basePath('assets/admin/core/images/iconkiwi42.png'); ?>" alt=".">
+            <span class="hidden-folded m-l-xs font-thin">kiw<span class="text-light">i</span></span>
         </a>
     </div>
 
-    <div class="collapse pos-rlt navbar-collapse box-shadow {{app.settings.navbarCollapseColor}}">
+    <div class="collapse pos-rlt navbar-collapse bg-primary bg_sub_header">
         <div class="nav navbar-nav hidden-xs">
             <a href class="btn no-shadow navbar-btn" ng-click="app.settings.asideFolded = !app.settings.asideFolded">
                 <i class="fa {{app.settings.asideFolded ? 'fa-indent' : 'fa-dedent'}} fa-fw"></i>
-            </a>
-            <a href class="btn no-shadow navbar-btn" ui-toggle-class="show" target="#aside-user">
-                <i class="icon-user fa-fw"></i>
             </a>
         </div>
 
@@ -39,6 +35,7 @@
                 <a ui-fullscreen></a>
             </li>
             <li class="dropdown" dropdown ng-controller="NotificationController" data-notification-url="<?= $this->url('admin/api/notification/list')?>">
+
                 <a href class="dropdown-toggle" dropdown-toggle>
                     <i class="icon-bell fa-fw"></i>
                     <span class="visible-xs-inline">Notifications</span>
