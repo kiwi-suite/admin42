@@ -12,15 +12,16 @@ namespace Admin42\Command\User;
 use Admin42\Command\Mail\SendCommand;
 use Admin42\Model\User;
 use Core42\Command\AbstractCommand;
-use Core42\Command\ConsoleAwareInterface;
+use Core42\Command\ConsoleAwareTrait;
 use Core42\View\Model\MailModel;
 use Zend\Crypt\Password\Bcrypt;
 use Zend\Validator\EmailAddress;
-use Zend\View\Model\ViewModel;
 use ZF\Console\Route;
 
-class CreateCommand extends AbstractCommand implements ConsoleAwareInterface
+class CreateCommand extends AbstractCommand
 {
+    use ConsoleAwareTrait;
+
     /**
      * @var string
      */
