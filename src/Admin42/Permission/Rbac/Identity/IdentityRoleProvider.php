@@ -9,7 +9,7 @@
 
 namespace Admin42\Permission\Rbac\Identity;
 
-use Core42\Authentication\AuthenticationService;
+use Admin42\Authentication\AuthenticationService;
 use Core42\Permission\Rbac\Identity\IdentityRoleProviderInterface;
 use Core42\Permission\Rbac\Role\RoleInterface;
 
