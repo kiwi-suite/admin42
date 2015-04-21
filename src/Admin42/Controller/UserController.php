@@ -22,7 +22,9 @@ class UserController extends AbstractAdminController
      */
     public function indexAction()
     {
-
+        if ($this->getRequest()->isXmlHttpRequest()) {
+            return $this->getSelector('Admin42\SmartTable\User')->getResult();
+        }
     }
 
     /**

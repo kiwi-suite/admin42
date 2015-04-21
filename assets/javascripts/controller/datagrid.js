@@ -1,22 +1,24 @@
-angular.module('admin42').controller('DataGridController',['$scope', function($scope){
-    function generateRandomItem() {
+angular.module('admin42').controller('DataGridController',['$scope', '$http', '$attrs', function($scope, $http, $attrs){
+    var url = $attrs.url;
 
-        return {
-            id: Math.floor(Math.random() * 30),
-            email: 'payer'+(Math.floor(Math.random() * 20)) + '@raum42.at'
-        }
-    }
     $scope.collection = [];
     $scope.isLoading = true;
-    $scope.itemsByPage = 2;
+    $scope.displayedPages = 1;
 
     $scope.callServer = function (tableState) {
-        $scope.isLoading = false;
         $scope.collection = [];
-        for (var j = 0; j < 2; j++) {
-            $scope.collection.push(generateRandomItem());
-        }
+        $scope.isLoading = true;
 
-        tableState.pagination.numberOfPages = 7;
+        $http.post(url, tableState).
+            success(function(data, status, headers, config) {
+                $scope.isLoading = false;
+
+                $scope.collection = data.data;
+
+                $scope.displayedPages = data.meta.displayedPages;
+                tableState.pagination.numberOfPages = data.meta.displayedPages;
+            }).
+            error(function(data, status, headers, config) {
+            });
     };
 }]);

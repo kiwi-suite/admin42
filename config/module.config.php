@@ -7,7 +7,6 @@ return array(
         'display_exceptions'        => false,
         'not_found_template'        => 'admin/error/404',
         'exception_template'        => 'admin/error/index',
-        'layout'                    => 'admin/layout/layout',
         'template_map'              => array(
             'admin/layout/layout'       => __DIR__ . '/../view/layout/layout.phtml',
             'admin/layout/layout-min'   => __DIR__ . '/../view/layout/layout-min.phtml',
@@ -25,9 +24,6 @@ return array(
         'factories' => array(
             'admin' => 'Admin42\View\Helper\Service\AdminFactory'
         ),
-        'invokables' => array(
-            'dataTable' => 'Admin42\View\Helper\DataTable',
-        ),
     ),
 
     'migration' => array(
@@ -43,11 +39,6 @@ return array(
             'Admin42\IdentityRoleProvider' => 'Admin42\Permission\Rbac\Service\IdentityRoleProviderFactory',
 
             'Admin42\Navigation\Listener\RbacListener' => 'Admin42\Navigation\Listener\RbacListenerFactory',
-
-            'Admin42\DataTable' => 'Admin42\DataTable\Service\DataTableFactory',
-        ),
-        'shared' => array(
-            'Admin42\DataTable' => false,
         ),
     ),
 

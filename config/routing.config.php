@@ -87,7 +87,7 @@ return array(
                             ),
 
                             'edit' => array(
-                                'type' => 'Zend\Mvc\Router\Http\Segment',
+                                'type' => 'Core42\Mvc\Router\Http\AngularSegment',
                                 'options' => array(
                                     'route' => 'edit/:id/',
                                     'defaults' => array(

@@ -4,28 +4,39 @@
         <?= $this->translate('title.users', 'admin') ?>
     </h1>
 </div>
+
 <div class="wrapper-md">
     <div class="panel panel-default">
-        <div class="table-responsive" ng-controller="DataGridController">
+        <div class="table-responsive" ng-controller="DataGridController" data-url="<?= $this->url()?>">
             <table st-table="collection"  st-pipe="callServer" class="table table-striped top-border-radius">
                 <thead>
                 <tr>
-                    <th st-sort="id">#ID</th>
-                    <th st-sort="email">E-Mail</th>
+                    <th st-sort="id"><?= $this->translate('field.id', 'admin') ?></th>
+                    <th st-sort="email"><?= $this->translate('field.email', 'admin') ?></th>
+                    <th></th>
                 </tr>
                 <tr>
                     <th>
-                        <input st-search="id" placeholder="search for id" class="input-sm form-control" type="search"/>
+                        <input st-search="'id'" placeholder="<?= $this->translate('search.id', 'admin') ?>" class="input-sm form-control" type="search"/>
                     </th>
                     <th>
-                        <input st-search placeholder="global search" class="input-sm form-control" type="search"/>
+                        <input st-search="'email'" placeholder="<?= $this->translate('search.email', 'admin') ?>" class="input-sm form-control" type="search"/>
+                    </th>
+                    <th>
+
                     </th>
                 </tr>
                 </thead>
                 <tbody ng-hide="isLoading">
                     <tr ng-repeat="row in collection">
-                        <td>{{row.id}}</td>
+                        <td><code>#{{row.id}}</code></td>
                         <td>{{row.email}}</td>
+                        <td>
+                            <a class="btn btn-default btn-sm" ng-href="<?= $this->url("admin/user/edit", array('id' => "{{ row.id }}"))?>">
+                                <span class="fa fa-pencil" aria-hidden="true"></span>
+                                <?= $this->translate('button.edit', 'admin') ?>
+                            </a>
+                        </td>
                     </tr>
                 </tbody>
                 <tbody ng-show="isLoading">
@@ -36,7 +47,7 @@
                 <tfoot>
                 <tr>
                     <td colspan="5" class="text-center">
-                        <div st-pagination="" st-items-by-page="itemsByPage" st-displayed-pages="7"></div>
+                        <div st-pagination="" st-items-by-page="10" st-displayed-pages="displayedPages"></div>
                     </td>
                 </tr>
                 </tfoot>

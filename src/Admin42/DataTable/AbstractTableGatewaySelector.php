@@ -9,6 +9,8 @@
 
 namespace Admin42\DataTable;
 
+use Zend\Db\Sql\Sql;
+
 abstract class AbstractTableGatewaySelector extends AbstractDataTableSelector
 {
     protected $tableGateway = '';
