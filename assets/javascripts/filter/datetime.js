@@ -10,7 +10,6 @@ angular.module('admin42')
             if (angular.isUndefined(timezone)) {
                 timezone = appConfig.timezone;
             }
-            console.log(format);
             var dateTime;
             if (angular.isObject(input)) {
                 if (angular.isUndefined(input.date)) {
