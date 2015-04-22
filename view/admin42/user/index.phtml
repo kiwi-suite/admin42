@@ -4,33 +4,66 @@
         <?= $this->translate('title.users', 'admin') ?>
     </h1>
 </div>
-
 <div class="wrapper-md">
     <div class="panel panel-default">
         <div class="table-responsive" ng-controller="DataGridController" data-url="<?= $this->url()?>">
             <table st-table="collection"  st-pipe="callServer" class="table table-striped top-border-radius">
                 <thead>
                 <tr>
-                    <th st-sort="id"><?= $this->translate('field.id', 'admin') ?></th>
-                    <th st-sort="email"><?= $this->translate('field.email', 'admin') ?></th>
+                    <th width="10%" st-sort="id"><?= $this->translate('field.id', 'admin') ?></th>
+                    <th width="15%" st-sort="email"><?= $this->translate('field.email', 'admin') ?></th>
+                    <th width="15%" st-sort="username"><?= $this->translate('field.username', 'admin') ?></th>
+                    <th width="15%" st-sort="displayName"><?= $this->translate('field.display-name', 'admin') ?></th>
+                    <th width="10%"><?= $this->translate('field.role', 'admin') ?></th>
+                    <th width="15%" st-sort="created"><?= $this->translate('field.created', 'admin') ?></th>
+                    <th width="15%" st-sort="lastLogin"><?= $this->translate('field.last-login', 'admin') ?></th>
                     <th></th>
                 </tr>
                 <tr>
                     <th>
-                        <input st-search="'id'" placeholder="<?= $this->translate('search.id', 'admin') ?>" class="input-sm form-control" type="search"/>
+                        <div class="input-group input-group-sm">
+                            <span class="input-group-addon">
+                                <i class="fa fa-fw fa-search"></i>
+                            </span>
+                            <input st-search="'id'" placeholder="<?= $this->translate('search.id', 'admin') ?>" class="form-control" type="text"/>
+                        </div>
                     </th>
                     <th>
-                        <input st-search="'email'" placeholder="<?= $this->translate('search.email', 'admin') ?>" class="input-sm form-control" type="search"/>
+                        <div class="input-group input-group-sm">
+                            <span class="input-group-addon">
+                                <i class="fa fa-fw fa-search"></i>
+                            </span>
+                            <input st-search="'email'" placeholder="<?= $this->translate('search.email', 'admin') ?>" class="form-control" type="text"/>
+                        </div>
                     </th>
                     <th>
-
+                        <div class="input-group input-group-sm">
+                            <span class="input-group-addon">
+                                <i class="fa fa-fw fa-search"></i>
+                            </span>
+                            <input st-search="'username'" placeholder="<?= $this->translate('search.username', 'admin') ?>" class="form-control" type="text"/>
+                        </div>
                     </th>
+                    <th>
+                        <div class="input-group input-group-sm">
+                            <span class="input-group-addon">
+                                <i class="fa fa-fw fa-search"></i>
+                            </span>
+                            <input st-search="'displayName'" placeholder="<?= $this->translate('search.display-name', 'admin') ?>" class="form-control" type="text"/>
+                        </div>
+                    </th>
+                    <th colspan="4"></th>
                 </tr>
                 </thead>
                 <tbody ng-hide="isLoading">
                     <tr ng-repeat="row in collection">
                         <td><code>#{{row.id}}</code></td>
                         <td>{{row.email}}</td>
+                        <td>{{row.username}}</td>
+                        <td>{{row.displayName}}</td>
+                        <td><span class="label label-info">{{row.role}}</span></td>
+                        <td><small>{{row.created | datetime}}</small></td>
+                        <td><small>{{row.lastLogin | datetime}}</small></td>
                         <td>
                             <a class="btn btn-default btn-sm" ng-href="<?= $this->url("admin/user/edit", array('id' => "{{ row.id }}"))?>">
                                 <span class="fa fa-pencil" aria-hidden="true"></span>
@@ -41,12 +74,12 @@
                 </tbody>
                 <tbody ng-show="isLoading">
                     <tr>
-                        <td colspan="5" class="text-center"><i class="fa fa-spin fa-refresh"></i></td>
+                        <td colspan="8" class="text-center"><i class="fa fa-spin fa-refresh"></i></td>
                     </tr>
                 </tbody>
                 <tfoot>
                 <tr>
-                    <td colspan="5" class="text-center">
+                    <td colspan="8" class="text-center">
                         <div st-pagination="" st-items-by-page="10" st-displayed-pages="displayedPages"></div>
                     </td>
                 </tr>

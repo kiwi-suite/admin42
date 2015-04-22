@@ -8,15 +8,15 @@ class UserSelector extends AbstractSmartTableSelector
     /**
      * @var null|array
      */
-    protected $columns = ['id', 'email', 'created'];
+    protected $columns = ['id', 'email', 'created', 'lastLogin', 'username', 'displayName', 'role'];
 
     /**
      * @var null|array
      */
-    protected $searchAbleColumns = ['id', 'email'];
+    protected $searchAbleColumns = ['id', 'email', 'username', 'displayName'];
 
     /**
      * @var array
      */
-    protected $sortAbleColumns = ['id', 'email'];
+    protected $sortAbleColumns = ['id', 'email', 'created', 'lastLogin', 'username', 'displayName', 'role'];
 }

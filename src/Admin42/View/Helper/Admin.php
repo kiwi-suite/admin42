@@ -49,8 +49,16 @@ class Admin extends AbstractHelper
      */
     public function angularBootstrap()
     {
-        return "angular.element(document).ready(function(){"
-            . "angular.bootstrap(document, ".json_encode($this->config['angular']['modules']).");"
+        $appConfig = [
+            'locale' => \Locale::getDefault(),
+            'defaultDateTimeFormat' => 'LLL',
+            'timezone' => date_default_timezone_get(),
+        ];
+        return "var APP;"
+            . "angular.element(document).ready(function(){"
+            . "APP = angular.module('APP', ".json_encode($this->config['angular']['modules']).");"
+            . "APP.constant('appConfig', ".json_encode($appConfig).");"
+            . "angular.bootstrap(document, ['APP']);"
             . "});" . PHP_EOL;
     }
 }

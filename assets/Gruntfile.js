@@ -28,7 +28,9 @@ module.exports = function(grunt) {
                     '<%= vendor_dir %>/angular-animate/angular-animate.js',
                     '<%= vendor_dir %>/angular-smart-table/dist/smart-table.min.js',
                     '<%= vendor_dir %>/angular-ui-utils/ui-utils.js',
-                    '<%= vendor_dir %>/screenfull/dist/screenfull.js'
+                    '<%= vendor_dir %>/screenfull/dist/screenfull.js',
+                    '<%= vendor_dir %>/moment/min/moment-with-locales.js',
+                    '<%= vendor_dir %>/moment-timezone/builds/moment-timezone-with-data.js'
                 ],
                 dest: '<%= dist %>/js/vendor.js'
             },
@@ -36,6 +38,7 @@ module.exports = function(grunt) {
                 src: [
                     'javascripts/*.js',
                     'javascripts/directive/*.js',
+                    'javascripts/filter/*.js',
                     'javascripts/controller/*.js'
                 ],
                 dest: '<%= dist %>/js/admin42.js'
