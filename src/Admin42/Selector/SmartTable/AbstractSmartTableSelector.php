@@ -161,7 +161,7 @@ abstract class AbstractSmartTableSelector extends AbstractTableGatewaySelector
         $paginator->setItemCountPerPage($this->limit);
         $paginator->setCurrentPageNumber(floor($this->offset/$this->limit) + 1);
 
-        $data = $this->cleanUpColumns($paginator->getCurrentItems()->toArray());
+        $data = $this->cleanUpColumns($paginator->getCurrentItems()->getArrayCopy());
 
         return new JsonModel(array(
             'data' => $data,
@@ -181,15 +181,19 @@ abstract class AbstractSmartTableSelector extends AbstractTableGatewaySelector
             return $data;
         }
 
-        foreach ($data as &$_item) {
-            $keys = array_keys($_item);
+        $newData = array();
+
+        foreach ($data as $_item) {
+            $itemData = $_item->toArray();
+            $keys = array_keys($itemData);
             foreach ($keys as $_key) {
                 if (!in_array($_key, $this->columns)) {
-                    unset($_item[$_key]);
+                    unset($itemData[$_key]);
                 }
             }
+            $newData[] = $itemData;
         }
 
-        return $data;
+        return $newData;
     }
 }
