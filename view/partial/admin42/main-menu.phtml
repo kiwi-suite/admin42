@@ -50,7 +50,7 @@ foreach ($this->iterator as $page){
         $html[] = '</a>';
     } else {
         $html[] = '<li'.(($isActive) ? ' class="active"' : "").'>';
-        $html[] = '<a href="'.$href.'"><span>' . $label . '</span></a>';
+        $html[] = '<a href="'.$href.'">'. $icon .'<span class="'.(($depth == 0) ? "font-bold" : "").'">' . $label . '</span></a>';
     }
 
     $prevDepth = $depth;
