@@ -66,16 +66,6 @@ return array(
                         ),
                         'may_terminate' => true,
                         'child_routes' => array(
-                            'index-sidebar' => array(
-                                'type' => 'Zend\Mvc\Router\Http\Literal',
-                                'options' => array(
-                                    'route' => 'index-sidebar/',
-                                    'defaults' => array(
-                                        'action' => 'index-sidebar',
-                                    ),
-                                ),
-                            ),
-
                             'manage' => array(
                                 'type' => 'Zend\Mvc\Router\Http\Literal',
                                 'options' => array(
