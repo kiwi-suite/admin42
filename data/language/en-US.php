@@ -2,6 +2,7 @@
 
 return array(
     'button.save'                   => 'Save',
+    'button.ok'                     => 'Ok',
     'button.cancel'                 => 'Cancel',
     'button.delete'                 => 'Delete',
     'button.edit'                   => 'Edit',
