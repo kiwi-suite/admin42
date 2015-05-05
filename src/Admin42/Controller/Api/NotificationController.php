@@ -17,18 +17,20 @@ use Zend\Db\Sql\Select;
 
 class NotificationController extends AbstractAdminController
 {
-
+    /**
+     * @return JsonModel
+     */
     public function listAction()
     {
         /** @var AuthenticationService $authService */
         $authService = $this->getServiceLocator()->get('Admin42\Authentication');
 
-        $notifications = array();
+        $notifications = [];
 
         $result = $this->getTableGateway('Admin42\Notification')->select(function(Select $select) use ($authService){
-            $select->where(array(
+            $select->where([
                 'userId' => $authService->getIdentity()->getId()
-            ));
+            ]);
             $select->order("created DESC");
             $select->limit(15);
         });
@@ -39,30 +41,33 @@ class NotificationController extends AbstractAdminController
             if (strlen($_notification->getRoute()) > 0) {
                 $params = (strlen($_notification->getRouteParams()) > 0)
                     ? json_decode($_notification->getRouteParams(), true)
-                    : array();
+                    : [];
                 $link = $this->url()->fromRoute($_notification->getRoute(), $params);
             }
 
-            $notifications[] = array(
+            $notifications[] = [
                 'id' => $_notification->getId(),
                 'text' => $_notification->getText(),
                 'link' => $link,
                 'created' => $_notification->getCreated()->format("Y-m-d H:i:s")
-            );
+            ];
         }
 
         return new JsonModel($notifications);
     }
 
+    /**
+     * @return JsonModel
+     */
     public function clearAction()
     {
         /** @var AuthenticationService $authenticationService */
         $authenticationService = $this->getServiceLocator()->get('Admin42\Authentication');
 
-        $this->getTableGateway('Admin42\Notification')->delete(array(
+        $this->getTableGateway('Admin42\Notification')->delete([
             'userId' => $authenticationService->getIdentity()->getId()
-        ));
+        ]);
 
-        return new JsonModel(array('success' => true));
+        return new JsonModel(['success' => true]);
     }
 }
