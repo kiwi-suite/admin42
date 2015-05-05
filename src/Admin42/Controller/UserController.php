@@ -279,7 +279,6 @@ class UserController extends AbstractAdminController
                 $this->flashMessenger()->addSuccessMessage("Success");
             }
         } else {
-
             $manageForm->setData(array(
                 'username' => $authenticationService->getIdentity()->getUsername(),
                 'email' => $authenticationService->getIdentity()->getEmail(),

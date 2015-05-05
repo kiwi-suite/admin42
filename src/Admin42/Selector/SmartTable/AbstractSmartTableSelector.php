@@ -66,7 +66,7 @@ abstract class AbstractSmartTableSelector extends AbstractTableGatewaySelector
         if (!empty($config['sort'])
             && !empty($config['sort']['predicate'])
             && ($config['sort']['reverse'] === true || $config['sort']['reverse'] === false)
-            && ($this->sortAbleColumns === null || in_array($config['sort']['predicate'] , $this->sortAbleColumns))
+            && ($this->sortAbleColumns === null || in_array($config['sort']['predicate'], $this->sortAbleColumns))
         ) {
             $this->sort = [
                 'column' => $config['sort']['predicate'],

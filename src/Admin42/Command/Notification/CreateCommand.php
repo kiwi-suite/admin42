@@ -64,7 +64,7 @@ class CreateCommand extends AbstractCommand
             foreach ($users as $_user) {
                 $this->userIds[] = $_user->getId();
             }
-        } elseif (is_array($users)){
+        } elseif (is_array($users)) {
             $this->userIds = $users;
         } elseif ($users instanceof \Closure) {
             $this->userIds = (array) $users();

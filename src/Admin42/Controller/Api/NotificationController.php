@@ -27,7 +27,7 @@ class NotificationController extends AbstractAdminController
 
         $notifications = [];
 
-        $result = $this->getTableGateway('Admin42\Notification')->select(function(Select $select) use ($authService){
+        $result = $this->getTableGateway('Admin42\Notification')->select(function (Select $select) use ($authService) {
             $select->where([
                 'userId' => $authService->getIdentity()->getId()
             ]);
