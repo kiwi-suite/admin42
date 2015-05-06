@@ -1,22 +1,66 @@
 <?php
 namespace Admin42\Selector\SmartTable;
 
+use Core42\Db\ResultSet\ResultSet;
+use Zend\Db\Sql\Select;
+
 class UserSelector extends AbstractSmartTableSelector
 {
-    protected $tableGateway = 'Admin42\User';
+    /**
+     * @return Select|string|ResultSet
+     */
+    protected function getSelect()
+    {
+        $gateway = $this->getTableGateway('Admin42\User');
+
+        $select = $gateway->getSql()->select();
+
+        $where = $this->getWhere();
+        if (!empty($where)) {
+            $select->where($where);
+        }
+
+        $order = $this->getOrder();
+        if (!empty($order)) {
+            $select->order($order);
+        }
+
+        return $select;
+    }
 
     /**
-     * @var null|array
+     * @return array
      */
-    protected $columns = ['id', 'email', 'created', 'lastLogin', 'username', 'displayName', 'role'];
+    protected function getDatabaseTypeMap()
+    {
+        return [
+            'id' => 'Mysql/Integer',
+            'lastLogin' => 'Mysql/Datetime',
+            'created' => 'Mysql/Datetime',
+        ];
+    }
 
     /**
-     * @var null|array
+     * @return array
      */
-    protected $searchAbleColumns = ['id', 'email', 'username', 'displayName'];
+    function getSearchAbleColumns()
+    {
+        return ['id', 'email', 'username', 'displayName'];
+    }
 
     /**
-     * @var array
+     * @return array
      */
-    protected $sortAbleColumns = ['id', 'email', 'created', 'lastLogin', 'username', 'displayName', 'role'];
+    function getSortAbleColumns()
+    {
+        return ['id', 'email', 'created', 'lastLogin', 'username', 'displayName', 'role'];
+    }
+
+    /**
+     * @return array
+     */
+    function getDisplayColumns()
+    {
+        return ['id', 'email', 'created', 'lastLogin', 'username', 'displayName', 'role'];
+    }
 }

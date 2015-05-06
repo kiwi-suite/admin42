@@ -2,6 +2,7 @@
 namespace Admin42\Selector\SmartTable;
 
 use Core42\Db\ResultSet\ResultSet;
+use Core42\Selector\AbstractDatabaseSelector;
 use Core42\Selector\AbstractTableGatewaySelector;
 use Core42\View\Model\JsonModel;
 use Zend\Db\Sql\Predicate\PredicateSet;
@@ -10,7 +11,7 @@ use Zend\Json\Json;
 use Zend\Paginator\Adapter\DbSelect;
 use Zend\Paginator\Paginator;
 
-abstract class AbstractSmartTableSelector extends AbstractTableGatewaySelector
+abstract class AbstractSmartTableSelector extends AbstractDatabaseSelector
 {
     /**
      * @var int
@@ -33,20 +34,22 @@ abstract class AbstractSmartTableSelector extends AbstractTableGatewaySelector
     protected $search = null;
 
     /**
-     * @var null|array
-     */
-    protected $searchAbleColumns = null;
-
-    /**
-     * @var null|array
-     */
-    protected $sortAbleColumns = null;
-
-    /**
-     *
+     * @throws \Exception
      */
     protected function init()
     {
+        parent::init();
+
+        if (!is_array($this->getSearchAbleColumns())) {
+            throw new \Exception("'getSearchAbleColumns' doesn't return an array");
+        }
+        if (!is_array($this->getSortAbleColumns())) {
+            throw new \Exception("'getSortAbleColumns' doesn't return an array");
+        }
+        if (!is_array($this->getDisplayColumns())) {
+            throw new \Exception("'getDisplayColumns' doesn't return an array");
+        }
+
         $request = $this->getServiceManager()->get("Request");
 
         $config = Json::decode($request->getContent(), Json::TYPE_ARRAY);
@@ -66,7 +69,7 @@ abstract class AbstractSmartTableSelector extends AbstractTableGatewaySelector
         if (!empty($config['sort'])
             && !empty($config['sort']['predicate'])
             && ($config['sort']['reverse'] === true || $config['sort']['reverse'] === false)
-            && ($this->sortAbleColumns === null || in_array($config['sort']['predicate'], $this->sortAbleColumns))
+            && (in_array($config['sort']['predicate'], $this->getSortAbleColumns()))
         ) {
             $this->sort = [
                 'column' => $config['sort']['predicate'],
@@ -79,6 +82,21 @@ abstract class AbstractSmartTableSelector extends AbstractTableGatewaySelector
     /**
      * @return array
      */
+    abstract function getSearchAbleColumns();
+
+    /**
+     * @return array
+     */
+    abstract function getSortAbleColumns();
+
+    /**
+     * @return array
+     */
+    abstract function getDisplayColumns();
+
+    /**
+     * @return array
+     */
     protected function getOrder()
     {
         if ($this->sort !== null) {
@@ -86,7 +104,7 @@ abstract class AbstractSmartTableSelector extends AbstractTableGatewaySelector
                 $this->sort['column'] => $this->sort['sort_sequence']
             ];
         }
-        return array();
+        return [];
     }
 
     /**
@@ -98,16 +116,12 @@ abstract class AbstractSmartTableSelector extends AbstractTableGatewaySelector
             return null;
         }
 
-        $tableGateway = $this->getTableGateway($this->tableGateway);
-        $searchAbleColumns = $this->searchAbleColumns;
-        if (empty($searchAbleColumns)) {
-            $searchAbleColumns = $tableGateway->getColumns();
-        }
+        $searchAbleColumns = $this->getSearchAbleColumns();
 
-        $searchWhere = array();
+        $searchWhere = [];
         foreach ($this->search as $column => $value) {
             if ($column == "$") {
-                $globalWhere = array();
+                $globalWhere = [];
                 foreach ($searchAbleColumns as $_column) {
                     $where = new Where();
                     $where->like($_column, "%" . $value . "%");
@@ -136,58 +150,42 @@ abstract class AbstractSmartTableSelector extends AbstractTableGatewaySelector
     {
         $select = $this->getSelect();
 
-        if ($this->columns !== null) {
-            $select->columns($this->columns);
-        }
-
-        $where = $this->getWhere();
-        if (!empty($where)) {
-            $select->where($where);
-        }
-
-        $order = $this->getOrder();
-        if (!empty($order)) {
-            $select->order($order);
-        }
-
         $paginator = new Paginator(new DbSelect(
             $select,
-            $this->getTableGateway($this->tableGateway)->getSql(),
+            $this->getSql(),
             new ResultSet(
-                $this->getTableGateway($this->tableGateway)->getHydrator(),
-                $this->getTableGateway($this->tableGateway)->getModel()
+                $this->getHydrator(),
+                $this->getModel()
             )
         ));
         $paginator->setItemCountPerPage($this->limit);
         $paginator->setCurrentPageNumber(floor($this->offset/$this->limit) + 1);
 
-        $data = $this->cleanUpColumns($paginator->getCurrentItems()->getArrayCopy());
+        $data = $this->prepareColumns($paginator->getCurrentItems()->getArrayCopy());
 
-        return new JsonModel(array(
+        return new JsonModel([
             'data' => $data,
-            'meta' => array(
+            'meta' => [
                 'displayedPages' => $paginator->count(),
-            )
-        ));
+            ]
+        ]);
     }
 
     /**
      * @param array $data
      * @return array
      */
-    protected function cleanUpColumns(array $data)
+    protected function prepareColumns(array $data)
     {
-        if ($this->columns == null) {
-            return $data;
-        }
+        $displayColumns = $this->getDisplayColumns();
 
-        $newData = array();
+        $newData = [];
 
         foreach ($data as $_item) {
             $itemData = $_item->toArray();
             $keys = array_keys($itemData);
             foreach ($keys as $_key) {
-                if (!in_array($_key, $this->columns)) {
+                if (!in_array($_key, $displayColumns)) {
                     unset($itemData[$_key]);
                 }
             }
