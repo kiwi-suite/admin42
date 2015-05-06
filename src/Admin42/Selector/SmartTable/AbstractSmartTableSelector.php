@@ -82,17 +82,17 @@ abstract class AbstractSmartTableSelector extends AbstractDatabaseSelector
     /**
      * @return array
      */
-    abstract function getSearchAbleColumns();
+    abstract protected function getSearchAbleColumns();
 
     /**
      * @return array
      */
-    abstract function getSortAbleColumns();
+    abstract protected function getSortAbleColumns();
 
     /**
      * @return array
      */
-    abstract function getDisplayColumns();
+    abstract protected function getDisplayColumns();
 
     /**
      * @return array

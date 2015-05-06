@@ -43,7 +43,7 @@ class UserSelector extends AbstractSmartTableSelector
     /**
      * @return array
      */
-    function getSearchAbleColumns()
+    protected function getSearchAbleColumns()
     {
         return ['id', 'email', 'username', 'displayName'];
     }
@@ -51,7 +51,7 @@ class UserSelector extends AbstractSmartTableSelector
     /**
      * @return array
      */
-    function getSortAbleColumns()
+    protected function getSortAbleColumns()
     {
         return ['id', 'email', 'created', 'lastLogin', 'username', 'displayName', 'role'];
     }
@@ -59,7 +59,7 @@ class UserSelector extends AbstractSmartTableSelector
     /**
      * @return array
      */
-    function getDisplayColumns()
+    protected function getDisplayColumns()
     {
         return ['id', 'email', 'created', 'lastLogin', 'username', 'displayName', 'role'];
     }
