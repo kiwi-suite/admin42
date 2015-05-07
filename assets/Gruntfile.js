@@ -120,6 +120,24 @@ module.exports = function(grunt) {
                         dest: '<%= dist %>/images/'
                     }
                 ]
+            },
+            flagicons: {
+                files: [
+                    {
+                        expand: true,
+                        flatten: true,
+                        src: ['<%= vendor_dir %>/flag-icon-css/flags/4x3/**'],
+                        dest: '<%= dist %>/flags/4x3/',
+                        filter: 'isFile'
+                    },
+                    {
+                        expand: true,
+                        flatten: true,
+                        src: ['<%= vendor_dir %>/flag-icon-css/flags/1x1/**'],
+                        dest: '<%= dist %>/flags/1x1/',
+                        filter: 'isFile'
+                    }
+                ]
             }
         },
 
