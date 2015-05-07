@@ -22,12 +22,4 @@ $id = uniqid();
             </ul>
         <?php endif; ?>
     </div>
-    <script>
-        $(document).ready(function() {
-            $("#<?= $id ?>").select2({
-                escapeMarkup: function (m) { return m; },
-                minimumResultsForSearch: 5
-            });
-        });
-    </script>
 </div>
