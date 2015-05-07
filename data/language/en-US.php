@@ -42,4 +42,13 @@ return array(
 
     'text.login-description'        => 'Enter username/email and password to continue.',
     'text.lostpw-description'       => 'To reset your password, enter the email address you use to sign in.',
+
+    'toaster.user.detail.title.success'     => 'User saved',
+    'toaster.user.detail.message.success'   => 'User was saved successfully',
+    'toaster.user.detail.title.error'       => 'User not saved',
+    'toaster.user.detail.message.error'     => 'There was an error in saving the user',
+    'toaster.user.delete.title.success'     => 'User deleted',
+    'toaster.user.delete.message.success'   => 'User was deleted successfully',
+    'toaster.user.manage.title.success'     => 'Profile saved',
+    'toaster.user.manage.message.success'   => 'Profile was saved successfully',
 );

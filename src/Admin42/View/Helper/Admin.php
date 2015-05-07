@@ -83,11 +83,11 @@ class Admin extends AbstractHelper
         $flash = $this->getView()->plugin('flashMessenger');
         foreach (array_keys($messages) as $type) {
             if ($flash->hasCurrentMessages($type)) {
-                $messages[$type][] = $flash->getCurrentMessages($type);
+                $messages[$type] = array_merge($messages[$type], $flash->getCurrentMessages($type));
                 $flash->clearCurrentMessagesFromNamespace($type);
             }
             if ($flash->hasMessages($type)) {
-                $messages[$type][] = $flash->getMessages($type);
+                $messages[$type] = array_merge($messages[$type], $flash->getMessages($type));
                 $flash->clearMessagesFromNamespace($type);
             }
 

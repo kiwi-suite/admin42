@@ -57,11 +57,17 @@ class UserController extends AbstractAdminController
                             ->setData($prg)
                             ->run();
             if (!$formCommand->hasErrors()) {
-                $this->flashMessenger()->addSuccessMessage("Success");
+                $this->flashMessenger()->addSuccessMessage([
+                    'title' => 'toaster.user.detail.title.success',
+                    'message' => 'toaster.user.detail.message.success',
+                ]);
 
                 return $this->redirect()->toRoute('admin/user/edit', array('id' => $user->getId()));
             } else {
-                $this->flashMessenger()->addErrorMessage("Error");
+                $this->flashMessenger()->addErrorMessage([
+                    'title' => 'toaster.user.detail.title.error',
+                    'message' => 'toaster.user.detail.message.error',
+                ]);
             }
         } else {
             if ($isEditMode === true) {
@@ -106,7 +112,10 @@ class UserController extends AbstractAdminController
             $deleteCmd->setUserId((int) $this->params()->fromPost('id'))
                 ->run();
 
-            $this->flashMessenger()->addSuccessMessage("Success");
+            $this->flashMessenger()->addSuccessMessage([
+                'title' => 'toaster.user.delete.title.success',
+                'message' => 'toaster.user.delete.message.success',
+            ]);
             return $this->redirect()->toRoute('admin/user');
         }
 
@@ -276,7 +285,10 @@ class UserController extends AbstractAdminController
 
 
             if (!$formCmd->hasErrors()) {
-                $this->flashMessenger()->addSuccessMessage("Success");
+                $this->flashMessenger()->addSuccessMessage([
+                    'title' => 'toaster.user.manage.title.success',
+                    'message' => 'toaster.user.manage.message.success',
+                ]);
             }
         } else {
             $manageForm->setData(array(

@@ -12,7 +12,7 @@ angular.module('admin42').controller('AppController',['$scope', 'toaster', '$tim
             }
 
             angular.forEach(messages, function(message){
-                toaster.pop(namespace, message.title, message.text);
+                toaster.pop(namespace, message.title, message.message);
             });
         });
     }, 1000);
