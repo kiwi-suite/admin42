@@ -1,8 +1,8 @@
-angular.module('admin42').controller('AppController',['$scope', 'toaster', '$timeout', function($scope, toaster, $timeout){
+angular.module('admin42').controller('AppController',['$scope', 'toaster', '$timeout', '$localStorage', function($scope, toaster, $timeout, $localStorage){
     $scope.app = {
-        settings: {
+        $storage: $localStorage.$default({
             asideFolded: false
-        }
+        })
     };
 
     $timeout(function(){
