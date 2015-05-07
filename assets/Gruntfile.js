@@ -29,6 +29,8 @@ module.exports = function(grunt) {
                     '<%= vendor_dir %>/angular-smart-table/dist/smart-table.js',
                     '<%= vendor_dir %>/angular-ui-utils/ui-utils.js',
                     '<%= vendor_dir %>/screenfull/dist/screenfull.js',
+                    '<%= vendor_dir %>/angularjs-toaster/toaster.js',
+                    '<%= vendor_dir %>/ngstorage/ngStorage.js',
                     '<%= vendor_dir %>/moment/min/moment-with-locales.js',
                     '<%= vendor_dir %>/moment-timezone/builds/moment-timezone-with-data.js'
                 ],
@@ -68,6 +70,7 @@ module.exports = function(grunt) {
                 files: {
                     '<%= dist %>/css/admin42.min.css': [
                         '<%= vendor_dir %>/animate.css/animate.css',
+                        '<%= vendor_dir %>/angularjs-toaster/toaster.css',
                         'less/main.less'
                     ]
                 }

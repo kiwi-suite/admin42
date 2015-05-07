@@ -11,6 +11,8 @@
 
     <script>
         <?= $this->admin()->angularBootstrap() ?>
+
+        <?= $this->admin()->flashMessenger() ?>
     </script>
 </head>
 
@@ -22,9 +24,11 @@
 
     <?= $this->partial('partial/admin42/sidebar') ?>
 
+    <toaster-container toaster-options="{'position-class': 'toast-top-right', 'close-button':true}"></toaster-container>
+
     <div class="app-content">
         <a href class="off-screen-toggle hide" ui-toggle-class="off-screen" data-target=".app-aside" ></a>
-        <div class="app-content-body fade-in-up">
+        <div class="app-content-body">
             <?= $this->content ?>
 
         </div>

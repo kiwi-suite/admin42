@@ -10,6 +10,8 @@
 namespace Admin42\View\Helper;
 
 use Admin42\Model\User;
+use Zend\I18n\View\Helper\Translate;
+use Zend\Mvc\Controller\Plugin\FlashMessenger;
 use Zend\View\Helper\AbstractHelper;
 
 class Admin extends AbstractHelper
@@ -17,7 +19,7 @@ class Admin extends AbstractHelper
     /**
      * @var array
      */
-    private $config = array();
+    private $config = [];
 
     /**
      * @param array $config
@@ -60,5 +62,48 @@ class Admin extends AbstractHelper
             . "APP.constant('appConfig', ".json_encode($appConfig).");"
             . "angular.bootstrap(document, ['APP']);"
             . "});" . PHP_EOL;
+    }
+
+    /**
+     * @return string
+     */
+    public function flashMessenger()
+    {
+        $messages = [
+            FlashMessenger::NAMESPACE_ERROR => [],
+            FlashMessenger::NAMESPACE_WARNING => [],
+            FlashMessenger::NAMESPACE_SUCCESS => [],
+            FlashMessenger::NAMESPACE_INFO => [],
+        ];
+
+        /** @var Translate $translator */
+        $translator = $this->getView()->plugin('translate');
+
+        /** @var \Zend\View\Helper\FlashMessenger $flash */
+        $flash = $this->getView()->plugin('flashMessenger');
+        foreach (array_keys($messages) as $type) {
+            if ($flash->hasCurrentMessages($type)) {
+                $messages[$type][] = $flash->getCurrentMessages($type);
+                $flash->clearCurrentMessagesFromNamespace($type);
+            }
+            if ($flash->hasMessages($type)) {
+                $messages[$type][] = $flash->getMessages($type);
+                $flash->clearMessagesFromNamespace($type);
+            }
+
+            foreach ($messages[$type] as &$_msg) {
+                if (is_string($_msg)) {
+                    $_msg = ['title' => 'toaster.'.$type, 'message' => $_msg];
+                }
+
+                $_msg = [
+                    'title' => $translator($_msg['title'], 'admin'),
+                    'message' => $translator($_msg['message'], 'admin'),
+                ];
+            }
+        }
+
+
+        return "var FLASH_MESSAGE = " . json_encode($messages) . ";" . PHP_EOL;
     }
 }
