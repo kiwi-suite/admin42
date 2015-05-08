@@ -139,6 +139,10 @@ abstract class AbstractSmartTableSelector extends AbstractDatabaseSelector
             $searchWhere[] = $where;
         }
 
+        if (empty($searchWhere)) {
+            return null;
+        }
+
         $predicateSet = new PredicateSet($searchWhere, PredicateSet::COMBINED_BY_AND);
         return $predicateSet;
     }
