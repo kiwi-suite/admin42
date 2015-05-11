@@ -26,9 +26,6 @@ angular.module('smart-table')
                     return ctrl.tableState().search;
                 }, function (newValue, oldValue) {
                     var predicateExpression = attr.stSearch42 || '$';
-
-                    console.log(predicateExpression, element[0].value, element[0]);
-
                     if (newValue.predicateObject && newValue.predicateObject[predicateExpression] !== element[0].value) {
                         element[0].value = newValue.predicateObject[predicateExpression] || '';
                     }
