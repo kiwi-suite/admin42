@@ -144,8 +144,12 @@ module.exports = function(grunt) {
         clean: {
             all: ['<%= dist %>/fonts/', '<%= dist %>/css/', '<%= dist %>/js/', '<%= dist %>/images/'],
 
-            vendorjs: ['<%= dist %>/js/vendor.js'],
-            appjs: ['<%= dist %>/js/admin42.js']
+            vendorjs: [
+                //'<%= dist %>/js/vendor.js'
+            ],
+            appjs: [
+                //'<%= dist %>/js/admin42.js'
+            ]
         },
 
         watch: {
