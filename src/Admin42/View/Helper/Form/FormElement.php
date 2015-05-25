@@ -12,6 +12,10 @@ use Zend\Form\ElementInterface;
 
 class FormElement extends \Zend\Form\View\Helper\FormElement
 {
+    /**
+     * @param ElementInterface $element
+     * @return string
+     */
     public function renderElement(ElementInterface $element)
     {
         $type = $this->getType($element);

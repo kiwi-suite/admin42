@@ -156,7 +156,7 @@ class EditCommand extends AbstractCommand
             $this->addError("email", "invalid email address");
         }
 
-        if ($this->getTableGateway('Admin42\User')->select(function(Select $select) {
+        if ($this->getTableGateway('Admin42\User')->select(function (Select $select) {
             $select->where(function (Where $where) {
                 $where->equalTo('email', $this->email);
                 $where->notEqualTo('id', $this->user->getId());

@@ -36,7 +36,7 @@ class FormCollection extends \Zend\Form\View\Helper\FormCollection
 
         if ($element instanceof CollectionElement && $element->shouldCreateTemplate()) {
             $templateProtoTypes[] = $this->renderCollectionTemplate($element);
-        } else if ($element instanceof Dynamic) {
+        } elseif ($element instanceof Dynamic) {
             $templateProtoTypes = $this->renderDynamicTemplate($element);
         }
 

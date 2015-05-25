@@ -98,7 +98,7 @@ class Dynamic extends Fieldset
 
         $name = $this->getName();
         $templateElements = $this->getTemplateElements();
-        foreach ($templateElements as  $elementOrFieldset) {
+        foreach ($templateElements as $elementOrFieldset) {
             $elementOrFieldset->setName($name . '[' . $elementOrFieldset->getName() . ']');
 
             // Recursively prepare elements
@@ -131,7 +131,7 @@ class Dynamic extends Fieldset
             return;
         }
 
-        uasort($data, function($value1, $value2){
+        uasort($data, function ($value1, $value2) {
             if (!array_key_exists('dynamic_index', $value1) || !array_key_exists('dynamic_index', $value2)) {
                 return 0;
             }
