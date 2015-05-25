@@ -1,8 +1,46 @@
-angular.module('admin42', ['ui.bootstrap', 'ngAnimate', 'ui.utils', 'smart-table', 'toaster', 'ngStorage']);
+angular.module('admin42', ['ui.bootstrap', 'ngAnimate', 'ui.utils', 'smart-table', 'toaster', 'ngStorage', 'ui.sortable']);
 
 angular.module('admin42').config(['$httpProvider', function($httpProvider) {
     $httpProvider.defaults.headers.common["X-Requested-With"] = 'XMLHttpRequest';
 }]);
+;angular.module('admin42')
+    .directive('adminDynamicForm', [function() {
+        return {
+            restrict: 'A',
+            scope: {
+                templateName: '@',
+                adminDynamicFormElements: '@',
+                adminDynamicPrototypes: '@'
+            },
+            templateUrl: 'dynamic_form/base.html',
+            controller: ['$scope', function($scope) {
+                $scope.data = {};
+                $scope.elements = angular.fromJson($scope.adminDynamicFormElements);
+                $scope.prototypes = angular.fromJson($scope.adminDynamicPrototypes);
+
+                $scope.data.selectedPrototype = $scope.prototypes[0];
+
+                $scope.addTemplate = function() {
+                    $scope.elements.push($scope.data.selectedPrototype);
+                };
+
+                $scope.sortableOptions = {
+                    axis: 'y',
+                    opacity: 0.5,
+                    handle: '.panel-sort-handle',
+                    items: "> .sortable-container",
+                    placeholder: "sortable-placeholder"
+                };
+
+                $scope.getName = function(element, name, index) {
+                    if (element.initial === false) {
+                        return element.name + '[' + index +'][' + name + ']';
+                    }
+                    return element.name + '[' + name + ']';
+                }
+            }]
+        };
+    }]);
 ;angular.module('admin42')
     .directive('uiFullscreen', ['$document', function($document) {
         return {

@@ -11,6 +11,8 @@ namespace Admin42\Command\User;
 
 use Admin42\Model\User;
 use Core42\Command\AbstractCommand;
+use Zend\Db\Sql\Select;
+use Zend\Db\Sql\Where;
 use Zend\Validator\EmailAddress;
 
 class EditCommand extends AbstractCommand
@@ -133,6 +135,8 @@ class EditCommand extends AbstractCommand
 
         if (!($this->user instanceof User)) {
             $this->addError("user", "invalid user");
+
+            return;
         }
 
         $this->username = (empty($this->username)) ? null : $this->username;
@@ -150,6 +154,15 @@ class EditCommand extends AbstractCommand
 
         if (!$emailValidator->isValid($this->email)) {
             $this->addError("email", "invalid email address");
+        }
+
+        if ($this->getTableGateway('Admin42\User')->select(function(Select $select) {
+            $select->where(function (Where $where) {
+                $where->equalTo('email', $this->email);
+                $where->notEqualTo('id', $this->user->getId());
+            });
+        })->count() > 0) {
+            $this->addError("email", "Email already taken");
         }
 
         if (!empty($this->username)) {

@@ -9,6 +9,7 @@
 
 namespace Admin42\Form\User;
 
+use Admin42\FormElements\Dynamic;
 use Admin42\FormElements\Role;
 use Zend\Form\Element\Csrf;
 use Zend\Form\Element\Email;

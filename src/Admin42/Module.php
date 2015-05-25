@@ -15,6 +15,7 @@ use Zend\EventManager\EventInterface;
 use Zend\ModuleManager\Feature\BootstrapListenerInterface;
 use Zend\ModuleManager\Feature\ConfigProviderInterface;
 use Zend\Mvc\MvcEvent;
+use Zend\ServiceManager\Config;
 
 class Module implements ConfigProviderInterface, BootstrapListenerInterface
 {
@@ -28,7 +29,6 @@ class Module implements ConfigProviderInterface, BootstrapListenerInterface
             include __DIR__ . '/../../config/cli.config.php',
             include __DIR__ . '/../../config/permissions.config.php',
             include __DIR__ . '/../../config/assets.config.php',
-            include __DIR__ . '/../../config/form.config.php',
             include __DIR__ . '/../../config/navigation.config.php',
             include __DIR__ . '/../../config/project.config.php',
             include __DIR__ . '/../../config/translation.config.php',
@@ -63,14 +63,16 @@ class Module implements ConfigProviderInterface, BootstrapListenerInterface
 
                 $viewHelperManager = $sm->get('viewHelperManager');
 
+                $config = $sm->get('config');
+                $smConfig = new Config($config['admin']['view_helpers']);
+                $smConfig->configureServiceManager($viewHelperManager);
+
                 $headScript = $viewHelperManager->get('headScript');
                 $headLink = $viewHelperManager->get('headLink');
                 $basePath = $viewHelperManager->get('basePath');
 
                 $headScript->appendFile($basePath('/assets/admin/core/js/vendor.min.js'));
                 $headScript->appendFile($basePath('/assets/admin/core/js/admin42.min.js'));
-                //$headScript->appendFile($basePath('/assets/admin/core/js/vendor.js'));
-                //$headScript->appendFile($basePath('/assets/admin/core/js/admin42.js'));
                 $headLink->appendStylesheet($basePath('/assets/admin/core/css/admin42.min.css'));
             },
             100

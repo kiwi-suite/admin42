@@ -22,15 +22,24 @@ module.exports = function(grunt) {
             vendor: {
                 src: [
                     '<%= vendor_dir %>/jquery/dist/jquery.js',
+
+                    '<%= vendor_dir %>/jquery-ui/ui/core.js',
+                    '<%= vendor_dir %>/jquery-ui/ui/widget.js',
+                    '<%= vendor_dir %>/jquery-ui/ui/mouse.js',
+                    '<%= vendor_dir %>/jquery-ui/ui/sortable.js',
+
                     '<%= vendor_dir %>/angular/angular.js',
+
                     '<%= vendor_dir %>/angular-bootstrap/ui-bootstrap.js',
                     '<%= vendor_dir %>/angular-bootstrap/ui-bootstrap-tpls.js',
                     '<%= vendor_dir %>/angular-animate/angular-animate.js',
                     '<%= vendor_dir %>/angular-smart-table/dist/smart-table.min.js',
                     '<%= vendor_dir %>/angular-ui-utils/ui-utils.js',
+                    '<%= vendor_dir %>/angular-ui-sortable/sortable.js',
                     '<%= vendor_dir %>/screenfull/dist/screenfull.js',
                     '<%= vendor_dir %>/angularjs-toaster/toaster.js',
                     '<%= vendor_dir %>/ngstorage/ngStorage.js',
+
                     '<%= vendor_dir %>/moment/min/moment-with-locales.js',
                     '<%= vendor_dir %>/moment-timezone/builds/moment-timezone-with-data.js'
                 ],

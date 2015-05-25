@@ -1,0 +1,91 @@
+<script type="text/ng-template" id="dynamic_form/base.html">
+    <fieldset>
+        <legend><?= $this->element->getLabel() ?></legend>
+        <div ui-sortable="sortableOptions" ng-model="elements">
+            <div class="sortable-container" ng-repeat="element in elements track by $index">
+                <input type="hidden" name="{{ getName(element, 'dynamic_index', $index) }}" value="{{ $index }}">
+                <input type="hidden" name="{{ getName(element, 'dynamic_deleted', $index) }}" ng-model="element.deleted" value="{{ element.deleted }}">
+                <input type="hidden" name="{{ getName(element, 'dynamic_type', $index) }}" ng-model="element.type" value="{{ element.type }}">
+                <div class="panel panel-default" ng-class="{'marked-deleted' : element.deleted}">
+                    <div class="panel-heading">
+                        <div class="pull-right">
+                            <a class="btn btn-xs btn-info panel-sort-handle">
+                                <i class="fa fa-fw fa-sort"></i>
+                            </a>
+                            <button class="btn btn-xs btn-danger" type="button" ng-click="element.deleted = !element.deleted">
+                                <span ng-show="element.deleted" class="fa-stack">
+                                    <i class="fa fa-fw fa-trash fa-stack-1x"></i>
+                                    <i class="fa fa-fw fa-ban fa-stack-2x"></i>
+                                </span>
+                                <i ng-hide="element.deleted" class="fa fa-fw fa-trash"></i>
+                            </button>
+                        </div>
+                        <div class="clearfix text-left">
+                            <a class="btn btn-link btn-xs" ng-click="element.collapsed = !element.collapsed">
+                                <i class="fa fa-fw" ng-class="{'fa-chevron-down': !element.collapsed, 'fa-chevron-right': element.collapsed}"></i>
+                            </a>
+                            {{ element.label }}
+                        </div>
+                    </div>
+                    <div collapse="element.collapsed" class="panel-body">
+                        <ng-include src="element.templateName"></ng-include>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </fieldset>
+    <div class="form-group">
+        <div class="col-sm-offset-9 col-sm-2 text-right">
+            <select ng-if="prototypes.length > 1" class="form-control" ng-model="data.selectedPrototype" ng-options="prototype.label for prototype in prototypes"></select>
+        </div>
+        <div class="col-sm-1 text-right">
+            <button class="btn btn-default" ng-click="addTemplate()" type="button">
+                <?= $this->translate('button.add', 'admin')?>
+            </button>
+        </div>
+    </div>
+    <div class="line line-dashed b-b line-lg pull-in"></div>
+</script>
+
+<?php
+$preparedFormElements = [];
+$prototypesElements = [];
+?>
+
+<?php foreach ($this->elements as $element): ?>
+    <?php
+    $preparedFormElementTemplateName = uniqid('dynamic_form/element/') . '.html';
+    $preparedFormElements[] = [
+        'deleted' => false,
+        'collapsed' => false,
+        'templateName' => $preparedFormElementTemplateName,
+        'label' => $element['element']->getLabel(),
+        'type' => $element['element']->getOption('dynamic_type'),
+        'name' => $element['element']->getName(),
+        'initial' => true,
+    ];
+    ?>
+    <script type="text/ng-template" id="<?= $preparedFormElementTemplateName ?>">
+        <?= $element['markup'] ?>
+    </script>
+<?php endforeach; ?>
+
+<?php foreach($this->templateProtoTypes as $element): ?>
+    <?php
+    $prototypeFormElementTemplateName = uniqid('dynamic_form/prototype/') . '.html';
+    $prototypesElements[] = [
+        'deleted' => false,
+        'collapsed' => false,
+        'templateName' => $prototypeFormElementTemplateName,
+        'label' => $element['element']->getLabel(),
+        'type' => $element['element']->getOption('dynamic_type'),
+        'name' => str_replace('[' . $element['templatePlaceholder'] . ']', '', $element['element']->getName()), //remove templatePlaceholder from Name
+        'initial' => false,
+    ];
+    ?>
+    <script type="text/ng-template" id="<?= $prototypeFormElementTemplateName ?>">
+        <?= $element['markup'] ?>
+    </script>
+<?php endforeach; ?>
+
+<div admin-dynamic-form admin-dynamic-form-elements='<?= json_encode($preparedFormElements)?>' admin-dynamic-prototypes='<?= json_encode($prototypesElements)?>'></div>
