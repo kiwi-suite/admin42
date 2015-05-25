@@ -34,8 +34,6 @@ return array(
             'Admin42\IdentityRoleProvider' => 'Admin42\Permission\Rbac\Service\IdentityRoleProviderFactory',
 
             'Admin42\Navigation\Listener\RbacListener' => 'Admin42\Navigation\Listener\RbacListenerFactory',
-
-            'Admin42\DynamicAttributeProvider' => 'Admin42\DynamicAttribute\Service\ProviderPluginManagerFactory',
         ),
     ),
 
