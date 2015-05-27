@@ -25,7 +25,7 @@ $this->admin()->addJsonTemplate($jsonDataId, $values)
         <input type="hidden" name="<?= $this->element->getName() ?>" value="{{ item.selected.id}}">
         <ui-select ng-model="item.selected" reset-search-input="false">
             <ui-select-match placeholder="<?= $this->translate($this->element->getLabel(), 'admin') ?>">{{$select.selected.label}}</ui-select-match>
-            <ui-select-choices repeat="item in items track by $index">
+            <ui-select-choices repeat="item in items | filter: $select.search">
                 <div ng-bind-html="item.label | highlight: $select.search"></div>
             </ui-select-choices>
         </ui-select>
