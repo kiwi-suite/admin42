@@ -1,4 +1,4 @@
-angular.module('admin42', ['ui.bootstrap', 'ngAnimate', 'ui.utils', 'smart-table', 'toaster', 'ngStorage', 'ui.sortable']);
+angular.module('admin42', ['ui.bootstrap', 'ngAnimate', 'ngSanitize', 'ui.utils', 'smart-table', 'toaster', 'ngStorage', 'ui.sortable', 'ui.select']);
 
 angular.module('admin42').config(['$httpProvider', function($httpProvider) {
     $httpProvider.defaults.headers.common["X-Requested-With"] = 'XMLHttpRequest';
@@ -63,6 +63,23 @@ angular.module('admin42').config(['$httpProvider', function($httpProvider) {
                         el.removeClass('active');
                     }
                 });
+            }
+        };
+    }]);
+;angular.module('admin42')
+    .factory('jsonCache', ['$cacheFactory', function($cacheFactory) {
+        return $cacheFactory('json-cache');
+    }])
+    .directive('script', ['jsonCache', function(jsonCache) {
+        return {
+            restrict: 'E',
+            terminal: true,
+            compile: function(element, attr) {
+                if (attr.type == 'application/json') {
+                    var jsonHandler = attr.id,
+                        json = angular.fromJson(element[0].text);
+                    jsonCache.put(jsonHandler, json);
+                }
             }
         };
     }]);
@@ -290,4 +307,17 @@ angular.module('smart-table')
                 }).
                 error(function() {});
         };
+    }]);
+;angular.module('admin42')
+    .controller('SelectController', ['$scope', '$attrs', 'jsonCache', function($scope, $attrs, jsonCache){
+        $scope.items = jsonCache.get($attrs.jsonDataId);
+        $scope.item = {};
+
+        if ($attrs.initValue.length > 0) {
+            angular.forEach($scope.items, function(value){
+                if (value.id == $attrs.initValue) {
+                    $scope.item.selected = value;
+                }
+            });
+        }
     }]);

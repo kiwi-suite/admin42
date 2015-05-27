@@ -22,6 +22,11 @@ class Admin extends AbstractHelper
     private $config = [];
 
     /**
+     * @var array
+     */
+    private $jsonTemplates = [];
+
+    /**
      * @param array $config
      */
     public function __construct(array $config)
@@ -105,5 +110,31 @@ class Admin extends AbstractHelper
 
 
         return "var FLASH_MESSAGE = " . json_encode($messages) . ";" . PHP_EOL;
+    }
+
+    /**
+     * @param string $id
+     * @param mixed $value
+     * @return $this
+     */
+    public function addJsonTemplate($id, $value)
+    {
+        $this->jsonTemplates[$id] = $value;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getJsonTemplates()
+    {
+        $templates = [];
+
+        foreach ($this->jsonTemplates as $id => $value) {
+            $templates[] = sprintf('<script id="%s" type="application/json">%s</script>', $id, json_encode($value));
+        }
+
+        return implode(PHP_EOL, $templates);
     }
 }
