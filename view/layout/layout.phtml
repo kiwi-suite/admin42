@@ -28,11 +28,13 @@
 
     <div class="app-content">
         <a href class="off-screen-toggle hide" ui-toggle-class="off-screen" data-target=".app-aside" ></a>
-        <div class="app-content-body">
+        <div class="app-content-body" ng-class="{'app-content-full' : app.appContentFull, 'h-full' : app.appContentFull}">
             <?= $this->content ?>
 
         </div>
     </div>
+
+    <div class="app-footer hide"></div>
 </div>
 
 <?= $this->admin()->getJsonTemplates() ?>

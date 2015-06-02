@@ -113,6 +113,16 @@ class Admin extends AbstractHelper
     }
 
     /**
+     * @param string $name
+     * @return string
+     */
+    public function generateAngularModelName($name)
+    {
+        return 'formElement.' . str_replace("]", "", str_replace("[", ".", $name));
+    }
+
+
+    /**
      * @param string $id
      * @param mixed $value
      * @return $this

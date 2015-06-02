@@ -4,6 +4,7 @@
             <label>
                 <?= $this->formCheckbox($this->element->setAttributes(array(
                     'id'            => $this->element->getName(),
+                    'data-ng-model' => $this->admin()->generateAngularModelName($this->element->getName())
                 ))) ?>&nbsp;<?= $this->translate($this->element->getLabel(), 'admin') ?>
             </label>
 

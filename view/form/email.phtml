@@ -9,6 +9,7 @@
         <?= $this->formEmail($this->element->setAttributes(array(
             'class'         => 'form-control input-sm',
             'id'            => $this->element->getName(),
+            'data-ng-model' => $this->admin()->generateAngularModelName($this->element->getName()),
         ))) ?>
         <?php if ($this->hasErrors): ?>
             <span class="glyphicon glyphicon-warning-sign form-control-feedback"></span>

@@ -238,6 +238,8 @@ angular.module('smart-table')
         })
     };
 
+    $scope.app.appContentFull = false;
+
     $timeout(function(){
         angular.forEach(FLASH_MESSAGE, function(messages, namespace){
             if (messages.length == 0) {

@@ -5,6 +5,8 @@ angular.module('admin42').controller('AppController',['$scope', 'toaster', '$tim
         })
     };
 
+    $scope.app.appContentFull = false;
+
     $timeout(function(){
         angular.forEach(FLASH_MESSAGE, function(messages, namespace){
             if (messages.length == 0) {
