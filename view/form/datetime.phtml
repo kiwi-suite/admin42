@@ -3,10 +3,26 @@
         <?= $this->element->getLabel() ?>
     </label>
     <div class="col-sm-10">
-        <?= $this->formDateTime($this->element->setAttributes(array(
-            'class'         => 'form-control',
-            'id'            => $this->element->getName(),
-        ))) ?>
+        <div class="input-group w-md" ng-controller="AdminDatepickerController">
+            <input type="hidden" name="<?= $this->element->getName() ?>" value="{{ <?= $this->admin()->generateAngularModelName($this->element->getName()) ?> | datetime:'':'YYYY-MM-DD[\T]HH:mm[P]'}}">
+            <?= $this->formText($this->element->setAttributes(array(
+                'class'         => 'form-control',
+                'id'            => $this->element->getName(),
+                'data-ng-model' => $this->admin()->generateAngularModelName($this->element->getName()),
+                'data-ng-initial' => '',
+                'data-datetime-picker' => 'yyyy-MM-dd HH:mm',
+                'data-is-open' => 'opened',
+                'data-datepicker-options' => 'dateOptions',
+                'data-close-text' => 'Close',
+                'disabled' => 'disabled'
+            ))) ?>
+            <span class="input-group-btn">
+                <button type="button" class="btn btn-default" ng-click="open($event)">
+                    <i class="fa fa-calendar"></i>
+                </button>
+            </span>
+        </div>
+        {{ <?= $this->admin()->generateAngularModelName($this->element->getName()) ?> | datetime:'':'YYYY-MM-DD[T]HH:mm[P]' }}
         <?php if ($this->hasErrors): ?>
             <span class="glyphicon glyphicon-warning-sign form-control-feedback"></span>
             <ul class="list-unstyled text-danger">
