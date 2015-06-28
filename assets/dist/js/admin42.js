@@ -1,4 +1,16 @@
-angular.module('admin42', ['ui.bootstrap', 'ngAnimate', 'ngSanitize', 'ui.utils', 'smart-table', 'toaster', 'ngStorage', 'ui.sortable', 'ui.select']);
+angular.module('admin42', [
+    'ui.bootstrap',
+    'ui.bootstrap.datetimepicker',
+    'ngAnimate',
+    'ngSanitize',
+    'ui.utils',
+    'smart-table',
+    'toaster',
+    'ngStorage',
+    'ui.sortable',
+    'ui.select',
+    'angularFileUpload'
+]);
 
 angular.module('admin42').config(['$httpProvider', function($httpProvider) {
     $httpProvider.defaults.headers.common["X-Requested-With"] = 'XMLHttpRequest';
@@ -152,6 +164,32 @@ angular.module('admin42').config(['$httpProvider', function($httpProvider) {
             }
         };
     }]);
+;angular.module('admin42')
+    .directive('ngInitial', function() {
+        return{
+            restrict: 'A',
+            controller: ['$scope', '$element', '$attrs', '$parse', function($scope, $element, $attrs, $parse){
+
+                var getter, setter, val, tag;
+                tag = $element[0].tagName.toLowerCase();
+
+                val = $attrs.initialValue || $element.val();
+                if(tag === 'input'){
+                    if($element.attr('type') === 'checkbox'){
+                        val = $element[0].checked ? true : undefined;
+                    } else if($element.attr('type') === 'radio'){
+                        val = ($element[0].checked || $element.attr('selected') !== undefined) ? $element.val() : undefined;
+                    }
+                }
+
+                if($attrs.ngModel){
+                    getter = $parse($attrs.ngModel);
+                    setter = getter.assign;
+                    setter($scope, val);
+                }
+            }]
+        };
+    });
 ;/**
  * modified stSearch directive for smart-tables
  * remove as soon as fixes are available from original vendor
@@ -213,7 +251,9 @@ angular.module('smart-table')
                 timezone = appConfig.timezone;
             }
             var dateTime;
-            if (angular.isObject(input)) {
+            if (angular.isObject(input) && input.constructor.name == 'Date') {
+                dateTime = moment.tz(input, input.timezone);
+            } else if (angular.isObject(input)) {
                 if (angular.isUndefined(input.date)) {
                     return emptyValue;
                 }
@@ -253,6 +293,158 @@ angular.module('smart-table')
     }, 1000);
 
 }]);
+;angular.module('admin42')
+    .controller('CropController', ['$scope', '$http', '$timeout', 'Cropper', 'jsonCache', '$attrs', '$interval', function ($scope, $http, $timeout, Cropper, jsonCache, $attrs, $interval) {
+        $scope.data = [];
+
+        $scope.dimensions = jsonCache.get($attrs.json)['dimension'];
+        $scope.meta = jsonCache.get($attrs.json)['meta'];
+        $scope.selectedHandle = $attrs.mediaSelector;
+
+        $scope.isActive = function(handle) {
+            if (handle == $scope.selectedHandle) {
+                return 'active';
+            }
+
+            return '';
+        };
+
+        $scope.hasChanges = function(handle) {
+            if (angular.isUndefined($scope.data[handle])) {
+                return false;
+            }
+
+            return true;
+        };
+
+        $scope.saveCroppedImage = function(handle, url) {
+            if (angular.isUndefined($scope.data[handle])) {
+                return false;
+            }
+
+            url = url.replace('{{ name }}', handle);
+
+            $http.post(url, $scope.data[handle]);
+        };
+
+        $scope.selectDimension = function(handle) {
+            $scope.selectedHandle = handle;
+
+            Cropper.getJqueryCrop().cropper("destroy");
+
+            var dimension = $scope.dimensions[handle];
+
+            var options = {
+                crop: function(dataNew) {
+                    $scope.data[$scope.selectedHandle] = dataNew;
+                },
+                responsive: true,
+                autoCrop: false,
+                rotatable: false,
+                zoomable: false,
+                guides: false,
+                built: function(e) {
+                    if (!angular.isUndefined($scope.meta[handle])) {
+                        console.log($scope.meta[handle]);
+                        $(this).cropper('setCropBoxData', {
+                            x:0,
+                            y:0,
+                            width: 500,
+                            height: 500
+                        });
+                    } else {
+                        $(this).cropper('setCropBoxData', {
+                            x:0,
+                            y:0,
+                            width: dimension.width,
+                            height: dimension.height
+                        });
+                    }
+                    $(this).cropper('crop');
+                }
+            }
+
+            if (dimension.width != 'auto' && dimension.height != 'auto') {
+                options.aspectRatio = dimension.width / dimension.height;
+            }
+
+            Cropper.getJqueryCrop().on('dragmove.cropper', function (e) {
+                var $cropper = $(e.target);
+
+                var data = $cropper.cropper('getCropBoxData');
+                var imageData = $cropper.cropper('getImageData');
+
+                if (dimension.width != 'auto' && data.width < dimension.width / (imageData.naturalWidth/imageData.width)) {
+                    return false;
+                }
+
+                if (dimension.height != 'auto' && data.height < dimension.height / (imageData.naturalHeight/imageData.height)) {
+                    return false;
+                }
+
+                return true;
+            }).on('dragstart.cropper', function (e) {
+                var $cropper = $(e.target);
+
+                var data = $cropper.cropper('getCropBoxData');
+                var imageData = $cropper.cropper('getImageData');
+                var hasChanged = false;
+
+                if (dimension.width != 'auto') {
+                    var width = dimension.width / (imageData.naturalWidth/imageData.width);
+                    if (angular.isUndefined(data.width) || data.width < width) {
+                        data.width = width;
+                        hasChanged = true;
+                    }
+                }
+
+                if (dimension.height != 'auto') {
+                    var height = dimension.height / (imageData.naturalHeight/imageData.height);
+                    if (angular.isUndefined(data.height) || data.height < height) {
+                        data.height = height;
+                        hasChanged = true;
+                    }
+
+                }
+
+                if (hasChanged) {
+                    $(e.target).cropper('setCropBoxData', data);
+                }
+            });
+
+            Cropper.getJqueryCrop().cropper(options);
+        };
+
+        var stop = $interval(function() {
+            if (Cropper.getJqueryCrop() != null) {
+                $scope.selectDimension($scope.selectedHandle);
+                stopInterval();
+            }
+        }, 100);
+        function stopInterval() {
+            $interval.cancel(stop);
+        }
+    }]);
+
+angular.module('admin42')
+    .directive('ngCropper', ['Cropper', function(Cropper) {
+        return {
+            restrict: 'A',
+            link: function(scope, element, atts) {
+                Cropper.setJqueryCrop(element);
+            }
+        };
+    }])
+.service('Cropper', [function() {
+    this.crop = null;
+
+    this.setJqueryCrop = function(crop) {
+        this.crop = crop;
+    };
+    this.getJqueryCrop = function() {
+        return this.crop;
+    };
+}]);
 ;angular.module('admin42').controller('DataGridController',['$scope', '$http', '$attrs', function($scope, $http, $attrs){
     var url = $attrs.url;
 
@@ -276,6 +468,83 @@ angular.module('smart-table')
             error(function(data, status, headers, config) {
             });
     };
+}]);
+;angular.module('admin42')
+    .controller('AdminDatepickerController',['$scope', '$attrs', function($scope, $attrs){
+        $scope.opened = false;
+
+        $scope.open = function($event) {
+            $event.preventDefault();
+            $event.stopPropagation();
+
+            $scope.opened = true;
+        };
+
+        $scope.dateOptions = {
+            formatYear: 'yy',
+            startingDay: 1,
+            enableDate: true,
+            enableTime: true,
+            class: 'datepicker',
+            showWeeks: false,
+            timeText: 'Time',
+            startingDay: 1
+        };
+
+        console.log($scope);
+}]);
+;angular.module('admin42')
+    .controller('FileSelectorController', ['$scope', '$attrs', function ($scope, $attrs) {
+
+}]);
+;angular.module('admin42')
+    .controller('MediaController', ['$scope', 'FileUploader', '$attrs', '$http', function ($scope, FileUploader, $attrs, $http) {
+        var currentTableState = {};
+        var url = $attrs.url;
+
+        $scope.isCollapsed = true;
+        $scope.collection = [];
+        $scope.isLoading = true;
+        $scope.displayedPages = 1;
+
+        var uploader = $scope.uploader = new FileUploader({
+            url: $attrs.uploadUrl
+        });
+
+        uploader.onCompleteAll = function() {
+            requestFromServer(url, currentTableState);
+        };
+
+        $scope.isImage = function(item) {
+            return (item.mimeType.substr(0, 6) == "image/");
+        };
+
+        $scope.getDocumentClass = function(item) {
+            return "fa-file";
+        };
+
+        $scope.callServer = function (tableState) {
+            currentTableState = tableState;
+
+            requestFromServer(url, tableState);
+        };
+
+        function requestFromServer(url, tableState) {
+            $scope.collection = [];
+            $scope.isLoading = true;
+
+            $http.post(url, tableState).
+                success(function(data, status, headers, config) {
+                    $scope.isLoading = false;
+
+                    $scope.collection = data.data;
+
+                    $scope.displayedPages = data.meta.displayedPages;
+                    tableState.pagination.numberOfPages = data.meta.displayedPages;
+                }).
+                error(function(data, status, headers, config) {
+                });
+        }
 }]);
 ;angular.module('admin42').controller('ModalController', ['$scope', '$modalInstance', function ($scope, $modalInstance) {
     $scope.ok = function () {

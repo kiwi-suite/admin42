@@ -1,0 +1,125 @@
+<div class="wrapper-md bg-white b-b box-shadow">
+    <h1 class="m-n font-thin h3">
+        <span class="fa fa-picture-o"></span>
+        <?= $this->translate('title.media', 'admin') ?>
+    </h1>
+</div>
+<div class="wrapper-md" ng-controller="MediaController" data-upload-url="<?= $this->url('admin/media/upload') ?>" data-url="<?= $this->url()?>">
+    <div class="panel panel-default">
+        <div class="panel-heading" ng-click="isCollapsed = !isCollapsed">
+            <span ng-if="!isCollapsed"><?= $this->translate('title.upload', 'admin') ?></span>
+            <h5 ng-if="isCollapsed"><?= $this->translate('start.upload', 'admin') ?></h5>
+        </div>
+        <div class="panel-body" collapse="isCollapsed">
+            <div class="row">
+                <div class="col-sm-12 col-xs-12 col-md-3">
+                    <div class="m-b-md">
+                        <div class="b-a b-2x b-dashed wrapper-lg bg-white text-center m-b" nv-file-over="" over-class="b-info" uploader="uploader">
+                            <?= $this->translate('media.info-dropzone', 'admin')?>
+                        </div>
+                    </div>
+                    <input type="file" nv-file-select="" uploader="uploader" multiple  />
+                </div>
+                <div class="col-sm-12 col-xs-12 col-md-9">
+                    <table ng-show="uploader.queue.length > 0" class="table bg-white-only b-a">
+                        <tr>
+                            <th width="50%">Name</th>
+                            <th ng-show="uploader.isHTML5">Size</th>
+                            <th ng-show="uploader.isHTML5">Progress</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                        <tr ng-repeat="item in uploader.queue">
+                            <td><strong>{{ item.file.name }}</strong></td>
+                            <td ng-show="uploader.isHTML5" nowrap>{{ item.file.size/1024/1024|number:2 }} MB</td>
+                            <td ng-show="uploader.isHTML5">
+                                <div class="progress progress-sm m-b-none m-t-xs">
+                                    <div class="progress-bar bg-info" role="progressbar" ng-style="{ 'width': item.progress + '%' }"></div>
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <span ng-show="item.isSuccess" class="text-success"><i class="glyphicon glyphicon-ok"></i></span>
+                                <span ng-show="item.isCancel" class="text-warning"><i class="glyphicon glyphicon-ban-circle"></i></span>
+                                <span ng-show="item.isError" class="text-danger"><i class="glyphicon glyphicon-remove"></i></span>
+                            </td>
+                            <td nowrap>
+                                <button type="button" class="btn btn-default btn-xs" ng-click="item.upload()" ng-disabled="item.isReady || item.isUploading || item.isSuccess">
+                                    <?= $this->translate('btn.upload', 'admin')?>
+                                </button>
+                                <button type="button" class="btn btn-default btn-xs" ng-click="item.cancel()" ng-disabled="!item.isUploading">
+                                    <?= $this->translate('btn.cancel', 'admin')?>
+                                </button>
+                                <button type="button" class="btn btn-default btn-xs" ng-click="item.remove()">
+                                    <?= $this->translate('btn.remove', 'admin')?>
+                                </button>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="panel-footer text-right" collapse="isCollapsed">
+            <button type="button" class="btn btn-addon btn-success" ng-click="uploader.uploadAll()" ng-hide="!uploader.getNotUploadedItems().length">
+                <i class="fa fa-arrow-circle-o-up"></i> <?= $this->translate('btn.upload_all', 'admin')?>
+            </button>
+            <button type="button" class="btn btn-addon btn-warning" ng-click="uploader.cancelAll()" ng-hide="!uploader.isUploading">
+                <i class="fa fa-ban"></i> <?= $this->translate('btn.cancel_all', 'admin')?>
+            </button>
+            <button type="button" class="btn btn-addon btn-danger" ng-click="uploader.clearQueue()" ng-hide="!uploader.queue.length">
+                <i class="fa fa-trash-o"></i> <?= $this->translate('btn.remove_all', 'admin')?>
+            </button>
+        </div>
+    </div>
+    <div class="table-responsive">
+        <table st-table="collection"  st-pipe="callServer" class="table table-striped top-border-radius">
+            <thead>
+            <tr>
+                <th>
+                    <input st-search="id" placeholder="<?= $this->translate('search.id', 'admin') ?>" class="form-control input-sm" type="text"/>
+                </th>
+                <th>
+                    <input st-search="filename" placeholder="<?= $this->translate('search.name', 'admin') ?>" class="form-control input-sm" type="text"/>
+                </th>
+                <th colspan="3">
+                </th>
+                <th class="text-right vertical-middle">
+                    <i class="fa fa-fw" ng-class="{'fa-circle-o-notch' : isLoading, 'fa-spin' : isLoading, 'fa-search': !isLoading}"></i>
+                </th>
+            </tr>
+            </thead>
+            <tbody ng-hide="isLoading">
+            <tr>
+                <td colspan="6">
+                    <div class="row">
+                        <div ng-repeat="row in collection" class="col-xs-6 col-sm-4 col-md-2 col-lg-2">
+                            <div class="item">
+                                <div class="pos-rlt b-a bg-white" style="max-width: 300px; height: 200px; overflow: hidden;">
+                                    <a href="<?= $this->url('admin/media/edit', ['id' => '{{row.id}}'])?>">
+                                        <img ng-if="isImage(row)" ng-src="<?= $this->url('admin/media/stream', ['id' => '{{ row.id }}', 'dimension' => 'admin_thumbnail'])?>">
+                                        <div ng-if="!isImage(row)" class="center text-center m-t-n w-full">
+                                            <i class="fa fa-5x" ng-class="getDocumentClass(row)"></i>
+                                        </div>
+                                    </a>
+                                </div>
+                                <div>
+                                    <a href="">
+                                        {{ row.filename }}
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+
+            <tfoot>
+            <tr>
+                <td colspan="6" class="text-center">
+                    <div st-pagination="" st-items-by-page="10" st-displayed-pages="displayedPages"></div>
+                </td>
+            </tr>
+            </tfoot>
+        </table>
+    </div>
+</div>

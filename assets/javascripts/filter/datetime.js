@@ -11,7 +11,9 @@ angular.module('admin42')
                 timezone = appConfig.timezone;
             }
             var dateTime;
-            if (angular.isObject(input)) {
+            if (angular.isObject(input) && input.constructor.name == 'Date') {
+                dateTime = moment.tz(input, input.timezone);
+            } else if (angular.isObject(input)) {
                 if (angular.isUndefined(input.date)) {
                     return emptyValue;
                 }

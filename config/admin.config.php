@@ -57,6 +57,7 @@ return [
                 'formtime'                => 'Admin42\View\Helper\Form\FormTime',
                 'formurl'                 => 'Admin42\View\Helper\Form\FormUrl',
                 'formweek'                => 'Admin42\View\Helper\Form\FormWeek',
+                'formfileselect'          => 'Admin42\View\Helper\Form\FileSelect',
             ],
             'factories' => [
                 'admin'                 => 'Admin42\View\Helper\Service\AdminFactory',

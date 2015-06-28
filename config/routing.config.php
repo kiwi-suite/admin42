@@ -108,6 +108,55 @@ return array(
                             ),
                         ),
                     ),
+                    'media' => array(
+                        'type' => 'Zend\Mvc\Router\Http\Literal',
+                        'options' => array(
+                            'route' => 'media/',
+                            'defaults' => array(
+                                'controller' => __NAMESPACE__ . '\Media',
+                                'action' => 'index'
+                            ),
+                        ),
+                        'may_terminate' => true,
+                        'child_routes' => array(
+                            'upload' => array(
+                                'type' => 'Zend\Mvc\Router\Http\Literal',
+                                'options' => array(
+                                    'route' => 'upload/',
+                                    'defaults' => array(
+                                        'action' => 'upload'
+                                    ),
+                                ),
+                            ),
+                            'crop' => array(
+                                'type' => 'Core42\Mvc\Router\Http\AngularSegment',
+                                'options' => array(
+                                    'route' => 'crop/:id/:dimension/',
+                                    'defaults' => array(
+                                        'action' => 'crop'
+                                    ),
+                                ),
+                            ),
+                            'edit' => array(
+                                'type' => 'Core42\Mvc\Router\Http\AngularSegment',
+                                'options' => array(
+                                    'route' => 'edit/:id/',
+                                    'defaults' => array(
+                                        'action' => 'edit'
+                                    ),
+                                ),
+                            ),
+                            'stream' => array(
+                                'type' => 'Core42\Mvc\Router\Http\AngularSegment',
+                                'options' => array(
+                                    'route' => 'stream/:id/[:dimension/]',
+                                    'defaults' => array(
+                                        'action' => 'stream'
+                                    ),
+                                ),
+                            ),
+                        ),
+                    ),
                     'api' => array(
                         'type' => 'Zend\Mvc\Router\Http\Literal',
                         'options' => array(

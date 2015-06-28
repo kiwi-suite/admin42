@@ -11585,7 +11585,7 @@ return $.widget("ui.sortable", $.ui.mouse, {
 
 }));
 ;/**
- * @license AngularJS v1.3.15
+ * @license AngularJS v1.3.16
  * (c) 2010-2014 Google, Inc. http://angularjs.org
  * License: MIT
  */
@@ -11640,7 +11640,7 @@ function minErr(module, ErrorConstructor) {
       return match;
     });
 
-    message = message + '\nhttp://errors.angularjs.org/1.3.15/' +
+    message = message + '\nhttp://errors.angularjs.org/1.3.16/' +
       (module ? module + '/' : '') + code;
     for (i = 2; i < arguments.length; i++) {
       message = message + (i == 2 ? '?' : '&') + 'p' + (i - 2) + '=' +
@@ -11735,6 +11735,7 @@ function minErr(module, ErrorConstructor) {
   createMap: true,
 
   NODE_TYPE_ELEMENT: true,
+  NODE_TYPE_ATTRIBUTE: true,
   NODE_TYPE_TEXT: true,
   NODE_TYPE_COMMENT: true,
   NODE_TYPE_DOCUMENT: true,
@@ -11846,7 +11847,9 @@ function isArrayLike(obj) {
     return false;
   }
 
-  var length = obj.length;
+  // Support: iOS 8.2 (not reproducible in simulator)
+  // "length" in obj used to prevent JIT error (gh-11508)
+  var length = "length" in Object(obj) && obj.length;
 
   if (obj.nodeType === NODE_TYPE_ELEMENT && length) {
     return true;
@@ -12628,8 +12631,8 @@ function toJsonReplacer(key, value) {
  * stripped since angular uses this notation internally.
  *
  * @param {Object|Array|Date|string|number} obj Input to be serialized into JSON.
- * @param {boolean|number=} pretty If set to true, the JSON output will contain newlines and whitespace.
- *    If set to an integer, the JSON output will contain that many spaces per indentation (the default is 2).
+ * @param {boolean|number} [pretty=2] If set to true, the JSON output will contain newlines and whitespace.
+ *    If set to an integer, the JSON output will contain that many spaces per indentation.
  * @returns {string|undefined} JSON-ified string representing `obj`.
  */
 function toJson(obj, pretty) {
@@ -13261,6 +13264,7 @@ function createMap() {
 }
 
 var NODE_TYPE_ELEMENT = 1;
+var NODE_TYPE_ATTRIBUTE = 2;
 var NODE_TYPE_TEXT = 3;
 var NODE_TYPE_COMMENT = 8;
 var NODE_TYPE_DOCUMENT = 9;
@@ -13497,10 +13501,17 @@ function setupModuleLoader(window) {
            * @ngdoc method
            * @name angular.Module#filter
            * @module ng
-           * @param {string} name Filter name.
+           * @param {string} name Filter name - this must be a valid angular expression identifier
            * @param {Function} filterFactory Factory function for creating new instance of filter.
            * @description
            * See {@link ng.$filterProvider#register $filterProvider.register()}.
+           *
+           * <div class="alert alert-warning">
+           * **Note:** Filter names must be valid angular {@link expression} identifiers, such as `uppercase` or `orderBy`.
+           * Names with special characters, such as hyphens and dots, are not allowed. If you wish to namespace
+           * your filters, then you can use capitalization (`myappSubsectionFilterx`) or underscores
+           * (`myapp_subsection_filterx`).
+           * </div>
            */
           filter: invokeLater('$filterProvider', 'register'),
 
@@ -13714,11 +13725,11 @@ function toDebugString(obj) {
  * - `codeName` – `{string}` – Code name of the release, such as "jiggling-armfat".
  */
 var version = {
-  full: '1.3.15',    // all of these placeholder strings will be replaced by grunt's
+  full: '1.3.16',    // all of these placeholder strings will be replaced by grunt's
   major: 1,    // package task
   minor: 3,
-  dot: 15,
-  codeName: 'locality-filtration'
+  dot: 16,
+  codeName: 'cookie-oatmealification'
 };
 
 
@@ -13894,7 +13905,7 @@ function publishExternalAPI(angular) {
  * Angular to manipulate the DOM in a cross-browser compatible way. **jqLite** implements only the most
  * commonly needed functionality with the goal of having a very small footprint.</div>
  *
- * To use jQuery, simply load it before `DOMContentLoaded` event fired.
+ * To use `jQuery`, simply ensure it is loaded before the `angular.js` file.
  *
  * <div class="alert">**Note:** all element references in Angular are always wrapped with jQuery or
  * jqLite; they are never raw DOM references.</div>
@@ -13910,7 +13921,7 @@ function publishExternalAPI(angular) {
  * - [`children()`](http://api.jquery.com/children/) - Does not support selectors
  * - [`clone()`](http://api.jquery.com/clone/)
  * - [`contents()`](http://api.jquery.com/contents/)
- * - [`css()`](http://api.jquery.com/css/) - Only retrieves inline-styles, does not call `getComputedStyle()`
+ * - [`css()`](http://api.jquery.com/css/) - Only retrieves inline-styles, does not call `getComputedStyle()`. As a setter, does not convert numbers to strings or append 'px'.
  * - [`data()`](http://api.jquery.com/data/)
  * - [`detach()`](http://api.jquery.com/detach/)
  * - [`empty()`](http://api.jquery.com/empty/)
@@ -14453,6 +14464,10 @@ forEach({
   },
 
   attr: function(element, name, value) {
+    var nodeType = element.nodeType;
+    if (nodeType === NODE_TYPE_TEXT || nodeType === NODE_TYPE_ATTRIBUTE || nodeType === NODE_TYPE_COMMENT) {
+      return;
+    }
     var lowercasedName = lowercase(name);
     if (BOOLEAN_ATTR[lowercasedName]) {
       if (isDefined(value)) {
@@ -15143,7 +15158,7 @@ function annotate(fn, strictDi, name) {
  * Return an instance of the service.
  *
  * @param {string} name The name of the instance to retrieve.
- * @param {string} caller An optional string to provide the origin of the function call for error messages.
+ * @param {string=} caller An optional string to provide the origin of the function call for error messages.
  * @return {*} The instance.
  */
 
@@ -15154,8 +15169,8 @@ function annotate(fn, strictDi, name) {
  * @description
  * Invoke the method and supply the method arguments from the `$injector`.
  *
- * @param {!Function} fn The function to invoke. Function parameters are injected according to the
- *   {@link guide/di $inject Annotation} rules.
+ * @param {Function|Array.<string|Function>} fn The injectable function to invoke. Function parameters are
+ *   injected according to the {@link guide/di $inject Annotation} rules.
  * @param {Object=} self The `this` for the invoked method.
  * @param {Object=} locals Optional object. If preset then any argument names are read from this
  *                         object first, before the `$injector` is consulted.
@@ -15422,8 +15437,8 @@ function annotate(fn, strictDi, name) {
  * configure your service in a provider.
  *
  * @param {string} name The name of the instance.
- * @param {function()} $getFn The $getFn for the instance creation. Internally this is a short hand
- *                            for `$provide.provider(name, {$get: $getFn})`.
+ * @param {Function|Array.<string|Function>} $getFn The injectable $getFn for the instance creation.
+ *                      Internally this is a short hand for `$provide.provider(name, {$get: $getFn})`.
  * @returns {Object} registered provider instance
  *
  * @example
@@ -15458,7 +15473,8 @@ function annotate(fn, strictDi, name) {
  * as a type/class.
  *
  * @param {string} name The name of the instance.
- * @param {Function} constructor A class (constructor function) that will be instantiated.
+ * @param {Function|Array.<string|Function>} constructor An injectable class (constructor function)
+ *     that will be instantiated.
  * @returns {Object} registered provider instance
  *
  * @example
@@ -15557,7 +15573,7 @@ function annotate(fn, strictDi, name) {
  * object which replaces or wraps and delegates to the original service.
  *
  * @param {string} name The name of the service to decorate.
- * @param {function()} decorator This function will be invoked when the service needs to be
+ * @param {Function|Array.<string|Function>} decorator This function will be invoked when the service needs to be
  *    instantiated and should return the decorated service instance. The function is called using
  *    the {@link auto.$injector#invoke injector.invoke} method and is therefore fully injectable.
  *    Local injection arguments:
@@ -17406,7 +17422,8 @@ function $TemplateCacheProvider() {
  *       templateNamespace: 'html',
  *       scope: false,
  *       controller: function($scope, $element, $attrs, $transclude, otherInjectables) { ... },
- *       controllerAs: 'stringAlias',
+ *       controllerAs: 'stringIdentifier',
+ *       bindToController: false,
  *       require: 'siblingDirectiveName', // or // ['^parentDirectiveName', '?optionalDirectiveName', '?^optionalParent'],
  *       compile: function compile(tElement, tAttrs, transclude) {
  *         return {
@@ -17725,9 +17742,15 @@ function $TemplateCacheProvider() {
  *   * `iAttrs` - instance attributes - Normalized list of attributes declared on this element shared
  *     between all directive linking functions.
  *
- *   * `controller` - a controller instance - A controller instance if at least one directive on the
- *     element defines a controller. The controller is shared among all the directives, which allows
- *     the directives to use the controllers as a communication channel.
+ *   * `controller` - the directive's required controller instance(s) - Instances are shared
+ *     among all directives, which allows the directives to use the controllers as a communication
+ *     channel. The exact value depends on the directive's `require` property:
+ *       * `string`: the controller instance
+ *       * `array`: array of controller instances
+ *       * no controller(s) required: `undefined`
+ *
+ *     If a required controller cannot be found, and it is optional, the instance is `null`,
+ *     otherwise the {@link error:$compile:ctreq Missing Required Controller} error is thrown.
  *
  *   * `transcludeFn` - A transclude linking function pre-bound to the correct transclusion scope.
  *     This is the same as the `$transclude`
@@ -18081,6 +18104,14 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
     return bindings;
   }
 
+  function assertValidDirectiveName(name) {
+    var letter = name.charAt(0);
+    if (!letter || letter !== lowercase(letter)) {
+      throw $compileMinErr('baddir', "Directive name '{0}' is invalid. The first character must be a lowercase letter", name);
+    }
+    return name;
+  }
+
   /**
    * @ngdoc method
    * @name $compileProvider#directive
@@ -18099,6 +18130,7 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
    this.directive = function registerDirective(name, directiveFactory) {
     assertNotHasOwnProperty(name, 'directive');
     if (isString(name)) {
+      assertValidDirectiveName(name);
       assertArg(directiveFactory, 'directiveFactory');
       if (!hasDirectives.hasOwnProperty(name)) {
         hasDirectives[name] = [];
@@ -20555,7 +20587,7 @@ function $HttpProvider() {
      *  headers: {
      *    'Content-Type': undefined
      *  },
-     *  data: { test: 'test' },
+     *  data: { test: 'test' }
      * }
      *
      * $http(req).success(function(){...}).error(function(){...});
@@ -20990,6 +21022,8 @@ function $HttpProvider() {
       }
 
       promise.success = function(fn) {
+        assertArgFn(fn, 'fn');
+
         promise.then(function(response) {
           fn(response.data, response.status, response.headers, config);
         });
@@ -20997,6 +21031,8 @@ function $HttpProvider() {
       };
 
       promise.error = function(fn) {
+        assertArgFn(fn, 'fn');
+
         promise.then(null, function(response) {
           fn(response.data, response.status, response.headers, config);
         });
@@ -21477,7 +21513,7 @@ function createHttpBackend($browser, createXhr, $browserDefer, callbacks, rawDoc
   };
 
   function jsonpReq(url, callbackId, done) {
-    // we can't use jQuery/jqLite here because jQuery does crazy shit with script elements, e.g.:
+    // we can't use jQuery/jqLite here because jQuery does crazy stuff with script elements, e.g.:
     // - fetches local scripts via XHR and evals them
     // - adds and immediately removes script elements from the document
     var script = rawDocument.createElement('script'), callback = null;
@@ -22538,11 +22574,19 @@ var locationPrototype = {
    *
    * Return host of current url.
    *
+   * Note: compared to the non-angular version `location.host` which returns `hostname:port`, this returns the `hostname` portion only.
+   *
    *
    * ```js
    * // given url http://example.com/#/some/path?foo=bar&baz=xoxo
    * var host = $location.host();
    * // => "example.com"
+   *
+   * // given url http://user:password@example.com:8080/#/some/path?foo=bar&baz=xoxo
+   * host = $location.host();
+   * // => "example.com"
+   * host = location.host;
+   * // => "example.com:8080"
    * ```
    *
    * @return {string} host of current url.
@@ -25097,7 +25141,7 @@ function $$RAFProvider() { //rAF
                                $window.webkitCancelRequestAnimationFrame;
 
     var rafSupported = !!requestAnimationFrame;
-    var raf = rafSupported
+    var rafFn = rafSupported
       ? function(fn) {
           var id = requestAnimationFrame(fn);
           return function() {
@@ -25111,9 +25155,47 @@ function $$RAFProvider() { //rAF
           };
         };
 
-    raf.supported = rafSupported;
+    queueFn.supported = rafSupported;
 
-    return raf;
+    var cancelLastRAF;
+    var taskCount = 0;
+    var taskQueue = [];
+    return queueFn;
+
+    function flush() {
+      for (var i = 0; i < taskQueue.length; i++) {
+        var task = taskQueue[i];
+        if (task) {
+          taskQueue[i] = null;
+          task();
+        }
+      }
+      taskCount = taskQueue.length = 0;
+    }
+
+    function queueFn(asyncFn) {
+      var index = taskQueue.length;
+
+      taskCount++;
+      taskQueue.push(asyncFn);
+
+      if (index === 0) {
+        cancelLastRAF = rafFn(flush);
+      }
+
+      return function cancelQueueFn() {
+        if (index >= 0) {
+          taskQueue[index] = null;
+          index = null;
+
+          if (--taskCount === 0 && cancelLastRAF) {
+            cancelLastRAF();
+            cancelLastRAF = null;
+            taskQueue.length = 0;
+          }
+        }
+      };
+    }
   }];
 }
 
@@ -25203,7 +25285,6 @@ function $RootScopeProvider() {
           this.$$childHead = this.$$childTail = null;
       this.$$listeners = {};
       this.$$listenerCount = {};
-      this.$$watchersCount = 0;
       this.$id = nextUid();
       this.$$ChildScope = null;
     }
@@ -28094,6 +28175,13 @@ function $WindowProvider() {
  * Dependency Injected. To achieve this a filter definition consists of a factory function which is
  * annotated with dependencies and is responsible for creating a filter function.
  *
+ * <div class="alert alert-warning">
+ * **Note:** Filter names must be valid angular {@link expression} identifiers, such as `uppercase` or `orderBy`.
+ * Names with special characters, such as hyphens and dots, are not allowed. If you wish to namespace
+ * your filters, then you can use capitalization (`myappSubsectionFilterx`) or underscores
+ * (`myapp_subsection_filterx`).
+ * </div>
+ *
  * ```js
  *   // Filter registration
  *   function MyModule($provide, $filterProvider) {
@@ -28175,6 +28263,13 @@ function $FilterProvider($provide) {
    * @name $filterProvider#register
    * @param {string|Object} name Name of the filter function, or an object map of filters where
    *    the keys are the filter names and the values are the filter factories.
+   *
+   *    <div class="alert alert-warning">
+   *    **Note:** Filter names must be valid angular {@link expression} identifiers, such as `uppercase` or `orderBy`.
+   *    Names with special characters, such as hyphens and dots, are not allowed. If you wish to namespace
+   *    your filters, then you can use capitalization (`myappSubsectionFilterx`) or underscores
+   *    (`myapp_subsection_filterx`).
+   *    </div>
    * @returns {Object} Registered filter instance, or if a map of filters was provided then a map
    *    of the registered filter instances.
    */
@@ -28348,14 +28443,16 @@ function filterFilter() {
   return function(array, expression, comparator) {
     if (!isArray(array)) return array;
 
+    var expressionType = (expression !== null) ? typeof expression : 'null';
     var predicateFn;
     var matchAgainstAnyProp;
 
-    switch (typeof expression) {
+    switch (expressionType) {
       case 'function':
         predicateFn = expression;
         break;
       case 'boolean':
+      case 'null':
       case 'number':
       case 'string':
         matchAgainstAnyProp = true;
@@ -28381,6 +28478,14 @@ function createPredicateFn(expression, comparator, matchAgainstAnyProp) {
     comparator = equals;
   } else if (!isFunction(comparator)) {
     comparator = function(actual, expected) {
+      if (isUndefined(actual)) {
+        // No substring matching against `undefined`
+        return false;
+      }
+      if ((actual === null) || (expected === null)) {
+        // No substring matching against `null`; only match against `null`
+        return actual === expected;
+      }
       if (isObject(actual) || isObject(expected)) {
         // Prevent an object to be considered equal to a string like `'[object'`
         return false;
@@ -28531,6 +28636,8 @@ function currencyFilter($locale) {
  * @description
  * Formats a number as text.
  *
+ * If the input is null or undefined, it will just be returned.
+ * If the input is infinite (Infinity/-Infinity) the Infinity symbol '∞' is returned.
  * If the input is not a number an empty string is returned.
  *
  * @param {number|string} number Number to format.
@@ -29139,7 +29246,7 @@ function limitToFilter() {
  *    Can be one of:
  *
  *    - `function`: Getter function. The result of this function will be sorted using the
- *      `<`, `=`, `>` operator.
+ *      `<`, `===`, `>` operator.
  *    - `string`: An Angular expression. The result of this expression is used to compare elements
  *      (for example `name` to sort by a property called `name` or `name.substr(0, 3)` to sort by
  *      3 first characters of a property called `name`). The result of a constant expression
@@ -30250,11 +30357,11 @@ function FormController(element, attrs, $scope, $animate, $interpolate) {
        <form name="myForm" ng-controller="FormController" class="my-form">
          userType: <input name="input" ng-model="userType" required>
          <span class="error" ng-show="myForm.input.$error.required">Required!</span><br>
-         <tt>userType = {{userType}}</tt><br>
-         <tt>myForm.input.$valid = {{myForm.input.$valid}}</tt><br>
-         <tt>myForm.input.$error = {{myForm.input.$error}}</tt><br>
-         <tt>myForm.$valid = {{myForm.$valid}}</tt><br>
-         <tt>myForm.$error.required = {{!!myForm.$error.required}}</tt><br>
+         <code>userType = {{userType}}</code><br>
+         <code>myForm.input.$valid = {{myForm.input.$valid}}</code><br>
+         <code>myForm.input.$error = {{myForm.input.$error}}</code><br>
+         <code>myForm.$valid = {{myForm.$valid}}</code><br>
+         <code>myForm.$error.required = {{!!myForm.$error.required}}</code><br>
         </form>
       </file>
       <file name="protractor.js" type="protractor">
@@ -30942,7 +31049,11 @@ var inputType = {
    * Text input with number validation and transformation. Sets the `number` validation
    * error if not a valid number.
    *
-   * The model must always be a number, otherwise Angular will throw an error.
+   * <div class="alert alert-warning">
+   * The model must always be of type `number` otherwise Angular will throw an error.
+   * Be aware that a string containing a number is not enough. See the {@link ngModel:numfmt}
+   * error docs for more information and an example of how to convert your model if necessary.
+   * </div>
    *
    * @param {string} ngModel Assignable angular expression to data-bind to.
    * @param {string=} name Property name of the form under which the control is published.
@@ -32650,17 +32761,13 @@ var ngClassEvenDirective = classDirective('Even', 1);
  * document; alternatively, the css rule above must be included in the external stylesheet of the
  * application.
  *
- * Legacy browsers, like IE7, do not provide attribute selector support (added in CSS 2.1) so they
- * cannot match the `[ng\:cloak]` selector. To work around this limitation, you must add the css
- * class `ng-cloak` in addition to the `ngCloak` directive as shown in the example below.
- *
  * @element ANY
  *
  * @example
    <example>
      <file name="index.html">
         <div id="template1" ng-cloak>{{ 'hello' }}</div>
-        <div id="template2" ng-cloak class="ng-cloak">{{ 'hello IE7' }}</div>
+        <div id="template2" class="ng-cloak">{{ 'world' }}</div>
      </file>
      <file name="protractor.js" type="protractor">
        it('should remove the template directive and css class', function() {
@@ -34685,7 +34792,7 @@ var NgModelController = ['$scope', '$exceptionHandler', '$attrs', '$element', '$
    * If the validity changes to invalid, the model will be set to `undefined`,
    * unless {@link ngModelOptions `ngModelOptions.allowInvalid`} is `true`.
    * If the validity changes to valid, it will set the model to the last available valid
-   * modelValue, i.e. either the last parsed value or the last value set from the scope.
+   * `$modelValue`, i.e. either the last parsed value or the last value set from the scope.
    */
   this.$validate = function() {
     // ignore $validate before model is initialized
@@ -34993,7 +35100,10 @@ var NgModelController = ['$scope', '$exceptionHandler', '$attrs', '$element', '$
 
     // if scope model value and ngModel value are out of sync
     // TODO(perf): why not move this to the action fn?
-    if (modelValue !== ctrl.$modelValue) {
+    if (modelValue !== ctrl.$modelValue &&
+       // checks for NaN is needed to allow setting the model to NaN when there's an asyncValidator
+       (ctrl.$modelValue === ctrl.$modelValue || modelValue === modelValue)
+    ) {
       ctrl.$modelValue = ctrl.$$rawModelValue = modelValue;
       parserValid = undefined;
 
@@ -35170,10 +35280,11 @@ var NgModelController = ['$scope', '$exceptionHandler', '$attrs', '$element', '$
            var _name = 'Brian';
            $scope.user = {
              name: function(newName) {
-               if (angular.isDefined(newName)) {
-                 _name = newName;
-               }
-               return _name;
+              // Note that newName can be undefined for two reasons:
+              // 1. Because it is called as a getter and thus called with no arguments
+              // 2. Because the property should actually be set to undefined. This happens e.g. if the
+              //    input is invalid
+              return arguments.length ? (_name = newName) : _name;
              }
            };
          }]);
@@ -35381,7 +35492,11 @@ var DEFAULT_REGEXP = /(\s+|^)default(\s+|$)/;
           var _name = 'Brian';
           $scope.user = {
             name: function(newName) {
-              return angular.isDefined(newName) ? (_name = newName) : _name;
+              // Note that newName can be undefined for two reasons:
+              // 1. Because it is called as a getter and thus called with no arguments
+              // 2. Because the property should actually be set to undefined. This happens e.g. if the
+              //    input is invalid
+              return arguments.length ? (_name = newName) : _name;
             }
           };
         }]);
@@ -36671,12 +36786,12 @@ var ngHideDirective = ['$animate', function($animate) {
    </example>
  */
 var ngStyleDirective = ngDirective(function(scope, element, attr) {
-  scope.$watchCollection(attr.ngStyle, function ngStyleWatchAction(newStyles, oldStyles) {
+  scope.$watch(attr.ngStyle, function ngStyleWatchAction(newStyles, oldStyles) {
     if (oldStyles && (newStyles !== oldStyles)) {
       forEach(oldStyles, function(val, style) { element.css(style, '');});
     }
     if (newStyles) element.css(newStyles);
-  });
+  }, true);
 });
 
 /**
@@ -36722,7 +36837,7 @@ var ngStyleDirective = ngDirective(function(scope, element, attr) {
  *
  * @scope
  * @priority 1200
- * @param {*} ngSwitch|on expression to match against <tt>ng-switch-when</tt>.
+ * @param {*} ngSwitch|on expression to match against <code>ng-switch-when</code>.
  * On child elements add:
  *
  * * `ngSwitchWhen`: the case statement to match against. If match then this
@@ -36739,7 +36854,7 @@ var ngStyleDirective = ngDirective(function(scope, element, attr) {
       <div ng-controller="ExampleController">
         <select ng-model="selection" ng-options="item for item in items">
         </select>
-        <tt>selection={{selection}}</tt>
+        <code>selection={{selection}}</code>
         <hr/>
         <div class="animate-switch-container"
           ng-switch on="selection">
@@ -37320,7 +37435,7 @@ var selectDirective = ['$compile', '$parse', function($compile,   $parse) {
             selectElement.val(viewValue);
             if (viewValue === '') emptyOption.prop('selected', true); // to make IE9 happy
           } else {
-            if (isUndefined(viewValue) && emptyOption) {
+            if (viewValue == null && emptyOption) {
               selectElement.val('');
             } else {
               selectCtrl.renderUnknownOption(viewValue);
@@ -46003,8 +46118,362 @@ angular.module("template/typeahead/typeahead-popup.html", []).run(["$templateCac
     "</ul>\n" +
     "");
 }]);
+;// https://github.com/Gillardo/bootstrap-ui-datetime-picker
+// Version: 1.1.0
+// Released: 2015-05-28 
+angular.module('ui.bootstrap.datetimepicker', ['ui.bootstrap.dateparser', 'ui.bootstrap.position'])
+    .constant('uiDatetimePickerConfig', {
+        dateFormat: 'yyyy-MM-dd HH:mm',
+        enableDate: true,
+        enableTime: true,
+        todayText: 'Today',
+        nowText: 'Now',
+        clearText: 'Clear',
+        closeText: 'Done',
+        dateText: 'Date',
+        timeText: 'Time',
+        closeOnDateSelection: true,
+        appendToBody: false,
+        showButtonBar: true
+    })
+    .directive('datetimePicker', ['$compile', '$parse', '$document', '$timeout', '$position', 'dateFilter', 'dateParser', 'uiDatetimePickerConfig',
+        function ($compile, $parse, $document, $timeout, $position, dateFilter, dateParser, uiDatetimePickerConfig) {
+            return {
+                restrict: 'A',
+                require: 'ngModel',
+                scope: {
+                    isOpen: '=?',
+                    enableDate: '=?',
+                    enableTime: '=?',
+                    todayText: '@',
+                    nowText: '@',
+                    dateText: '@',
+                    timeText: '@',
+                    clearText: '@',
+                    closeText: '@',
+                    dateDisabled: '&'
+                },
+                link: function (scope, element, attrs, ngModel) {
+                    var dateFormat = uiDatetimePickerConfig.dateFormat, currentDate,
+                        closeOnDateSelection = angular.isDefined(attrs.closeOnDateSelection) ? scope.$parent.$eval(attrs.closeOnDateSelection) : uiDatetimePickerConfig.closeOnDateSelection,
+                        appendToBody = angular.isDefined(attrs.datepickerAppendToBody) ? scope.$parent.$eval(attrs.datepickerAppendToBody) : uiDatetimePickerConfig.appendToBody;
+
+                    scope.showButtonBar = angular.isDefined(attrs.showButtonBar) ? scope.$parent.$eval(attrs.showButtonBar) : uiDatetimePickerConfig.showButtonBar;
+
+                    // determine which pickers should be available. Defaults to date and time
+                    scope.enableDate = angular.isDefined(scope.enableDate) ? scope.enableDate : uiDatetimePickerConfig.enableDate;
+                    scope.enableTime = angular.isDefined(scope.enableTime) ? scope.enableTime : uiDatetimePickerConfig.enableTime;
+
+                    // default picker view
+                    scope.showPicker = scope.enableDate ? 'date' : 'time';
+
+                    // default text
+                    scope.todayText = scope.todayText || 'Today';
+                    scope.nowText = scope.nowText || 'Now';
+                    scope.clearText = scope.clearText || 'Clear';
+                    scope.closeText = scope.closeText || 'Close';
+                    scope.dateText = scope.dateText || 'Date';
+                    scope.timeText = scope.timeText || 'Time';
+
+                    scope.getText = function (key) {
+                        return scope[key + 'Text'] || uiDatetimePickerConfig[key + 'Text'];
+                    };
+
+                    attrs.$observe('datetimePicker', function (value) {
+                        dateFormat = value || uiDatetimePickerConfig.dateFormat;
+                        ngModel.$render();
+                    });
+
+                    // popup element used to display calendar
+                    var popupEl = angular.element('' +
+                    '<div date-picker-wrap ng-show="showPicker == \'date\'">' +
+                    '<div datepicker></div>' +
+                    '</div>' +
+                    '<div time-picker-wrap ng-show="showPicker == \'time\'">' +
+                    '<div timepicker style="margin:0 auto"></div>' +
+                    '</div>');
+
+                    // get attributes from directive
+                    popupEl.attr({
+                        'ng-model': 'date',
+                        'ng-change': 'dateSelection()'
+                    });
+
+                    function cameltoDash(string) {
+                        return string.replace(/([A-Z])/g, function ($1) { return '-' + $1.toLowerCase(); });
+                    }
+
+                    // datepicker element
+                    var datepickerEl = angular.element(popupEl.children()[0]);
+                    if (attrs.datepickerOptions) {
+                        angular.forEach(scope.$parent.$eval(attrs.datepickerOptions), function (value, option) {
+                            datepickerEl.attr(cameltoDash(option), value);
+                        });
+                    }
+
+                    // timepicker element
+                    var timepickerEl = angular.element(popupEl.children()[1]);
+                    if (attrs.timepickerOptions) {
+                        angular.forEach(scope.$parent.$eval(attrs.timepickerOptions), function (value, option) {
+                            timepickerEl.attr(cameltoDash(option), value);
+                        });
+                    }
+
+                    // set datepickerMode to day by default as need to create watch
+                    // this gets round issue#5 where by the highlight is not shown
+                    if (!attrs['datepickerMode']) attrs['datepickerMode'] = 'day';
+
+                    scope.watchData = {};
+                    angular.forEach(['minDate', 'maxDate', 'datepickerMode'], function (key) {
+                        if (attrs[key]) {
+                            var getAttribute = $parse(attrs[key]);
+
+                            scope.$parent.$watch(getAttribute, function (value) {
+                                scope.watchData[key] = value;
+                            });
+                            datepickerEl.attr(cameltoDash(key), 'watchData.' + key);
+
+                            // Propagate changes from datepicker to outside
+                            if (key === 'datepickerMode') {
+                                var setAttribute = getAttribute.assign;
+                                scope.$watch('watchData.' + key, function (value, oldvalue) {
+                                    if (value !== oldvalue) {
+                                        setAttribute(scope.$parent, value);
+                                    }
+                                });
+                            }
+                        }
+                    });
+
+                    if (attrs.dateDisabled) {
+                        datepickerEl.attr('date-disabled', 'dateDisabled({ date: date, mode: mode })');
+                    }
+
+                    function isDateDisabled(dt) {
+                        return attrs.dateDisabled && angular.isDefined(dt) && scope.dateDisabled({ date: dt, mode: scope.watchData['datepickerMode']});
+                    }
+
+                    function parseDate(viewValue) {
+                        if (!viewValue) {
+                            ngModel.$setValidity('date', true);
+                            return null;
+                        } else if (angular.isDate(viewValue) && !isNaN(viewValue)) {
+                            ngModel.$setValidity('date', true);
+                            return viewValue;
+                        } else if (angular.isString(viewValue)) {
+                            var date = dateParser.parse(viewValue, dateFormat) || new Date(viewValue);
+
+                            if (isNaN(date)) {
+                                ngModel.$setValidity('date', false);
+                                return undefined;
+                            } else {
+                                ngModel.$setValidity('date', true);
+                                return date;
+                            }
+                        } else {
+                            ngModel.$setValidity('date', false);
+                            return undefined;
+                        }
+                    }
+                    ngModel.$parsers.unshift(parseDate);
+
+                    // Inner change
+                    scope.dateSelection = function (dt) {
+                        // check which picker is being shown, if its date, all is fine and this is the date
+                        // we will use, if its the timePicker but enableDate = true, we need to merge
+                        // the values, else timePicker will reset the date
+                        if (scope.enableDate && scope.enableTime && scope.showPicker === 'time') {
+                            if (currentDate && currentDate !== null && (scope.date !== null || dt || dt != null)) {
+                                // dt will not be undefined if the now or today button is pressed
+                                if (dt && dt != null) {
+                                    currentDate.setHours(dt.getHours());
+                                    currentDate.setMinutes(dt.getMinutes());
+                                    currentDate.setSeconds(dt.getSeconds());
+                                    currentDate.setMilliseconds(dt.getMilliseconds());
+                                    dt = new Date(currentDate);
+                                } else {
+                                    currentDate.setHours(scope.date.getHours());
+                                    currentDate.setMinutes(scope.date.getMinutes());
+                                    currentDate.setSeconds(scope.date.getSeconds());
+                                    currentDate.setMilliseconds(scope.date.getMilliseconds());
+                                }
+
+                            }
+                        }
+
+                        if (angular.isDefined(dt)) {
+                            scope.date = dt;
+                        }
+
+                        // store currentDate
+                        currentDate = scope.date;
+
+                        ngModel.$setViewValue(scope.date);
+                        ngModel.$render();
+
+                        if (closeOnDateSelection) {
+                            // do not close when using timePicker
+                            if (scope.showPicker != 'time') {
+                                // if time is enabled, swap to timePicker
+                                if (scope.enableTime) {
+                                    scope.showPicker = 'time';
+                                } else {
+                                    scope.isOpen = false;
+                                    element[0].focus();
+                                }
+                            }
+                        }
+
+                    };
+
+                    element.bind('input change keyup', function () {
+                        scope.$apply(function () {
+                            scope.date = ngModel.$modelValue;
+                        });
+                    });
+
+                    // Outer change
+                    ngModel.$render = function () {
+                        var date = ngModel.$viewValue ? parseDate(ngModel.$viewValue) : null;
+                        var display = date ? dateFilter(date, dateFormat) : '';
+                        element.val(display);
+                        scope.date = date;
+                    };
+
+                    var documentClickBind = function (event) {
+                        if (scope.isOpen && event.target !== element[0]) {
+                            scope.$apply(function () {
+                                scope.isOpen = false;
+                            });
+                        }
+                    };
+
+                    var keydown = function (evt, noApply) {
+                        scope.keydown(evt);
+                    };
+                    element.bind('keydown', keydown);
+
+                    scope.keydown = function (evt) {
+                        if (evt.which === 27) {
+                            evt.preventDefault();
+
+                            if (scope.isOpen) {
+                                evt.stopPropagation();
+                            }
+                            scope.close();
+                        } else if (evt.which === 40 && !scope.isOpen) {
+                            scope.isOpen = true;
+                        }
+                    };
+
+                    scope.$watch('isOpen', function (value) {
+                        if (value) {
+                            scope.$broadcast('datepicker.focus');
+
+                            scope.position = appendToBody ? $position.offset(element) : $position.position(element);
+                            scope.position.top = scope.position.top + element.prop('offsetHeight');
+
+                            $document.bind('mousedown', documentClickBind);
+                        } else {
+                            $document.unbind('mousedown', documentClickBind);
+                        }
+                    });
+
+                    scope.isTodayDisabled = function() {
+                        return isDateDisabled(new Date());
+                    };
+
+                    scope.select = function (date) {
+
+                        if (date === 'today' || date == 'now') {
+                            var now = new Date();
+                            if (angular.isDate(ngModel.$modelValue)) {
+                                date = new Date(ngModel.$modelValue);
+                                date.setFullYear(now.getFullYear(), now.getMonth(), now.getDate());
+                                date.setHours(now.getHours(), now.getMinutes(), now.getSeconds(), now.getMilliseconds());
+                            } else {
+                                date = now;
+                            }
+                        }
+
+                        scope.dateSelection(date);
+                    };
+
+                    scope.close = function () {
+                        scope.isOpen = false;
+                        element[0].focus();
+                    };
+
+                    scope.changePicker = function (e) {
+                        scope.showPicker = e;
+                    };
+
+                    var $popup = $compile(popupEl)(scope);
+                    // Prevent jQuery cache memory leak (template is now redundant after linking)
+                    popupEl.remove();
+
+                    if (appendToBody) {
+                        $document.find('body').append($popup);
+                    } else {
+                        element.after($popup);
+                    }
+
+                    scope.$on('$destroy', function () {
+                        $popup.remove();
+                        element.unbind('keydown', keydown);
+                        $document.unbind('mousedown', documentClickBind);
+                    });
+                }
+            };
+        }])
+
+    .directive('datePickerWrap', function () {
+        return {
+            restrict: 'EA',
+            replace: true,
+            transclude: true,
+            templateUrl: 'template/datetime-picker.html',
+            link: function (scope, element, attrs) {
+                element.bind('mousedown', function (event) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                });
+            }
+        };
+    })
+
+    .directive('timePickerWrap', function () {
+        return {
+            restrict: 'EA',
+            replace: true,
+            transclude: true,
+            templateUrl: 'template/datetime-picker.html',
+            link: function (scope, element, attrs) {
+                element.bind('mousedown', function (event) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                });
+            }
+        };
+    });
+angular.module('ui.bootstrap.datetimepicker').run(['$templateCache', function($templateCache) {
+  'use strict';
+
+  $templateCache.put('template/datetime-picker.html',
+    "<ul class=\"dropdown-menu dropdown-menu-left\" ng-style=\"{display: (isOpen && 'block') || 'none', top: position.top+'px', left: position.left+'px'}\" style=left:inherit ng-keydown=keydown($event)><li style=\"padding:0 5px 5px 5px\" class=datetime-picker><div ng-transclude></div></li><li ng-if=showButtonBar style=padding:5px><span class=\"btn-group pull-left\" style=margin-right:10px><button ng-if=\"showPicker == 'date'\" type=button class=\"btn btn-sm btn-info\" ng-click=\"select('today')\" ng-disabled=isTodayDisabled()>{{ getText('today') }}</button> <button ng-if=\"showPicker == 'time'\" type=button class=\"btn btn-sm btn-info\" ng-click=\"select('now')\" ng-disabled=isTodayDisabled()>{{ getText('now') }}</button> <button type=button class=\"btn btn-sm btn-danger\" ng-click=select(null)>{{ getText('clear') }}</button></span> <span class=\"btn-group pull-right\"><button ng-if=\"showPicker == 'date' && enableTime\" type=button class=\"btn btn-sm btn-default\" ng-click=\"changePicker('time')\">{{ getText('time')}}</button> <button ng-if=\"showPicker == 'time' && enableDate\" type=button class=\"btn btn-sm btn-default\" ng-click=\"changePicker('date')\">{{ getText('date')}}</button> <button type=button class=\"btn btn-sm btn-success\" ng-click=close()>{{ getText('close') }}</button></span></li></ul>"
+  );
+
+}]);
+;angular.module('ui.bootstrap.datetimepicker').run(['$templateCache', function($templateCache) {
+  'use strict';
+
+  $templateCache.put('template/datetime-picker.html',
+    "<ul class=\"dropdown-menu dropdown-menu-left\" ng-style=\"{display: (isOpen && 'block') || 'none', top: position.top+'px', left: position.left+'px'}\" style=left:inherit ng-keydown=keydown($event)><li style=\"padding:0 5px 5px 5px\" class=datetime-picker><div ng-transclude></div></li><li ng-if=showButtonBar style=padding:5px><span class=\"btn-group pull-left\" style=margin-right:10px><button ng-if=\"showPicker == 'date'\" type=button class=\"btn btn-sm btn-info\" ng-click=\"select('today')\" ng-disabled=isTodayDisabled()>{{ getText('today') }}</button> <button ng-if=\"showPicker == 'time'\" type=button class=\"btn btn-sm btn-info\" ng-click=\"select('now')\" ng-disabled=isTodayDisabled()>{{ getText('now') }}</button> <button type=button class=\"btn btn-sm btn-danger\" ng-click=select(null)>{{ getText('clear') }}</button></span> <span class=\"btn-group pull-right\"><button ng-if=\"showPicker == 'date' && enableTime\" type=button class=\"btn btn-sm btn-default\" ng-click=\"changePicker('time')\">{{ getText('time')}}</button> <button ng-if=\"showPicker == 'time' && enableDate\" type=button class=\"btn btn-sm btn-default\" ng-click=\"changePicker('date')\">{{ getText('date')}}</button> <button type=button class=\"btn btn-sm btn-success\" ng-click=close()>{{ getText('close') }}</button></span></li></ul>"
+  );
+
+}]);
 ;/**
- * @license AngularJS v1.3.15
+ * @license AngularJS v1.3.16
  * (c) 2010-2014 Google, Inc. http://angularjs.org
  * License: MIT
  */
@@ -46443,9 +46912,11 @@ angular.module('ngAnimate', ['ng'])
         //so that all the animated elements within the animation frame
         //will be properly updated and drawn on screen. This is
         //required to perform multi-class CSS based animations with
-        //Firefox. DO NOT REMOVE THIS LINE.
-        var a = bod.offsetWidth + 1;
-        fn();
+        //Firefox. DO NOT REMOVE THIS LINE. DO NOT OPTIMIZE THIS LINE.
+        //THE MINIFIER WILL REMOVE IT OTHERWISE WHICH WILL RESULT IN AN
+        //UNPREDICTABLE BUG THAT IS VERY HARD TO TRACK DOWN AND WILL
+        //TAKE YEARS AWAY FROM YOUR LIFE!
+        fn(bod.offsetWidth);
       });
     };
   }])
@@ -48141,7 +48612,7 @@ angular.module('ngAnimate', ['ng'])
 
 })(window, window.angular);
 ;/**
- * @license AngularJS v1.3.15
+ * @license AngularJS v1.3.16
  * (c) 2010-2014 Google, Inc. http://angularjs.org
  * License: MIT
  */
@@ -48820,10 +49291,10 @@ angular.module('ngSanitize').filter('linky', ['$sanitize', function($sanitize) {
 
 })(window, window.angular);
 ;/** 
-* @version 2.0.2
+* @version 2.0.3
 * @license MIT
 */
-!function(t,e){"use strict";t.module("smart-table",[]).run(["$templateCache",function(t){t.put("template/smart-table/pagination.html",'<nav ng-if="pages.length >= 2"><ul class="pagination"><li ng-repeat="page in pages" ng-class="{active: page==currentPage}"><a ng-click="selectPage(page)">{{page}}</a></li></ul></nav>')}]),t.module("smart-table").constant("stConfig",{pagination:{template:"template/smart-table/pagination.html",itemsByPage:10,displayedPages:5},search:{delay:400},select:{mode:"single",selectedClass:"st-selected"},sort:{ascentClass:"st-sort-ascent",descentClass:"st-sort-descent"},pipe:{delay:100}}),t.module("smart-table").controller("stTableController",["$scope","$parse","$filter","$attrs",function(a,s,n,r){function i(t){return t?[].concat(t):[]}function c(){h=i(l(a)),P===!0&&S.pipe()}var l,o,u,p=r.stTable,g=s(p),f=g.assign,d=n("orderBy"),m=n("filter"),h=i(g(a)),b={sort:{},search:{},pagination:{start:0}},P=!0,S=this;r.stSafeSrc&&(l=s(r.stSafeSrc),a.$watch(function(){var t=l(a);return t?t.length:0},function(t){t!==h.length&&c()}),a.$watch(function(){return l(a)},function(t,e){t!==e&&c()})),this.sortBy=function(e,a){return b.sort.predicate=e,b.sort.reverse=a===!0,t.isFunction(e)?b.sort.functionName=e.name:delete b.sort.functionName,b.pagination.start=0,this.pipe()},this.search=function(e,a){var s=b.search.predicateObject||{},n=a?a:"$";return e=t.isString(e)?e.trim():e,s[n]=e,e||delete s[n],b.search.predicateObject=s,b.pagination.start=0,this.pipe()},this.pipe=function(){var t,s=b.pagination;o=b.search.predicateObject?m(h,b.search.predicateObject):h,b.sort.predicate&&(o=d(o,b.sort.predicate,b.sort.reverse)),s.number!==e&&(s.numberOfPages=o.length>0?Math.ceil(o.length/s.number):1,s.start=s.start>=o.length?(s.numberOfPages-1)*s.number:s.start,t=o.slice(s.start,s.start+parseInt(s.number))),f(a,t||o)},this.select=function(t,a){var s=h,n=s.indexOf(t);-1!==n&&("single"===a?(t.isSelected=t.isSelected!==!0,u&&(u.isSelected=!1),u=t.isSelected===!0?t:e):s[n].isSelected=!s[n].isSelected)},this.slice=function(t,e){return b.pagination.start=t,b.pagination.number=e,this.pipe()},this.tableState=function(){return b},this.getFilteredCollection=function(){return o||h},this.setFilterFunction=function(t){m=n(t)},this.setSortFunction=function(t){d=n(t)},this.preventPipeOnWatch=function(){P=!1}}]).directive("stTable",function(){return{restrict:"A",controller:"stTableController",link:function(t,e,a,s){a.stSetFilter&&s.setFilterFunction(a.stSetFilter),a.stSetSort&&s.setSortFunction(a.stSetSort)}}}),t.module("smart-table").directive("stSearch",["stConfig","$timeout",function(t,e){return{require:"^stTable",link:function(a,s,n,r){var i=r,c=null,l=n.stDelay||t.search.delay;n.$observe("stSearch",function(t,e){var a=s[0].value;t!==e&&a&&(r.tableState().search={},i.search(a,t))}),a.$watch(function(){return r.tableState().search},function(t){var e=n.stSearch||"$";t.predicateObject&&t.predicateObject[e]!==s[0].value&&(s[0].value=t.predicateObject[e]||"")},!0),s.bind("input",function(t){t=t.originalEvent||t,null!==c&&e.cancel(c),c=e(function(){i.search(t.target.value,n.stSearch||""),c=null},l)})}}}]),t.module("smart-table").directive("stSelectRow",["stConfig",function(t){return{restrict:"A",require:"^stTable",scope:{row:"=stSelectRow"},link:function(e,a,s,n){var r=s.stSelectMode||t.select.mode;a.bind("click",function(){e.$apply(function(){n.select(e.row,r)})}),e.$watch("row.isSelected",function(e){e===!0?a.addClass(t.select.selectedClass):a.removeClass(t.select.selectedClass)})}}}]),t.module("smart-table").directive("stSort",["stConfig","$parse",function(a,s){return{restrict:"A",require:"^stTable",link:function(n,r,i,c){function l(){g++,u=t.isFunction(p(n))?p(n):i.stSort,g%3===0&&i.stSkipNatural===e?(g=0,c.tableState().sort={},c.tableState().pagination.start=0,c.pipe()):c.sortBy(u,g%2===0)}var o,u=i.stSort,p=s(u),g=0,f=i.stClassAscent||a.sort.ascentClass,d=i.stClassDescent||a.sort.descentClass,m=[f,d];i.stSortDefault&&(o=n.$eval(i.stSortDefault)!==e?n.$eval(i.stSortDefault):i.stSortDefault),r.bind("click",function(){u&&n.$apply(l)}),o&&(g="reverse"===o?1:0,l()),n.$watch(function(){return c.tableState().sort},function(t){t.predicate!==u?(g=0,r.removeClass(f).removeClass(d)):(g=t.reverse===!0?2:1,r.removeClass(m[g%2]).addClass(m[g-1]))},!0)}}}]),t.module("smart-table").directive("stPagination",["stConfig",function(t){return{restrict:"EA",require:"^stTable",scope:{stItemsByPage:"=?",stDisplayedPages:"=?",stPageChange:"&"},templateUrl:function(e,a){return a.stTemplate?a.stTemplate:t.pagination.template},link:function(e,a,s,n){function r(){var t,a,s=n.tableState().pagination,r=1,i=e.currentPage;for(e.currentPage=Math.floor(s.start/s.number)+1,r=Math.max(r,e.currentPage-Math.abs(Math.floor(e.stDisplayedPages/2))),t=r+e.stDisplayedPages,t>s.numberOfPages&&(t=s.numberOfPages+1,r=Math.max(1,t-e.stDisplayedPages)),e.pages=[],e.numPages=s.numberOfPages,a=r;t>a;a++)e.pages.push(a);i!==e.currentPage&&e.stPageChange({newPage:e.currentPage})}e.stItemsByPage=e.stItemsByPage?+e.stItemsByPage:t.pagination.itemsByPage,e.stDisplayedPages=e.stDisplayedPages?+e.stDisplayedPages:t.pagination.displayedPages,e.currentPage=1,e.pages=[],e.$watch(function(){return n.tableState().pagination},r,!0),e.$watch("stItemsByPage",function(t,a){t!==a&&e.selectPage(1)}),e.$watch("stDisplayedPages",r),e.selectPage=function(t){t>0&&t<=e.numPages&&n.slice((t-1)*e.stItemsByPage,e.stItemsByPage)},n.tableState().pagination.number||n.slice(0,e.stItemsByPage)}}}]),t.module("smart-table").directive("stPipe",["stConfig","$timeout",function(e,a){return{require:"stTable",scope:{stPipe:"="},link:{pre:function(s,n,r,i){var c=null;t.isFunction(s.stPipe)&&(i.preventPipeOnWatch(),i.pipe=function(){return null!==c&&a.cancel(c),c=a(function(){s.stPipe(i.tableState(),i)},e.pipe.delay)})},post:function(t,e,a,s){s.pipe()}}}}])}(angular);;/**
+!function(t,e){"use strict";t.module("smart-table",[]).run(["$templateCache",function(t){t.put("template/smart-table/pagination.html",'<nav ng-if="pages.length >= 2"><ul class="pagination"><li ng-repeat="page in pages" ng-class="{active: page==currentPage}"><a ng-click="selectPage(page)">{{page}}</a></li></ul></nav>')}]),t.module("smart-table").constant("stConfig",{pagination:{template:"template/smart-table/pagination.html",itemsByPage:10,displayedPages:5},search:{delay:400},select:{mode:"single",selectedClass:"st-selected"},sort:{ascentClass:"st-sort-ascent",descentClass:"st-sort-descent",skipNatural:!1},pipe:{delay:100}}),t.module("smart-table").controller("stTableController",["$scope","$parse","$filter","$attrs",function(a,s,n,r){function i(t){return t?[].concat(t):[]}function c(){h=i(l(a)),P===!0&&S.pipe()}var l,o,u,p=r.stTable,g=s(p),f=g.assign,d=n("orderBy"),m=n("filter"),h=i(g(a)),b={sort:{},search:{},pagination:{start:0}},P=!0,S=this;r.stSafeSrc&&(l=s(r.stSafeSrc),a.$watch(function(){var t=l(a);return t?t.length:0},function(t){t!==h.length&&c()}),a.$watch(function(){return l(a)},function(t,e){t!==e&&c()})),this.sortBy=function(e,a){return b.sort.predicate=e,b.sort.reverse=a===!0,t.isFunction(e)?b.sort.functionName=e.name:delete b.sort.functionName,b.pagination.start=0,this.pipe()},this.search=function(e,a){var s=b.search.predicateObject||{},n=a?a:"$";return e=t.isString(e)?e.trim():e,s[n]=e,e||delete s[n],b.search.predicateObject=s,b.pagination.start=0,this.pipe()},this.pipe=function(){var t,s=b.pagination;o=b.search.predicateObject?m(h,b.search.predicateObject):h,b.sort.predicate&&(o=d(o,b.sort.predicate,b.sort.reverse)),s.number!==e&&(s.numberOfPages=o.length>0?Math.ceil(o.length/s.number):1,s.start=s.start>=o.length?(s.numberOfPages-1)*s.number:s.start,t=o.slice(s.start,s.start+parseInt(s.number))),f(a,t||o)},this.select=function(t,s){var n=i(g(a)),r=n.indexOf(t);-1!==r&&("single"===s?(t.isSelected=t.isSelected!==!0,u&&(u.isSelected=!1),u=t.isSelected===!0?t:e):n[r].isSelected=!n[r].isSelected)},this.slice=function(t,e){return b.pagination.start=t,b.pagination.number=e,this.pipe()},this.tableState=function(){return b},this.getFilteredCollection=function(){return o||h},this.setFilterFunction=function(t){m=n(t)},this.setSortFunction=function(t){d=n(t)},this.preventPipeOnWatch=function(){P=!1}}]).directive("stTable",function(){return{restrict:"A",controller:"stTableController",link:function(t,e,a,s){a.stSetFilter&&s.setFilterFunction(a.stSetFilter),a.stSetSort&&s.setSortFunction(a.stSetSort)}}}),t.module("smart-table").directive("stSearch",["stConfig","$timeout",function(t,e){return{require:"^stTable",link:function(a,s,n,r){var i=r,c=null,l=n.stDelay||t.search.delay;n.$observe("stSearch",function(t,e){var a=s[0].value;t!==e&&a&&(r.tableState().search={},i.search(a,t))}),a.$watch(function(){return r.tableState().search},function(t){var e=n.stSearch||"$";t.predicateObject&&t.predicateObject[e]!==s[0].value&&(s[0].value=t.predicateObject[e]||"")},!0),s.bind("input",function(t){t=t.originalEvent||t,null!==c&&e.cancel(c),c=e(function(){i.search(t.target.value,n.stSearch||""),c=null},l)})}}}]),t.module("smart-table").directive("stSelectRow",["stConfig",function(t){return{restrict:"A",require:"^stTable",scope:{row:"=stSelectRow"},link:function(e,a,s,n){var r=s.stSelectMode||t.select.mode;a.bind("click",function(){e.$apply(function(){n.select(e.row,r)})}),e.$watch("row.isSelected",function(e){e===!0?a.addClass(t.select.selectedClass):a.removeClass(t.select.selectedClass)})}}}]),t.module("smart-table").directive("stSort",["stConfig","$parse",function(a,s){return{restrict:"A",require:"^stTable",link:function(n,r,i,c){function l(){g++,u=t.isFunction(p(n))?p(n):i.stSort,g%3===0&&!!h!=!0?(g=0,c.tableState().sort={},c.tableState().pagination.start=0,c.pipe()):c.sortBy(u,g%2===0)}var o,u=i.stSort,p=s(u),g=0,f=i.stClassAscent||a.sort.ascentClass,d=i.stClassDescent||a.sort.descentClass,m=[f,d],h=i.stSkipNatural!==e?i.stSkipNatural:a.skipNatural;i.stSortDefault&&(o=n.$eval(i.stSortDefault)!==e?n.$eval(i.stSortDefault):i.stSortDefault),r.bind("click",function(){u&&n.$apply(l)}),o&&(g="reverse"===o?1:0,l()),n.$watch(function(){return c.tableState().sort},function(t){t.predicate!==u?(g=0,r.removeClass(f).removeClass(d)):(g=t.reverse===!0?2:1,r.removeClass(m[g%2]).addClass(m[g-1]))},!0)}}}]),t.module("smart-table").directive("stPagination",["stConfig",function(t){return{restrict:"EA",require:"^stTable",scope:{stItemsByPage:"=?",stDisplayedPages:"=?",stPageChange:"&"},templateUrl:function(e,a){return a.stTemplate?a.stTemplate:t.pagination.template},link:function(e,a,s,n){function r(){var t,a,s=n.tableState().pagination,r=1,i=e.currentPage;for(e.currentPage=Math.floor(s.start/s.number)+1,r=Math.max(r,e.currentPage-Math.abs(Math.floor(e.stDisplayedPages/2))),t=r+e.stDisplayedPages,t>s.numberOfPages&&(t=s.numberOfPages+1,r=Math.max(1,t-e.stDisplayedPages)),e.pages=[],e.numPages=s.numberOfPages,a=r;t>a;a++)e.pages.push(a);i!==e.currentPage&&e.stPageChange({newPage:e.currentPage})}e.stItemsByPage=e.stItemsByPage?+e.stItemsByPage:t.pagination.itemsByPage,e.stDisplayedPages=e.stDisplayedPages?+e.stDisplayedPages:t.pagination.displayedPages,e.currentPage=1,e.pages=[],e.$watch(function(){return n.tableState().pagination},r,!0),e.$watch("stItemsByPage",function(t,a){t!==a&&e.selectPage(1)}),e.$watch("stDisplayedPages",r),e.selectPage=function(t){t>0&&t<=e.numPages&&n.slice((t-1)*e.stItemsByPage,e.stItemsByPage)},n.tableState().pagination.number||n.slice(0,e.stItemsByPage)}}}]),t.module("smart-table").directive("stPipe",["stConfig","$timeout",function(e,a){return{require:"stTable",scope:{stPipe:"="},link:{pre:function(s,n,r,i){var c=null;t.isFunction(s.stPipe)&&(i.preventPipeOnWatch(),i.pipe=function(){return null!==c&&a.cancel(c),c=a(function(){s.stPipe(i.tableState(),i)},e.pipe.delay)})},post:function(t,e,a,s){s.pipe()}}}}])}(angular);;/**
  * angular-ui-utils - Swiss-Army-Knife of AngularJS tools (with no external dependencies!)
  * @version v0.2.3 - 2015-03-30
  * @link http://angular-ui.github.com
@@ -51248,7 +51719,14 @@ angular.module('ui.utils',  [
   'ui.unique',
   'ui.validate'
 ]);
-;(function(window, angular, undefined) {
+;/**
+ * angular-ui-sortable - This directive allows you to jQueryUI Sortable.
+ * @version v0.13.4 - 2015-06-07
+ * @link http://angular-ui.github.com
+ * @license MIT
+ */
+
+(function(window, angular, undefined) {
 'use strict';
 /*
  jQuery UI Sortable plugin wrapper
@@ -51271,9 +51749,9 @@ angular.module('ui.sortable', [])
 
           function combineCallbacks(first,second){
             if(second && (typeof second === 'function')) {
-              return function(e, ui) {
-                first(e, ui);
-                second(e, ui);
+              return function() {
+                first.apply(this, arguments);
+                second.apply(this, arguments);
               };
             }
             return first;
@@ -51538,7 +52016,7 @@ angular.module('ui.sortable', [])
             wrappers.helper = function (inner) {
               if (inner && typeof inner === 'function') {
                 return function (e, item) {
-                  var innerResult = inner(e, item);
+                  var innerResult = inner.apply(this, arguments);
                   item.sortable._isCustomHelperUsed = item !== innerResult;
                   return innerResult;
                 };
@@ -51601,7 +52079,8 @@ angular.module('ui.sortable', [])
     }
   ]);
 
-})(window, window.angular);;/*!
+})(window, window.angular);
+;/*!
  * ui-select
  * http://github.com/angular-ui/ui-select
  * Version: 0.11.2 - 2015-03-17T04:08:46.474Z
@@ -53496,7 +53975,7 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
 
     /*
      * AngularJS Toaster
-     * Version: 0.4.13
+     * Version: 0.4.14
      *
      * Copyright 2013-2015 Jiri Kavulak.
      * All Rights Reserved.
@@ -53509,7 +53988,7 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
 
     angular.module('toaster', ['ngAnimate']).constant(
         'toasterConfig', {
-            'limit':          0,                   // limits max number of toasts
+            'limit': 0,                   // limits max number of toasts
             'tap-to-dismiss': true,
 
             /* Options:
@@ -53520,31 +53999,31 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
              icon-class value
              'close-button': { 'toast-error': true, 'toast-info': false }
              */
-            'close-button':   false,
+            'close-button': false,
 
-            'newest-on-top':        true, //'fade-in': 1000,            // done in css
+            'newest-on-top': true, //'fade-in': 1000,            // done in css
             //'on-fade-in': undefined,    // not implemented
             //'fade-out': 1000,           // done in css
             //'on-fade-out': undefined,   // not implemented
             //'extended-time-out': 1000,  // not implemented
-            'time-out':             5000, // Set timeOut and extendedTimeout to 0 to make it sticky
-            'icon-classes':         {
-                error:   'toast-error',
-                info:    'toast-info',
-                wait:    'toast-wait',
+            'time-out': 5000, // Set timeOut and extendedTimeout to 0 to make it sticky
+            'icon-classes': {
+                error: 'toast-error',
+                info: 'toast-info',
+                wait: 'toast-wait',
                 success: 'toast-success',
                 warning: 'toast-warning'
             },
-            'body-output-type':     '', // Options: '', 'trustedHtml', 'template', 'templateWithData'
-            'body-template':        'toasterBodyTmpl.html',
-            'icon-class':           'toast-info',
-            'position-class':       'toast-top-right', // Options (see CSS):
-                                                       // 'toast-top-full-width', 'toast-bottom-full-width', 'toast-center',
-                                                       // 'toast-top-left', 'toast-top-center', 'toast-top-rigt',
-                                                       // 'toast-bottom-left', 'toast-bottom-center', 'toast-bottom-rigt',
-            'title-class':          'toast-title',
-            'message-class':        'toast-message',
-            'prevent-duplicates':   false,
+            'body-output-type': '', // Options: '', 'trustedHtml', 'template', 'templateWithData'
+            'body-template': 'toasterBodyTmpl.html',
+            'icon-class': 'toast-info',
+            'position-class': 'toast-top-right', // Options (see CSS):
+            // 'toast-top-full-width', 'toast-bottom-full-width', 'toast-center',
+            // 'toast-top-left', 'toast-top-center', 'toast-top-right',
+            // 'toast-bottom-left', 'toast-bottom-center', 'toast-bottom-right',
+            'title-class': 'toast-title',
+            'message-class': 'toast-message',
+            'prevent-duplicates': false,
             'mouseover-timer-stop': true // stop timeout on mouseover and restart timer on mouseout
         }
     ).service(
@@ -53554,27 +54033,27 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
                     if (angular.isObject(type)) {
                         var params = type; // Enable named parameters as pop argument
                         this.toast = {
-                            type:            params.type,
-                            title:           params.title,
-                            body:            params.body,
-                            timeout:         params.timeout,
-                            bodyOutputType:  params.bodyOutputType,
-                            clickHandler:    params.clickHandler,
+                            type: params.type,
+                            title: params.title,
+                            body: params.body,
+                            timeout: params.timeout,
+                            bodyOutputType: params.bodyOutputType,
+                            clickHandler: params.clickHandler,
                             showCloseButton: params.showCloseButton,
-                            uid:             params.toastId
+                            uid: params.toastId
                         };
                         toastId = params.toastId;
                         toasterId = params.toasterId;
                     } else {
                         this.toast = {
-                            type:            type,
-                            title:           title,
-                            body:            body,
-                            timeout:         timeout,
-                            bodyOutputType:  bodyOutputType,
-                            clickHandler:    clickHandler,
+                            type: type,
+                            title: title,
+                            body: body,
+                            timeout: timeout,
+                            bodyOutputType: bodyOutputType,
+                            clickHandler: clickHandler,
                             showCloseButton: showCloseButton,
-                            uid:             toastId
+                            uid: toastId
                         };
                     }
                     $rootScope.$emit('toaster-newToast', toasterId, toastId);
@@ -53601,7 +54080,7 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
                                     toastId
                                 );
                             } else { // 'title' is actually an object with options
-                                this.pop(angular.extend(title, {type: toasterType}));
+                                this.pop(angular.extend(title, { type: toasterType }));
                             }
                         };
                     })(type);
@@ -53635,13 +54114,13 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
                         }
                     },
 
-                    subscribeToNewToastEvent:      function (onNewToast) {
+                    subscribeToNewToastEvent: function (onNewToast) {
                         newToastEventSubscribers.push(onNewToast);
                     },
-                    subscribeToClearToastsEvent:   function (onClearToasts) {
+                    subscribeToClearToastsEvent: function (onClearToasts) {
                         clearToastsEventSubscribers.push(onClearToasts);
                     },
-                    unsubscribeToNewToastEvent:    function (onNewToast) {
+                    unsubscribeToNewToastEvent: function (onNewToast) {
                         var index = newToastEventSubscribers.indexOf(onNewToast);
                         if (index >= 0) {
                             newToastEventSubscribers.splice(index, 1);
@@ -53665,10 +54144,10 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
                     }
                 };
                 return {
-                    setup:                         toasterFactory.setup,
-                    subscribeToNewToastEvent:      toasterFactory.subscribeToNewToastEvent,
-                    subscribeToClearToastsEvent:   toasterFactory.subscribeToClearToastsEvent,
-                    unsubscribeToNewToastEvent:    toasterFactory.unsubscribeToNewToastEvent,
+                    setup: toasterFactory.setup,
+                    subscribeToNewToastEvent: toasterFactory.subscribeToNewToastEvent,
+                    subscribeToClearToastsEvent: toasterFactory.subscribeToClearToastsEvent,
+                    unsubscribeToNewToastEvent: toasterFactory.unsubscribeToNewToastEvent,
                     unsubscribeToClearToastsEvent: toasterFactory.unsubscribeToClearToastsEvent
                 };
             }]
@@ -53677,23 +54156,23 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
             '$parse', '$rootScope', '$interval', '$sce', 'toasterConfig', 'toaster', 'toasterEventRegistry',
             function ($parse, $rootScope, $interval, $sce, toasterConfig, toaster, toasterEventRegistry) {
                 return {
-                    replace:    true,
-                    restrict:   'EA',
-                    scope:      true, // creates an internal scope for this directive (one per directive instance)
-                    link:       function (scope, elm, attrs) {
+                    replace: true,
+                    restrict: 'EA',
+                    scope: true, // creates an internal scope for this directive (one per directive instance)
+                    link: function (scope, elm, attrs) {
                         var id = 0, mergedConfig;
 
                         // Merges configuration set in directive with default one
                         mergedConfig = angular.extend({}, toasterConfig, scope.$eval(attrs.toasterOptions));
 
                         scope.config = {
-                            toasterId:      mergedConfig['toaster-id'],
-                            position:       mergedConfig['position-class'],
-                            title:          mergedConfig['title-class'],
-                            message:        mergedConfig['message-class'],
-                            tap:            mergedConfig['tap-to-dismiss'],
-                            closeButton:    mergedConfig['close-button'],
-                            animation:      mergedConfig['animation-class'],
+                            toasterId: mergedConfig['toaster-id'],
+                            position: mergedConfig['position-class'],
+                            title: mergedConfig['title-class'],
+                            message: mergedConfig['message-class'],
+                            tap: mergedConfig['tap-to-dismiss'],
+                            closeButton: mergedConfig['close-button'],
+                            animation: mergedConfig['animation-class'],
                             mouseoverTimer: mergedConfig['mouseover-timer-stop']
                         };
 
@@ -53714,6 +54193,7 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
 
                         scope.configureTimer = function (toast) {
                             var timeout = angular.isNumber(toast.timeout) ? toast.timeout : mergedConfig['time-out'];
+                            if (typeof timeout === "object") timeout = timeout[toast.type];
                             if (timeout > 0) {
                                 setTimeout(toast, timeout);
                             }
@@ -53885,16 +54365,14 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
                                 }
                             };
 
-                            $scope.click = function (toast) {
-                                if ($scope.config.tap === true || toast.showCloseButton === true) {
+                            $scope.click = function (toast, isCloseButton) {
+                                if ($scope.config.tap === true || (toast.showCloseButton === true && isCloseButton === true)) {
                                     var removeToast = true;
                                     if (toast.clickHandler) {
                                         if (angular.isFunction(toast.clickHandler)) {
-                                            removeToast = toast.clickHandler(toast, toast.showCloseButton);
+                                            removeToast = toast.clickHandler(toast, true);
                                         } else if (angular.isFunction($scope.$parent.$eval(toast.clickHandler))) {
-                                            removeToast = $scope.$parent.$eval(toast.clickHandler)(
-                                                toast, toast.showCloseButton
-                                            );
+                                            removeToast = $scope.$parent.$eval(toast.clickHandler)(toast, toast.showCloseButton);
                                         } else {
                                             console.log("TOAST-NOTE: Your click handler is not inside a parent scope of toaster-container.");
                                         }
@@ -53905,21 +54383,29 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
                                 }
                             };
                         }],
-                    template:   '<div id="toast-container" ng-class="[config.position, config.animation]">' + '<div ng-repeat="toaster in toasters" class="toast" ng-class="toaster.type" ng-click="click(toaster)" ng-mouseover="stopTimer(toaster)" ng-mouseout="restartTimer(toaster)">' + '<button type="button" class="toast-close-button" ng-show="toaster.showCloseButton" ng-click="click(toaster)">&times;</button>' + '<div ng-class="config.title">{{toaster.title}}</div>' + '<div ng-class="config.message" ng-switch on="toaster.bodyOutputType">' + '<div ng-switch-when="trustedHtml" ng-bind-html="toaster.html"></div>' + '<div ng-switch-when="template"><div ng-include="toaster.bodyTemplate"></div></div>' + '<div ng-switch-when="templateWithData"><div ng-include="toaster.bodyTemplate"></div></div>' + '<div ng-switch-default >{{toaster.body}}</div>' + '</div>' + '</div>' + '</div>'
+                    template: '<div id="toast-container" ng-class="[config.position, config.animation]">' + '<div ng-repeat="toaster in toasters" class="toast" ng-class="toaster.type" ng-click="click(toaster)" ng-mouseover="stopTimer(toaster)" ng-mouseout="restartTimer(toaster)">' + '<button type="button" class="toast-close-button" ng-show="toaster.showCloseButton" ng-click="click(toaster, true)">&times;</button>' + '<div ng-class="config.title">{{toaster.title}}</div>' + '<div ng-class="config.message" ng-switch on="toaster.bodyOutputType">' + '<div ng-switch-when="trustedHtml" ng-bind-html="toaster.html"></div>' + '<div ng-switch-when="template"><div ng-include="toaster.bodyTemplate"></div></div>' + '<div ng-switch-when="templateWithData"><div ng-include="toaster.bodyTemplate"></div></div>' + '<div ng-switch-default >{{toaster.body}}</div>' + '</div>' + '</div>' + '</div>'
                 };
             }]
     );
-})(window, document);
-;'use strict';
+})(window, document);;(function(angular, factory) {
+    'use strict';
+    if (typeof define === 'function' && define.amd) {
+        define('ngStorage', ['angular'], function(angular) {
+            return factory(angular);
+        });
+    } else {
+        return factory(angular);
+    }
+}(typeof angular === 'undefined' ? null : angular, function(angular) {
 
-(function() {
+    'use strict';
 
     /**
      * @ngdoc overview
      * @name ngStorage
      */
 
-    angular.module('ngStorage', []).
+    angular.module('ngStorage', [])
 
     /**
      * @ngdoc object
@@ -53928,7 +54414,7 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
      * @requires $window
      */
 
-    factory('$localStorage', _storageFactory('localStorage')).
+    .factory('$localStorage', _storageFactory('localStorage'))
 
     /**
      * @ngdoc object
@@ -53937,19 +54423,44 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
      * @requires $window
      */
 
-    factory('$sessionStorage', _storageFactory('sessionStorage'));
+    .factory('$sessionStorage', _storageFactory('sessionStorage'));
 
     function _storageFactory(storageType) {
         return [
             '$rootScope',
             '$window',
+            '$log',
+            '$timeout',
 
             function(
                 $rootScope,
-                $window
+                $window,
+                $log,
+                $timeout
             ){
+                function isStorageSupported(storageType) {
+                    var supported = $window[storageType];
+
+                    // When Safari (OS X or iOS) is in private browsing mode, it appears as though localStorage
+                    // is available, but trying to call .setItem throws an exception below:
+                    // "QUOTA_EXCEEDED_ERR: DOM Exception 22: An attempt was made to add something to storage that exceeded the quota."
+                    if (supported && storageType === 'localStorage') {
+                        var key = '__' + Math.round(Math.random() * 1e7);
+
+                        try {
+                            localStorage.setItem(key, key);
+                            localStorage.removeItem(key);
+                        }
+                        catch (err) {
+                            supported = false;
+                        }
+                    }
+
+                    return supported;
+                }
+
                 // #9: Assign a placeholder object if Web Storage is unavailable to prevent breaking the entire AngularJS app
-                var webStorage = $window[storageType] || (console.warn('This browser does not support Web Storage!'), {}),
+                var webStorage = isStorageSupported(storageType) || ($log.warn('This browser does not support Web Storage!'), {setItem: function() {}, getItem: function() {}}),
                     $storage = {
                         $default: function(items) {
                             for (var k in items) {
@@ -53969,7 +54480,15 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
                     _last$storage,
                     _debounce;
 
-                for (var i = 0, k; i < webStorage.length; i++) {
+                try {
+                    webStorage = $window[storageType];
+                    webStorage.length;
+                } catch(e) {
+                    $log.warn('This browser does not support Web Storage!');
+                    webStorage = {};
+                }
+
+                for (var i = 0, l = webStorage.length, k; i < l; i++) {
                     // #8, #10: `webStorage.key(i)` may be an empty string (or throw an exception in IE9 if `webStorage` is empty)
                     (k = webStorage.key(i)) && 'ngStorage-' === k.slice(0, 10) && ($storage[k.slice(10)] = angular.fromJson(webStorage.getItem(k)));
                 }
@@ -53977,23 +54496,25 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
                 _last$storage = angular.copy($storage);
 
                 $rootScope.$watch(function() {
-                    _debounce || (_debounce = setTimeout(function() {
+                    var temp$storage;
+                    _debounce || (_debounce = $timeout(function() {
                         _debounce = null;
 
                         if (!angular.equals($storage, _last$storage)) {
+                            temp$storage = angular.copy(_last$storage);
                             angular.forEach($storage, function(v, k) {
                                 angular.isDefined(v) && '$' !== k[0] && webStorage.setItem('ngStorage-' + k, angular.toJson(v));
 
-                                delete _last$storage[k];
+                                delete temp$storage[k];
                             });
 
-                            for (var k in _last$storage) {
+                            for (var k in temp$storage) {
                                 webStorage.removeItem('ngStorage-' + k);
                             }
 
                             _last$storage = angular.copy($storage);
                         }
-                    }, 100));
+                    }, 100, false));
                 });
 
                 // #6: Use `$window.addEventListener` instead of `angular.element` to avoid the jQuery-specific `event.originalEvent`
@@ -54012,8 +54533,3633 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
         ];
     }
 
-})();
-;(function (global, factory) {
+}));
+;/*
+ angular-file-upload v1.1.5
+ https://github.com/nervgh/angular-file-upload
+*/
+(function(angular, factory) {
+    if (typeof define === 'function' && define.amd) {
+        define('angular-file-upload', ['angular'], function(angular) {
+            return factory(angular);
+        });
+    } else {
+        return factory(angular);
+    }
+}(typeof angular === 'undefined' ? null : angular, function(angular) {
+
+var module = angular.module('angularFileUpload', []);
+
+'use strict';
+
+/**
+ * Classes
+ *
+ * FileUploader
+ * FileUploader.FileLikeObject
+ * FileUploader.FileItem
+ * FileUploader.FileDirective
+ * FileUploader.FileSelect
+ * FileUploader.FileDrop
+ * FileUploader.FileOver
+ */
+
+module
+
+
+    .value('fileUploaderOptions', {
+        url: '/',
+        alias: 'file',
+        headers: {},
+        queue: [],
+        progress: 0,
+        autoUpload: false,
+        removeAfterUpload: false,
+        method: 'POST',
+        filters: [],
+        formData: [],
+        queueLimit: Number.MAX_VALUE,
+        withCredentials: false
+    })
+
+
+    .factory('FileUploader', ['fileUploaderOptions', '$rootScope', '$http', '$window', '$compile',
+        function(fileUploaderOptions, $rootScope, $http, $window, $compile) {
+            /**
+             * Creates an instance of FileUploader
+             * @param {Object} [options]
+             * @constructor
+             */
+            function FileUploader(options) {
+                var settings = angular.copy(fileUploaderOptions);
+                angular.extend(this, settings, options, {
+                    isUploading: false,
+                    _nextIndex: 0,
+                    _failFilterIndex: -1,
+                    _directives: {select: [], drop: [], over: []}
+                });
+
+                // add default filters
+                this.filters.unshift({name: 'queueLimit', fn: this._queueLimitFilter});
+                this.filters.unshift({name: 'folder', fn: this._folderFilter});
+            }
+            /**********************
+             * PUBLIC
+             **********************/
+            /**
+             * Checks a support the html5 uploader
+             * @returns {Boolean}
+             * @readonly
+             */
+            FileUploader.prototype.isHTML5 = !!($window.File && $window.FormData);
+            /**
+             * Adds items to the queue
+             * @param {File|HTMLInputElement|Object|FileList|Array<Object>} files
+             * @param {Object} [options]
+             * @param {Array<Function>|String} filters
+             */
+            FileUploader.prototype.addToQueue = function(files, options, filters) {
+                var list = this.isArrayLikeObject(files) ? files: [files];
+                var arrayOfFilters = this._getFilters(filters);
+                var count = this.queue.length;
+                var addedFileItems = [];
+
+                angular.forEach(list, function(some /*{File|HTMLInputElement|Object}*/) {
+                    var temp = new FileUploader.FileLikeObject(some);
+
+                    if (this._isValidFile(temp, arrayOfFilters, options)) {
+                        var fileItem = new FileUploader.FileItem(this, some, options);
+                        addedFileItems.push(fileItem);
+                        this.queue.push(fileItem);
+                        this._onAfterAddingFile(fileItem);
+                    } else {
+                        var filter = this.filters[this._failFilterIndex];
+                        this._onWhenAddingFileFailed(temp, filter, options);
+                    }
+                }, this);
+
+                if(this.queue.length !== count) {
+                    this._onAfterAddingAll(addedFileItems);
+                    this.progress = this._getTotalProgress();
+                }
+
+                this._render();
+                if (this.autoUpload) this.uploadAll();
+            };
+            /**
+             * Remove items from the queue. Remove last: index = -1
+             * @param {FileItem|Number} value
+             */
+            FileUploader.prototype.removeFromQueue = function(value) {
+                var index = this.getIndexOfItem(value);
+                var item = this.queue[index];
+                if (item.isUploading) item.cancel();
+                this.queue.splice(index, 1);
+                item._destroy();
+                this.progress = this._getTotalProgress();
+            };
+            /**
+             * Clears the queue
+             */
+            FileUploader.prototype.clearQueue = function() {
+                while(this.queue.length) {
+                    this.queue[0].remove();
+                }
+                this.progress = 0;
+            };
+            /**
+             * Uploads a item from the queue
+             * @param {FileItem|Number} value
+             */
+            FileUploader.prototype.uploadItem = function(value) {
+                var index = this.getIndexOfItem(value);
+                var item = this.queue[index];
+                var transport = this.isHTML5 ? '_xhrTransport' : '_iframeTransport';
+
+                item._prepareToUploading();
+                if(this.isUploading) return;
+
+                this.isUploading = true;
+                this[transport](item);
+            };
+            /**
+             * Cancels uploading of item from the queue
+             * @param {FileItem|Number} value
+             */
+            FileUploader.prototype.cancelItem = function(value) {
+                var index = this.getIndexOfItem(value);
+                var item = this.queue[index];
+                var prop = this.isHTML5 ? '_xhr' : '_form';
+                if (item && item.isUploading) item[prop].abort();
+            };
+            /**
+             * Uploads all not uploaded items of queue
+             */
+            FileUploader.prototype.uploadAll = function() {
+                var items = this.getNotUploadedItems().filter(function(item) {
+                    return !item.isUploading;
+                });
+                if (!items.length) return;
+
+                angular.forEach(items, function(item) {
+                    item._prepareToUploading();
+                });
+                items[0].upload();
+            };
+            /**
+             * Cancels all uploads
+             */
+            FileUploader.prototype.cancelAll = function() {
+                var items = this.getNotUploadedItems();
+                angular.forEach(items, function(item) {
+                    item.cancel();
+                });
+            };
+            /**
+             * Returns "true" if value an instance of File
+             * @param {*} value
+             * @returns {Boolean}
+             * @private
+             */
+            FileUploader.prototype.isFile = function(value) {
+                var fn = $window.File;
+                return (fn && value instanceof fn);
+            };
+            /**
+             * Returns "true" if value an instance of FileLikeObject
+             * @param {*} value
+             * @returns {Boolean}
+             * @private
+             */
+            FileUploader.prototype.isFileLikeObject = function(value) {
+                return value instanceof FileUploader.FileLikeObject;
+            };
+            /**
+             * Returns "true" if value is array like object
+             * @param {*} value
+             * @returns {Boolean}
+             */
+            FileUploader.prototype.isArrayLikeObject = function(value) {
+                return (angular.isObject(value) && 'length' in value);
+            };
+            /**
+             * Returns a index of item from the queue
+             * @param {Item|Number} value
+             * @returns {Number}
+             */
+            FileUploader.prototype.getIndexOfItem = function(value) {
+                return angular.isNumber(value) ? value : this.queue.indexOf(value);
+            };
+            /**
+             * Returns not uploaded items
+             * @returns {Array}
+             */
+            FileUploader.prototype.getNotUploadedItems = function() {
+                return this.queue.filter(function(item) {
+                    return !item.isUploaded;
+                });
+            };
+            /**
+             * Returns items ready for upload
+             * @returns {Array}
+             */
+            FileUploader.prototype.getReadyItems = function() {
+                return this.queue
+                    .filter(function(item) {
+                        return (item.isReady && !item.isUploading);
+                    })
+                    .sort(function(item1, item2) {
+                        return item1.index - item2.index;
+                    });
+            };
+            /**
+             * Destroys instance of FileUploader
+             */
+            FileUploader.prototype.destroy = function() {
+                angular.forEach(this._directives, function(key) {
+                    angular.forEach(this._directives[key], function(object) {
+                        object.destroy();
+                    }, this);
+                }, this);
+            };
+            /**
+             * Callback
+             * @param {Array} fileItems
+             */
+            FileUploader.prototype.onAfterAddingAll = function(fileItems) {};
+            /**
+             * Callback
+             * @param {FileItem} fileItem
+             */
+            FileUploader.prototype.onAfterAddingFile = function(fileItem) {};
+            /**
+             * Callback
+             * @param {File|Object} item
+             * @param {Object} filter
+             * @param {Object} options
+             * @private
+             */
+            FileUploader.prototype.onWhenAddingFileFailed = function(item, filter, options) {};
+            /**
+             * Callback
+             * @param {FileItem} fileItem
+             */
+            FileUploader.prototype.onBeforeUploadItem = function(fileItem) {};
+            /**
+             * Callback
+             * @param {FileItem} fileItem
+             * @param {Number} progress
+             */
+            FileUploader.prototype.onProgressItem = function(fileItem, progress) {};
+            /**
+             * Callback
+             * @param {Number} progress
+             */
+            FileUploader.prototype.onProgressAll = function(progress) {};
+            /**
+             * Callback
+             * @param {FileItem} item
+             * @param {*} response
+             * @param {Number} status
+             * @param {Object} headers
+             */
+            FileUploader.prototype.onSuccessItem = function(item, response, status, headers) {};
+            /**
+             * Callback
+             * @param {FileItem} item
+             * @param {*} response
+             * @param {Number} status
+             * @param {Object} headers
+             */
+            FileUploader.prototype.onErrorItem = function(item, response, status, headers) {};
+            /**
+             * Callback
+             * @param {FileItem} item
+             * @param {*} response
+             * @param {Number} status
+             * @param {Object} headers
+             */
+            FileUploader.prototype.onCancelItem = function(item, response, status, headers) {};
+            /**
+             * Callback
+             * @param {FileItem} item
+             * @param {*} response
+             * @param {Number} status
+             * @param {Object} headers
+             */
+            FileUploader.prototype.onCompleteItem = function(item, response, status, headers) {};
+            /**
+             * Callback
+             */
+            FileUploader.prototype.onCompleteAll = function() {};
+            /**********************
+             * PRIVATE
+             **********************/
+            /**
+             * Returns the total progress
+             * @param {Number} [value]
+             * @returns {Number}
+             * @private
+             */
+            FileUploader.prototype._getTotalProgress = function(value) {
+                if(this.removeAfterUpload) return value || 0;
+
+                var notUploaded = this.getNotUploadedItems().length;
+                var uploaded = notUploaded ? this.queue.length - notUploaded : this.queue.length;
+                var ratio = 100 / this.queue.length;
+                var current = (value || 0) * ratio / 100;
+
+                return Math.round(uploaded * ratio + current);
+            };
+            /**
+             * Returns array of filters
+             * @param {Array<Function>|String} filters
+             * @returns {Array<Function>}
+             * @private
+             */
+            FileUploader.prototype._getFilters = function(filters) {
+                if (angular.isUndefined(filters)) return this.filters;
+                if (angular.isArray(filters)) return filters;
+                var names = filters.match(/[^\s,]+/g);
+                return this.filters.filter(function(filter) {
+                    return names.indexOf(filter.name) !== -1;
+                }, this);
+            };
+            /**
+             * Updates html
+             * @private
+             */
+            FileUploader.prototype._render = function() {
+                if (!$rootScope.$$phase) $rootScope.$apply();
+            };
+            /**
+             * Returns "true" if item is a file (not folder)
+             * @param {File|FileLikeObject} item
+             * @returns {Boolean}
+             * @private
+             */
+            FileUploader.prototype._folderFilter = function(item) {
+                return !!(item.size || item.type);
+            };
+            /**
+             * Returns "true" if the limit has not been reached
+             * @returns {Boolean}
+             * @private
+             */
+            FileUploader.prototype._queueLimitFilter = function() {
+                return this.queue.length < this.queueLimit;
+            };
+            /**
+             * Returns "true" if file pass all filters
+             * @param {File|Object} file
+             * @param {Array<Function>} filters
+             * @param {Object} options
+             * @returns {Boolean}
+             * @private
+             */
+            FileUploader.prototype._isValidFile = function(file, filters, options) {
+                this._failFilterIndex = -1;
+                return !filters.length ? true : filters.every(function(filter) {
+                    this._failFilterIndex++;
+                    return filter.fn.call(this, file, options);
+                }, this);
+            };
+            /**
+             * Checks whether upload successful
+             * @param {Number} status
+             * @returns {Boolean}
+             * @private
+             */
+            FileUploader.prototype._isSuccessCode = function(status) {
+                return (status >= 200 && status < 300) || status === 304;
+            };
+            /**
+             * Transforms the server response
+             * @param {*} response
+             * @param {Object} headers
+             * @returns {*}
+             * @private
+             */
+            FileUploader.prototype._transformResponse = function(response, headers) {
+                var headersGetter = this._headersGetter(headers);
+                angular.forEach($http.defaults.transformResponse, function(transformFn) {
+                    response = transformFn(response, headersGetter);
+                });
+                return response;
+            };
+            /**
+             * Parsed response headers
+             * @param headers
+             * @returns {Object}
+             * @see https://github.com/angular/angular.js/blob/master/src/ng/http.js
+             * @private
+             */
+            FileUploader.prototype._parseHeaders = function(headers) {
+                var parsed = {}, key, val, i;
+
+                if (!headers) return parsed;
+
+                angular.forEach(headers.split('\n'), function(line) {
+                    i = line.indexOf(':');
+                    key = line.slice(0, i).trim().toLowerCase();
+                    val = line.slice(i + 1).trim();
+
+                    if (key) {
+                        parsed[key] = parsed[key] ? parsed[key] + ', ' + val : val;
+                    }
+                });
+
+                return parsed;
+            };
+            /**
+             * Returns function that returns headers
+             * @param {Object} parsedHeaders
+             * @returns {Function}
+             * @private
+             */
+            FileUploader.prototype._headersGetter = function(parsedHeaders) {
+                return function(name) {
+                    if (name) {
+                        return parsedHeaders[name.toLowerCase()] || null;
+                    }
+                    return parsedHeaders;
+                };
+            };
+            /**
+             * The XMLHttpRequest transport
+             * @param {FileItem} item
+             * @private
+             */
+            FileUploader.prototype._xhrTransport = function(item) {
+                var xhr = item._xhr = new XMLHttpRequest();
+                var form = new FormData();
+                var that = this;
+
+                that._onBeforeUploadItem(item);
+
+                angular.forEach(item.formData, function(obj) {
+                    angular.forEach(obj, function(value, key) {
+                        form.append(key, value);
+                    });
+                });
+
+                form.append(item.alias, item._file, item.file.name);
+
+                xhr.upload.onprogress = function(event) {
+                    var progress = Math.round(event.lengthComputable ? event.loaded * 100 / event.total : 0);
+                    that._onProgressItem(item, progress);
+                };
+
+                xhr.onload = function() {
+                    var headers = that._parseHeaders(xhr.getAllResponseHeaders());
+                    var response = that._transformResponse(xhr.response, headers);
+                    var gist = that._isSuccessCode(xhr.status) ? 'Success' : 'Error';
+                    var method = '_on' + gist + 'Item';
+                    that[method](item, response, xhr.status, headers);
+                    that._onCompleteItem(item, response, xhr.status, headers);
+                };
+
+                xhr.onerror = function() {
+                    var headers = that._parseHeaders(xhr.getAllResponseHeaders());
+                    var response = that._transformResponse(xhr.response, headers);
+                    that._onErrorItem(item, response, xhr.status, headers);
+                    that._onCompleteItem(item, response, xhr.status, headers);
+                };
+
+                xhr.onabort = function() {
+                    var headers = that._parseHeaders(xhr.getAllResponseHeaders());
+                    var response = that._transformResponse(xhr.response, headers);
+                    that._onCancelItem(item, response, xhr.status, headers);
+                    that._onCompleteItem(item, response, xhr.status, headers);
+                };
+
+                xhr.open(item.method, item.url, true);
+
+                xhr.withCredentials = item.withCredentials;
+
+                angular.forEach(item.headers, function(value, name) {
+                    xhr.setRequestHeader(name, value);
+                });
+
+                xhr.send(form);
+                this._render();
+            };
+            /**
+             * The IFrame transport
+             * @param {FileItem} item
+             * @private
+             */
+            FileUploader.prototype._iframeTransport = function(item) {
+                var form = angular.element('<form style="display: none;" />');
+                var iframe = angular.element('<iframe name="iframeTransport' + Date.now() + '">');
+                var input = item._input;
+                var that = this;
+
+                if (item._form) item._form.replaceWith(input); // remove old form
+                item._form = form; // save link to new form
+
+                that._onBeforeUploadItem(item);
+
+                input.prop('name', item.alias);
+
+                angular.forEach(item.formData, function(obj) {
+                    angular.forEach(obj, function(value, key) {
+                        var element = angular.element('<input type="hidden" name="' + key + '" />');
+                        element.val(value);
+                        form.append(element);
+                    });
+                });
+
+                form.prop({
+                    action: item.url,
+                    method: 'POST',
+                    target: iframe.prop('name'),
+                    enctype: 'multipart/form-data',
+                    encoding: 'multipart/form-data' // old IE
+                });
+
+                iframe.bind('load', function() {
+                    try {
+                        // Fix for legacy IE browsers that loads internal error page
+                        // when failed WS response received. In consequence iframe
+                        // content access denied error is thrown becouse trying to
+                        // access cross domain page. When such thing occurs notifying
+                        // with empty response object. See more info at:
+                        // http://stackoverflow.com/questions/151362/access-is-denied-error-on-accessing-iframe-document-object
+                        // Note that if non standard 4xx or 5xx error code returned
+                        // from WS then response content can be accessed without error
+                        // but 'XHR' status becomes 200. In order to avoid confusion
+                        // returning response via same 'success' event handler.
+
+                        // fixed angular.contents() for iframes
+                        var html = iframe[0].contentDocument.body.innerHTML;
+                    } catch (e) {}
+
+                    var xhr = {response: html, status: 200, dummy: true};
+                    var headers = {};
+                    var response = that._transformResponse(xhr.response, headers);
+
+                    that._onSuccessItem(item, response, xhr.status, headers);
+                    that._onCompleteItem(item, response, xhr.status, headers);
+                });
+
+                form.abort = function() {
+                    var xhr = {status: 0, dummy: true};
+                    var headers = {};
+                    var response;
+
+                    iframe.unbind('load').prop('src', 'javascript:false;');
+                    form.replaceWith(input);
+
+                    that._onCancelItem(item, response, xhr.status, headers);
+                    that._onCompleteItem(item, response, xhr.status, headers);
+                };
+
+                input.after(form);
+                form.append(input).append(iframe);
+
+                form[0].submit();
+                this._render();
+            };
+            /**
+             * Inner callback
+             * @param {File|Object} item
+             * @param {Object} filter
+             * @param {Object} options
+             * @private
+             */
+            FileUploader.prototype._onWhenAddingFileFailed = function(item, filter, options) {
+                this.onWhenAddingFileFailed(item, filter, options);
+            };
+            /**
+             * Inner callback
+             * @param {FileItem} item
+             */
+            FileUploader.prototype._onAfterAddingFile = function(item) {
+                this.onAfterAddingFile(item);
+            };
+            /**
+             * Inner callback
+             * @param {Array<FileItem>} items
+             */
+            FileUploader.prototype._onAfterAddingAll = function(items) {
+                this.onAfterAddingAll(items);
+            };
+            /**
+             *  Inner callback
+             * @param {FileItem} item
+             * @private
+             */
+            FileUploader.prototype._onBeforeUploadItem = function(item) {
+                item._onBeforeUpload();
+                this.onBeforeUploadItem(item);
+            };
+            /**
+             * Inner callback
+             * @param {FileItem} item
+             * @param {Number} progress
+             * @private
+             */
+            FileUploader.prototype._onProgressItem = function(item, progress) {
+                var total = this._getTotalProgress(progress);
+                this.progress = total;
+                item._onProgress(progress);
+                this.onProgressItem(item, progress);
+                this.onProgressAll(total);
+                this._render();
+            };
+            /**
+             * Inner callback
+             * @param {FileItem} item
+             * @param {*} response
+             * @param {Number} status
+             * @param {Object} headers
+             * @private
+             */
+            FileUploader.prototype._onSuccessItem = function(item, response, status, headers) {
+                item._onSuccess(response, status, headers);
+                this.onSuccessItem(item, response, status, headers);
+            };
+            /**
+             * Inner callback
+             * @param {FileItem} item
+             * @param {*} response
+             * @param {Number} status
+             * @param {Object} headers
+             * @private
+             */
+            FileUploader.prototype._onErrorItem = function(item, response, status, headers) {
+                item._onError(response, status, headers);
+                this.onErrorItem(item, response, status, headers);
+            };
+            /**
+             * Inner callback
+             * @param {FileItem} item
+             * @param {*} response
+             * @param {Number} status
+             * @param {Object} headers
+             * @private
+             */
+            FileUploader.prototype._onCancelItem = function(item, response, status, headers) {
+                item._onCancel(response, status, headers);
+                this.onCancelItem(item, response, status, headers);
+            };
+            /**
+             * Inner callback
+             * @param {FileItem} item
+             * @param {*} response
+             * @param {Number} status
+             * @param {Object} headers
+             * @private
+             */
+            FileUploader.prototype._onCompleteItem = function(item, response, status, headers) {
+                item._onComplete(response, status, headers);
+                this.onCompleteItem(item, response, status, headers);
+
+                var nextItem = this.getReadyItems()[0];
+                this.isUploading = false;
+
+                if(angular.isDefined(nextItem)) {
+                    nextItem.upload();
+                    return;
+                }
+
+                this.onCompleteAll();
+                this.progress = this._getTotalProgress();
+                this._render();
+            };
+            /**********************
+             * STATIC
+             **********************/
+            /**
+             * @borrows FileUploader.prototype.isFile
+             */
+            FileUploader.isFile = FileUploader.prototype.isFile;
+            /**
+             * @borrows FileUploader.prototype.isFileLikeObject
+             */
+            FileUploader.isFileLikeObject = FileUploader.prototype.isFileLikeObject;
+            /**
+             * @borrows FileUploader.prototype.isArrayLikeObject
+             */
+            FileUploader.isArrayLikeObject = FileUploader.prototype.isArrayLikeObject;
+            /**
+             * @borrows FileUploader.prototype.isHTML5
+             */
+            FileUploader.isHTML5 = FileUploader.prototype.isHTML5;
+            /**
+             * Inherits a target (Class_1) by a source (Class_2)
+             * @param {Function} target
+             * @param {Function} source
+             */
+            FileUploader.inherit = function(target, source) {
+                target.prototype = Object.create(source.prototype);
+                target.prototype.constructor = target;
+                target.super_ = source;
+            };
+            FileUploader.FileLikeObject = FileLikeObject;
+            FileUploader.FileItem = FileItem;
+            FileUploader.FileDirective = FileDirective;
+            FileUploader.FileSelect = FileSelect;
+            FileUploader.FileDrop = FileDrop;
+            FileUploader.FileOver = FileOver;
+
+            // ---------------------------
+
+            /**
+             * Creates an instance of FileLikeObject
+             * @param {File|HTMLInputElement|Object} fileOrInput
+             * @constructor
+             */
+            function FileLikeObject(fileOrInput) {
+                var isInput = angular.isElement(fileOrInput);
+                var fakePathOrObject = isInput ? fileOrInput.value : fileOrInput;
+                var postfix = angular.isString(fakePathOrObject) ? 'FakePath' : 'Object';
+                var method = '_createFrom' + postfix;
+                this[method](fakePathOrObject);
+            }
+
+            /**
+             * Creates file like object from fake path string
+             * @param {String} path
+             * @private
+             */
+            FileLikeObject.prototype._createFromFakePath = function(path) {
+                this.lastModifiedDate = null;
+                this.size = null;
+                this.type = 'like/' + path.slice(path.lastIndexOf('.') + 1).toLowerCase();
+                this.name = path.slice(path.lastIndexOf('/') + path.lastIndexOf('\\') + 2);
+            };
+            /**
+             * Creates file like object from object
+             * @param {File|FileLikeObject} object
+             * @private
+             */
+            FileLikeObject.prototype._createFromObject = function(object) {
+                this.lastModifiedDate = angular.copy(object.lastModifiedDate);
+                this.size = object.size;
+                this.type = object.type;
+                this.name = object.name;
+            };
+
+            // ---------------------------
+
+            /**
+             * Creates an instance of FileItem
+             * @param {FileUploader} uploader
+             * @param {File|HTMLInputElement|Object} some
+             * @param {Object} options
+             * @constructor
+             */
+            function FileItem(uploader, some, options) {
+                var isInput = angular.isElement(some);
+                var input = isInput ? angular.element(some) : null;
+                var file = !isInput ? some : null;
+
+                angular.extend(this, {
+                    url: uploader.url,
+                    alias: uploader.alias,
+                    headers: angular.copy(uploader.headers),
+                    formData: angular.copy(uploader.formData),
+                    removeAfterUpload: uploader.removeAfterUpload,
+                    withCredentials: uploader.withCredentials,
+                    method: uploader.method
+                }, options, {
+                    uploader: uploader,
+                    file: new FileUploader.FileLikeObject(some),
+                    isReady: false,
+                    isUploading: false,
+                    isUploaded: false,
+                    isSuccess: false,
+                    isCancel: false,
+                    isError: false,
+                    progress: 0,
+                    index: null,
+                    _file: file,
+                    _input: input
+                });
+
+                if (input) this._replaceNode(input);
+            }
+            /**********************
+             * PUBLIC
+             **********************/
+            /**
+             * Uploads a FileItem
+             */
+            FileItem.prototype.upload = function() {
+                this.uploader.uploadItem(this);
+            };
+            /**
+             * Cancels uploading of FileItem
+             */
+            FileItem.prototype.cancel = function() {
+                this.uploader.cancelItem(this);
+            };
+            /**
+             * Removes a FileItem
+             */
+            FileItem.prototype.remove = function() {
+                this.uploader.removeFromQueue(this);
+            };
+            /**
+             * Callback
+             * @private
+             */
+            FileItem.prototype.onBeforeUpload = function() {};
+            /**
+             * Callback
+             * @param {Number} progress
+             * @private
+             */
+            FileItem.prototype.onProgress = function(progress) {};
+            /**
+             * Callback
+             * @param {*} response
+             * @param {Number} status
+             * @param {Object} headers
+             */
+            FileItem.prototype.onSuccess = function(response, status, headers) {};
+            /**
+             * Callback
+             * @param {*} response
+             * @param {Number} status
+             * @param {Object} headers
+             */
+            FileItem.prototype.onError = function(response, status, headers) {};
+            /**
+             * Callback
+             * @param {*} response
+             * @param {Number} status
+             * @param {Object} headers
+             */
+            FileItem.prototype.onCancel = function(response, status, headers) {};
+            /**
+             * Callback
+             * @param {*} response
+             * @param {Number} status
+             * @param {Object} headers
+             */
+            FileItem.prototype.onComplete = function(response, status, headers) {};
+            /**********************
+             * PRIVATE
+             **********************/
+            /**
+             * Inner callback
+             */
+            FileItem.prototype._onBeforeUpload = function() {
+                this.isReady = true;
+                this.isUploading = true;
+                this.isUploaded = false;
+                this.isSuccess = false;
+                this.isCancel = false;
+                this.isError = false;
+                this.progress = 0;
+                this.onBeforeUpload();
+            };
+            /**
+             * Inner callback
+             * @param {Number} progress
+             * @private
+             */
+            FileItem.prototype._onProgress = function(progress) {
+                this.progress = progress;
+                this.onProgress(progress);
+            };
+            /**
+             * Inner callback
+             * @param {*} response
+             * @param {Number} status
+             * @param {Object} headers
+             * @private
+             */
+            FileItem.prototype._onSuccess = function(response, status, headers) {
+                this.isReady = false;
+                this.isUploading = false;
+                this.isUploaded = true;
+                this.isSuccess = true;
+                this.isCancel = false;
+                this.isError = false;
+                this.progress = 100;
+                this.index = null;
+                this.onSuccess(response, status, headers);
+            };
+            /**
+             * Inner callback
+             * @param {*} response
+             * @param {Number} status
+             * @param {Object} headers
+             * @private
+             */
+            FileItem.prototype._onError = function(response, status, headers) {
+                this.isReady = false;
+                this.isUploading = false;
+                this.isUploaded = true;
+                this.isSuccess = false;
+                this.isCancel = false;
+                this.isError = true;
+                this.progress = 0;
+                this.index = null;
+                this.onError(response, status, headers);
+            };
+            /**
+             * Inner callback
+             * @param {*} response
+             * @param {Number} status
+             * @param {Object} headers
+             * @private
+             */
+            FileItem.prototype._onCancel = function(response, status, headers) {
+                this.isReady = false;
+                this.isUploading = false;
+                this.isUploaded = false;
+                this.isSuccess = false;
+                this.isCancel = true;
+                this.isError = false;
+                this.progress = 0;
+                this.index = null;
+                this.onCancel(response, status, headers);
+            };
+            /**
+             * Inner callback
+             * @param {*} response
+             * @param {Number} status
+             * @param {Object} headers
+             * @private
+             */
+            FileItem.prototype._onComplete = function(response, status, headers) {
+                this.onComplete(response, status, headers);
+                if (this.removeAfterUpload) this.remove();
+            };
+            /**
+             * Destroys a FileItem
+             */
+            FileItem.prototype._destroy = function() {
+                if (this._input) this._input.remove();
+                if (this._form) this._form.remove();
+                delete this._form;
+                delete this._input;
+            };
+            /**
+             * Prepares to uploading
+             * @private
+             */
+            FileItem.prototype._prepareToUploading = function() {
+                this.index = this.index || ++this.uploader._nextIndex;
+                this.isReady = true;
+            };
+            /**
+             * Replaces input element on his clone
+             * @param {JQLite|jQuery} input
+             * @private
+             */
+            FileItem.prototype._replaceNode = function(input) {
+                var clone = $compile(input.clone())(input.scope());
+                clone.prop('value', null); // FF fix
+                input.css('display', 'none');
+                input.after(clone); // remove jquery dependency
+            };
+
+            // ---------------------------
+
+            /**
+             * Creates instance of {FileDirective} object
+             * @param {Object} options
+             * @param {Object} options.uploader
+             * @param {HTMLElement} options.element
+             * @param {Object} options.events
+             * @param {String} options.prop
+             * @constructor
+             */
+            function FileDirective(options) {
+                angular.extend(this, options);
+                this.uploader._directives[this.prop].push(this);
+                this._saveLinks();
+                this.bind();
+            }
+            /**
+             * Map of events
+             * @type {Object}
+             */
+            FileDirective.prototype.events = {};
+            /**
+             * Binds events handles
+             */
+            FileDirective.prototype.bind = function() {
+                for(var key in this.events) {
+                    var prop = this.events[key];
+                    this.element.bind(key, this[prop]);
+                }
+            };
+            /**
+             * Unbinds events handles
+             */
+            FileDirective.prototype.unbind = function() {
+                for(var key in this.events) {
+                    this.element.unbind(key, this.events[key]);
+                }
+            };
+            /**
+             * Destroys directive
+             */
+            FileDirective.prototype.destroy = function() {
+                var index = this.uploader._directives[this.prop].indexOf(this);
+                this.uploader._directives[this.prop].splice(index, 1);
+                this.unbind();
+                // this.element = null;
+            };
+            /**
+             * Saves links to functions
+             * @private
+             */
+            FileDirective.prototype._saveLinks = function() {
+                for(var key in this.events) {
+                    var prop = this.events[key];
+                    this[prop] = this[prop].bind(this);
+                }
+            };
+
+            // ---------------------------
+
+            FileUploader.inherit(FileSelect, FileDirective);
+
+            /**
+             * Creates instance of {FileSelect} object
+             * @param {Object} options
+             * @constructor
+             */
+            function FileSelect(options) {
+                FileSelect.super_.apply(this, arguments);
+
+                if(!this.uploader.isHTML5) {
+                    this.element.removeAttr('multiple');
+                }
+                this.element.prop('value', null); // FF fix
+            }
+            /**
+             * Map of events
+             * @type {Object}
+             */
+            FileSelect.prototype.events = {
+                $destroy: 'destroy',
+                change: 'onChange'
+            };
+            /**
+             * Name of property inside uploader._directive object
+             * @type {String}
+             */
+            FileSelect.prototype.prop = 'select';
+            /**
+             * Returns options
+             * @return {Object|undefined}
+             */
+            FileSelect.prototype.getOptions = function() {};
+            /**
+             * Returns filters
+             * @return {Array<Function>|String|undefined}
+             */
+            FileSelect.prototype.getFilters = function() {};
+            /**
+             * If returns "true" then HTMLInputElement will be cleared
+             * @returns {Boolean}
+             */
+            FileSelect.prototype.isEmptyAfterSelection = function() {
+                return !!this.element.attr('multiple');
+            };
+            /**
+             * Event handler
+             */
+            FileSelect.prototype.onChange = function() {
+                var files = this.uploader.isHTML5 ? this.element[0].files : this.element[0];
+                var options = this.getOptions();
+                var filters = this.getFilters();
+
+                if (!this.uploader.isHTML5) this.destroy();
+                this.uploader.addToQueue(files, options, filters);
+                if (this.isEmptyAfterSelection()) this.element.prop('value', null);
+            };
+
+            // ---------------------------
+
+            FileUploader.inherit(FileDrop, FileDirective);
+
+            /**
+             * Creates instance of {FileDrop} object
+             * @param {Object} options
+             * @constructor
+             */
+            function FileDrop(options) {
+                FileDrop.super_.apply(this, arguments);
+            }
+            /**
+             * Map of events
+             * @type {Object}
+             */
+            FileDrop.prototype.events = {
+                $destroy: 'destroy',
+                drop: 'onDrop',
+                dragover: 'onDragOver',
+                dragleave: 'onDragLeave'
+            };
+            /**
+             * Name of property inside uploader._directive object
+             * @type {String}
+             */
+            FileDrop.prototype.prop = 'drop';
+            /**
+             * Returns options
+             * @return {Object|undefined}
+             */
+            FileDrop.prototype.getOptions = function() {};
+            /**
+             * Returns filters
+             * @return {Array<Function>|String|undefined}
+             */
+            FileDrop.prototype.getFilters = function() {};
+            /**
+             * Event handler
+             */
+            FileDrop.prototype.onDrop = function(event) {
+                var transfer = this._getTransfer(event);
+                if (!transfer) return;
+                var options = this.getOptions();
+                var filters = this.getFilters();
+                this._preventAndStop(event);
+                angular.forEach(this.uploader._directives.over, this._removeOverClass, this);
+                this.uploader.addToQueue(transfer.files, options, filters);
+            };
+            /**
+             * Event handler
+             */
+            FileDrop.prototype.onDragOver = function(event) {
+                var transfer = this._getTransfer(event);
+                if(!this._haveFiles(transfer.types)) return;
+                transfer.dropEffect = 'copy';
+                this._preventAndStop(event);
+                angular.forEach(this.uploader._directives.over, this._addOverClass, this);
+            };
+            /**
+             * Event handler
+             */
+            FileDrop.prototype.onDragLeave = function(event) {
+                if (event.currentTarget !== this.element[0]) return;
+                this._preventAndStop(event);
+                angular.forEach(this.uploader._directives.over, this._removeOverClass, this);
+            };
+            /**
+             * Helper
+             */
+            FileDrop.prototype._getTransfer = function(event) {
+                return event.dataTransfer ? event.dataTransfer : event.originalEvent.dataTransfer; // jQuery fix;
+            };
+            /**
+             * Helper
+             */
+            FileDrop.prototype._preventAndStop = function(event) {
+                event.preventDefault();
+                event.stopPropagation();
+            };
+            /**
+             * Returns "true" if types contains files
+             * @param {Object} types
+             */
+            FileDrop.prototype._haveFiles = function(types) {
+                if (!types) return false;
+                if (types.indexOf) {
+                    return types.indexOf('Files') !== -1;
+                } else if(types.contains) {
+                    return types.contains('Files');
+                } else {
+                    return false;
+                }
+            };
+            /**
+             * Callback
+             */
+            FileDrop.prototype._addOverClass = function(item) {
+                item.addOverClass();
+            };
+            /**
+             * Callback
+             */
+            FileDrop.prototype._removeOverClass = function(item) {
+                item.removeOverClass();
+            };
+
+            // ---------------------------
+
+            FileUploader.inherit(FileOver, FileDirective);
+
+            /**
+             * Creates instance of {FileDrop} object
+             * @param {Object} options
+             * @constructor
+             */
+            function FileOver(options) {
+                FileOver.super_.apply(this, arguments);
+            }
+            /**
+             * Map of events
+             * @type {Object}
+             */
+            FileOver.prototype.events = {
+                $destroy: 'destroy'
+            };
+            /**
+             * Name of property inside uploader._directive object
+             * @type {String}
+             */
+            FileOver.prototype.prop = 'over';
+            /**
+             * Over class
+             * @type {string}
+             */
+            FileOver.prototype.overClass = 'nv-file-over';
+            /**
+             * Adds over class
+             */
+            FileOver.prototype.addOverClass = function() {
+                this.element.addClass(this.getOverClass());
+            };
+            /**
+             * Removes over class
+             */
+            FileOver.prototype.removeOverClass = function() {
+                this.element.removeClass(this.getOverClass());
+            };
+            /**
+             * Returns over class
+             * @returns {String}
+             */
+            FileOver.prototype.getOverClass = function() {
+                return this.overClass;
+            };
+
+            return FileUploader;
+        }])
+
+
+    .directive('nvFileSelect', ['$parse', 'FileUploader', function($parse, FileUploader) {
+        return {
+            link: function(scope, element, attributes) {
+                var uploader = scope.$eval(attributes.uploader);
+
+                if (!(uploader instanceof FileUploader)) {
+                    throw new TypeError('"Uploader" must be an instance of FileUploader');
+                }
+
+                var object = new FileUploader.FileSelect({
+                    uploader: uploader,
+                    element: element
+                });
+
+                object.getOptions = $parse(attributes.options).bind(object, scope);
+                object.getFilters = function() {return attributes.filters;};
+            }
+        };
+    }])
+
+
+    .directive('nvFileDrop', ['$parse', 'FileUploader', function($parse, FileUploader) {
+        return {
+            link: function(scope, element, attributes) {
+                var uploader = scope.$eval(attributes.uploader);
+
+                if (!(uploader instanceof FileUploader)) {
+                    throw new TypeError('"Uploader" must be an instance of FileUploader');
+                }
+
+                if (!uploader.isHTML5) return;
+
+                var object = new FileUploader.FileDrop({
+                    uploader: uploader,
+                    element: element
+                });
+
+                object.getOptions = $parse(attributes.options).bind(object, scope);
+                object.getFilters = function() {return attributes.filters;};
+            }
+        };
+    }])
+
+
+    .directive('nvFileOver', ['FileUploader', function(FileUploader) {
+        return {
+            link: function(scope, element, attributes) {
+                var uploader = scope.$eval(attributes.uploader);
+
+                if (!(uploader instanceof FileUploader)) {
+                    throw new TypeError('"Uploader" must be an instance of FileUploader');
+                }
+
+                var object = new FileUploader.FileOver({
+                    uploader: uploader,
+                    element: element
+                });
+
+                object.getOverClass = function() {
+                    return attributes.overClass || this.overClass;
+                };
+            }
+        };
+    }])
+
+    return module;
+}));;/*!
+ * Cropper v0.10.0
+ * https://github.com/fengyuanchen/cropper
+ *
+ * Copyright (c) 2014-2015 Fengyuan Chen and other contributors
+ * Released under the MIT license
+ *
+ * Date: 2015-06-08T14:57:26.353Z
+ */
+
+(function (factory) {
+  if (typeof define === 'function' && define.amd) {
+    // AMD. Register as anonymous module.
+    define(['jquery'], factory);
+  } else if (typeof exports === 'object') {
+    // Node / CommonJS
+    factory(require('jquery'));
+  } else {
+    // Browser globals.
+    factory(jQuery);
+  }
+})(function ($) {
+
+  'use strict';
+
+  var $window = $(window),
+      $document = $(document),
+      location = window.location,
+
+      // Constants
+      CROPPER_NAMESPACE = '.cropper',
+      CROPPER_PREVIEW = 'preview' + CROPPER_NAMESPACE,
+
+      // RegExps
+      REGEXP_DRAG_TYPES = /^(e|n|w|s|ne|nw|sw|se|all|crop|move|zoom)$/,
+
+      // Classes
+      CLASS_MODAL = 'cropper-modal',
+      CLASS_HIDE = 'cropper-hide',
+      CLASS_HIDDEN = 'cropper-hidden',
+      CLASS_INVISIBLE = 'cropper-invisible',
+      CLASS_MOVE = 'cropper-move',
+      CLASS_CROP = 'cropper-crop',
+      CLASS_DISABLED = 'cropper-disabled',
+      CLASS_BG = 'cropper-bg',
+
+      // Events
+      EVENT_MOUSE_DOWN = 'mousedown touchstart',
+      EVENT_MOUSE_MOVE = 'mousemove touchmove',
+      EVENT_MOUSE_UP = 'mouseup mouseleave touchend touchleave touchcancel',
+      EVENT_WHEEL = 'wheel mousewheel DOMMouseScroll',
+      EVENT_DBLCLICK = 'dblclick',
+      EVENT_RESIZE = 'resize' + CROPPER_NAMESPACE, // Bind to window with namespace
+      EVENT_BUILD = 'build' + CROPPER_NAMESPACE,
+      EVENT_BUILT = 'built' + CROPPER_NAMESPACE,
+      EVENT_DRAG_START = 'dragstart' + CROPPER_NAMESPACE,
+      EVENT_DRAG_MOVE = 'dragmove' + CROPPER_NAMESPACE,
+      EVENT_DRAG_END = 'dragend' + CROPPER_NAMESPACE,
+      EVENT_ZOOM_IN = 'zoomin' + CROPPER_NAMESPACE,
+      EVENT_ZOOM_OUT = 'zoomout' + CROPPER_NAMESPACE,
+      EVENT_CHANGE = 'change' + CROPPER_NAMESPACE,
+
+      // Supports
+      SUPPORT_CANVAS = $.isFunction($('<canvas>')[0].getContext),
+
+      // Others
+      sqrt = Math.sqrt,
+      min = Math.min,
+      max = Math.max,
+      abs = Math.abs,
+      sin = Math.sin,
+      cos = Math.cos,
+      num = parseFloat,
+
+      // Prototype
+      prototype = {};
+
+  function isNumber(n) {
+    return typeof n === 'number' && !isNaN(n);
+  }
+
+  function isUndefined(n) {
+    return typeof n === 'undefined';
+  }
+
+  function toArray(obj, offset) {
+    var args = [];
+
+    if (isNumber(offset)) { // It's necessary for IE8
+      args.push(offset);
+    }
+
+    return args.slice.apply(obj, args);
+  }
+
+  // Custom proxy to avoid jQuery's guid
+  function proxy(fn, context) {
+    var args = toArray(arguments, 2);
+
+    return function () {
+      return fn.apply(context, args.concat(toArray(arguments)));
+    };
+  }
+
+  function isCrossOriginURL(url) {
+    var parts = url.match(/^(https?:)\/\/([^\:\/\?#]+):?(\d*)/i);
+
+    return parts && (parts[1] !== location.protocol || parts[2] !== location.hostname || parts[3] !== location.port);
+  }
+
+  function addTimestamp(url) {
+    var timestamp = 'timestamp=' + (new Date()).getTime();
+
+    return (url + (url.indexOf('?') === -1 ? '?' : '&') + timestamp);
+  }
+
+  function getRotateValue(degree) {
+    return degree ? 'rotate(' + degree + 'deg)' : 'none';
+  }
+
+  function getRotatedSizes(data, reverse) {
+    var deg = abs(data.degree) % 180,
+        arc = (deg > 90 ? (180 - deg) : deg) * Math.PI / 180,
+        sinArc = sin(arc),
+        cosArc = cos(arc),
+        width = data.width,
+        height = data.height,
+        aspectRatio = data.aspectRatio,
+        newWidth,
+        newHeight;
+
+    if (!reverse) {
+      newWidth = width * cosArc + height * sinArc;
+      newHeight = width * sinArc + height * cosArc;
+    } else {
+      newWidth = width / (cosArc + sinArc / aspectRatio);
+      newHeight = newWidth / aspectRatio;
+    }
+
+    return {
+      width: newWidth,
+      height: newHeight
+    };
+  }
+
+  function getSourceCanvas(image, data) {
+    var canvas = $('<canvas>')[0],
+        context = canvas.getContext('2d'),
+        width = data.naturalWidth,
+        height = data.naturalHeight,
+        rotate = data.rotate,
+        rotated = getRotatedSizes({
+          width: width,
+          height: height,
+          degree: rotate
+        });
+
+    if (rotate) {
+      canvas.width = rotated.width;
+      canvas.height = rotated.height;
+      context.save();
+      context.translate(rotated.width / 2, rotated.height / 2);
+      context.rotate(rotate * Math.PI / 180);
+      context.drawImage(image, -width / 2, -height / 2, width, height);
+      context.restore();
+    } else {
+      canvas.width = width;
+      canvas.height = height;
+      context.drawImage(image, 0, 0, width, height);
+    }
+
+    return canvas;
+  }
+
+  function Cropper(element, options) {
+    this.$element = $(element);
+    this.options = $.extend({}, Cropper.DEFAULTS, $.isPlainObject(options) && options);
+
+    this.ready = false;
+    this.built = false;
+    this.rotated = false;
+    this.cropped = false;
+    this.disabled = false;
+    this.canvas = null;
+    this.cropBox = null;
+
+    this.load();
+  }
+
+  prototype.load = function (url) {
+    var options = this.options,
+        $this = this.$element,
+        crossOrigin,
+        bustCacheUrl,
+        buildEvent,
+        $clone;
+
+    if (!url) {
+      if ($this.is('img')) {
+        if (!$this.attr('src')) {
+          return;
+        }
+
+        url = $this.prop('src');
+      } else if ($this.is('canvas') && SUPPORT_CANVAS) {
+        url = $this[0].toDataURL();
+      }
+    }
+
+    if (!url) {
+      return;
+    }
+
+    buildEvent = $.Event(EVENT_BUILD);
+    $this.one(EVENT_BUILD, options.build).trigger(buildEvent); // Only trigger once
+
+    if (buildEvent.isDefaultPrevented()) {
+      return;
+    }
+
+    if (options.checkImageOrigin && isCrossOriginURL(url)) {
+      crossOrigin = ' crossOrigin="anonymous"';
+
+      if (!$this.prop('crossOrigin')) { // Only when there was not a "crossOrigin" property
+        bustCacheUrl = addTimestamp(url); // Bust cache (#148)
+      }
+    }
+
+    // IE8 compatibility: Don't use "$().attr()" to set "src"
+    this.$clone = $clone = $('<img' + (crossOrigin || '') + ' src="' + (bustCacheUrl || url) + '">');
+
+    $clone.one('load', $.proxy(function () {
+      var image = $clone[0],
+          naturalWidth = image.naturalWidth || image.width,
+          naturalHeight = image.naturalHeight || image.height; // $clone.width() and $clone.height() will return 0 in IE8 (#319)
+
+      this.image = {
+        naturalWidth: naturalWidth,
+        naturalHeight: naturalHeight,
+        aspectRatio: naturalWidth / naturalHeight,
+        rotate: 0
+      };
+
+      this.url = url;
+      this.ready = true;
+      this.build();
+    }, this)).one('error', function () {
+      $clone.remove();
+    });
+
+    // Hide and insert into the document
+    $clone.addClass(CLASS_HIDE).insertAfter($this);
+  };
+
+  prototype.build = function () {
+    var $this = this.$element,
+        $clone = this.$clone,
+        options = this.options,
+        $cropper,
+        $cropBox,
+        $face;
+
+    if (!this.ready) {
+      return;
+    }
+
+    if (this.built) {
+      this.unbuild();
+    }
+
+    // Create cropper elements
+    this.$cropper = $cropper = $(Cropper.TEMPLATE);
+
+    // Hide the original image
+    $this.addClass(CLASS_HIDDEN);
+
+    // Show the clone iamge
+    $clone.removeClass(CLASS_HIDE);
+
+    this.$container = $this.parent().append($cropper);
+    this.$canvas = $cropper.find('.cropper-canvas').append($clone);
+    this.$dragBox = $cropper.find('.cropper-drag-box');
+    this.$cropBox = $cropBox = $cropper.find('.cropper-crop-box');
+    this.$viewBox = $cropper.find('.cropper-view-box');
+    this.$face = $face = $cropBox.find('.cropper-face');
+
+    this.addListeners();
+    this.initPreview();
+
+    // Format aspect ratio
+    options.aspectRatio = num(options.aspectRatio) || NaN; // 0 -> NaN
+
+    if (options.autoCrop) {
+      this.cropped = true;
+
+      if (options.modal) {
+        this.$dragBox.addClass(CLASS_MODAL);
+      }
+    } else {
+      $cropBox.addClass(CLASS_HIDDEN);
+    }
+
+    if (options.background) {
+      $cropper.addClass(CLASS_BG);
+    }
+
+    if (!options.highlight) {
+      $face.addClass(CLASS_INVISIBLE);
+    }
+
+    if (!options.guides) {
+      $cropBox.find('.cropper-dashed').addClass(CLASS_HIDDEN);
+    }
+
+    if (options.cropBoxMovable) {
+      $face.addClass(CLASS_MOVE).data('drag', 'all');
+    }
+
+    if (!options.cropBoxResizable) {
+      $cropBox.find('.cropper-line, .cropper-point').addClass(CLASS_HIDDEN);
+    }
+
+    this.setDragMode(options.dragCrop ? 'crop' : options.movable ? 'move' : 'none');
+
+    this.built = true;
+    this.render();
+    this.setData(options.data);
+    $this.one(EVENT_BUILT, options.built).trigger(EVENT_BUILT); // Only trigger once
+  };
+
+  prototype.unbuild = function () {
+    if (!this.built) {
+      return;
+    }
+
+    this.built = false;
+    this.initialImage = null;
+    this.initialCanvas = null; // This is necessary when replace
+    this.initialCropBox = null;
+    this.container = null;
+    this.canvas = null;
+    this.cropBox = null; // This is necessary when replace
+    this.removeListeners();
+
+    this.resetPreview();
+    this.$preview = null;
+
+    this.$viewBox = null;
+    this.$cropBox = null;
+    this.$dragBox = null;
+    this.$canvas = null;
+    this.$container = null;
+
+    this.$cropper.remove();
+    this.$cropper = null;
+  };
+
+  $.extend(prototype, {
+    render: function () {
+      this.initContainer();
+      this.initCanvas();
+      this.initCropBox();
+
+      this.renderCanvas();
+
+      if (this.cropped) {
+        this.renderCropBox();
+      }
+    },
+
+    initContainer: function () {
+      var $this = this.$element,
+          $container = this.$container,
+          $cropper = this.$cropper,
+          options = this.options;
+
+      $cropper.addClass(CLASS_HIDDEN);
+      $this.removeClass(CLASS_HIDDEN);
+
+      $cropper.css((this.container = {
+        width: max($container.width(), num(options.minContainerWidth) || 200),
+        height: max($container.height(), num(options.minContainerHeight) || 100)
+      }));
+
+      $this.addClass(CLASS_HIDDEN);
+      $cropper.removeClass(CLASS_HIDDEN);
+    },
+
+    // image box (wrapper)
+    initCanvas: function () {
+      var container = this.container,
+          containerWidth = container.width,
+          containerHeight = container.height,
+          image = this.image,
+          aspectRatio = image.aspectRatio,
+          canvas = {
+            aspectRatio: aspectRatio,
+            width: containerWidth,
+            height: containerHeight
+          };
+
+      if (containerHeight * aspectRatio > containerWidth) {
+        canvas.height = containerWidth / aspectRatio;
+      } else {
+        canvas.width = containerHeight * aspectRatio;
+      }
+
+      canvas.oldLeft = canvas.left = (containerWidth - canvas.width) / 2;
+      canvas.oldTop = canvas.top = (containerHeight - canvas.height) / 2;
+
+      this.canvas = canvas;
+      this.limitCanvas(true, true);
+      this.initialImage = $.extend({}, image);
+      this.initialCanvas = $.extend({}, canvas);
+    },
+
+    limitCanvas: function (size, position) {
+      var options = this.options,
+          strict = options.strict,
+          container = this.container,
+          containerWidth = container.width,
+          containerHeight = container.height,
+          canvas = this.canvas,
+          aspectRatio = canvas.aspectRatio,
+          cropBox = this.cropBox,
+          cropped = this.cropped && cropBox,
+          initialCanvas = this.initialCanvas || canvas,
+          initialCanvasWidth = initialCanvas.width,
+          initialCanvasHeight = initialCanvas.height,
+          minCanvasWidth,
+          minCanvasHeight;
+
+      if (size) {
+        minCanvasWidth = num(options.minCanvasWidth) || 0;
+        minCanvasHeight = num(options.minCanvasHeight) || 0;
+
+        if (minCanvasWidth) {
+          if (strict) {
+            minCanvasWidth = max(cropped ? cropBox.width : initialCanvasWidth, minCanvasWidth);
+          }
+
+          minCanvasHeight = minCanvasWidth / aspectRatio;
+        } else if (minCanvasHeight) {
+          if (strict) {
+            minCanvasHeight = max(cropped ? cropBox.height : initialCanvasHeight, minCanvasHeight);
+          }
+
+          minCanvasWidth = minCanvasHeight * aspectRatio;
+        } else if (strict) {
+          if (cropped) {
+            minCanvasWidth = cropBox.width;
+            minCanvasHeight = cropBox.height;
+
+            if (minCanvasHeight * aspectRatio > minCanvasWidth) {
+              minCanvasWidth = minCanvasHeight * aspectRatio;
+            } else {
+              minCanvasHeight = minCanvasWidth / aspectRatio;
+            }
+          } else {
+            minCanvasWidth = initialCanvasWidth;
+            minCanvasHeight = initialCanvasHeight;
+          }
+        }
+
+        $.extend(canvas, {
+          minWidth: minCanvasWidth,
+          minHeight: minCanvasHeight,
+          maxWidth: Infinity,
+          maxHeight: Infinity
+        });
+      }
+
+      if (position) {
+        if (strict) {
+          if (cropped) {
+            canvas.minLeft = min(cropBox.left, (cropBox.left + cropBox.width) - canvas.width);
+            canvas.minTop = min(cropBox.top, (cropBox.top + cropBox.height) - canvas.height);
+            canvas.maxLeft = cropBox.left;
+            canvas.maxTop = cropBox.top;
+          } else {
+            canvas.minLeft = min(0, containerWidth - canvas.width);
+            canvas.minTop = min(0, containerHeight - canvas.height);
+            canvas.maxLeft = max(0, containerWidth - canvas.width);
+            canvas.maxTop = max(0, containerHeight - canvas.height);
+          }
+        } else {
+          canvas.minLeft = -canvas.width;
+          canvas.minTop = -canvas.height;
+          canvas.maxLeft = containerWidth;
+          canvas.maxTop = containerHeight;
+        }
+      }
+    },
+
+    renderCanvas: function (changed) {
+      var options = this.options,
+          canvas = this.canvas,
+          image = this.image,
+          aspectRatio,
+          rotated;
+
+      if (this.rotated) {
+        this.rotated = false;
+
+        // Computes rotatation sizes with image sizes
+        rotated = getRotatedSizes({
+          width: image.width,
+          height: image.height,
+          degree: image.rotate
+        });
+
+        aspectRatio = rotated.width / rotated.height;
+
+        if (aspectRatio !== canvas.aspectRatio) {
+          canvas.left -= (rotated.width - canvas.width) / 2;
+          canvas.top -= (rotated.height - canvas.height) / 2;
+          canvas.width = rotated.width;
+          canvas.height = rotated.height;
+          canvas.aspectRatio = aspectRatio;
+          this.limitCanvas(true, false);
+        }
+      }
+
+      if (canvas.width > canvas.maxWidth || canvas.width < canvas.minWidth) {
+        canvas.left = canvas.oldLeft;
+      }
+
+      if (canvas.height > canvas.maxHeight || canvas.height < canvas.minHeight) {
+        canvas.top = canvas.oldTop;
+      }
+
+      canvas.width = min(max(canvas.width, canvas.minWidth), canvas.maxWidth);
+      canvas.height = min(max(canvas.height, canvas.minHeight), canvas.maxHeight);
+
+      this.limitCanvas(false, true);
+
+      canvas.oldLeft = canvas.left = min(max(canvas.left, canvas.minLeft), canvas.maxLeft);
+      canvas.oldTop = canvas.top = min(max(canvas.top, canvas.minTop), canvas.maxTop);
+
+      this.$canvas.css({
+        width: canvas.width,
+        height: canvas.height,
+        left: canvas.left,
+        top: canvas.top
+      });
+
+      this.renderImage();
+
+      if (this.cropped && options.strict) {
+        this.limitCropBox(true, true);
+      }
+
+      if (changed) {
+        this.output();
+      }
+    },
+
+    renderImage: function () {
+      var canvas = this.canvas,
+          image = this.image,
+          reversed;
+
+      if (image.rotate) {
+        reversed = getRotatedSizes({
+          width: canvas.width,
+          height: canvas.height,
+          degree: image.rotate,
+          aspectRatio: image.aspectRatio
+        }, true);
+      }
+
+      $.extend(image, reversed ? {
+        width: reversed.width,
+        height: reversed.height,
+        left: (canvas.width - reversed.width) / 2,
+        top: (canvas.height - reversed.height) / 2
+      } : {
+        width: canvas.width,
+        height: canvas.height,
+        left: 0,
+        top: 0
+      });
+
+      this.$clone.css({
+        width: image.width,
+        height: image.height,
+        marginLeft: image.left,
+        marginTop: image.top,
+        transform: getRotateValue(image.rotate)
+      });
+    },
+
+    initCropBox: function () {
+      var options = this.options,
+          canvas = this.canvas,
+          aspectRatio = options.aspectRatio,
+          autoCropArea = num(options.autoCropArea) || 0.8,
+          cropBox = {
+            width: canvas.width,
+            height: canvas.height
+          };
+
+      if (aspectRatio) {
+        if (canvas.height * aspectRatio > canvas.width) {
+          cropBox.height = cropBox.width / aspectRatio;
+        } else {
+          cropBox.width = cropBox.height * aspectRatio;
+        }
+      }
+
+      this.cropBox = cropBox;
+      this.limitCropBox(true, true);
+
+      // Initialize auto crop area
+      cropBox.width = min(max(cropBox.width, cropBox.minWidth), cropBox.maxWidth);
+      cropBox.height = min(max(cropBox.height, cropBox.minHeight), cropBox.maxHeight);
+
+      // The width of auto crop area must large than "minWidth", and the height too. (#164)
+      cropBox.width = max(cropBox.minWidth, cropBox.width * autoCropArea);
+      cropBox.height = max(cropBox.minHeight, cropBox.height * autoCropArea);
+      cropBox.oldLeft = cropBox.left = canvas.left + (canvas.width - cropBox.width) / 2;
+      cropBox.oldTop = cropBox.top = canvas.top + (canvas.height - cropBox.height) / 2;
+
+      this.initialCropBox = $.extend({}, cropBox);
+    },
+
+    limitCropBox: function (size, position) {
+      var options = this.options,
+          strict = options.strict,
+          container = this.container,
+          containerWidth = container.width,
+          containerHeight = container.height,
+          canvas = this.canvas,
+          cropBox = this.cropBox,
+          aspectRatio = options.aspectRatio,
+          minCropBoxWidth,
+          minCropBoxHeight;
+
+      if (size) {
+        minCropBoxWidth = num(options.minCropBoxWidth) || 0;
+        minCropBoxHeight = num(options.minCropBoxHeight) || 0;
+
+        // min/maxCropBoxWidth/Height must less than conatiner width/height
+        cropBox.minWidth = min(containerWidth, minCropBoxWidth);
+        cropBox.minHeight = min(containerHeight, minCropBoxHeight);
+        cropBox.maxWidth = min(containerWidth, strict ? canvas.width : containerWidth);
+        cropBox.maxHeight = min(containerHeight, strict ? canvas.height : containerHeight);
+
+        if (aspectRatio) {
+          // compare crop box size with container first
+          if (cropBox.maxHeight * aspectRatio > cropBox.maxWidth) {
+            cropBox.minHeight = cropBox.minWidth / aspectRatio;
+            cropBox.maxHeight = cropBox.maxWidth / aspectRatio;
+          } else {
+            cropBox.minWidth = cropBox.minHeight * aspectRatio;
+            cropBox.maxWidth = cropBox.maxHeight * aspectRatio;
+          }
+        }
+
+        // The "minWidth" must be less than "maxWidth", and the "minHeight" too.
+        cropBox.minWidth = min(cropBox.maxWidth, cropBox.minWidth);
+        cropBox.minHeight = min(cropBox.maxHeight, cropBox.minHeight);
+      }
+
+      if (position) {
+        if (strict) {
+          cropBox.minLeft = max(0, canvas.left);
+          cropBox.minTop = max(0, canvas.top);
+          cropBox.maxLeft = min(containerWidth, canvas.left + canvas.width) - cropBox.width;
+          cropBox.maxTop = min(containerHeight, canvas.top + canvas.height) - cropBox.height;
+        } else {
+          cropBox.minLeft = 0;
+          cropBox.minTop = 0;
+          cropBox.maxLeft = containerWidth - cropBox.width;
+          cropBox.maxTop = containerHeight - cropBox.height;
+        }
+      }
+    },
+
+    renderCropBox: function () {
+      var options = this.options,
+          container = this.container,
+          containerWidth = container.width,
+          containerHeight = container.height,
+          cropBox = this.cropBox;
+
+      if (cropBox.width > cropBox.maxWidth || cropBox.width < cropBox.minWidth) {
+        cropBox.left = cropBox.oldLeft;
+      }
+
+      if (cropBox.height > cropBox.maxHeight || cropBox.height < cropBox.minHeight) {
+        cropBox.top = cropBox.oldTop;
+      }
+
+      cropBox.width = min(max(cropBox.width, cropBox.minWidth), cropBox.maxWidth);
+      cropBox.height = min(max(cropBox.height, cropBox.minHeight), cropBox.maxHeight);
+
+      this.limitCropBox(false, true);
+
+      cropBox.oldLeft = cropBox.left = min(max(cropBox.left, cropBox.minLeft), cropBox.maxLeft);
+      cropBox.oldTop = cropBox.top = min(max(cropBox.top, cropBox.minTop), cropBox.maxTop);
+
+      if (options.movable && options.cropBoxMovable) {
+        // Turn to move the canvas when the crop box is equal to the container
+        this.$face.data('drag', (cropBox.width === containerWidth && cropBox.height === containerHeight) ? 'move' : 'all');
+      }
+
+      this.$cropBox.css({
+        width: cropBox.width,
+        height: cropBox.height,
+        left: cropBox.left,
+        top: cropBox.top
+      });
+
+      if (this.cropped && options.strict) {
+        this.limitCanvas(true, true);
+      }
+
+      if (!this.disabled) {
+        this.output();
+      }
+    },
+
+    output: function () {
+      var options = this.options,
+          $this = this.$element;
+
+      this.preview();
+
+      if (options.crop) {
+        options.crop.call($this, this.getData());
+      }
+
+      $this.trigger(EVENT_CHANGE);
+    }
+  });
+
+  prototype.initPreview = function () {
+    var url = this.url;
+
+    this.$preview = $(this.options.preview);
+    this.$viewBox.html('<img src="' + url + '">');
+
+    // Override img element styles
+    // Add `display:block` to avoid margin top issue (Occur only when margin-top <= -height)
+    this.$preview.each(function () {
+      var $this = $(this);
+
+      $this.data(CROPPER_PREVIEW, {
+        width: $this.width(),
+        height: $this.height(),
+        original: $this.html()
+      }).html('<img src="' + url + '" style="display:block;width:100%;min-width:0!important;min-height:0!important;max-width:none!important;max-height:none!important;image-orientation: 0deg!important">');
+    });
+  };
+
+  prototype.resetPreview = function () {
+    this.$preview.each(function () {
+      var $this = $(this);
+
+      $this.html($this.data(CROPPER_PREVIEW).original).removeData(CROPPER_PREVIEW);
+    });
+  };
+
+  prototype.preview = function () {
+    var image = this.image,
+        canvas = this.canvas,
+        cropBox = this.cropBox,
+        width = image.width,
+        height = image.height,
+        left = cropBox.left - canvas.left - image.left,
+        top = cropBox.top - canvas.top - image.top,
+        rotate = image.rotate;
+
+    if (!this.cropped || this.disabled) {
+      return;
+    }
+
+    this.$viewBox.find('img').css({
+      width: width,
+      height: height,
+      marginLeft: -left,
+      marginTop: -top,
+      transform: getRotateValue(rotate)
+    });
+
+    this.$preview.each(function () {
+      var $this = $(this),
+          data = $this.data(CROPPER_PREVIEW),
+          ratio = data.width / cropBox.width,
+          newWidth = data.width,
+          newHeight = cropBox.height * ratio;
+
+      if (newHeight > data.height) {
+        ratio = data.height / cropBox.height;
+        newWidth = cropBox.width * ratio;
+        newHeight = data.height;
+      }
+
+      $this.width(newWidth).height(newHeight).find('img').css({
+        width: width * ratio,
+        height: height * ratio,
+        marginLeft: -left * ratio,
+        marginTop: -top * ratio,
+        transform: getRotateValue(rotate)
+      });
+    });
+  };
+
+  prototype.addListeners = function () {
+    var options = this.options,
+        $this = this.$element,
+        $cropper = this.$cropper;
+
+    if ($.isFunction(options.dragstart)) {
+      $this.on(EVENT_DRAG_START, options.dragstart);
+    }
+
+    if ($.isFunction(options.dragmove)) {
+      $this.on(EVENT_DRAG_MOVE, options.dragmove);
+    }
+
+    if ($.isFunction(options.dragend)) {
+      $this.on(EVENT_DRAG_END, options.dragend);
+    }
+
+    if ($.isFunction(options.zoomin)) {
+      $this.on(EVENT_ZOOM_IN, options.zoomin);
+    }
+
+    if ($.isFunction(options.zoomout)) {
+      $this.on(EVENT_ZOOM_OUT, options.zoomout);
+    }
+
+    if ($.isFunction(options.change)) {
+      $this.on(EVENT_CHANGE, options.change);
+    }
+
+    $cropper.on(EVENT_MOUSE_DOWN, $.proxy(this.dragstart, this));
+
+    if (options.zoomable && options.mouseWheelZoom) {
+      $cropper.on(EVENT_WHEEL, $.proxy(this.wheel, this));
+    }
+
+    if (options.doubleClickToggle) {
+      $cropper.on(EVENT_DBLCLICK, $.proxy(this.dblclick, this));
+    }
+
+    $document.on(EVENT_MOUSE_MOVE, (this._dragmove = proxy(this.dragmove, this))).on(EVENT_MOUSE_UP, (this._dragend = proxy(this.dragend, this)));
+
+    if (options.responsive) {
+      $window.on(EVENT_RESIZE, (this._resize = proxy(this.resize, this)));
+    }
+  };
+
+  prototype.removeListeners = function () {
+    var options = this.options,
+        $this = this.$element,
+        $cropper = this.$cropper;
+
+    if ($.isFunction(options.dragstart)) {
+      $this.off(EVENT_DRAG_START, options.dragstart);
+    }
+
+    if ($.isFunction(options.dragmove)) {
+      $this.off(EVENT_DRAG_MOVE, options.dragmove);
+    }
+
+    if ($.isFunction(options.dragend)) {
+      $this.off(EVENT_DRAG_END, options.dragend);
+    }
+
+    if ($.isFunction(options.zoomin)) {
+      $this.off(EVENT_ZOOM_IN, options.zoomin);
+    }
+
+    if ($.isFunction(options.zoomout)) {
+      $this.off(EVENT_ZOOM_OUT, options.zoomout);
+    }
+
+    if ($.isFunction(options.change)) {
+      $this.off(EVENT_CHANGE, options.change);
+    }
+
+    $cropper.off(EVENT_MOUSE_DOWN, this.dragstart);
+
+    if (options.zoomable && options.mouseWheelZoom) {
+      $cropper.off(EVENT_WHEEL, this.wheel);
+    }
+
+    if (options.doubleClickToggle) {
+      $cropper.off(EVENT_DBLCLICK, this.dblclick);
+    }
+
+    $document.off(EVENT_MOUSE_MOVE, this._dragmove).off(EVENT_MOUSE_UP, this._dragend);
+
+    if (options.responsive) {
+      $window.off(EVENT_RESIZE, this._resize);
+    }
+  };
+
+  $.extend(prototype, {
+    resize: function () {
+      var $container = this.$container,
+          container = this.container,
+          canvasData,
+          cropBoxData,
+          ratio;
+
+      if (this.disabled || !container) { // Check "container" for IE8
+        return;
+      }
+
+      ratio = $container.width() / container.width;
+
+      if (ratio !== 1 || $container.height() !== container.height) {
+        canvasData = this.getCanvasData();
+        cropBoxData = this.getCropBoxData();
+
+        this.render();
+        this.setCanvasData($.each(canvasData, function (i, n) {
+          canvasData[i] = n * ratio;
+        }));
+        this.setCropBoxData($.each(cropBoxData, function (i, n) {
+          cropBoxData[i] = n * ratio;
+        }));
+      }
+    },
+
+    dblclick: function () {
+      if (this.disabled) {
+        return;
+      }
+
+      if (this.$dragBox.hasClass(CLASS_CROP)) {
+        this.setDragMode('move');
+      } else {
+        this.setDragMode('crop');
+      }
+    },
+
+    wheel: function (event) {
+      var e = event.originalEvent,
+          delta = 1;
+
+      if (this.disabled) {
+        return;
+      }
+
+      event.preventDefault();
+
+      if (e.deltaY) {
+        delta = e.deltaY > 0 ? 1 : -1;
+      } else if (e.wheelDelta) {
+        delta = -e.wheelDelta / 120;
+      } else if (e.detail) {
+        delta = e.detail > 0 ? 1 : -1;
+      }
+
+      this.zoom(-delta * 0.1);
+    },
+
+    dragstart: function (event) {
+      var options = this.options,
+          originalEvent = event.originalEvent,
+          touches = originalEvent && originalEvent.touches,
+          e = event,
+          dragType,
+          dragStartEvent,
+          touchesLength;
+
+      if (this.disabled) {
+        return;
+      }
+
+      if (touches) {
+        touchesLength = touches.length;
+
+        if (touchesLength > 1) {
+          if (options.zoomable && options.touchDragZoom && touchesLength === 2) {
+            e = touches[1];
+            this.startX2 = e.pageX;
+            this.startY2 = e.pageY;
+            dragType = 'zoom';
+          } else {
+            return;
+          }
+        }
+
+        e = touches[0];
+      }
+
+      dragType = dragType || $(e.target).data('drag');
+
+      if (REGEXP_DRAG_TYPES.test(dragType)) {
+        event.preventDefault();
+
+        dragStartEvent = $.Event(EVENT_DRAG_START, {
+          originalEvent: originalEvent,
+          dragType: dragType
+        });
+
+        this.$element.trigger(dragStartEvent);
+
+        if (dragStartEvent.isDefaultPrevented()) {
+          return;
+        }
+
+        this.dragType = dragType;
+        this.cropping = false;
+        this.startX = e.pageX;
+        this.startY = e.pageY;
+
+        if (dragType === 'crop') {
+          this.cropping = true;
+          this.$dragBox.addClass(CLASS_MODAL);
+        }
+      }
+    },
+
+    dragmove: function (event) {
+      var options = this.options,
+          originalEvent = event.originalEvent,
+          touches = originalEvent && originalEvent.touches,
+          e = event,
+          dragType = this.dragType,
+          dragMoveEvent,
+          touchesLength;
+
+      if (this.disabled) {
+        return;
+      }
+
+      if (touches) {
+        touchesLength = touches.length;
+
+        if (touchesLength > 1) {
+          if (options.zoomable && options.touchDragZoom && touchesLength === 2) {
+            e = touches[1];
+            this.endX2 = e.pageX;
+            this.endY2 = e.pageY;
+          } else {
+            return;
+          }
+        }
+
+        e = touches[0];
+      }
+
+      if (dragType) {
+        event.preventDefault();
+
+        dragMoveEvent = $.Event(EVENT_DRAG_MOVE, {
+          originalEvent: originalEvent,
+          dragType: dragType
+        });
+
+        this.$element.trigger(dragMoveEvent);
+
+        if (dragMoveEvent.isDefaultPrevented()) {
+          return;
+        }
+
+        this.endX = e.pageX;
+        this.endY = e.pageY;
+
+        this.change(e.shiftKey);
+      }
+    },
+
+    dragend: function (event) {
+      var dragType = this.dragType,
+          dragEndEvent;
+
+      if (this.disabled) {
+        return;
+      }
+
+      if (dragType) {
+        event.preventDefault();
+
+        dragEndEvent = $.Event(EVENT_DRAG_END, {
+          originalEvent: event.originalEvent,
+          dragType: dragType
+        });
+
+        this.$element.trigger(dragEndEvent);
+
+        if (dragEndEvent.isDefaultPrevented()) {
+          return;
+        }
+
+        if (this.cropping) {
+          this.cropping = false;
+          this.$dragBox.toggleClass(CLASS_MODAL, this.cropped && this.options.modal);
+        }
+
+        this.dragType = '';
+      }
+    }
+  });
+
+  $.extend(prototype, {
+    crop: function () {
+      if (!this.built || this.disabled) {
+        return;
+      }
+
+      if (!this.cropped) {
+        this.cropped = true;
+        this.limitCropBox(true, true);
+
+        if (this.options.modal) {
+          this.$dragBox.addClass(CLASS_MODAL);
+        }
+
+        this.$cropBox.removeClass(CLASS_HIDDEN);
+      }
+
+      this.setCropBoxData(this.initialCropBox);
+    },
+
+    reset: function () {
+      if (!this.built || this.disabled) {
+        return;
+      }
+
+      this.image = $.extend({}, this.initialImage);
+      this.canvas = $.extend({}, this.initialCanvas);
+      this.cropBox = $.extend({}, this.initialCropBox); // required for strict mode
+
+      this.renderCanvas();
+
+      if (this.cropped) {
+        this.renderCropBox();
+      }
+    },
+
+    clear: function () {
+      if (!this.cropped || this.disabled) {
+        return;
+      }
+
+      $.extend(this.cropBox, {
+        left: 0,
+        top: 0,
+        width: 0,
+        height: 0
+      });
+
+      this.cropped = false;
+      this.renderCropBox();
+
+      this.limitCanvas();
+      this.renderCanvas(); // Render canvas after render crop box
+
+      this.$dragBox.removeClass(CLASS_MODAL);
+      this.$cropBox.addClass(CLASS_HIDDEN);
+    },
+
+    destroy: function () {
+      var $this = this.$element;
+
+      if (this.ready) {
+        this.unbuild();
+        $this.removeClass(CLASS_HIDDEN);
+      } else if (this.$clone) {
+        this.$clone.remove();
+      }
+
+      $this.removeData('cropper');
+    },
+
+    replace: function (url) {
+      if (!this.disabled && url) {
+        this.options.data = null; // Remove previous data
+        this.load(url);
+      }
+    },
+
+    enable: function () {
+      if (this.built) {
+        this.disabled = false;
+        this.$cropper.removeClass(CLASS_DISABLED);
+      }
+    },
+
+    disable: function () {
+      if (this.built) {
+        this.disabled = true;
+        this.$cropper.addClass(CLASS_DISABLED);
+      }
+    },
+
+    move: function (offsetX, offsetY) {
+      var canvas = this.canvas;
+
+      if (this.built && !this.disabled && this.options.movable && isNumber(offsetX) && isNumber(offsetY)) {
+        canvas.left += offsetX;
+        canvas.top += offsetY;
+        this.renderCanvas(true);
+      }
+    },
+
+    zoom: function (delta) {
+      var canvas = this.canvas,
+          zoomEvent,
+          width,
+          height;
+
+      delta = num(delta);
+
+      if (delta && this.built && !this.disabled && this.options.zoomable) {
+        zoomEvent = delta > 0 ? $.Event(EVENT_ZOOM_IN) : $.Event(EVENT_ZOOM_OUT);
+        this.$element.trigger(zoomEvent);
+
+        if (zoomEvent.isDefaultPrevented()) {
+          return;
+        }
+
+        delta = delta <= -1 ? 1 / (1 - delta) : delta <= 1 ? (1 + delta) : delta;
+        width = canvas.width * delta;
+        height = canvas.height * delta;
+        canvas.left -= (width - canvas.width) / 2;
+        canvas.top -= (height - canvas.height) / 2;
+        canvas.width = width;
+        canvas.height = height;
+        this.renderCanvas(true);
+        this.setDragMode('move');
+      }
+    },
+
+    rotate: function (degree) {
+      var image = this.image;
+
+      degree = num(degree);
+
+      if (degree && this.built && !this.disabled && this.options.rotatable) {
+        image.rotate = (image.rotate + degree) % 360;
+        this.rotated = true;
+        this.renderCanvas(true);
+      }
+    },
+
+    getData: function (rounded) {
+      var cropBox = this.cropBox,
+          canvas = this.canvas,
+          image = this.image,
+          ratio,
+          data;
+
+      if (this.built && this.cropped) {
+        data = {
+          x: cropBox.left - canvas.left,
+          y: cropBox.top - canvas.top,
+          width: cropBox.width,
+          height: cropBox.height
+        };
+
+        ratio = image.width / image.naturalWidth;
+
+        $.each(data, function (i, n) {
+          n = n / ratio;
+          data[i] = rounded ? Math.round(n) : n;
+        });
+
+      } else {
+        data = {
+          x: 0,
+          y: 0,
+          width: 0,
+          height: 0
+        };
+      }
+
+      data.rotate = this.ready ? image.rotate : 0;
+
+      return data;
+    },
+
+    setData: function (data) {
+      var image = this.image,
+          canvas = this.canvas,
+          cropBoxData = {},
+          ratio;
+
+      if (this.built && !this.disabled && $.isPlainObject(data)) {
+        if (isNumber(data.rotate) && data.rotate !== image.rotate && this.options.rotatable) {
+          image.rotate = data.rotate;
+          this.rotated = true;
+          this.renderCanvas(true);
+        }
+
+        ratio = image.width / image.naturalWidth;
+
+        if (isNumber(data.x)) {
+          cropBoxData.left = data.x * ratio + canvas.left;
+        }
+
+        if (isNumber(data.y)) {
+          cropBoxData.top = data.y * ratio + canvas.top;
+        }
+
+        if (isNumber(data.width)) {
+          cropBoxData.width = data.width * ratio;
+        }
+
+        if (isNumber(data.height)) {
+          cropBoxData.height = data.height * ratio;
+        }
+
+        this.setCropBoxData(cropBoxData);
+      }
+    },
+
+    getContainerData: function () {
+      return this.built ? this.container : {};
+    },
+
+    getImageData: function () {
+      return this.ready ? this.image : {};
+    },
+
+    getCanvasData: function () {
+      var canvas = this.canvas,
+          data;
+
+      if (this.built) {
+        data = {
+          left: canvas.left,
+          top: canvas.top,
+          width: canvas.width,
+          height: canvas.height
+        };
+      }
+
+      return data || {};
+    },
+
+    setCanvasData: function (data) {
+      var canvas = this.canvas,
+          aspectRatio = canvas.aspectRatio;
+
+      if (this.built && !this.disabled && $.isPlainObject(data)) {
+        if (isNumber(data.left)) {
+          canvas.left = data.left;
+        }
+
+        if (isNumber(data.top)) {
+          canvas.top = data.top;
+        }
+
+        if (isNumber(data.width)) {
+          canvas.width = data.width;
+          canvas.height = data.width / aspectRatio;
+        } else if (isNumber(data.height)) {
+          canvas.height = data.height;
+          canvas.width = data.height * aspectRatio;
+        }
+
+        this.renderCanvas(true);
+      }
+    },
+
+    getCropBoxData: function () {
+      var cropBox = this.cropBox,
+          data;
+
+      if (this.built && this.cropped) {
+        data = {
+          left: cropBox.left,
+          top: cropBox.top,
+          width: cropBox.width,
+          height: cropBox.height
+        };
+      }
+
+      return data || {};
+    },
+
+    setCropBoxData: function (data) {
+      var cropBox = this.cropBox,
+          aspectRatio = this.options.aspectRatio;
+
+      if (this.built && this.cropped && !this.disabled && $.isPlainObject(data)) {
+
+        if (isNumber(data.left)) {
+          cropBox.left = data.left;
+        }
+
+        if (isNumber(data.top)) {
+          cropBox.top = data.top;
+        }
+
+        if (isNumber(data.width)) {
+          cropBox.width = data.width;
+        }
+
+        if (isNumber(data.height)) {
+          cropBox.height = data.height;
+        }
+
+        if (aspectRatio) {
+          if (isNumber(data.width)) {
+            cropBox.height = cropBox.width / aspectRatio;
+          } else if (isNumber(data.height)) {
+            cropBox.width = cropBox.height * aspectRatio;
+          }
+        }
+
+        this.renderCropBox();
+      }
+    },
+
+    getCroppedCanvas: function (options) {
+      var originalWidth,
+          originalHeight,
+          canvasWidth,
+          canvasHeight,
+          scaledWidth,
+          scaledHeight,
+          scaledRatio,
+          aspectRatio,
+          canvas,
+          context,
+          data;
+
+      if (!this.built || !this.cropped || !SUPPORT_CANVAS) {
+        return;
+      }
+
+      if (!$.isPlainObject(options)) {
+        options = {};
+      }
+
+      data = this.getData();
+      originalWidth = data.width;
+      originalHeight = data.height;
+      aspectRatio = originalWidth / originalHeight;
+
+      if ($.isPlainObject(options)) {
+        scaledWidth = options.width;
+        scaledHeight = options.height;
+
+        if (scaledWidth) {
+          scaledHeight = scaledWidth / aspectRatio;
+          scaledRatio = scaledWidth / originalWidth;
+        } else if (scaledHeight) {
+          scaledWidth = scaledHeight * aspectRatio;
+          scaledRatio = scaledHeight / originalHeight;
+        }
+      }
+
+      canvasWidth = scaledWidth || originalWidth;
+      canvasHeight = scaledHeight || originalHeight;
+
+      canvas = $('<canvas>')[0];
+      canvas.width = canvasWidth;
+      canvas.height = canvasHeight;
+      context = canvas.getContext('2d');
+
+      if (options.fillColor) {
+        context.fillStyle = options.fillColor;
+        context.fillRect(0, 0, canvasWidth, canvasHeight);
+      }
+
+      // https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D.drawImage
+      context.drawImage.apply(context, (function () {
+        var source = getSourceCanvas(this.$clone[0], this.image),
+            sourceWidth = source.width,
+            sourceHeight = source.height,
+            args = [source],
+            srcX = data.x, // source canvas
+            srcY = data.y,
+            srcWidth,
+            srcHeight,
+            dstX, // destination canvas
+            dstY,
+            dstWidth,
+            dstHeight;
+
+        if (srcX <= -originalWidth || srcX > sourceWidth) {
+          srcX = srcWidth = dstX = dstWidth = 0;
+        } else if (srcX <= 0) {
+          dstX = -srcX;
+          srcX = 0;
+          srcWidth = dstWidth = min(sourceWidth, originalWidth + srcX);
+        } else if (srcX <= sourceWidth) {
+          dstX = 0;
+          srcWidth = dstWidth = min(originalWidth, sourceWidth - srcX);
+        }
+
+        if (srcWidth <= 0 || srcY <= -originalHeight || srcY > sourceHeight) {
+          srcY = srcHeight = dstY = dstHeight = 0;
+        } else if (srcY <= 0) {
+          dstY = -srcY;
+          srcY = 0;
+          srcHeight = dstHeight = min(sourceHeight, originalHeight + srcY);
+        } else if (srcY <= sourceHeight) {
+          dstY = 0;
+          srcHeight = dstHeight = min(originalHeight, sourceHeight - srcY);
+        }
+
+        args.push(srcX, srcY, srcWidth, srcHeight);
+
+        // Scale destination sizes
+        if (scaledRatio) {
+          dstX *= scaledRatio;
+          dstY *= scaledRatio;
+          dstWidth *= scaledRatio;
+          dstHeight *= scaledRatio;
+        }
+
+        // Avoid "IndexSizeError" in IE and Firefox
+        if (dstWidth > 0 && dstHeight > 0) {
+          args.push(dstX, dstY, dstWidth, dstHeight);
+        }
+
+        return args;
+      }).call(this));
+
+      return canvas;
+    },
+
+    setAspectRatio: function (aspectRatio) {
+      var options = this.options;
+
+      if (!this.disabled && !isUndefined(aspectRatio)) {
+        options.aspectRatio = num(aspectRatio) || NaN; // 0 -> NaN
+
+        if (this.built) {
+          this.initCropBox();
+
+          if (this.cropped) {
+            this.renderCropBox();
+          }
+        }
+      }
+    },
+
+    setDragMode: function (mode) {
+      var options = this.options,
+          croppable,
+          movable;
+
+      if (this.ready && !this.disabled) {
+        croppable = options.dragCrop && mode === 'crop';
+        movable = options.movable && mode === 'move';
+        mode = (croppable || movable) ? mode : 'none';
+
+        this.$dragBox.data('drag', mode).toggleClass(CLASS_CROP, croppable).toggleClass(CLASS_MOVE, movable);
+
+        if (!options.cropBoxMovable) {
+          // Sync drag mode to crop box when it is not movable(#300)
+          this.$face.data('drag', mode).toggleClass(CLASS_CROP, croppable).toggleClass(CLASS_MOVE, movable);
+        }
+      }
+    }
+  });
+
+  prototype.change = function (shiftKey) {
+    var dragType = this.dragType,
+        options = this.options,
+        canvas = this.canvas,
+        container = this.container,
+        cropBox = this.cropBox,
+        width = cropBox.width,
+        height = cropBox.height,
+        left = cropBox.left,
+        top = cropBox.top,
+        right = left + width,
+        bottom = top + height,
+        minLeft = 0,
+        minTop = 0,
+        maxWidth = container.width,
+        maxHeight = container.height,
+        renderable = true,
+        aspectRatio = options.aspectRatio,
+        range = {
+          x: this.endX - this.startX,
+          y: this.endY - this.startY
+        },
+        offset;
+
+    // Locking aspect ratio in "free mode" by holding shift key (#259)
+    if (!aspectRatio && shiftKey) {
+      aspectRatio = width && height ? width / height : 1;
+    }
+
+    if (options.strict) {
+      minLeft = cropBox.minLeft;
+      minTop = cropBox.minTop;
+      maxWidth = minLeft + min(container.width, canvas.width);
+      maxHeight = minTop + min(container.height, canvas.height);
+    }
+
+    if (aspectRatio) {
+      range.X = range.y * aspectRatio;
+      range.Y = range.x / aspectRatio;
+    }
+
+    switch (dragType) {
+      // Move cropBox
+      case 'all':
+        left += range.x;
+        top += range.y;
+        break;
+
+      // Resize cropBox
+      case 'e':
+        if (range.x >= 0 && (right >= maxWidth || aspectRatio && (top <= minTop || bottom >= maxHeight))) {
+          renderable = false;
+          break;
+        }
+
+        width += range.x;
+
+        if (aspectRatio) {
+          height = width / aspectRatio;
+          top -= range.Y / 2;
+        }
+
+        if (width < 0) {
+          dragType = 'w';
+          width = 0;
+        }
+
+        break;
+
+      case 'n':
+        if (range.y <= 0 && (top <= minTop || aspectRatio && (left <= minLeft || right >= maxWidth))) {
+          renderable = false;
+          break;
+        }
+
+        height -= range.y;
+        top += range.y;
+
+        if (aspectRatio) {
+          width = height * aspectRatio;
+          left += range.X / 2;
+        }
+
+        if (height < 0) {
+          dragType = 's';
+          height = 0;
+        }
+
+        break;
+
+      case 'w':
+        if (range.x <= 0 && (left <= minLeft || aspectRatio && (top <= minTop || bottom >= maxHeight))) {
+          renderable = false;
+          break;
+        }
+
+        width -= range.x;
+        left += range.x;
+
+        if (aspectRatio) {
+          height = width / aspectRatio;
+          top += range.Y / 2;
+        }
+
+        if (width < 0) {
+          dragType = 'e';
+          width = 0;
+        }
+
+        break;
+
+      case 's':
+        if (range.y >= 0 && (bottom >= maxHeight || aspectRatio && (left <= minLeft || right >= maxWidth))) {
+          renderable = false;
+          break;
+        }
+
+        height += range.y;
+
+        if (aspectRatio) {
+          width = height * aspectRatio;
+          left -= range.X / 2;
+        }
+
+        if (height < 0) {
+          dragType = 'n';
+          height = 0;
+        }
+
+        break;
+
+      case 'ne':
+        if (aspectRatio) {
+          if (range.y <= 0 && (top <= minTop || right >= maxWidth)) {
+            renderable = false;
+            break;
+          }
+
+          height -= range.y;
+          top += range.y;
+          width = height * aspectRatio;
+        } else {
+          if (range.x >= 0) {
+            if (right < maxWidth) {
+              width += range.x;
+            } else if (range.y <= 0 && top <= minTop) {
+              renderable = false;
+            }
+          } else {
+            width += range.x;
+          }
+
+          if (range.y <= 0) {
+            if (top > minTop) {
+              height -= range.y;
+              top += range.y;
+            }
+          } else {
+            height -= range.y;
+            top += range.y;
+          }
+        }
+
+        if (width < 0 && height < 0) {
+          dragType = 'sw';
+          height = 0;
+          width = 0;
+        } else if (width < 0) {
+          dragType = 'nw';
+          width = 0;
+        } else if (height < 0) {
+          dragType = 'se';
+          height = 0;
+        }
+
+        break;
+
+      case 'nw':
+        if (aspectRatio) {
+          if (range.y <= 0 && (top <= minTop || left <= minLeft)) {
+            renderable = false;
+            break;
+          }
+
+          height -= range.y;
+          top += range.y;
+          width = height * aspectRatio;
+          left += range.X;
+        } else {
+          if (range.x <= 0) {
+            if (left > minLeft) {
+              width -= range.x;
+              left += range.x;
+            } else if (range.y <= 0 && top <= minTop) {
+              renderable = false;
+            }
+          } else {
+            width -= range.x;
+            left += range.x;
+          }
+
+          if (range.y <= 0) {
+            if (top > minTop) {
+              height -= range.y;
+              top += range.y;
+            }
+          } else {
+            height -= range.y;
+            top += range.y;
+          }
+        }
+
+        if (width < 0 && height < 0) {
+          dragType = 'se';
+          height = 0;
+          width = 0;
+        } else if (width < 0) {
+          dragType = 'ne';
+          width = 0;
+        } else if (height < 0) {
+          dragType = 'sw';
+          height = 0;
+        }
+
+        break;
+
+      case 'sw':
+        if (aspectRatio) {
+          if (range.x <= 0 && (left <= minLeft || bottom >= maxHeight)) {
+            renderable = false;
+            break;
+          }
+
+          width -= range.x;
+          left += range.x;
+          height = width / aspectRatio;
+        } else {
+          if (range.x <= 0) {
+            if (left > minLeft) {
+              width -= range.x;
+              left += range.x;
+            } else if (range.y >= 0 && bottom >= maxHeight) {
+              renderable = false;
+            }
+          } else {
+            width -= range.x;
+            left += range.x;
+          }
+
+          if (range.y >= 0) {
+            if (bottom < maxHeight) {
+              height += range.y;
+            }
+          } else {
+            height += range.y;
+          }
+        }
+
+        if (width < 0 && height < 0) {
+          dragType = 'ne';
+          height = 0;
+          width = 0;
+        } else if (width < 0) {
+          dragType = 'se';
+          width = 0;
+        } else if (height < 0) {
+          dragType = 'nw';
+          height = 0;
+        }
+
+        break;
+
+      case 'se':
+        if (aspectRatio) {
+          if (range.x >= 0 && (right >= maxWidth || bottom >= maxHeight)) {
+            renderable = false;
+            break;
+          }
+
+          width += range.x;
+          height = width / aspectRatio;
+        } else {
+          if (range.x >= 0) {
+            if (right < maxWidth) {
+              width += range.x;
+            } else if (range.y >= 0 && bottom >= maxHeight) {
+              renderable = false;
+            }
+          } else {
+            width += range.x;
+          }
+
+          if (range.y >= 0) {
+            if (bottom < maxHeight) {
+              height += range.y;
+            }
+          } else {
+            height += range.y;
+          }
+        }
+
+        if (width < 0 && height < 0) {
+          dragType = 'nw';
+          height = 0;
+          width = 0;
+        } else if (width < 0) {
+          dragType = 'sw';
+          width = 0;
+        } else if (height < 0) {
+          dragType = 'ne';
+          height = 0;
+        }
+
+        break;
+
+      // Move image
+      case 'move':
+        canvas.left += range.x;
+        canvas.top += range.y;
+        this.renderCanvas(true);
+        renderable = false;
+        break;
+
+      // Scale image
+      case 'zoom':
+        this.zoom(function (x1, y1, x2, y2) {
+          var z1 = sqrt(x1 * x1 + y1 * y1),
+              z2 = sqrt(x2 * x2 + y2 * y2);
+
+          return (z2 - z1) / z1;
+        }(
+          abs(this.startX - this.startX2),
+          abs(this.startY - this.startY2),
+          abs(this.endX - this.endX2),
+          abs(this.endY - this.endY2)
+        ));
+
+        this.startX2 = this.endX2;
+        this.startY2 = this.endY2;
+        renderable = false;
+        break;
+
+      // Crop image
+      case 'crop':
+        if (range.x && range.y) {
+          offset = this.$cropper.offset();
+          left = this.startX - offset.left;
+          top = this.startY - offset.top;
+          width = cropBox.minWidth;
+          height = cropBox.minHeight;
+
+          if (range.x > 0) {
+            if (range.y > 0) {
+              dragType = 'se';
+            } else {
+              dragType = 'ne';
+              top -= height;
+            }
+          } else {
+            if (range.y > 0) {
+              dragType = 'sw';
+              left -= width;
+            } else {
+              dragType = 'nw';
+              left -= width;
+              top -= height;
+            }
+          }
+
+          // Show the cropBox if is hidden
+          if (!this.cropped) {
+            this.cropped = true;
+            this.$cropBox.removeClass(CLASS_HIDDEN);
+          }
+        }
+
+        break;
+
+      // No default
+    }
+
+    if (renderable) {
+      cropBox.width = width;
+      cropBox.height = height;
+      cropBox.left = left;
+      cropBox.top = top;
+      this.dragType = dragType;
+
+      this.renderCropBox();
+    }
+
+    // Override
+    this.startX = this.endX;
+    this.startY = this.endY;
+  };
+
+  $.extend(Cropper.prototype, prototype);
+
+  Cropper.DEFAULTS = {
+    // Defines the aspect ratio of the crop box
+    // Type: Number
+    aspectRatio: NaN,
+
+    // Defines the percentage of automatic cropping area when initializes
+    // Type: Number (Must large than 0 and less than 1)
+    autoCropArea: 0.8, // 80%
+
+    // Outputs the cropping results.
+    // Type: Function
+    crop: null,
+
+    // Previous/latest crop data
+    // Type: Object
+    data: null,
+
+    // Add extra containers for previewing
+    // Type: String (jQuery selector)
+    preview: '',
+
+    // Toggles
+    strict: true, // strict mode, the image cannot zoom out less than the container
+    responsive: true, // Rebuild when resize the window
+    checkImageOrigin: true, // Check if the target image is cross origin
+
+    modal: true, // Show the black modal
+    guides: true, // Show the dashed lines for guiding
+    highlight: true, // Show the white modal to highlight the crop box
+    background: true, // Show the grid background
+
+    autoCrop: true, // Enable to crop the image automatically when initialize
+    dragCrop: true, // Enable to create new crop box by dragging over the image
+    movable: true, // Enable to move the image
+    rotatable: true, // Enable to rotate the image
+    zoomable: true, // Enable to zoom the image
+    touchDragZoom: true, // Enable to zoom the image by wheeling mouse
+    mouseWheelZoom: true, // Enable to zoom the image by dragging touch
+    cropBoxMovable: true, // Enable to move the crop box
+    cropBoxResizable: true, // Enable to resize the crop box
+    doubleClickToggle: true, // Toggle drag mode between "crop" and "move" when double click on the cropper
+
+    // Dimensions
+    minCanvasWidth: 0,
+    minCanvasHeight: 0,
+    minCropBoxWidth: 0,
+    minCropBoxHeight: 0,
+    minContainerWidth: 200,
+    minContainerHeight: 100,
+
+    // Events
+    build: null, // Function
+    built: null, // Function
+    dragstart: null, // Function
+    dragmove: null, // Function
+    dragend: null, // Function
+    zoomin: null, // Function
+    zoomout: null, // Function
+    change: null // Function
+  };
+
+  Cropper.setDefaults = function (options) {
+    $.extend(Cropper.DEFAULTS, options);
+  };
+
+  // Use the string compressor: Strmin (https://github.com/fengyuanchen/strmin)
+  Cropper.TEMPLATE = (function (source, words) {
+    words = words.split(',');
+    return source.replace(/\d+/g, function (i) {
+      return words[i];
+    });
+  })('<0 6="5-container"><0 6="5-canvas"></0><0 6="5-2-9"></0><0 6="5-crop-9"><1 6="5-view-9"></1><1 6="5-8 8-h"></1><1 6="5-8 8-v"></1><1 6="5-face"></1><1 6="5-7 7-e" 3-2="e"></1><1 6="5-7 7-n" 3-2="n"></1><1 6="5-7 7-w" 3-2="w"></1><1 6="5-7 7-s" 3-2="s"></1><1 6="5-4 4-e" 3-2="e"></1><1 6="5-4 4-n" 3-2="n"></1><1 6="5-4 4-w" 3-2="w"></1><1 6="5-4 4-s" 3-2="s"></1><1 6="5-4 4-ne" 3-2="ne"></1><1 6="5-4 4-nw" 3-2="nw"></1><1 6="5-4 4-sw" 3-2="sw"></1><1 6="5-4 4-se" 3-2="se"></1></0></0>', 'div,span,drag,data,point,cropper,class,line,dashed,box');
+
+  /* Template source:
+  <div class="cropper-container">
+    <div class="cropper-canvas"></div>
+    <div class="cropper-drag-box"></div>
+    <div class="cropper-crop-box">
+      <span class="cropper-view-box"></span>
+      <span class="cropper-dashed dashed-h"></span>
+      <span class="cropper-dashed dashed-v"></span>
+      <span class="cropper-face"></span>
+      <span class="cropper-line line-e" data-drag="e"></span>
+      <span class="cropper-line line-n" data-drag="n"></span>
+      <span class="cropper-line line-w" data-drag="w"></span>
+      <span class="cropper-line line-s" data-drag="s"></span>
+      <span class="cropper-point point-e" data-drag="e"></span>
+      <span class="cropper-point point-n" data-drag="n"></span>
+      <span class="cropper-point point-w" data-drag="w"></span>
+      <span class="cropper-point point-s" data-drag="s"></span>
+      <span class="cropper-point point-ne" data-drag="ne"></span>
+      <span class="cropper-point point-nw" data-drag="nw"></span>
+      <span class="cropper-point point-sw" data-drag="sw"></span>
+      <span class="cropper-point point-se" data-drag="se"></span>
+    </div>
+  </div>
+  */
+
+  // Save the other cropper
+  Cropper.other = $.fn.cropper;
+
+  // Register as jQuery plugin
+  $.fn.cropper = function (options) {
+    var args = toArray(arguments, 1),
+        result;
+
+    this.each(function () {
+      var $this = $(this),
+          data = $this.data('cropper'),
+          fn;
+
+      if (!data) {
+        $this.data('cropper', (data = new Cropper(this, options)));
+      }
+
+      if (typeof options === 'string' && $.isFunction((fn = data[options]))) {
+        result = fn.apply(data, args);
+      }
+    });
+
+    return isUndefined(result) ? this : result;
+  };
+
+  $.fn.cropper.Constructor = Cropper;
+  $.fn.cropper.setDefaults = Cropper.setDefaults;
+
+  // No conflict
+  $.fn.cropper.noConflict = function () {
+    $.fn.cropper = Cropper.other;
+    return this;
+  };
+
+});
+;(function() {
+'use strict';
+
+angular.module('ngCropper', ['ng'])
+.directive('ngCropper', ['$q', function($q) {
+  return {
+    restrict: 'A',
+    scope: {options: '=ngOptions'},
+    link: function(scope, element, atts) {
+      var shown = false;
+
+      scope.$on(atts.ngShow, function() {
+        if (shown) return;
+        shown = true;
+
+        preprocess(scope.options, element[0])
+          .then(function(options) {
+            element.cropper(options);
+          })
+      });
+
+      scope.$on(atts.ngHide, function() {
+        if (!shown) return;
+        shown = false;
+        element.cropper('destroy');
+      });
+
+      scope.$watch('options.disabled', function(disabled) {
+        if (!shown) return;
+        if (disabled) element.cropper('disable');
+        if (!disabled) element.cropper('enable');
+      });
+    }
+  };
+
+  function preprocess(options, img) {
+    options = options || {};
+
+    var defer = $q.defer();
+    var toResolve = [passInitial(options)];
+
+    if (options.maximize) toResolve.push(maximizeSelection(options, img));
+
+    $q.all(toResolve).then(function(values) {
+      var lastUpdatedOptions = values[values.length-1];
+      defer.resolve(lastUpdatedOptions);
+    });
+
+    return defer.promise;
+  }
+
+  /**
+   * The only promise to resolve when no more processing promiseses passed.
+   */
+  function passInitial(options) {
+    var defer = $q.defer();
+    defer.resolve(options);
+    return defer.promise;
+  }
+
+  /**
+   * Change options to make selection maximum for the image.
+   * fengyuanchen/cropper calculates valid selection's height & width
+   * with respect to `aspectRatio`.
+   */
+  function maximizeSelection(options, img) {
+    var defer = $q.defer();
+
+    getRealSize(img).then(function(size) {
+      options.data = size;
+      defer.resolve(options);
+    });
+
+    return defer.promise;
+  }
+
+  /**
+   * Returns real image size (without changes by css, attributes).
+   */
+  function getRealSize(img) {
+    var defer = $q.defer();
+    var size = {height: null, width: null};
+    var image = new Image();
+
+    image.onload = function() {
+      defer.resolve({width: image.width, height: image.height});
+    }
+
+    image.src = img.src;
+    return defer.promise;
+  }
+}])
+.service('Cropper', ['$q', function($q) {
+
+  this.encode = function(blob) {
+    var defer = $q.defer();
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      defer.resolve(e.target.result);
+    };
+    reader.readAsDataURL(blob);
+    return defer.promise;
+  };
+
+  this.decode = function(dataUrl) {
+    var meta = dataUrl.split(';')[0];
+    var type = meta.split(':')[1];
+    var binary = atob(dataUrl.split(',')[1]);
+    var array = new Uint8Array(binary.length);
+    for (var i = 0; i < binary.length; i++) {
+        array[i] = binary.charCodeAt(i);
+    }
+    return new Blob([array], {type: type});
+  };
+
+  this.crop = function(file, data) {
+    var defer = $q.defer();
+    var _decode = this.decode;
+
+    this.encode(file).then(_createImage).then(function(image) {
+      var canvas = createCanvas(data);
+      var context = canvas.getContext('2d');
+
+      context.drawImage(image, data.x, data.y, data.width, data.height, 0, 0, data.width, data.height);
+
+      var encoded = canvas.toDataURL(file.type);
+      var blob = _decode(encoded);
+
+      defer.resolve(blob);
+      removeElement(canvas);
+    });
+
+    return defer.promise;
+  };
+
+  this.scale = function(file, data) {
+    var defer = $q.defer();
+    var _decode = this.decode;
+
+    this.encode(file).then(_createImage).then(function(image) {
+      var heightOrig = image.height;
+      var widthOrig = image.width;
+      var ratio, height, width;
+
+      if (angular.isNumber(data)) {
+        ratio = data;
+        height = heightOrig * ratio;
+        width = widthOrig * ratio;
+      }
+
+      if (angular.isObject(data)) {
+        ratio = widthOrig / heightOrig;
+        height = data.height;
+        width = data.width;
+
+        if (height && !width)
+          width = height * ratio;
+        else if (width && !height)
+          height = width / ratio;
+      }
+
+      var canvas = createCanvas(data);
+      var context = canvas.getContext('2d');
+
+      canvas.height = height;
+      canvas.width = width;
+
+      context.drawImage(image, 0, 0, widthOrig, heightOrig, 0, 0, width, height);
+
+      var encoded = canvas.toDataURL(file.type);
+      var blob = _decode(encoded);
+
+      defer.resolve(blob);
+      removeElement(canvas);
+    });
+
+    return defer.promise;
+  };
+
+
+  function _createImage(source) {
+    var defer = $q.defer();
+    var image = new Image();
+    image.onload = function(e) { defer.resolve(e.target); };
+    image.src = source;
+    return defer.promise;
+  }
+
+  function createCanvas(data) {
+    var canvas = document.createElement('canvas');
+    canvas.width = data.width;
+    canvas.height = data.height;
+    canvas.style.display = 'none';
+    document.body.appendChild(canvas);
+    return canvas;
+  }
+
+  function removeElement(el) {
+    el.parentElement.removeChild(el);
+  }
+
+}]);
+
+})();;(function (global, factory) {
     typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
     typeof define === 'function' && define.amd ? define(factory) :
     global.moment = factory()
@@ -54031,28 +58177,12 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
         hookCallback = callback;
     }
 
-    function defaultParsingFlags() {
-        // We need to deep clone this object.
-        return {
-            empty           : false,
-            unusedTokens    : [],
-            unusedInput     : [],
-            overflow        : -2,
-            charsLeftOver   : 0,
-            nullInput       : false,
-            invalidMonth    : null,
-            invalidFormat   : false,
-            userInvalidated : false,
-            iso             : false
-        };
-    }
-
     function isArray(input) {
         return Object.prototype.toString.call(input) === '[object Array]';
     }
 
     function isDate(input) {
-        return Object.prototype.toString.call(input) === '[object Date]' || input instanceof Date;
+        return input instanceof Date || Object.prototype.toString.call(input) === '[object Date]';
     }
 
     function map(arr, fn) {
@@ -54089,21 +58219,45 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
         return createLocalOrUTC(input, format, locale, strict, true).utc();
     }
 
+    function defaultParsingFlags() {
+        // We need to deep clone this object.
+        return {
+            empty           : false,
+            unusedTokens    : [],
+            unusedInput     : [],
+            overflow        : -2,
+            charsLeftOver   : 0,
+            nullInput       : false,
+            invalidMonth    : null,
+            invalidFormat   : false,
+            userInvalidated : false,
+            iso             : false
+        };
+    }
+
+    function getParsingFlags(m) {
+        if (m._pf == null) {
+            m._pf = defaultParsingFlags();
+        }
+        return m._pf;
+    }
+
     function valid__isValid(m) {
         if (m._isValid == null) {
+            var flags = getParsingFlags(m);
             m._isValid = !isNaN(m._d.getTime()) &&
-                m._pf.overflow < 0 &&
-                !m._pf.empty &&
-                !m._pf.invalidMonth &&
-                !m._pf.nullInput &&
-                !m._pf.invalidFormat &&
-                !m._pf.userInvalidated;
+                flags.overflow < 0 &&
+                !flags.empty &&
+                !flags.invalidMonth &&
+                !flags.nullInput &&
+                !flags.invalidFormat &&
+                !flags.userInvalidated;
 
             if (m._strict) {
                 m._isValid = m._isValid &&
-                    m._pf.charsLeftOver === 0 &&
-                    m._pf.unusedTokens.length === 0 &&
-                    m._pf.bigHour === undefined;
+                    flags.charsLeftOver === 0 &&
+                    flags.unusedTokens.length === 0 &&
+                    flags.bigHour === undefined;
             }
         }
         return m._isValid;
@@ -54112,10 +58266,10 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
     function valid__createInvalid (flags) {
         var m = create_utc__createUTC(NaN);
         if (flags != null) {
-            extend(m._pf, flags);
+            extend(getParsingFlags(m), flags);
         }
         else {
-            m._pf.userInvalidated = true;
+            getParsingFlags(m).userInvalidated = true;
         }
 
         return m;
@@ -54151,7 +58305,7 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
             to._offset = from._offset;
         }
         if (typeof from._pf !== 'undefined') {
-            to._pf = from._pf;
+            to._pf = getParsingFlags(from);
         }
         if (typeof from._locale !== 'undefined') {
             to._locale = from._locale;
@@ -54186,7 +58340,7 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
     }
 
     function isMoment (obj) {
-        return obj instanceof Moment || (obj != null && hasOwnProp(obj, '_isAMomentObject'));
+        return obj instanceof Moment || (obj != null && obj._isAMomentObject != null);
     }
 
     function toInt(argumentForCoercion) {
@@ -54624,7 +58778,7 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
         if (month != null) {
             array[MONTH] = month;
         } else {
-            config._pf.invalidMonth = input;
+            getParsingFlags(config).invalidMonth = input;
         }
     });
 
@@ -54708,7 +58862,7 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
         var overflow;
         var a = m._a;
 
-        if (a && m._pf.overflow === -2) {
+        if (a && getParsingFlags(m).overflow === -2) {
             overflow =
                 a[MONTH]       < 0 || a[MONTH]       > 11  ? MONTH :
                 a[DATE]        < 1 || a[DATE]        > daysInMonth(a[YEAR], a[MONTH]) ? DATE :
@@ -54718,11 +58872,11 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
                 a[MILLISECOND] < 0 || a[MILLISECOND] > 999 ? MILLISECOND :
                 -1;
 
-            if (m._pf._overflowDayOfYear && (overflow < YEAR || overflow > DATE)) {
+            if (getParsingFlags(m)._overflowDayOfYear && (overflow < YEAR || overflow > DATE)) {
                 overflow = DATE;
             }
 
-            m._pf.overflow = overflow;
+            getParsingFlags(m).overflow = overflow;
         }
 
         return m;
@@ -54735,10 +58889,12 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
     }
 
     function deprecate(msg, fn) {
-        var firstTime = true;
+        var firstTime = true,
+            msgWithStack = msg + '\n' + (new Error()).stack;
+
         return extend(function () {
             if (firstTime) {
-                warn(msg);
+                warn(msgWithStack);
                 firstTime = false;
             }
             return fn.apply(this, arguments);
@@ -54783,7 +58939,7 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
             match = from_string__isoRegex.exec(string);
 
         if (match) {
-            config._pf.iso = true;
+            getParsingFlags(config).iso = true;
             for (i = 0, l = isoDates.length; i < l; i++) {
                 if (isoDates[i][1].exec(string)) {
                     // match[5] should be 'T' or undefined
@@ -55063,7 +59219,7 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
             yearToUse = defaults(config._a[YEAR], currentDate[YEAR]);
 
             if (config._dayOfYear > daysInYear(yearToUse)) {
-                config._pf._overflowDayOfYear = true;
+                getParsingFlags(config)._overflowDayOfYear = true;
             }
 
             date = createUTCDate(yearToUse, 0, config._dayOfYear);
@@ -55159,7 +59315,7 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
         }
 
         config._a = [];
-        config._pf.empty = true;
+        getParsingFlags(config).empty = true;
 
         // This array is used to make a Date, either with `new Date` or `Date.UTC`
         var string = '' + config._i,
@@ -55175,7 +59331,7 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
             if (parsedInput) {
                 skipped = string.substr(0, string.indexOf(parsedInput));
                 if (skipped.length > 0) {
-                    config._pf.unusedInput.push(skipped);
+                    getParsingFlags(config).unusedInput.push(skipped);
                 }
                 string = string.slice(string.indexOf(parsedInput) + parsedInput.length);
                 totalParsedInputLength += parsedInput.length;
@@ -55183,27 +59339,29 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
             // don't parse if it's not a known token
             if (formatTokenFunctions[token]) {
                 if (parsedInput) {
-                    config._pf.empty = false;
+                    getParsingFlags(config).empty = false;
                 }
                 else {
-                    config._pf.unusedTokens.push(token);
+                    getParsingFlags(config).unusedTokens.push(token);
                 }
                 addTimeToArrayFromToken(token, parsedInput, config);
             }
             else if (config._strict && !parsedInput) {
-                config._pf.unusedTokens.push(token);
+                getParsingFlags(config).unusedTokens.push(token);
             }
         }
 
         // add remaining unparsed input length to the string
-        config._pf.charsLeftOver = stringLength - totalParsedInputLength;
+        getParsingFlags(config).charsLeftOver = stringLength - totalParsedInputLength;
         if (string.length > 0) {
-            config._pf.unusedInput.push(string);
+            getParsingFlags(config).unusedInput.push(string);
         }
 
         // clear _12h flag if hour is <= 12
-        if (config._pf.bigHour === true && config._a[HOUR] <= 12) {
-            config._pf.bigHour = undefined;
+        if (getParsingFlags(config).bigHour === true &&
+                config._a[HOUR] <= 12 &&
+                config._a[HOUR] > 0) {
+            getParsingFlags(config).bigHour = undefined;
         }
         // handle meridiem
         config._a[HOUR] = meridiemFixWrap(config._locale, config._a[HOUR], config._meridiem);
@@ -55247,7 +59405,7 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
             currentScore;
 
         if (config._f.length === 0) {
-            config._pf.invalidFormat = true;
+            getParsingFlags(config).invalidFormat = true;
             config._d = new Date(NaN);
             return;
         }
@@ -55258,7 +59416,6 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
             if (config._useUTC != null) {
                 tempConfig._useUTC = config._useUTC;
             }
-            tempConfig._pf = defaultParsingFlags();
             tempConfig._f = config._f[i];
             configFromStringAndFormat(tempConfig);
 
@@ -55267,12 +59424,12 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
             }
 
             // if there is any input that was not parsed add a penalty for that format
-            currentScore += tempConfig._pf.charsLeftOver;
+            currentScore += getParsingFlags(tempConfig).charsLeftOver;
 
             //or tokens
-            currentScore += tempConfig._pf.unusedTokens.length * 10;
+            currentScore += getParsingFlags(tempConfig).unusedTokens.length * 10;
 
-            tempConfig._pf.score = currentScore;
+            getParsingFlags(tempConfig).score = currentScore;
 
             if (scoreToBeat == null || currentScore < scoreToBeat) {
                 scoreToBeat = currentScore;
@@ -55315,6 +59472,8 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
             configFromStringAndArray(config);
         } else if (format) {
             configFromStringAndFormat(config);
+        } else if (isDate(input)) {
+            config._d = input;
         } else {
             configFromInput(config);
         }
@@ -55367,7 +59526,6 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
         c._i = input;
         c._f = format;
         c._strict = strict;
-        c._pf = defaultParsingFlags();
 
         return createFromConfig(c);
     }
@@ -55941,11 +60099,25 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
     }
 
     function from (time, withoutSuffix) {
+        if (!this.isValid()) {
+            return this.localeData().invalidDate();
+        }
         return create__createDuration({to: this, from: time}).locale(this.locale()).humanize(!withoutSuffix);
     }
 
     function fromNow (withoutSuffix) {
         return this.from(local__createLocal(), withoutSuffix);
+    }
+
+    function to (time, withoutSuffix) {
+        if (!this.isValid()) {
+            return this.localeData().invalidDate();
+        }
+        return create__createDuration({from: this, to: time}).locale(this.locale()).humanize(!withoutSuffix);
+    }
+
+    function toNow (withoutSuffix) {
+        return this.to(local__createLocal(), withoutSuffix);
     }
 
     function locale (key) {
@@ -56050,11 +60222,11 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
     }
 
     function parsingFlags () {
-        return extend({}, this._pf);
+        return extend({}, getParsingFlags(this));
     }
 
     function invalidAt () {
-        return this._pf.overflow;
+        return getParsingFlags(this).overflow;
     }
 
     addFormatToken(0, ['gg', 2], 0, function () {
@@ -56205,7 +60377,7 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
         if (weekday != null) {
             week.d = weekday;
         } else {
-            config._pf.invalidWeekday = input;
+            getParsingFlags(config).invalidWeekday = input;
         }
     });
 
@@ -56330,7 +60502,7 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
     });
     addParseToken(['h', 'hh'], function (input, array, config) {
         array[HOUR] = toInt(input);
-        config._pf.bigHour = true;
+        getParsingFlags(config).bigHour = true;
     });
 
     // LOCALES
@@ -56447,6 +60619,8 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
     momentPrototype__proto.format       = moment_format__format;
     momentPrototype__proto.from         = from;
     momentPrototype__proto.fromNow      = fromNow;
+    momentPrototype__proto.to           = to;
+    momentPrototype__proto.toNow        = toNow;
     momentPrototype__proto.get          = getSet;
     momentPrototype__proto.invalidAt    = invalidAt;
     momentPrototype__proto.isAfter      = isAfter;
@@ -56635,7 +60809,7 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
         }
         // Lenient ordinal parsing accepts just a number in addition to
         // number + (possibly) stuff coming from _ordinalParseLenient.
-        this._ordinalParseLenient = new RegExp(this._ordinalParse.source + '|' + /\d{1,2}/.source);
+        this._ordinalParseLenient = new RegExp(this._ordinalParse.source + '|' + (/\d{1,2}/).source);
     }
 
     var prototype__proto = Locale.prototype;
@@ -56852,13 +61026,13 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
             // handle milliseconds separately because of floating point math errors (issue #1867)
             days = this._days + Math.round(yearsToDays(this._months / 12));
             switch (units) {
-                case 'week'   : return days / 7            + milliseconds / 6048e5;
-                case 'day'    : return days                + milliseconds / 864e5;
-                case 'hour'   : return days * 24           + milliseconds / 36e5;
-                case 'minute' : return days * 24 * 60      + milliseconds / 6e4;
-                case 'second' : return days * 24 * 60 * 60 + milliseconds / 1000;
+                case 'week'   : return days / 7     + milliseconds / 6048e5;
+                case 'day'    : return days         + milliseconds / 864e5;
+                case 'hour'   : return days * 24    + milliseconds / 36e5;
+                case 'minute' : return days * 1440  + milliseconds / 6e4;
+                case 'second' : return days * 86400 + milliseconds / 1000;
                 // Math.floor prevents floating point math errors here
-                case 'millisecond': return Math.floor(days * 24 * 60 * 60 * 1000) + milliseconds;
+                case 'millisecond': return Math.floor(days * 864e5) + milliseconds;
                 default: throw new Error('Unknown unit ' + units);
             }
         }
@@ -57061,12 +61235,12 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
     ;
 
     //! moment.js
-    //! version : 2.10.2
+    //! version : 2.10.3
     //! authors : Tim Wood, Iskren Chernev, Moment.js contributors
     //! license : MIT
     //! momentjs.com
 
-    utils_hooks__hooks.version = '2.10.2';
+    utils_hooks__hooks.version = '2.10.3';
 
     setHookCallback(local__createLocal);
 
@@ -57412,7 +61586,7 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
         longDateFormat : {
             LT : 'HH:mm',
             LTS : 'HH:mm:ss',
-            L : 'DD/MM/YYYY',
+            L : 'D/\u200FM/\u200FYYYY',
             LL : 'D MMMM YYYY',
             LLL : 'D MMMM YYYY LT',
             LLLL : 'dddd D MMMM YYYY LT'
@@ -57452,7 +61626,7 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
             yy : pluralize('y')
         },
         preparse: function (string) {
-            return string.replace(/[١٢٣٤٥٦٧٨٩٠]/g, function (match) {
+            return string.replace(/\u200f/g, '').replace(/[١٢٣٤٥٦٧٨٩٠]/g, function (match) {
                 return ar__numberMap[match];
             }).replace(/،/g, ',');
         },
@@ -58421,47 +62595,47 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
     //! author : Anatoly Mironov : https://github.com/mirontoli
 
     var cv = _moment__default.defineLocale('cv', {
-        months : 'кăрлач_нарăс_пуш_ака_май_çĕртме_утă_çурла_авăн_юпа_чӳк_раштав'.split('_'),
-        monthsShort : 'кăр_нар_пуш_ака_май_çĕр_утă_çур_ав_юпа_чӳк_раш'.split('_'),
-        weekdays : 'вырсарникун_тунтикун_ытларикун_юнкун_кĕçнерникун_эрнекун_шăматкун'.split('_'),
-        weekdaysShort : 'выр_тун_ытл_юн_кĕç_эрн_шăм'.split('_'),
-        weekdaysMin : 'вр_тн_ыт_юн_кç_эр_шм'.split('_'),
+        months : 'кӑрлач_нарӑс_пуш_ака_май_ҫӗртме_утӑ_ҫурла_авӑн_юпа_чӳк_раштав'.split('_'),
+        monthsShort : 'кӑр_нар_пуш_ака_май_ҫӗр_утӑ_ҫур_авн_юпа_чӳк_раш'.split('_'),
+        weekdays : 'вырсарникун_тунтикун_ытларикун_юнкун_кӗҫнерникун_эрнекун_шӑматкун'.split('_'),
+        weekdaysShort : 'выр_тун_ытл_юн_кӗҫ_эрн_шӑм'.split('_'),
+        weekdaysMin : 'вр_тн_ыт_юн_кҫ_эр_шм'.split('_'),
         longDateFormat : {
             LT : 'HH:mm',
             LTS : 'LT:ss',
             L : 'DD-MM-YYYY',
-            LL : 'YYYY [çулхи] MMMM [уйăхĕн] D[-мĕшĕ]',
-            LLL : 'YYYY [çулхи] MMMM [уйăхĕн] D[-мĕшĕ], LT',
-            LLLL : 'dddd, YYYY [çулхи] MMMM [уйăхĕн] D[-мĕшĕ], LT'
+            LL : 'YYYY [ҫулхи] MMMM [уйӑхӗн] D[-мӗшӗ]',
+            LLL : 'YYYY [ҫулхи] MMMM [уйӑхӗн] D[-мӗшӗ], LT',
+            LLLL : 'dddd, YYYY [ҫулхи] MMMM [уйӑхӗн] D[-мӗшӗ], LT'
         },
         calendar : {
             sameDay: '[Паян] LT [сехетре]',
             nextDay: '[Ыран] LT [сехетре]',
-            lastDay: '[Ĕнер] LT [сехетре]',
-            nextWeek: '[Çитес] dddd LT [сехетре]',
-            lastWeek: '[Иртнĕ] dddd LT [сехетре]',
+            lastDay: '[Ӗнер] LT [сехетре]',
+            nextWeek: '[Ҫитес] dddd LT [сехетре]',
+            lastWeek: '[Иртнӗ] dddd LT [сехетре]',
             sameElse: 'L'
         },
         relativeTime : {
             future : function (output) {
-                var affix = /сехет$/i.exec(output) ? 'рен' : /çул$/i.exec(output) ? 'тан' : 'ран';
+                var affix = /сехет$/i.exec(output) ? 'рен' : /ҫул$/i.exec(output) ? 'тан' : 'ран';
                 return output + affix;
             },
             past : '%s каялла',
-            s : 'пĕр-ик çеккунт',
-            m : 'пĕр минут',
+            s : 'пӗр-ик ҫеккунт',
+            m : 'пӗр минут',
             mm : '%d минут',
-            h : 'пĕр сехет',
+            h : 'пӗр сехет',
             hh : '%d сехет',
-            d : 'пĕр кун',
+            d : 'пӗр кун',
             dd : '%d кун',
-            M : 'пĕр уйăх',
-            MM : '%d уйăх',
-            y : 'пĕр çул',
-            yy : '%d çул'
+            M : 'пӗр уйӑх',
+            MM : '%d уйӑх',
+            y : 'пӗр ҫул',
+            yy : '%d ҫул'
         },
-        ordinalParse: /\d{1,2}-мĕш/,
-        ordinal : '%d-мĕш',
+        ordinalParse: /\d{1,2}-мӗш/,
+        ordinal : '%d-мӗш',
         week : {
             dow : 1, // Monday is the first day of the week.
             doy : 7  // The week that contains Jan 1st is the first week of the year.
@@ -59026,11 +63200,11 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
     //! locale : spanish (es)
     //! author : Julio Napurí : https://github.com/julionc
 
-    var monthsShortDot = 'ene._feb._mar._abr._may._jun._jul._ago._sep._oct._nov._dic.'.split('_'),
-        es__monthsShort = 'ene_feb_mar_abr_may_jun_jul_ago_sep_oct_nov_dic'.split('_');
+    var monthsShortDot = 'Ene._Feb._Mar._Abr._May._Jun._Jul._Ago._Sep._Oct._Nov._Dic.'.split('_'),
+        es__monthsShort = 'Ene_Feb_Mar_Abr_May_Jun_Jul_Ago_Sep_Oct_Nov_Dic'.split('_');
 
     var es = _moment__default.defineLocale('es', {
-        months : 'enero_febrero_marzo_abril_mayo_junio_julio_agosto_septiembre_octubre_noviembre_diciembre'.split('_'),
+        months : 'Enero_Febrero_Marzo_Abril_Mayo_Junio_Julio_Agosto_Septiembre_Octubre_Noviembre_Diciembre'.split('_'),
         monthsShort : function (m, format) {
             if (/-MMM-/.test(format)) {
                 return es__monthsShort[m.month()];
@@ -59038,8 +63212,8 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
                 return monthsShortDot[m.month()];
             }
         },
-        weekdays : 'domingo_lunes_martes_miércoles_jueves_viernes_sábado'.split('_'),
-        weekdaysShort : 'dom._lun._mar._mié._jue._vie._sáb.'.split('_'),
+        weekdays : 'Domingo_Lunes_Martes_Miércoles_Jueves_Viernes_Sábado'.split('_'),
+        weekdaysShort : 'Dom._Lun._Mar._Mié._Jue._Vie._Sáb.'.split('_'),
         weekdaysMin : 'Do_Lu_Ma_Mi_Ju_Vi_Sá'.split('_'),
         longDateFormat : {
             LT : 'H:mm',
@@ -59914,8 +64088,8 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
     }
 
     var hr = _moment__default.defineLocale('hr', {
-        months : 'sječanj_veljača_ožujak_travanj_svibanj_lipanj_srpanj_kolovoz_rujan_listopad_studeni_prosinac'.split('_'),
-        monthsShort : 'sje._vel._ožu._tra._svi._lip._srp._kol._ruj._lis._stu._pro.'.split('_'),
+        months : 'siječanj_veljača_ožujak_travanj_svibanj_lipanj_srpanj_kolovoz_rujan_listopad_studeni_prosinac'.split('_'),
+        monthsShort : 'sij._velj._ožu._tra._svi._lip._srp._kol._ruj._lis._stu._pro.'.split('_'),
         weekdays : 'nedjelja_ponedjeljak_utorak_srijeda_četvrtak_petak_subota'.split('_'),
         weekdaysShort : 'ned._pon._uto._sri._čet._pet._sub.'.split('_'),
         weekdaysMin : 'ne_po_ut_sr_če_pe_su'.split('_'),
@@ -60485,6 +64659,78 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
     });
 
     //! moment.js locale configuration
+    //! locale : Boso Jowo (jv)
+    //! author : Rony Lantip : https://github.com/lantip
+    //! reference: http://jv.wikipedia.org/wiki/Basa_Jawa
+
+    var jv = _moment__default.defineLocale('jv', {
+        months : 'Januari_Februari_Maret_April_Mei_Juni_Juli_Agustus_September_Oktober_Nopember_Desember'.split('_'),
+        monthsShort : 'Jan_Feb_Mar_Apr_Mei_Jun_Jul_Ags_Sep_Okt_Nop_Des'.split('_'),
+        weekdays : 'Minggu_Senen_Seloso_Rebu_Kemis_Jemuwah_Septu'.split('_'),
+        weekdaysShort : 'Min_Sen_Sel_Reb_Kem_Jem_Sep'.split('_'),
+        weekdaysMin : 'Mg_Sn_Sl_Rb_Km_Jm_Sp'.split('_'),
+        longDateFormat : {
+            LT : 'HH.mm',
+            LTS : 'LT.ss',
+            L : 'DD/MM/YYYY',
+            LL : 'D MMMM YYYY',
+            LLL : 'D MMMM YYYY [pukul] LT',
+            LLLL : 'dddd, D MMMM YYYY [pukul] LT'
+        },
+        meridiemParse: /enjing|siyang|sonten|ndalu/,
+        meridiemHour : function (hour, meridiem) {
+            if (hour === 12) {
+                hour = 0;
+            }
+            if (meridiem === 'enjing') {
+                return hour;
+            } else if (meridiem === 'siyang') {
+                return hour >= 11 ? hour : hour + 12;
+            } else if (meridiem === 'sonten' || meridiem === 'ndalu') {
+                return hour + 12;
+            }
+        },
+        meridiem : function (hours, minutes, isLower) {
+            if (hours < 11) {
+                return 'enjing';
+            } else if (hours < 15) {
+                return 'siyang';
+            } else if (hours < 19) {
+                return 'sonten';
+            } else {
+                return 'ndalu';
+            }
+        },
+        calendar : {
+            sameDay : '[Dinten puniko pukul] LT',
+            nextDay : '[Mbenjang pukul] LT',
+            nextWeek : 'dddd [pukul] LT',
+            lastDay : '[Kala wingi pukul] LT',
+            lastWeek : 'dddd [kepengker pukul] LT',
+            sameElse : 'L'
+        },
+        relativeTime : {
+            future : 'wonten ing %s',
+            past : '%s ingkang kepengker',
+            s : 'sawetawis detik',
+            m : 'setunggal menit',
+            mm : '%d menit',
+            h : 'setunggal jam',
+            hh : '%d jam',
+            d : 'sedinten',
+            dd : '%d dinten',
+            M : 'sewulan',
+            MM : '%d wulan',
+            y : 'setaun',
+            yy : '%d taun'
+        },
+        week : {
+            dow : 1, // Monday is the first day of the week.
+            doy : 7  // The week that contains Jan 1st is the first week of the year.
+        }
+    });
+
+    //! moment.js locale configuration
     //! locale : Georgian (ka)
     //! author : Irakli Janiashvili : https://github.com/irakli-janiashvili
 
@@ -60910,24 +65156,41 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
     //! moment.js locale configuration
     //! locale : latvian (lv)
     //! author : Kristaps Karlsons : https://github.com/skakri
+    //! author : Jānis Elmeris : https://github.com/JanisE
 
     var lv__units = {
-        'mm': 'minūti_minūtes_minūte_minūtes',
-        'hh': 'stundu_stundas_stunda_stundas',
-        'dd': 'dienu_dienas_diena_dienas',
-        'MM': 'mēnesi_mēnešus_mēnesis_mēneši',
-        'yy': 'gadu_gadus_gads_gadi'
+        'm': 'minūtes_minūtēm_minūte_minūtes'.split('_'),
+        'mm': 'minūtes_minūtēm_minūte_minūtes'.split('_'),
+        'h': 'stundas_stundām_stunda_stundas'.split('_'),
+        'hh': 'stundas_stundām_stunda_stundas'.split('_'),
+        'd': 'dienas_dienām_diena_dienas'.split('_'),
+        'dd': 'dienas_dienām_diena_dienas'.split('_'),
+        'M': 'mēneša_mēnešiem_mēnesis_mēneši'.split('_'),
+        'MM': 'mēneša_mēnešiem_mēnesis_mēneši'.split('_'),
+        'y': 'gada_gadiem_gads_gadi'.split('_'),
+        'yy': 'gada_gadiem_gads_gadi'.split('_')
     };
-    function lv__format(word, number, withoutSuffix) {
-        var forms = word.split('_');
+    /**
+     * @param withoutSuffix boolean true = a length of time; false = before/after a period of time.
+     */
+    function lv__format(forms, number, withoutSuffix) {
         if (withoutSuffix) {
+            // E.g. "21 minūte", "3 minūtes".
             return number % 10 === 1 && number !== 11 ? forms[2] : forms[3];
         } else {
+            // E.g. "21 minūtes" as in "pēc 21 minūtes".
+            // E.g. "3 minūtēm" as in "pēc 3 minūtēm".
             return number % 10 === 1 && number !== 11 ? forms[0] : forms[1];
         }
     }
     function lv__relativeTimeWithPlural(number, withoutSuffix, key) {
         return number + ' ' + lv__format(lv__units[key], number, withoutSuffix);
+    }
+    function relativeTimeWithSingular(number, withoutSuffix, key) {
+        return lv__format(lv__units[key], number, withoutSuffix);
+    }
+    function relativeSeconds(number, withoutSuffix) {
+        return withoutSuffix ? 'dažas sekundes' : 'dažām sekundēm';
     }
 
     var lv = _moment__default.defineLocale('lv', {
@@ -60939,7 +65202,7 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
         longDateFormat : {
             LT : 'HH:mm',
             LTS : 'LT:ss',
-            L : 'DD.MM.YYYY',
+            L : 'DD.MM.YYYY.',
             LL : 'YYYY. [gada] D. MMMM',
             LLL : 'YYYY. [gada] D. MMMM, LT',
             LLLL : 'YYYY. [gada] D. MMMM, dddd, LT'
@@ -60953,18 +65216,18 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
             sameElse : 'L'
         },
         relativeTime : {
-            future : '%s vēlāk',
-            past : '%s agrāk',
-            s : 'dažas sekundes',
-            m : 'minūti',
+            future : 'pēc %s',
+            past : 'pirms %s',
+            s : relativeSeconds,
+            m : relativeTimeWithSingular,
             mm : lv__relativeTimeWithPlural,
-            h : 'stundu',
+            h : relativeTimeWithSingular,
             hh : lv__relativeTimeWithPlural,
-            d : 'dienu',
+            d : relativeTimeWithSingular,
             dd : lv__relativeTimeWithPlural,
-            M : 'mēnesi',
+            M : relativeTimeWithSingular,
             MM : lv__relativeTimeWithPlural,
-            y : 'gadu',
+            y : relativeTimeWithSingular,
             yy : lv__relativeTimeWithPlural
         },
         ordinalParse: /\d{1,2}\./,
@@ -60972,6 +65235,104 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
         week : {
             dow : 1, // Monday is the first day of the week.
             doy : 4  // The week that contains Jan 4th is the first week of the year.
+        }
+    });
+
+    //! moment.js locale configuration
+    //! locale : Montenegrin (me)
+    //! author : Miodrag Nikač <miodrag@restartit.me> : https://github.com/miodragnikac
+
+    var me__translator = {
+        words: { //Different grammatical cases
+            m: ['jedan minut', 'jednog minuta'],
+            mm: ['minut', 'minuta', 'minuta'],
+            h: ['jedan sat', 'jednog sata'],
+            hh: ['sat', 'sata', 'sati'],
+            dd: ['dan', 'dana', 'dana'],
+            MM: ['mjesec', 'mjeseca', 'mjeseci'],
+            yy: ['godina', 'godine', 'godina']
+        },
+        correctGrammaticalCase: function (number, wordKey) {
+            return number === 1 ? wordKey[0] : (number >= 2 && number <= 4 ? wordKey[1] : wordKey[2]);
+        },
+        translate: function (number, withoutSuffix, key) {
+            var wordKey = me__translator.words[key];
+            if (key.length === 1) {
+                return withoutSuffix ? wordKey[0] : wordKey[1];
+            } else {
+                return number + ' ' + me__translator.correctGrammaticalCase(number, wordKey);
+            }
+        }
+    };
+
+    var me = _moment__default.defineLocale('me', {
+        months: ['januar', 'februar', 'mart', 'april', 'maj', 'jun', 'jul', 'avgust', 'septembar', 'oktobar', 'novembar', 'decembar'],
+        monthsShort: ['jan.', 'feb.', 'mar.', 'apr.', 'maj', 'jun', 'jul', 'avg.', 'sep.', 'okt.', 'nov.', 'dec.'],
+        weekdays: ['nedjelja', 'ponedjeljak', 'utorak', 'srijeda', 'četvrtak', 'petak', 'subota'],
+        weekdaysShort: ['ned.', 'pon.', 'uto.', 'sri.', 'čet.', 'pet.', 'sub.'],
+        weekdaysMin: ['ne', 'po', 'ut', 'sr', 'če', 'pe', 'su'],
+        longDateFormat: {
+            LT: 'H:mm',
+            LTS : 'LT:ss',
+            L: 'DD. MM. YYYY',
+            LL: 'D. MMMM YYYY',
+            LLL: 'D. MMMM YYYY LT',
+            LLLL: 'dddd, D. MMMM YYYY LT'
+        },
+        calendar: {
+            sameDay: '[danas u] LT',
+            nextDay: '[sjutra u] LT',
+
+            nextWeek: function () {
+                switch (this.day()) {
+                case 0:
+                    return '[u] [nedjelju] [u] LT';
+                case 3:
+                    return '[u] [srijedu] [u] LT';
+                case 6:
+                    return '[u] [subotu] [u] LT';
+                case 1:
+                case 2:
+                case 4:
+                case 5:
+                    return '[u] dddd [u] LT';
+                }
+            },
+            lastDay  : '[juče u] LT',
+            lastWeek : function () {
+                var lastWeekDays = [
+                    '[prošle] [nedjelje] [u] LT',
+                    '[prošlog] [ponedjeljka] [u] LT',
+                    '[prošlog] [utorka] [u] LT',
+                    '[prošle] [srijede] [u] LT',
+                    '[prošlog] [četvrtka] [u] LT',
+                    '[prošlog] [petka] [u] LT',
+                    '[prošle] [subote] [u] LT'
+                ];
+                return lastWeekDays[this.day()];
+            },
+            sameElse : 'L'
+        },
+        relativeTime : {
+            future : 'za %s',
+            past   : 'prije %s',
+            s      : 'nekoliko sekundi',
+            m      : me__translator.translate,
+            mm     : me__translator.translate,
+            h      : me__translator.translate,
+            hh     : me__translator.translate,
+            d      : 'dan',
+            dd     : me__translator.translate,
+            M      : 'mjesec',
+            MM     : me__translator.translate,
+            y      : 'godinu',
+            yy     : me__translator.translate
+        },
+        ordinalParse: /\d{1,2}\./,
+        ordinal : '%d.',
+        week : {
+            dow : 1, // Monday is the first day of the week.
+            doy : 7  // The week that contains Jan 1st is the first week of the year.
         }
     });
 
@@ -61327,8 +65688,9 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
         months: 'ဇန်နဝါရီ_ဖေဖော်ဝါရီ_မတ်_ဧပြီ_မေ_ဇွန်_ဇူလိုင်_သြဂုတ်_စက်တင်ဘာ_အောက်တိုဘာ_နိုဝင်ဘာ_ဒီဇင်ဘာ'.split('_'),
         monthsShort: 'ဇန်_ဖေ_မတ်_ပြီ_မေ_ဇွန်_လိုင်_သြ_စက်_အောက်_နို_ဒီ'.split('_'),
         weekdays: 'တနင်္ဂနွေ_တနင်္လာ_အင်္ဂါ_ဗုဒ္ဓဟူး_ကြာသပတေး_သောကြာ_စနေ'.split('_'),
-        weekdaysShort: 'နွေ_လာ_င်္ဂါ_ဟူး_ကြာ_သော_နေ'.split('_'),
-        weekdaysMin: 'နွေ_လာ_င်္ဂါ_ဟူး_ကြာ_သော_နေ'.split('_'),
+        weekdaysShort: 'နွေ_လာ_ဂါ_ဟူး_ကြာ_သော_နေ'.split('_'),
+        weekdaysMin: 'နွေ_လာ_ဂါ_ဟူး_ကြာ_သော_နေ'.split('_'),
+
         longDateFormat: {
             LT: 'HH:mm',
             LTS: 'HH:mm:ss',
@@ -61676,7 +66038,12 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
 
     var pl = _moment__default.defineLocale('pl', {
         months : function (momentToFormat, format) {
-            if (/D MMMM/.test(format)) {
+            if (format === '') {
+                // Hack: if format empty we know this is used to generate
+                // RegExp by moment. Give then back both valid forms of months
+                // in RegExp ready format.
+                return '(' + monthsSubjective[momentToFormat.month()] + '|' + monthsNominative[momentToFormat.month()] + ')';
+            } else if (/D MMMM/.test(format)) {
                 return monthsSubjective[momentToFormat.month()];
             } else {
                 return monthsNominative[momentToFormat.month()];
@@ -61741,11 +66108,11 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
     //! author : Caio Ribeiro Pereira : https://github.com/caio-ribeiro-pereira
 
     var pt_br = _moment__default.defineLocale('pt-br', {
-        months : 'janeiro_fevereiro_março_abril_maio_junho_julho_agosto_setembro_outubro_novembro_dezembro'.split('_'),
-        monthsShort : 'jan_fev_mar_abr_mai_jun_jul_ago_set_out_nov_dez'.split('_'),
-        weekdays : 'domingo_segunda-feira_terça-feira_quarta-feira_quinta-feira_sexta-feira_sábado'.split('_'),
-        weekdaysShort : 'dom_seg_ter_qua_qui_sex_sáb'.split('_'),
-        weekdaysMin : 'dom_2ª_3ª_4ª_5ª_6ª_sáb'.split('_'),
+        months : 'Janeiro_Fevereiro_Março_Abril_Maio_Junho_Julho_Agosto_Setembro_Outubro_Novembro_Dezembro'.split('_'),
+        monthsShort : 'Jan_Fev_Mar_Abr_Mai_Jun_Jul_Ago_Set_Out_Nov_Dez'.split('_'),
+        weekdays : 'Domingo_Segunda-Feira_Terça-Feira_Quarta-Feira_Quinta-Feira_Sexta-Feira_Sábado'.split('_'),
+        weekdaysShort : 'Dom_Seg_Ter_Qua_Qui_Sex_Sáb'.split('_'),
+        weekdaysMin : 'Dom_2ª_3ª_4ª_5ª_6ª_Sáb'.split('_'),
         longDateFormat : {
             LT : 'HH:mm',
             LTS : 'LT:ss',
@@ -61790,11 +66157,11 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
     //! author : Jefferson : https://github.com/jalex79
 
     var pt = _moment__default.defineLocale('pt', {
-        months : 'janeiro_fevereiro_março_abril_maio_junho_julho_agosto_setembro_outubro_novembro_dezembro'.split('_'),
-        monthsShort : 'jan_fev_mar_abr_mai_jun_jul_ago_set_out_nov_dez'.split('_'),
-        weekdays : 'domingo_segunda-feira_terça-feira_quarta-feira_quinta-feira_sexta-feira_sábado'.split('_'),
-        weekdaysShort : 'dom_seg_ter_qua_qui_sex_sáb'.split('_'),
-        weekdaysMin : 'dom_2ª_3ª_4ª_5ª_6ª_sáb'.split('_'),
+        months : 'Janeiro_Fevereiro_Março_Abril_Maio_Junho_Julho_Agosto_Setembro_Outubro_Novembro_Dezembro'.split('_'),
+        monthsShort : 'Jan_Fev_Mar_Abr_Mai_Jun_Jul_Ago_Set_Out_Nov_Dez'.split('_'),
+        weekdays : 'Domingo_Segunda-Feira_Terça-Feira_Quarta-Feira_Quinta-Feira_Sexta-Feira_Sábado'.split('_'),
+        weekdaysShort : 'Dom_Seg_Ter_Qua_Qui_Sex_Sáb'.split('_'),
+        weekdaysMin : 'Dom_2ª_3ª_4ª_5ª_6ª_Sáb'.split('_'),
         longDateFormat : {
             LT : 'HH:mm',
             LTS : 'LT:ss',
@@ -62055,6 +66422,60 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
     });
 
     //! moment.js locale configuration
+    //! locale : Sinhalese (si)
+    //! author : Sampath Sitinamaluwa : https://github.com/sampathsris
+
+    var si = _moment__default.defineLocale('si', {
+        months : 'ජනවාරි_පෙබරවාරි_මාර්තු_අප්‍රේල්_මැයි_ජූනි_ජූලි_අගෝස්තු_සැප්තැම්බර්_ඔක්තෝබර්_නොවැම්බර්_දෙසැම්බර්'.split('_'),
+        monthsShort : 'ජන_පෙබ_මාර්_අප්_මැයි_ජූනි_ජූලි_අගෝ_සැප්_ඔක්_නොවැ_දෙසැ'.split('_'),
+        weekdays : 'ඉරිදා_සඳුදා_අඟහරුවාදා_බදාදා_බ්‍රහස්පතින්දා_සිකුරාදා_සෙනසුරාදා'.split('_'),
+        weekdaysShort : 'ඉරි_සඳු_අඟ_බදා_බ්‍රහ_සිකු_සෙන'.split('_'),
+        weekdaysMin : 'ඉ_ස_අ_බ_බ්‍ර_සි_සෙ'.split('_'),
+        longDateFormat : {
+            LT : 'a h:mm',
+            LTS : 'a h:mm:ss',
+            L : 'YYYY/MM/DD',
+            LL : 'YYYY MMMM D',
+            LLL : 'YYYY MMMM D, LT',
+            LLLL : 'YYYY MMMM D [වැනි] dddd, LTS'
+        },
+        calendar : {
+            sameDay : '[අද] LT[ට]',
+            nextDay : '[හෙට] LT[ට]',
+            nextWeek : 'dddd LT[ට]',
+            lastDay : '[ඊයේ] LT[ට]',
+            lastWeek : '[පසුගිය] dddd LT[ට]',
+            sameElse : 'L'
+        },
+        relativeTime : {
+            future : '%sකින්',
+            past : '%sකට පෙර',
+            s : 'තත්පර කිහිපය',
+            m : 'මිනිත්තුව',
+            mm : 'මිනිත්තු %d',
+            h : 'පැය',
+            hh : 'පැය %d',
+            d : 'දිනය',
+            dd : 'දින %d',
+            M : 'මාසය',
+            MM : 'මාස %d',
+            y : 'වසර',
+            yy : 'වසර %d'
+        },
+        ordinalParse: /\d{1,2} වැනි/,
+        ordinal : function (number) {
+            return number + ' වැනි';
+        },
+        meridiem : function (hours, minutes, isLower) {
+            if (hours > 11) {
+                return isLower ? 'ප.ව.' : 'පස් වරු';
+            } else {
+                return isLower ? 'පෙ.ව.' : 'පෙර වරු';
+            }
+        }
+    });
+
+    //! moment.js locale configuration
     //! locale : slovak (sk)
     //! author : Martin Minka : https://github.com/k2s
     //! based on work of petrbela : https://github.com/petrbela
@@ -62205,62 +66626,72 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
     //! locale : slovenian (sl)
     //! author : Robert Sedovšek : https://github.com/sedovsek
 
-    function sl__translate(number, withoutSuffix, key) {
+    function sl__processRelativeTime(number, withoutSuffix, key, isFuture) {
         var result = number + ' ';
         switch (key) {
+        case 's':
+            return withoutSuffix || isFuture ? 'nekaj sekund' : 'nekaj sekundami';
         case 'm':
             return withoutSuffix ? 'ena minuta' : 'eno minuto';
         case 'mm':
             if (number === 1) {
-                result += 'minuta';
+                result += withoutSuffix ? 'minuta' : 'minuto';
             } else if (number === 2) {
-                result += 'minuti';
-            } else if (number === 3 || number === 4) {
-                result += 'minute';
+                result += withoutSuffix || isFuture ? 'minuti' : 'minutama';
+            } else if (number < 5) {
+                result += withoutSuffix || isFuture ? 'minute' : 'minutami';
             } else {
-                result += 'minut';
+                result += withoutSuffix || isFuture ? 'minut' : 'minutami';
             }
             return result;
         case 'h':
             return withoutSuffix ? 'ena ura' : 'eno uro';
         case 'hh':
             if (number === 1) {
-                result += 'ura';
+                result += withoutSuffix ? 'ura' : 'uro';
             } else if (number === 2) {
-                result += 'uri';
-            } else if (number === 3 || number === 4) {
-                result += 'ure';
+                result += withoutSuffix || isFuture ? 'uri' : 'urama';
+            } else if (number < 5) {
+                result += withoutSuffix || isFuture ? 'ure' : 'urami';
             } else {
-                result += 'ur';
+                result += withoutSuffix || isFuture ? 'ur' : 'urami';
             }
             return result;
+        case 'd':
+            return withoutSuffix || isFuture ? 'en dan' : 'enim dnem';
         case 'dd':
             if (number === 1) {
-                result += 'dan';
+                result += withoutSuffix || isFuture ? 'dan' : 'dnem';
+            } else if (number === 2) {
+                result += withoutSuffix || isFuture ? 'dni' : 'dnevoma';
             } else {
-                result += 'dni';
+                result += withoutSuffix || isFuture ? 'dni' : 'dnevi';
             }
             return result;
+        case 'M':
+            return withoutSuffix || isFuture ? 'en mesec' : 'enim mesecem';
         case 'MM':
             if (number === 1) {
-                result += 'mesec';
+                result += withoutSuffix || isFuture ? 'mesec' : 'mesecem';
             } else if (number === 2) {
-                result += 'meseca';
-            } else if (number === 3 || number === 4) {
-                result += 'mesece';
+                result += withoutSuffix || isFuture ? 'meseca' : 'mesecema';
+            } else if (number < 5) {
+                result += withoutSuffix || isFuture ? 'mesece' : 'meseci';
             } else {
-                result += 'mesecev';
+                result += withoutSuffix || isFuture ? 'mesecev' : 'meseci';
             }
             return result;
+        case 'y':
+            return withoutSuffix || isFuture ? 'eno leto' : 'enim letom';
         case 'yy':
             if (number === 1) {
-                result += 'leto';
+                result += withoutSuffix || isFuture ? 'leto' : 'letom';
             } else if (number === 2) {
-                result += 'leti';
-            } else if (number === 3 || number === 4) {
-                result += 'leta';
+                result += withoutSuffix || isFuture ? 'leti' : 'letoma';
+            } else if (number < 5) {
+                result += withoutSuffix || isFuture ? 'leta' : 'leti';
             } else {
-                result += 'let';
+                result += withoutSuffix || isFuture ? 'let' : 'leti';
             }
             return result;
         }
@@ -62283,6 +66714,7 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
         calendar : {
             sameDay  : '[danes ob] LT',
             nextDay  : '[jutri ob] LT',
+
             nextWeek : function () {
                 switch (this.day()) {
                 case 0:
@@ -62302,9 +66734,11 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
             lastWeek : function () {
                 switch (this.day()) {
                 case 0:
+                    return '[prejšnjo] [nedeljo] [ob] LT';
                 case 3:
+                    return '[prejšnjo] [sredo] [ob] LT';
                 case 6:
-                    return '[prejšnja] dddd [ob] LT';
+                    return '[prejšnjo] [soboto] [ob] LT';
                 case 1:
                 case 2:
                 case 4:
@@ -62316,18 +66750,18 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
         },
         relativeTime : {
             future : 'čez %s',
-            past   : '%s nazaj',
-            s      : 'nekaj sekund',
-            m      : sl__translate,
-            mm     : sl__translate,
-            h      : sl__translate,
-            hh     : sl__translate,
-            d      : 'en dan',
-            dd     : sl__translate,
-            M      : 'en mesec',
-            MM     : sl__translate,
-            y      : 'eno leto',
-            yy     : sl__translate
+            past   : 'pred %s',
+            s      : sl__processRelativeTime,
+            m      : sl__processRelativeTime,
+            mm     : sl__processRelativeTime,
+            h      : sl__processRelativeTime,
+            hh     : sl__processRelativeTime,
+            d      : sl__processRelativeTime,
+            dd     : sl__processRelativeTime,
+            M      : sl__processRelativeTime,
+            MM     : sl__processRelativeTime,
+            y      : sl__processRelativeTime,
+            yy     : sl__processRelativeTime
         },
         ordinalParse: /\d{1,2}\./,
         ordinal : '%d.',
@@ -62611,8 +67045,8 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
             sameDay: '[Idag] LT',
             nextDay: '[Imorgon] LT',
             lastDay: '[Igår] LT',
-            nextWeek: 'dddd LT',
-            lastWeek: '[Förra] dddd[en] LT',
+            nextWeek: '[På] dddd LT',
+            lastWeek: '[I] dddd[s] LT',
             sameElse: 'L'
         },
         relativeTime : {
@@ -63263,7 +67697,7 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
         weekdaysShort : '周日_周一_周二_周三_周四_周五_周六'.split('_'),
         weekdaysMin : '日_一_二_三_四_五_六'.split('_'),
         longDateFormat : {
-            LT : 'Ah点mm',
+            LT : 'Ah点mm分',
             LTS : 'Ah点m分s秒',
             L : 'YYYY-MM-DD',
             LL : 'YYYY年MMMD日',
@@ -63349,16 +67783,16 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
             future : '%s内',
             past : '%s前',
             s : '几秒',
-            m : '1分钟',
-            mm : '%d分钟',
-            h : '1小时',
-            hh : '%d小时',
-            d : '1天',
-            dd : '%d天',
-            M : '1个月',
-            MM : '%d个月',
-            y : '1年',
-            yy : '%d年'
+            m : '1 分钟',
+            mm : '%d 分钟',
+            h : '1 小时',
+            hh : '%d 小时',
+            d : '1 天',
+            dd : '%d 天',
+            M : '1 个月',
+            MM : '%d 个月',
+            y : '1 年',
+            yy : '%d 年'
         },
         week : {
             // GB/T 7408-1994《数据元和交换格式·信息交换·日期和时间表示法》与ISO 8601:1988等效
@@ -63378,7 +67812,7 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
         weekdaysShort : '週日_週一_週二_週三_週四_週五_週六'.split('_'),
         weekdaysMin : '日_一_二_三_四_五_六'.split('_'),
         longDateFormat : {
-            LT : 'Ah點mm',
+            LT : 'Ah點mm分',
             LTS : 'Ah點m分s秒',
             L : 'YYYY年MMMD日',
             LL : 'YYYY年MMMD日',

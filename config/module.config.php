@@ -34,10 +34,17 @@ return array(
             'Admin42\IdentityRoleProvider' => 'Admin42\Permission\Rbac\Service\IdentityRoleProviderFactory',
 
             'Admin42\Navigation\Listener\RbacListener' => 'Admin42\Navigation\Listener\RbacListenerFactory',
+
+            'Imagine' => 'Admin42\Imagine\Service\ImagineFactory',
+
+            'Admin42\MediaOptions' => 'Admin42\Media\Service\MediaOptionsFactory',
         ),
     ),
 
     'form_elements' => array(
+        'invokables' => [
+            'fileSelect' => 'Admin42\FormElements\FileSelect'
+        ],
         'factories' => array(
             'role'      => 'Admin42\FormElements\Service\RoleFactory',
             'dynamic'   => 'Admin42\FormElements\Service\DynamicFactory',

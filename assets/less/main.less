@@ -41,9 +41,11 @@ body, .bg_body{
     background:url(../images/bg_sub_header.jpg);
 }
 
-thead{
-    background:@brand-dark;
-    color:@brand-light;
+.table {
+    thead{
+        background:@brand-dark;
+        color:@brand-light;
+    }
 }
 
 .navbar-form .input-group>.form-control:focus{
@@ -196,4 +198,28 @@ thead{
 .marked-deleted {
   filter:alpha(opacity=50);
   opacity:0.5;
+}
+
+.nav-tabs{
+  > li {
+    > a {
+      color: @nav-tabs-active-link-hover-color;
+      background-color: @nav-tabs-active-link-hover-bg;
+      border: 1px solid @nav-tabs-active-link-hover-border-color;
+      border-bottom-color: transparent;
+      cursor: default;
+    }
+  }
+  > .active {
+    > a {
+      background-color: #ffffff !important;
+    }
+  }
+}
+
+.timeline-sidebar {
+  .tl-date {
+    margin-left: -8.5em;
+    width: 5.5em;
+  }
 }

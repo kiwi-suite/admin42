@@ -12,6 +12,14 @@ return array(
                         'order' => 10000,
                     ),
                 ),
+                'media' => array(
+                    'options' => array(
+                        'label' => 'label.media',
+                        'route' => 'admin/media',
+                        'icon' => 'fa fa-picture-o fa-fw',
+                        'order' => 5000,
+                    ),
+                ),
             ),
         ),
         'listeners' => array(

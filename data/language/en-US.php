@@ -18,6 +18,7 @@ return array(
     'label.users'                   => 'Users',
     'label.user-add'                => 'Add User',
     'label.user-edit'               => 'Edit User',
+    'label.media'                   => 'Media',
 
     'field.id'                      => '#ID',
     'field.username'                => 'Username',
@@ -34,6 +35,8 @@ return array(
     'title.users'                   => 'User management',
     'title.user-edit'               => 'Edit user',
     'title.user-add'                => 'Add user',
+
+    'title.media'                   => 'Media management',
 
     'search.id'                     => 'Search for #ID',
     'search.email'                  => 'Search for Email',

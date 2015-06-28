@@ -32,6 +32,8 @@ module.exports = function(grunt) {
 
                     '<%= vendor_dir %>/angular-bootstrap/ui-bootstrap.js',
                     '<%= vendor_dir %>/angular-bootstrap/ui-bootstrap-tpls.js',
+                    '<%= vendor_dir %>/bootstrap-ui-datetime-picker/dist/datetime-picker.js',
+                    '<%= vendor_dir %>/bootstrap-ui-datetime-picker/dist/datetime-picker.tpls.js',
                     '<%= vendor_dir %>/angular-animate/angular-animate.js',
                     '<%= vendor_dir %>/angular-sanitize/angular-sanitize.js',
                     '<%= vendor_dir %>/angular-smart-table/dist/smart-table.min.js',
@@ -41,6 +43,9 @@ module.exports = function(grunt) {
                     '<%= vendor_dir %>/screenfull/dist/screenfull.js',
                     '<%= vendor_dir %>/angularjs-toaster/toaster.js',
                     '<%= vendor_dir %>/ngstorage/ngStorage.js',
+                    '<%= vendor_dir %>/angular-file-upload/angular-file-upload.js',
+                    '<%= vendor_dir %>/cropper/dist/cropper.js',
+                    '<%= vendor_dir %>/ng-cropper/dist/ngCropper.js',
 
                     '<%= vendor_dir %>/moment/min/moment-with-locales.js',
                     '<%= vendor_dir %>/moment-timezone/builds/moment-timezone-with-data.js'
@@ -82,6 +87,7 @@ module.exports = function(grunt) {
                     '<%= dist %>/css/admin42.min.css': [
                         '<%= vendor_dir %>/animate.css/animate.css',
                         '<%= vendor_dir %>/angularjs-toaster/toaster.css',
+                        '<%= vendor_dir %>/cropper/dist/cropper.css',
                         'less/main.less',
                         '<%= vendor_dir %>/angular-ui-select/dist/select.css'
                     ]
