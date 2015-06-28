@@ -6,12 +6,11 @@
  * @copyright Copyright (c) 2010-2014 raum42 OG (http://www.raum42.at)
  *
  */
+namespace Admin42\View\Helper\Form;
 
-namespace Admin42\FormElements;
+use Zend\Form\View\Helper\AbstractHelper;
 
-use Zend\Form\Element;
-
-class FileSelect extends Element
+class FileSelect extends AbstractHelper
 {
 
 }

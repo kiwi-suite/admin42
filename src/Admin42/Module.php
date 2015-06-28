@@ -33,6 +33,7 @@ class Module implements ConfigProviderInterface, BootstrapListenerInterface
             include __DIR__ . '/../../config/project.config.php',
             include __DIR__ . '/../../config/translation.config.php',
             include __DIR__ . '/../../config/admin.config.php',
+            include __DIR__ . '/../../config/media.config.php',
             include __DIR__ . '/../../config/routing.config.php'
         );
     }
@@ -74,6 +75,9 @@ class Module implements ConfigProviderInterface, BootstrapListenerInterface
                 $headScript->appendFile($basePath('/assets/admin/core/js/vendor.min.js'));
                 $headScript->appendFile($basePath('/assets/admin/core/js/admin42.min.js'));
                 $headLink->appendStylesheet($basePath('/assets/admin/core/css/admin42.min.css'));
+
+                $formElement = $viewHelperManager->get('formElement');
+                $formElement->addClass('Admin42\FormElements\FileSelect', 'formfileselect');
             },
             100
         );
