@@ -1,10 +1,12 @@
+<?php if ($this->params()->fromRoute('referrer') == "index"): ?>
 <div class="wrapper-md bg-white b-b box-shadow">
     <h1 class="m-n font-thin h3">
         <span class="fa fa-picture-o"></span>
         <?= $this->translate('title.media', 'admin') ?>
     </h1>
 </div>
-<div class="wrapper-md" ng-controller="MediaController" data-upload-url="<?= $this->url('admin/media/upload') ?>" data-url="<?= $this->url()?>">
+<?php endif; ?>
+<div class="<?= ($this->params()->fromRoute('referrer') == "index") ? "wrapper-md" : ""?>" ng-controller="MediaController" data-upload-url="<?= $this->url('admin/media/upload') ?>" data-url="<?= $this->url()?>">
     <div class="panel panel-default">
         <div class="panel-heading" ng-click="isCollapsed = !isCollapsed">
             <span ng-if="!isCollapsed"><?= $this->translate('title.upload', 'admin') ?></span>
@@ -23,11 +25,11 @@
                 <div class="col-sm-12 col-xs-12 col-md-9">
                     <table ng-show="uploader.queue.length > 0" class="table bg-white-only b-a">
                         <tr>
-                            <th width="50%">Name</th>
-                            <th ng-show="uploader.isHTML5">Size</th>
-                            <th ng-show="uploader.isHTML5">Progress</th>
-                            <th>Status</th>
-                            <th>Actions</th>
+                            <th width="50%"><?= $this->translate('field.name', 'admin')?></th>
+                            <th ng-show="uploader.isHTML5"><?= $this->translate('field.size', 'admin')?></th>
+                            <th ng-show="uploader.isHTML5"><?= $this->translate('field.progress', 'admin')?></th>
+                            <th><?= $this->translate('field.status', 'admin')?></th>
+                            <th></th>
                         </tr>
                         <tr ng-repeat="item in uploader.queue">
                             <td><strong>{{ item.file.name }}</strong></td>
@@ -44,13 +46,13 @@
                             </td>
                             <td nowrap>
                                 <button type="button" class="btn btn-default btn-xs" ng-click="item.upload()" ng-disabled="item.isReady || item.isUploading || item.isSuccess">
-                                    <?= $this->translate('btn.upload', 'admin')?>
+                                    <?= $this->translate('button.upload', 'admin')?>
                                 </button>
                                 <button type="button" class="btn btn-default btn-xs" ng-click="item.cancel()" ng-disabled="!item.isUploading">
-                                    <?= $this->translate('btn.cancel', 'admin')?>
+                                    <?= $this->translate('button.cancel', 'admin')?>
                                 </button>
                                 <button type="button" class="btn btn-default btn-xs" ng-click="item.remove()">
-                                    <?= $this->translate('btn.remove', 'admin')?>
+                                    <?= $this->translate('button.remove', 'admin')?>
                                 </button>
                             </td>
                         </tr>
@@ -60,13 +62,13 @@
         </div>
         <div class="panel-footer text-right" collapse="isCollapsed">
             <button type="button" class="btn btn-addon btn-success" ng-click="uploader.uploadAll()" ng-hide="!uploader.getNotUploadedItems().length">
-                <i class="fa fa-arrow-circle-o-up"></i> <?= $this->translate('btn.upload_all', 'admin')?>
+                <i class="fa fa-arrow-circle-o-up"></i> <?= $this->translate('button.upload_all', 'admin')?>
             </button>
             <button type="button" class="btn btn-addon btn-warning" ng-click="uploader.cancelAll()" ng-hide="!uploader.isUploading">
-                <i class="fa fa-ban"></i> <?= $this->translate('btn.cancel_all', 'admin')?>
+                <i class="fa fa-ban"></i> <?= $this->translate('button.cancel_all', 'admin')?>
             </button>
             <button type="button" class="btn btn-addon btn-danger" ng-click="uploader.clearQueue()" ng-hide="!uploader.queue.length">
-                <i class="fa fa-trash-o"></i> <?= $this->translate('btn.remove_all', 'admin')?>
+                <i class="fa fa-trash-o"></i> <?= $this->translate('button.remove_all', 'admin')?>
             </button>
         </div>
     </div>
@@ -91,10 +93,19 @@
             <tr>
                 <td colspan="6">
                     <div class="row">
-                        <div ng-repeat="row in collection" class="col-xs-6 col-sm-4 col-md-2 col-lg-2">
-                            <div class="item">
+                        <div ng-repeat="row in collection" class="<?= ($this->params()->fromRoute('referrer') == "index") ? "col-xs-6 col-sm-4 col-md-2 col-lg-2" : "col-xs-6 col-sm-6 col-md-4 col-lg-4"?>">
+                            <div class="item m-t-md">
                                 <div class="pos-rlt b-a bg-white" style="max-width: 300px; height: 200px; overflow: hidden;">
+                                    <div ng-show="selectedMedia == row.id" class="bottom">
+                                        <div class="pull-right m-t-sm m-r-sm badge bg-success">
+                                            <i class="fa fa-check"></i>
+                                        </div>
+                                    </div>
+                                    <?php if ($this->params()->fromRoute('referrer') == "index"): ?>
                                     <a href="<?= $this->url('admin/media/edit', ['id' => '{{row.id}}'])?>">
+                                    <?php else: ?>
+                                    <a ng-click="selectMedia(row)">
+                                    <?php endif; ?>
                                         <img ng-if="isImage(row)" ng-src="<?= $this->url('admin/media/stream', ['id' => '{{ row.id }}', 'dimension' => 'admin_thumbnail'])?>">
                                         <div ng-if="!isImage(row)" class="center text-center m-t-n w-full">
                                             <i class="fa fa-5x" ng-class="getDocumentClass(row)"></i>
@@ -102,7 +113,11 @@
                                     </a>
                                 </div>
                                 <div>
-                                    <a href="">
+                                    <?php if ($this->params()->fromRoute('referrer') == "index"): ?>
+                                    <a href="<?= $this->url('admin/media/edit', ['id' => '{{row.id}}'])?>">
+                                    <?php else: ?>
+                                    <a ng-click="selectMedia(row)">
+                                    <?php endif; ?>
                                         {{ row.filename }}
                                     </a>
                                 </div>

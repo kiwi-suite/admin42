@@ -51,4 +51,10 @@ return array(
             'dynamic'   => 'Admin42\FormElements\Service\DynamicFactory',
         ),
     ),
+
+    'view_helpers' => [
+        'factories' => [
+            'media'            => 'Admin42\View\Helper\Service\MediaFactory',
+        ],
+    ],
 );

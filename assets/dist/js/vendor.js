@@ -55158,13 +55158,12 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
 		window.screenfull = screenfull;
 	}
 })();
-;/* global angular */
-(function (window, document) {
+;(function () {
     'use strict';
 
     /*
      * AngularJS Toaster
-     * Version: 0.4.15
+     * Version: 0.4.14
      *
      * Copyright 2013-2015 Jiri Kavulak.
      * All Rights Reserved.
@@ -55175,7 +55174,7 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
      * Related to project of John Papa, Hans Fjällemark and Nguyễn Thiện Hùng (thienhung1989)
      */
 
-    angular.module('toaster', []).constant(
+    angular.module('toaster', ['ngAnimate']).constant(
         'toasterConfig', {
             'limit': 0,                   // limits max number of toasts
             'tap-to-dismiss': true,
@@ -55189,8 +55188,8 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
              'close-button': { 'toast-error': true, 'toast-info': false }
              */
             'close-button': false,
-            'newest-on-top': true, 
-            //'fade-in': 1000,            // done in css
+
+            'newest-on-top': true, //'fade-in': 1000,            // done in css
             //'on-fade-in': undefined,    // not implemented
             //'fade-out': 1000,           // done in css
             //'on-fade-out': undefined,   // not implemented
@@ -55218,7 +55217,7 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
     ).service(
         'toaster', [
             '$rootScope', 'toasterConfig', function ($rootScope, toasterConfig) {
-                this.pop = function (type, title, body, timeout, bodyOutputType, clickHandler, toasterId, showCloseButton, toastId, onHideCallback) {
+                this.pop = function (type, title, body, timeout, bodyOutputType, clickHandler, toasterId, showCloseButton, toastId) {
                     if (angular.isObject(type)) {
                         var params = type; // Enable named parameters as pop argument
                         this.toast = {
@@ -55229,8 +55228,7 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
                             bodyOutputType: params.bodyOutputType,
                             clickHandler: params.clickHandler,
                             showCloseButton: params.showCloseButton,
-                            uid: params.toastId,
-                            onHideCallback: params.onHideCallback
+                            uid: params.toastId
                         };
                         toastId = params.toastId;
                         toasterId = params.toasterId;
@@ -55243,8 +55241,7 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
                             bodyOutputType: bodyOutputType,
                             clickHandler: clickHandler,
                             showCloseButton: showCloseButton,
-                            uid: toastId,
-                            onHideCallback: onHideCallback
+                            uid: toastId
                         };
                     }
                     $rootScope.$emit('toaster-newToast', toasterId, toastId);
@@ -55257,7 +55254,7 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
                 // Create one method per icon class, to allow to call toaster.info() and similar
                 for (var type in toasterConfig['icon-classes']) {
                     this[type] = (function (toasterType) {
-                        return function (title, body, timeout, bodyOutputType, clickHandler, toasterId, showCloseButton, toastId,onHideCallback) {
+                        return function (title, body, timeout, bodyOutputType, clickHandler, toasterId, showCloseButton, toastId) {
                             if (angular.isString(title)) {
                                 this.pop(
                                     toasterType,
@@ -55268,8 +55265,7 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
                                     clickHandler,
                                     toasterId,
                                     showCloseButton,
-                                    toastId,
-                                    onHideCallback
+                                    toastId
                                 );
                             } else { // 'title' is actually an object with options
                                 this.pop(angular.extend(title, { type: toasterType }));
@@ -55492,10 +55488,6 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
                                     $interval.cancel(toast.timeoutPromise);
                                 }
                                 scope.toasters.splice(toastIndex, 1);
-                                
-                                if (angular.isFunction(toast.onHideCallback)) {
-                                    toast.onHideCallback();
-                                }
                             }
                         }
 
@@ -55566,9 +55558,9 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
                                     var removeToast = true;
                                     if (toast.clickHandler) {
                                         if (angular.isFunction(toast.clickHandler)) {
-                                            removeToast = toast.clickHandler(toast, isCloseButton);
+                                            removeToast = toast.clickHandler(toast, true);
                                         } else if (angular.isFunction($scope.$parent.$eval(toast.clickHandler))) {
-                                            removeToast = $scope.$parent.$eval(toast.clickHandler)(toast, isCloseButton);
+                                            removeToast = $scope.$parent.$eval(toast.clickHandler)(toast, toast.showCloseButton);
                                         } else {
                                             console.log("TOAST-NOTE: Your click handler is not inside a parent scope of toaster-container.");
                                         }
@@ -55635,20 +55627,7 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
                 $timeout
             ){
                 function isStorageSupported(storageType) {
-
-                    // Some installations of IE, for an unknown reason, throw "SCRIPT5: Error: Access is denied"
-                    // when accessing window.localStorage. This happens before you try to do anything with it. Catch
-                    // that error and allow execution to continue.
-
-                    // fix 'SecurityError: DOM Exception 18' exception in Desktop Safari, Mobile Safari
-                    // when "Block cookies": "Always block" is turned on
-                    var supported;
-                    try {
-                        supported = $window[storageType];
-                    }
-                    catch (err) {
-                        supported = false;
-                    }
+                    var supported = $window[storageType];
 
                     // When Safari (OS X or iOS) is in private browsing mode, it appears as though localStorage
                     // is available, but trying to call .setItem throws an exception below:
@@ -55680,7 +55659,7 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
                         },
                         $reset: function(items) {
                             for (var k in $storage) {
-                                '$' === k[0] || (delete $storage[k] && webStorage.removeItem('ngStorage-' + k));
+                                '$' === k[0] || delete $storage[k];
                             }
 
                             return $storage.$default(items);
@@ -97641,7 +97620,6 @@ angular.module('ui.tinymce', [])
     uiTinymceConfig = uiTinymceConfig || {};
     var generatedIds = 0;
     var ID_ATTR = 'ui-tinymce';
-
     if (uiTinymceConfig.baseUrl) {
       tinymce.baseURL = uiTinymceConfig.baseUrl;
     }

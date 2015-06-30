@@ -109,13 +109,17 @@ return array(
                         ),
                     ),
                     'media' => array(
-                        'type' => 'Zend\Mvc\Router\Http\Literal',
+                        'type' => 'Zend\Mvc\Router\Http\Segment',
                         'options' => array(
-                            'route' => 'media/',
+                            'route' => 'media/[:referrer/]',
                             'defaults' => array(
                                 'controller' => __NAMESPACE__ . '\Media',
-                                'action' => 'index'
+                                'action' => 'index',
+                                'referrer' => 'index'
                             ),
+                            'constraints' => [
+                                'referrer' => '(index|modal)'
+                            ],
                         ),
                         'may_terminate' => true,
                         'child_routes' => array(

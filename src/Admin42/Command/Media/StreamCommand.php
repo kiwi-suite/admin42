@@ -89,7 +89,7 @@ class StreamCommand extends AbstractCommand
         $headers = new Headers();
         $stream = new Stream();
 
-        if (substr($this->media->getMimeType(), 0, 6) === "image/") {
+        if (substr($this->media->getMimeType(), 0, 6) === "image/" && strlen($this->dimension)) {
             $cmd = $this->getCommand('Admin42\Media\ImageResize');
             $media = $cmd->setMedia($this->media)
                 ->setDimensionName($this->dimension)

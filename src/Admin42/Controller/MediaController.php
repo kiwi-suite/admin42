@@ -13,6 +13,7 @@ use Admin42\Mvc\Controller\AbstractAdminController;
 use Core42\View\Model\JsonModel;
 use Zend\Http\PhpEnvironment\Response;
 use Zend\Json\Json;
+use Zend\View\Model\ViewModel;
 
 class MediaController extends AbstractAdminController
 {
@@ -21,14 +22,20 @@ class MediaController extends AbstractAdminController
      */
     public function indexAction()
     {
-        if ($this->getRequest()->isXmlHttpRequest()) {
+        if ($this->getRequest()->isXmlHttpRequest() && $this->params("referrer") == "index") {
 
             return $this->getSelector('Admin42\SmartTable\Media')->getResult();
         }
 
-        return [
+        $viewModel = new ViewModel([
             'uploadForm' => $this->getForm('Admin42\Media\Upload')
-        ];
+        ]);
+
+        if ($this->params('referrer') === "modal") {
+            $viewModel->setTerminal(true);
+        }
+
+        return $viewModel;
     }
 
     public function editAction()

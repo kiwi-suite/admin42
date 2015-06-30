@@ -11,6 +11,14 @@ return array(
     'button.recover-password'       => 'Recover password',
     'button.lost-password'          => 'Lost password?',
     'button.user-add'               => 'Add user',
+    'button.download'               => 'Download',
+    'button.clear'                  => 'Clear',
+    'button.select'                 => 'Select',
+    'button.remove'                 => 'Remove',
+    'button.upload'                 => 'Upload',
+    'button.upload_all'             => 'Upload All',
+    'button.cancel_all'             => 'Cancel All',
+    'button.remove_all'             => 'Remove All',
 
     'label.profile'                 => 'Profile',
     'label.logout'                  => 'Logout',
@@ -30,6 +38,10 @@ return array(
     'field.last-login'              => 'Last Login',
     'field.created'                 => 'Created',
     'field.role'                    => 'Role',
+    'field.name'                    => 'Name',
+    'field.size'                    => 'Size',
+    'field.progress'                => 'Progress',
+    'field.status'                  => 'Status',
 
     'title.user-manage'             => 'Manage your profile settings',
     'title.users'                   => 'User management',
@@ -42,6 +54,7 @@ return array(
     'search.email'                  => 'Search for Email',
     'search.username'               => 'Search for Username',
     'search.display-name'           => 'Search for Display Name',
+    'search.name'                   => 'Search for Name',
 
     'text.login-description'        => 'Enter username/email and password to continue.',
     'text.lostpw-description'       => 'To reset your password, enter the email address you use to sign in.',
@@ -54,4 +67,8 @@ return array(
     'toaster.user.delete.message.success'   => 'User was deleted successfully',
     'toaster.user.manage.title.success'     => 'Profile saved',
     'toaster.user.manage.message.success'   => 'Profile was saved successfully',
+
+    'start.upload'                  => 'Click here to start an upload',
+    'title.upload'                  => 'Upload',
+    'media.info-dropzone'           => 'Drag your files into this area',
 );
