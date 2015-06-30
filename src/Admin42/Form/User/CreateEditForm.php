@@ -44,10 +44,5 @@ class CreateEditForm extends Form
         $role->setLabel("Role");
         $role->setAttribute("required", "required");
         $this->add($role);
-
-        $fileSelector = $this->getFormFactory()->getFormElementManager()->get('fileSelect');
-        $fileSelector->setName("file");
-        $fileSelector->setLabel("file");
-        $this->add($fileSelector);
     }
 }
