@@ -2,15 +2,15 @@
 /**
  * admin42 (www.raum42.at)
  *
- * @link http://www.raum42.at
+ * @link      http://www.raum42.at
  * @copyright Copyright (c) 2010-2014 raum42 OG (http://www.raum42.at)
  *
  */
 
 namespace Admin42\Form\User;
 
-use Admin42\FormElements\Dynamic;
 use Admin42\FormElements\Role;
+use Admin42\FormElements\Wysiwyg;
 use Zend\Form\Element\Csrf;
 use Zend\Form\Element\Email;
 use Zend\Form\Element\Text;

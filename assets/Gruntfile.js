@@ -47,6 +47,9 @@ module.exports = function(grunt) {
                     '<%= vendor_dir %>/cropper/dist/cropper.js',
                     '<%= vendor_dir %>/ng-cropper/dist/ngCropper.js',
 
+                    '<%= vendor_dir %>/tinymce-dist/tinymce.js',
+                    '<%= vendor_dir %>/angular-ui-tinymce/src/tinymce.js',
+
                     '<%= vendor_dir %>/moment/min/moment-with-locales.js',
                     '<%= vendor_dir %>/moment-timezone/builds/moment-timezone-with-data.js'
                 ],
@@ -57,7 +60,8 @@ module.exports = function(grunt) {
                     'javascripts/*.js',
                     'javascripts/directive/*.js',
                     'javascripts/filter/*.js',
-                    'javascripts/controller/*.js'
+                    'javascripts/controller/*.js',
+                    'javascripts/tinymcePlugins/**/*.js'
                 ],
                 dest: '<%= dist %>/js/admin42.js'
             }
@@ -157,6 +161,29 @@ module.exports = function(grunt) {
                     }
                 ]
             }
+            // wtf does not work if not flattened -> manual copy
+            //tinymce: {
+            //    files: [
+            //        {
+            //            expand: true,
+            //            flatten: false,
+            //            src: '<%= vendor_dir %>/tinymce-dist/plugins/**/*',
+            //            dest: '<%= dist %>/js/tinymce/plugins/.'
+            //        },
+            //        {
+            //            expand: true,
+            //            flatten: false,
+            //            src: '<%= vendor_dir %>/tinymce-dist/skins/**',
+            //            dest: '<%= dist %>/js/tinymce/skins/'
+            //        },
+            //        {
+            //            cdw: '<%= vendor_dir %>/tinymce-dist/',
+            //            src: ['**/*'],
+            //            dest: '<%= dist %>/js/tinymce/',
+            //            expand: true
+            //        }
+            //    ]
+            //}
         },
 
         clean: {

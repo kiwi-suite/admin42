@@ -7,16 +7,18 @@ angular.module('admin42').controller('AppController',['$scope', 'toaster', '$tim
 
     $scope.app.appContentFull = false;
 
-    $timeout(function(){
-        angular.forEach(FLASH_MESSAGE, function(messages, namespace){
-            if (messages.length == 0) {
-                return;
-            }
+    if(typeof FLASH_MESSAGE !== 'undefined') {
+        $timeout(function(){
+            angular.forEach(FLASH_MESSAGE, function(messages, namespace){
+                if (messages.length == 0) {
+                    return;
+                }
 
-            angular.forEach(messages, function(message){
-                toaster.pop(namespace, message.title, message.message);
+                angular.forEach(messages, function(message){
+                    toaster.pop(namespace, message.title, message.message);
+                });
             });
-        });
-    }, 1000);
+        }, 1000);
+    }
 
 }]);

@@ -157,6 +157,17 @@ return array(
                             ),
                         ),
                     ),
+                    'file-dialog' => array(
+                        'type' => 'Zend\Mvc\Router\Http\Literal',
+                        'options' => array(
+                            'route' => 'file-dialog/',
+                            'defaults' => array(
+                                'controller' => __NAMESPACE__ . '\FileDialog',
+                                'action' => 'fileDialog'
+                            ),
+                        ),
+                        'may_terminate' => true,
+                    ),
                     'api' => array(
                         'type' => 'Zend\Mvc\Router\Http\Literal',
                         'options' => array(

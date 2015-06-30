@@ -58,6 +58,7 @@ return [
                 'formurl'                 => 'Admin42\View\Helper\Form\FormUrl',
                 'formweek'                => 'Admin42\View\Helper\Form\FormWeek',
                 'formfileselect'          => 'Admin42\View\Helper\Form\FileSelect',
+                'formwysiwyg'             => 'Admin42\View\Helper\Form\FormWysiwyg',
             ],
             'factories' => [
                 'admin'                 => 'Admin42\View\Helper\Service\AdminFactory',

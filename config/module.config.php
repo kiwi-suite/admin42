@@ -10,6 +10,7 @@ return array(
         'template_map'              => array(
             'admin/layout/layout'       => __DIR__ . '/../view/layout/layout.phtml',
             'admin/layout/layout-min'   => __DIR__ . '/../view/layout/layout-min.phtml',
+            'admin/layout/dialog'       => __DIR__ . '/../view/layout/dialog.phtml',
             'admin/error/404'           => __DIR__ . '/../view/error/404.phtml',
             'admin/error/index'         => __DIR__ . '/../view/error/index.phtml',
         ),
