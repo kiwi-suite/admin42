@@ -44,7 +44,9 @@ return array(
 
     'form_elements' => array(
         'invokables' => [
-            'fileSelect' => 'Admin42\FormElements\FileSelect'
+            'fileSelect' => 'Admin42\FormElements\FileSelect',
+            'datetime'   => 'Admin42\FormElements\DateTime',
+            'wysiwyg'    => 'Admin42\FormElements\Wysiwyg',
         ],
         'factories' => array(
             'role'      => 'Admin42\FormElements\Service\RoleFactory',

@@ -7,7 +7,9 @@ angular.module('admin42')
                 adminDynamicFormElements: '@',
                 adminDynamicPrototypes: '@'
             },
-            templateUrl: 'dynamic_form/base.html',
+            templateUrl: function(elem,attrs){
+                return attrs.baseForm;
+            },
             controller: ['$scope', function($scope) {
                 $scope.data = {};
                 $scope.elements = angular.fromJson($scope.adminDynamicFormElements);
@@ -16,7 +18,7 @@ angular.module('admin42')
                 $scope.data.selectedPrototype = $scope.prototypes[0];
 
                 $scope.addTemplate = function() {
-                    $scope.elements.push($scope.data.selectedPrototype);
+                    $scope.elements.push(angular.copy($scope.data.selectedPrototype));
                 };
 
                 $scope.sortableOptions = {

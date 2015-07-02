@@ -19,6 +19,4 @@ angular.module('admin42')
             timeText: 'Time',
             startingDay: 1
         };
-
-        console.log($scope);
 }]);

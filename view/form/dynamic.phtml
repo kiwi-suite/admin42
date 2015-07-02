@@ -1,4 +1,7 @@
-<script type="text/ng-template" id="dynamic_form/base.html">
+<?php
+$baseForm = uniqid('dynamic_form/base') . '.html';
+?>
+<script type="text/ng-template" id="<?= $baseForm ?>">
     <fieldset>
         <legend><?= $this->element->getLabel() ?></legend>
         <div ui-sortable="sortableOptions" ng-model="elements">
@@ -88,4 +91,4 @@ $prototypesElements = [];
     </script>
 <?php endforeach; ?>
 
-<div admin-dynamic-form admin-dynamic-form-elements='<?= json_encode($preparedFormElements)?>' admin-dynamic-prototypes='<?= json_encode($prototypesElements)?>'></div>
+<div base-form="<?= $baseForm ?>" admin-dynamic-form admin-dynamic-form-elements='<?= json_encode($preparedFormElements)?>' admin-dynamic-prototypes='<?= json_encode($prototypesElements)?>'></div>

@@ -97765,6 +97765,15 @@ angular.module('ui.tinymce', [])
           }
         });
 
+          scope.$on('$tinymce:redraw', function(e, id) {
+              ensureInstance();
+              if (tinyInstance) {
+                  $timeout(function () {
+                      tinyInstance.init(options);
+                  });
+              }
+          });
+
         scope.$on('$destroy', function() {
           ensureInstance();
 

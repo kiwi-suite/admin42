@@ -3,7 +3,6 @@ $modalTemplate = uniqid('mediaModalSelectorContent') . '.html';
 $jsonDataId = uniqid('form/mediaselect/') . '.json';
 
 $media = [];
-$media = $this->media(1)->toArray();
 if ($this->element->getValue() > 0) {
     $media = $this->media($this->element->getValue())->toArray();
 }

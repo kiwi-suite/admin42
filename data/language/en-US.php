@@ -19,6 +19,7 @@ return array(
     'button.upload_all'             => 'Upload All',
     'button.cancel_all'             => 'Cancel All',
     'button.remove_all'             => 'Remove All',
+    'button.add'                    => 'Add',
 
     'label.profile'                 => 'Profile',
     'label.logout'                  => 'Logout',
@@ -27,6 +28,8 @@ return array(
     'label.user-add'                => 'Add User',
     'label.user-edit'               => 'Edit User',
     'label.media'                   => 'Media',
+    'label.title'                   => 'Title',
+    'label.description'             => 'Description',
 
     'field.id'                      => '#ID',
     'field.username'                => 'Username',

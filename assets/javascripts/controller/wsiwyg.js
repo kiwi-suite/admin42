@@ -1,9 +1,10 @@
 angular.module('admin42')
-    .controller('WysiwygController', function ($scope, $attrs) {
-
+    .controller('WysiwygController', function ($scope, $attrs, $rootScope) {
         if ($attrs.ngBaseUrl) {
             tinymce.baseURL = $attrs.ngBaseUrl;
         }
+
+        $rootScope.$on('$includeContentLoaded', function(event) {});
 
         $scope.tinymceOptionsFull = {
 
@@ -11,11 +12,11 @@ angular.module('admin42')
             trusted: true,
             format: 'raw',
 
-            content_css: $attrs.ngContentCss,
+            //content_css: $attrs.ngContentCss,
             file_browser_callback: fileBrowser,
 
             // == http://www.tinymce.com/wiki.php/Plugins
-            plugins: 'paste advlist autolink lists charmap print preview link image ' +
+            plugins: 'paste advlist autolink lists charmap print preview ' +
                 //'media link42 image42 ' +
             '',
 
@@ -38,7 +39,7 @@ angular.module('admin42')
 
             // == http://www.tinymce.com/wiki.php/Controls
             toolbar: 'undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | ' +
-            'bullist numlist outdent indent | removeformat | link image media ' +
+            'bullist numlist outdent indent | removeformat ' +
                 //"link42 image42 | " +
             '',
 

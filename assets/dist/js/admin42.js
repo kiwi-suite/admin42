@@ -25,7 +25,9 @@ angular.module('admin42').config(['$httpProvider', function($httpProvider) {
                 adminDynamicFormElements: '@',
                 adminDynamicPrototypes: '@'
             },
-            templateUrl: 'dynamic_form/base.html',
+            templateUrl: function(elem,attrs){
+                return attrs.baseForm;
+            },
             controller: ['$scope', function($scope) {
                 $scope.data = {};
                 $scope.elements = angular.fromJson($scope.adminDynamicFormElements);
@@ -34,7 +36,7 @@ angular.module('admin42').config(['$httpProvider', function($httpProvider) {
                 $scope.data.selectedPrototype = $scope.prototypes[0];
 
                 $scope.addTemplate = function() {
-                    $scope.elements.push($scope.data.selectedPrototype);
+                    $scope.elements.push(angular.copy($scope.data.selectedPrototype));
                 };
 
                 $scope.sortableOptions = {
@@ -493,8 +495,6 @@ angular.module('admin42')
             timeText: 'Time',
             startingDay: 1
         };
-
-        console.log($scope);
 }]);
 ;angular.module('admin42')
     .controller('FileSelectorController', ['$scope', '$attrs', 'jsonCache', '$modal', function ($scope, $attrs, jsonCache, $modal) {
@@ -660,11 +660,12 @@ angular.module('admin42')
         }
     }]);
 ;angular.module('admin42')
-    .controller('WysiwygController', function ($scope, $attrs) {
-
+    .controller('WysiwygController', function ($scope, $attrs, $rootScope) {
         if ($attrs.ngBaseUrl) {
             tinymce.baseURL = $attrs.ngBaseUrl;
         }
+
+        $rootScope.$on('$includeContentLoaded', function(event) {});
 
         $scope.tinymceOptionsFull = {
 
@@ -672,11 +673,11 @@ angular.module('admin42')
             trusted: true,
             format: 'raw',
 
-            content_css: $attrs.ngContentCss,
+            //content_css: $attrs.ngContentCss,
             file_browser_callback: fileBrowser,
 
             // == http://www.tinymce.com/wiki.php/Plugins
-            plugins: 'paste advlist autolink lists charmap print preview link image ' +
+            plugins: 'paste advlist autolink lists charmap print preview ' +
                 //'media link42 image42 ' +
             '',
 
@@ -699,7 +700,7 @@ angular.module('admin42')
 
             // == http://www.tinymce.com/wiki.php/Controls
             toolbar: 'undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | ' +
-            'bullist numlist outdent indent | removeformat | link image media ' +
+            'bullist numlist outdent indent | removeformat ' +
                 //"link42 image42 | " +
             '',
 
