@@ -8,13 +8,16 @@ class Migration20150612090154
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `directory` varchar(255) NOT NULL,
   `filename` varchar(255) NOT NULL,
+  `title` varchar(45) DEFAULT NULL,
+  `description` varchar(255) DEFAULT NULL,
+  `keywords` varchar(1000) DEFAULT NULL,
   `mimeType` varchar(255) NOT NULL,
   `size` int(10) unsigned NOT NULL,
+  `meta` longtext,
   `updated` datetime NOT NULL,
   `created` datetime NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-";
+) ENGINE=InnoDB DEFAULT CHARSET=utf8";
         $serviceManager->get('Db\Master')->query($sql, \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
     }
 
