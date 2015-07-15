@@ -2,7 +2,9 @@
 namespace Admin42\Selector\SmartTable;
 
 use Core42\Db\ResultSet\ResultSet;
+use Zend\Db\Sql\Predicate\PredicateSet;
 use Zend\Db\Sql\Select;
+use Zend\Db\Sql\Where;
 
 class UserSelector extends AbstractSmartTableSelector
 {
@@ -38,6 +40,20 @@ class UserSelector extends AbstractSmartTableSelector
             'lastLogin' => 'Mysql/Datetime',
             'created' => 'Mysql/Datetime',
         ];
+    }
+
+    protected function getWhere()
+    {
+        $where = parent::getWhere();
+
+        $excludeDeleted = new Where();
+        $excludeDeleted->notIn('status', ['inactive']);
+
+        if (empty($where)) {
+            return $excludeDeleted;
+        }
+
+        return new PredicateSet([$where, $excludeDeleted], PredicateSet::COMBINED_BY_AND);
     }
 
     /**
