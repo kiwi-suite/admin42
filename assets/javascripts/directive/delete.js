@@ -3,7 +3,9 @@ angular.module('admin42')
         return {
             restrict: 'E',
             templateUrl: 'element/delete.html',
-            scope: true,
+            scope: {
+                callback: "="
+            },
             controller: ['$scope', '$attrs', '$modal', '$window', '$parse', function($scope, $attrs, $modal, $window, $parse) {
                 if (angular.isUndefined($attrs.size)) {
                     $scope.size = "lg";
@@ -64,9 +66,8 @@ angular.module('admin42')
                             return;
                         }
 
-                        if (angular.isDefined($attrs.callback)) {
-                            var callback = $parse($attrs.callback);
-                            callback();
+                        if (angular.isDefined($scope.callback)) {
+                            $scope.callback();
                         }
                     }, function () {
 
@@ -89,8 +90,6 @@ angular.module('admin42')
             function ($scope, $modalInstance, $http, requestUrl, requestParams, requestTitle, requestContent, requestMethod) {
                 $scope.title = requestTitle;
                 $scope.content = requestContent;
-
-                console.log(requestParams);
 
                 $scope.ok = function () {
                     $http({
