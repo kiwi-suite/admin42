@@ -116,10 +116,15 @@ class UserController extends AbstractAdminController
                 'title' => 'toaster.user.delete.title.success',
                 'message' => 'toaster.user.delete.message.success',
             ]);
-            return $this->redirect()->toRoute('admin/user');
+
+            return new JsonModel([
+               'redirect' => $this->url()->fromRoute('admin/user')
+            ]);
         }
 
-        return $this->redirect()->toRoute('admin/user');
+        return new JsonModel([
+            'redirect' => $this->url()->fromRoute('admin/user')
+        ]);
     }
 
     /**

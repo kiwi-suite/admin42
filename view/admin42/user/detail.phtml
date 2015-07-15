@@ -22,14 +22,13 @@
                         </button>
 
                         <?php if($this->params()->fromRoute('isEditMode') == true): ?>
-                        <button
-                            type="button"
-                            class="btn btn-danger dynamic-form-submit"
-                            data-action="<?= $this->url('admin/user/delete')?>"
-                            data-form-id="<?= $this->params()->fromRoute('id') ?>">
-                            <span class="fa fa-trash-o"></span>
-                            <?= $this->translate('button.delete', 'admin') ?>
-                        </button>
+                            <delete
+                                url="<?= $this->url('admin/user/delete') ?>"
+                                title="<?= $this->translate("user.modal.delete.title", "admin") ?>"
+                                content="<?= $this->translate("user.modal.delete.content", "admin") ?>"
+                                request-id="<?= $this->params()->fromRoute("id") ?>"
+                                >
+                            </delete>
                         <?php endif; ?>
                     </div>
                 </div>

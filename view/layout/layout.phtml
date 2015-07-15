@@ -14,6 +14,8 @@
 
         <?= $this->admin()->flashMessenger() ?>
     </script>
+
+    <?= $this->partial('partial/admin42/delete-template') ?>
 </head>
 
 <body ng-controller="AppController" ng-cloak>
@@ -38,6 +40,7 @@
 </div>
 
 <?= $this->admin()->getJsonTemplates() ?>
+
 </body>
 
 </html>
