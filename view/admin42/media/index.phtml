@@ -16,7 +16,7 @@
             <div class="row">
                 <div class="col-sm-12 col-xs-12 col-md-3">
                     <div class="m-b-md">
-                        <div class="b-a b-2x b-dashed wrapper-lg bg-white text-center m-b" nv-file-over="" over-class="b-info" uploader="uploader">
+                        <div class="b-a b-2x b-dashed wrapper-lg bg-white text-center m-b" nv-file-drop uploader="uploader">
                             <?= $this->translate('media.info-dropzone', 'admin')?>
                         </div>
                     </div>
@@ -112,7 +112,7 @@
                                         </div>
                                     </a>
                                 </div>
-                                <div>
+                                <div style="max-height: 40px; height: 40px; overflow: hidden;">
                                     <?php if ($this->params()->fromRoute('referrer') == "index"): ?>
                                     <a href="<?= $this->url('admin/media/edit', ['id' => '{{row.id}}'])?>">
                                     <?php else: ?>
