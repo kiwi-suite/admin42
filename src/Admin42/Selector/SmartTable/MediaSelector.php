@@ -23,6 +23,8 @@ class MediaSelector extends AbstractSmartTableSelector
         $order = $this->getOrder();
         if (!empty($order)) {
             $select->order($order);
+        } else {
+            $select->order('created DESC');
         }
 
         return $select;
