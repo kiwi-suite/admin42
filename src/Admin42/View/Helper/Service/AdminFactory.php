@@ -25,7 +25,8 @@ class AdminFactory implements FactoryInterface
     public function createService(ServiceLocatorInterface $serviceLocator)
     {
         $config = $serviceLocator->getServiceLocator()->get('Config');
+        $userTableGateway = $serviceLocator->getServiceLocator()->get('TableGateway')->get('Admin42\User');
 
-        return new Admin($config['admin']);
+        return new Admin($config['admin'], $userTableGateway);
     }
 }
