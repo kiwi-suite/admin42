@@ -9,9 +9,6 @@
 
 namespace Admin42\FormElements;
 
-use Zend\Form\Element\Hidden;
-use Zend\Form\Element\Text;
-use Zend\Form\Element\Textarea;
 use Zend\Form\ElementInterface;
 use Zend\Form\ElementPrepareAwareInterface;
 use Zend\Form\Exception\InvalidArgumentException;
@@ -25,7 +22,12 @@ class Dynamic extends Fieldset
     /**
      * @var string
      */
-    protected $templatePlaceholder = '{{ $index }}';
+    protected $templatePlaceholder = '{{ element.internIndex }}';
+
+    /**
+     * @var string
+     */
+    protected $templatePlaceholderName = "";
 
     /**
      * @var array
@@ -197,6 +199,7 @@ class Dynamic extends Fieldset
 
         $elementOrFieldset = clone ($this->targetElements[$name]);
         $elementOrFieldset->setName($formName);
+        $elementOrFieldset->setOption("intern_index", $formName);
 
         $this->add($elementOrFieldset);
 
@@ -227,19 +230,6 @@ class Dynamic extends Fieldset
         }
 
         $elementOrFieldset->setOption('dynamic_type', $name);
-
-        $hidden = new Hidden("dynamic_index");
-        $hidden->setValue($this->templatePlaceholder);
-        $elementOrFieldset->add($hidden);
-
-        $hidden = new Hidden("dynamic_deleted");
-        $hidden->setAttribute("data-ng-model", "element.deleted");
-        $elementOrFieldset->add($hidden);
-
-        $hidden = new Hidden("dynamic_type");
-        $hidden->setValue($name);
-        $hidden->setAttribute("data-ng-model", "element.type");
-        $elementOrFieldset->add($hidden);
 
         $this->targetElements[$name] = $elementOrFieldset;
     }
