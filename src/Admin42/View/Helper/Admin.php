@@ -27,6 +27,11 @@ class Admin extends AbstractHelper
     private $jsonTemplates = [];
 
     /**
+     * @var array
+     */
+    private $htmlTemplates = [];
+
+    /**
      * @param array $config
      */
     public function __construct(array $config)
@@ -156,6 +161,32 @@ class Admin extends AbstractHelper
 
         foreach ($this->jsonTemplates as $id => $value) {
             $templates[] = sprintf('<script id="%s" type="application/json">%s</script>', $id, json_encode($value));
+        }
+
+        return implode(PHP_EOL, $templates);
+    }
+
+    /**
+     * @param string $id
+     * @param string $html
+     * @return $this
+     */
+    public function addHtmlTemplate($id, $html)
+    {
+        $this->htmlTemplates[$id] = $html;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getHtmlTemplates()
+    {
+        $templates = [];
+
+        foreach ($this->htmlTemplates as $id => $html) {
+            $templates[] = sprintf('<script id="%s" type="text/ng-template">%s</script>', $id, $html);
         }
 
         return implode(PHP_EOL, $templates);

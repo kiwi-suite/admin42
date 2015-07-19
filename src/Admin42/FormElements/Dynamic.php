@@ -9,6 +9,7 @@
 
 namespace Admin42\FormElements;
 
+use Zend\Form\Element\Hidden;
 use Zend\Form\Element\Text;
 use Zend\Form\Element\Textarea;
 use Zend\Form\ElementInterface;
@@ -216,16 +217,29 @@ class Dynamic extends Fieldset
             $elementOrFieldset = $factory->create($elementOrFieldset);
         }
 
-        if (!$elementOrFieldset instanceof ElementInterface) {
+        if (!$elementOrFieldset instanceof FieldsetInterface) {
             throw new InvalidArgumentException(sprintf(
                 '%s requires that $elementOrFieldset be an object implementing %s; received "%s"',
                 __METHOD__,
-                __NAMESPACE__ . '\ElementInterface',
+                __NAMESPACE__ . '\FieldsetInterface',
                 (is_object($elementOrFieldset) ? get_class($elementOrFieldset) : gettype($elementOrFieldset))
             ));
         }
 
         $elementOrFieldset->setOption('dynamic_type', $name);
+
+        $hidden = new Hidden("dynamic_index");
+        $hidden->setValue($this->templatePlaceholder);
+        $elementOrFieldset->add($hidden);
+
+        $hidden = new Hidden("dynamic_deleted");
+        $hidden->setAttribute("data-ng-model", "element.deleted");
+        $elementOrFieldset->add($hidden);
+
+        $hidden = new Hidden("dynamic_type");
+        $hidden->setValue($name);
+        $hidden->setAttribute("data-ng-model", "element.type");
+        $elementOrFieldset->add($hidden);
 
         $this->targetElements[$name] = $elementOrFieldset;
     }

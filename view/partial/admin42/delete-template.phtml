@@ -1,29 +1,33 @@
-<script id="element/delete.html" type="text/ng-template">
-    <button ng-if="size == 'lg'" class="btn btn-danger" type="button" ng-click="delete()">
-        <i class="fa fa-trash-o"></i>
-        <?= $this->translate('button.delete', 'admin')?>
-    </button>
-    <button ng-if="size == 'sm'" class="btn btn-sm btn-danger" type="button" ng-click="delete()">
-        <i class="fa fa-trash-o"></i>
-        <?= $this->translate('button.delete', 'admin')?>
-    </button>
-    <button ng-if="size == 'xs'" class="btn btn-sm btn-danger" type="button" ng-click="delete()">
-        <i class="fa fa-trash-o"></i>
-    </button>
-</script>
+<?php
+$deleteContent = <<<EOT
+<button ng-if="size == 'lg'" class="btn btn-danger" type="button" ng-click="delete()">
+    <i class="fa fa-trash-o"></i>
+    {$this->translate('button.delete', 'admin')}
+</button>
+<button ng-if="size == 'sm'" class="btn btn-sm btn-danger" type="button" ng-click="delete()">
+    <i class="fa fa-trash-o"></i>
+    {$this->translate('button.delete', 'admin')}
+</button>
+<button ng-if="size == 'xs'" class="btn btn-sm btn-danger" type="button" ng-click="delete()">
+    <i class="fa fa-trash-o"></i>
+</button>
+EOT;
+$this->admin()->addHtmlTemplate("element/delete.html", $deleteContent);
 
-<script id="element/delete-modal.html" type="text/ng-template">
-    <div class="modal-header">
-        <h3 class="modal-title">{{ title }}</h3>
-    </div>
-    <div class="modal-body">
-        {{ content }}
-    </div>
-    <div class="modal-footer">
-        <button class="btn btn-danger" ng-click="ok()">
-            <span class="fa fa-trash-o"></span>
-            <?= $this->translate('button.delete', 'admin') ?>
-        </button>
-        <button class="btn btn-default" ng-click="cancel()"><?= $this->translate('button.cancel', 'admin') ?></button>
-    </div>
-</script>
+
+$deleteContent = <<<EOT
+<div class="modal-header">
+    <h3 class="modal-title">{{ title }}</h3>
+</div>
+<div class="modal-body">
+    {{ content }}
+</div>
+<div class="modal-footer">
+    <button class="btn btn-danger" ng-click="ok()">
+        <span class="fa fa-trash-o"></span>
+        {$this->translate('button.delete', 'admin')}
+    </button>
+    <button class="btn btn-default" ng-click="cancel()">{$this->translate('button.cancel', 'admin')}</button>
+</div>
+EOT;
+$this->admin()->addHtmlTemplate("element/delete-modal.html", $deleteContent);

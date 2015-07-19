@@ -10,10 +10,10 @@ angular.module('admin42')
             templateUrl: function(elem,attrs){
                 return attrs.baseForm;
             },
-            controller: ['$scope', function($scope) {
+            controller: ['$scope', 'jsonCache', function($scope, jsonCache) {
                 $scope.data = {};
-                $scope.elements = angular.fromJson($scope.adminDynamicFormElements);
-                $scope.prototypes = angular.fromJson($scope.adminDynamicPrototypes);
+                $scope.elements = jsonCache.get($scope.adminDynamicFormElements);
+                $scope.prototypes = jsonCache.get($scope.adminDynamicPrototypes);
 
                 $scope.data.selectedPrototype = $scope.prototypes[0];
 
