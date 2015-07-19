@@ -199,7 +199,7 @@ class Dynamic extends Fieldset
 
         $elementOrFieldset = clone ($this->targetElements[$name]);
         $elementOrFieldset->setName($formName);
-        $elementOrFieldset->setOption("intern_index", $formName);
+        $elementOrFieldset->setOption("internIndex", $formName);
 
         $this->add($elementOrFieldset);
 
