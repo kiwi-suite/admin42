@@ -10,6 +10,7 @@
 namespace Admin42\View\Helper;
 
 use Admin42\Model\User;
+use Admin42\TableGateway\UserTableGateway;
 use Zend\I18n\View\Helper\Translate;
 use Zend\Mvc\Controller\Plugin\FlashMessenger;
 use Zend\View\Helper\AbstractHelper;
@@ -32,11 +33,22 @@ class Admin extends AbstractHelper
     private $htmlTemplates = [];
 
     /**
+     * @var UserTableGateway
+     */
+    private $userTableGateway;
+
+    /**
+     * @var array
+     */
+    private $userCache = [];
+
+    /**
      * @param array $config
      */
-    public function __construct(array $config)
+    public function __construct(array $config, UserTableGateway $userTableGateway)
     {
         $this->config = $config;
+        $this->userTableGateway = $userTableGateway;
     }
 
     /**
@@ -54,6 +66,26 @@ class Admin extends AbstractHelper
         }
 
         return $displayName;
+    }
+
+    /**
+     * @param int $userId
+     * @return string
+     * @throws \Exception
+     */
+    public function getUserDisplayNameById($userId)
+    {
+        if (array_key_exists($userId, $this->userCache)) {
+            return $this->userCache[$userId];
+        }
+
+        $user = $this->userTableGateway->selectByPrimary($userId);
+        if ($user !== null) {
+            $this->userCache[$userId] = $this->getUserDisplayName($user);
+            return $this->userCache[$userId];
+        }
+
+        return '';
     }
 
     /**
