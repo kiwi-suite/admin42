@@ -4,8 +4,6 @@ angular.module('admin42')
             tinymce.baseURL = $attrs.ngBaseUrl;
         }
 
-        $rootScope.$on('$includeContentLoaded', function(event) {});
-
         $scope.tinymceOptionsFull = {
 
             // ui-tinymce specific options to avoid $sce strict sanitization (trusted, format)
