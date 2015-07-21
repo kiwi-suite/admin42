@@ -198,7 +198,7 @@ class ImageCropCommand extends AbstractCommand
 
 
         $meta = $this->media->getMeta();
-        $meta = (strlen($meta)) ? Json::decode($meta) : [];
+        $meta = (strlen($meta)) ? Json::decode($meta, true) : [];
         $meta[$this->dimensionName] = [
             'x' => $this->offsetX,
             'y' => $this->offsetY,
