@@ -20,10 +20,8 @@ $name = uniqid('wysiwyg_');
         <?= $this->formWysiwyg(
             $this->element->setAttributes(
                 [
-                    'class'                  => 'form-control',
-                    'data-ng-model'          => $name,
-                    'data-ng-initial'        => '',
-                    'data-ui-tinymce'        => 'tinymceOptionsFull'
+                    'class'              => 'form-control',
+                    'data-tiny-wysiwyg'  => 'tinymceOptionsFull'
                 ]
             )
         ) ?>
