@@ -15,7 +15,7 @@ angular.module('admin42')
             menubar: false,
             // == http://www.tinymce.com/wiki.php/Controls
             toolbar: 'undo redo paste | styleselect | bold italic | alignleft aligncenter alignright alignjustify | ' +
-            'bullist numlist outdent indent | removeformat | table | ' +
+            'bullist numlist outdent indent | removeformat | table code | ' +
                 //"link42 image42 | " +
             '',
             skin: 'lightgray',
