@@ -8,7 +8,7 @@ angular.module('admin42')
             trusted: true,
             format: 'raw',
             file_browser_callback: fileBrowser,
-            plugins: 'paste advlist autolink lists charmap table' +
+            plugins: 'paste advlist autolink lists charmap table code' +
                 //'media link42 image42 ' +
             '',
             image_advtab: true,
