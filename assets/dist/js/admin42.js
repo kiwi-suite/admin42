@@ -9,8 +9,7 @@ angular.module('admin42', [
     'ngStorage',
     'ui.sortable',
     'ui.select',
-    'angularFileUpload',
-    'ui.tinymce'
+    'angularFileUpload'
 ]);
 
 angular.module('admin42').config(['$httpProvider', function($httpProvider) {
@@ -154,7 +153,9 @@ angular.module('admin42')
                 $scope.data.selectedPrototype = $scope.prototypes[0];
 
                 $scope.addTemplate = function() {
-                    $scope.elements.push(angular.copy($scope.data.selectedPrototype));
+                    var element = angular.copy($scope.data.selectedPrototype);
+                    element.internIndex = $scope.elements.length;
+                    $scope.elements.push(element);
                 };
 
                 $scope.sortableOptions = {
@@ -162,19 +163,39 @@ angular.module('admin42')
                     opacity: 0.5,
                     handle: '.panel-sort-handle',
                     items: "> .sortable-container",
-                    placeholder: "sortable-placeholder"
+                    placeholder: "sortable-placeholder",
+                    start: function() {
+                        $scope.$broadcast('$tinyWysiwyg:disable');
+                        $scope.$emit('$tinyWysiwyg:disable');
+                    },
+                    stop: function(event, ui) {
+                        $scope.$broadcast('$tinyWysiwyg:enable');
+                        $scope.$emit('$tinyWysiwyg:enable');
+                    }
                 };
 
-                $scope.getName = function(element, name, index) {
-                    if (element.initial === false) {
-                        return element.name + '[' + index +'][' + name + ']';
-                    }
-                    return element.name + '[' + name + ']';
-                }
             }]
         };
     }]);
-;angular.module('admin42')
+;angular.module('admin42').directive('dynamicModel', ['$compile', function ($compile) {
+    return {
+        'link': function(scope, element, attrs) {
+            scope.$watch(attrs.dynamicModel, function(dynamicModel) {
+                if (attrs.ngModel == dynamicModel || !dynamicModel) return;
+
+                element.attr('ng-model', dynamicModel);
+                if (dynamicModel == '') {
+                    element.removeAttr('ng-model');
+                }
+
+                // Unbind all previous event handlers, this is 
+                // necessary to remove previously linked models.
+                element.unbind();
+                $compile(element)(scope);
+            });
+        }
+    };
+}]);;angular.module('admin42')
     .directive('uiFullscreen', ['$document', function($document) {
         return {
             restrict: 'AC',
@@ -358,6 +379,40 @@ angular.module('smart-table')
                 });
             }
         };
+    }]);
+;angular.module('admin42')
+    .directive('tinyWysiwyg', ['$timeout', '$window', function ($timeout, $window) {
+        var editorCounter = 0;
+        var idPrefix = 'tiny-wysiwyg';
+
+        return {
+            link: function(scope, element, attrs, ctrls) {
+                var tinyInstance;
+
+                attrs.$set('id', idPrefix + '-' + editorCounter++);
+
+                var expression = {};
+                angular.extend(expression, scope.$eval(attrs.tinyWysiwyg));
+                var options = {
+                    format: 'raw',
+                    selector: '#' + attrs.id
+                };
+                angular.extend(options, expression);
+
+                $timeout(function() {
+                    tinymce.init(options);
+                    tinyInstance = tinymce.get(attrs.id);
+                });
+
+                scope.$on('$tinyWysiwyg:disable', function() {
+                    tinymce.execCommand('mceRemoveEditor', false, attrs.id);
+                });
+
+                scope.$on('$tinyWysiwyg:enable', function() {
+                    tinymce.execCommand('mceAddEditor', false, attrs.id);
+                });
+            }
+        }
     }]);
 ;angular.module('admin42')
     .filter('datetime', function(appConfig) {
@@ -783,47 +838,24 @@ angular.module('admin42')
             tinymce.baseURL = $attrs.ngBaseUrl;
         }
 
-        $rootScope.$on('$includeContentLoaded', function(event) {});
-
         $scope.tinymceOptionsFull = {
-
-            // ui-tinymce specific options to avoid $sce strict sanitization (trusted, format)
             trusted: true,
             format: 'raw',
-
-            //content_css: $attrs.ngContentCss,
             file_browser_callback: fileBrowser,
-
-            // == http://www.tinymce.com/wiki.php/Plugins
-            plugins: 'paste advlist autolink lists charmap print preview ' +
+            plugins: 'paste advlist autolink lists charmap table code' +
                 //'media link42 image42 ' +
             '',
-
-            // == plugins settings
             image_advtab: true,
-            // prefill a link list
-            //link_list: [
-            //    {title: 'My page 1', value: 'http://www.tinymce.com'},
-            //    {title: 'My page 2', value: 'http://www.moxiecode.com'}
-            //],
-            // classes for links
-            //link_class_list: [
-            //    {title: 'None', value: ''},
-            //    {title: 'Dog', value: 'dog'},
-            //    {title: 'Cat', value: 'cat'}
-            //],
-
-            // == http://www.tinymce.com/wiki.php/Configuration:menu
             menubar: false,
-
             // == http://www.tinymce.com/wiki.php/Controls
-            toolbar: 'undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | ' +
-            'bullist numlist outdent indent | removeformat ' +
+            toolbar: 'undo redo paste | styleselect | bold italic | alignleft aligncenter alignright alignjustify | ' +
+            'bullist numlist outdent indent | removeformat | table code | ' +
                 //"link42 image42 | " +
             '',
-
             skin: 'lightgray',
-            theme: 'modern'
+            theme: 'modern',
+            elementpath: false,
+            resize: true
         };
 
         // == http://www.tinymce.com/wiki.php/TinyMCE3x:How-to_implement_a_custom_file_browser

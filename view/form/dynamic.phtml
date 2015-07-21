@@ -1,7 +1,6 @@
 <?php
 $baseFormName = uniqid('dynamic_form/base') . '.html';
 $baseFormContent = <<<EOT
-<fieldset>
     <legend>{$this->element->getLabel()}</legend>
     <div ui-sortable="sortableOptions" ng-model="elements">
         <div class="sortable-container" ng-repeat="element in elements track by \$index">
@@ -27,6 +26,9 @@ $baseFormContent = <<<EOT
                     </div>
                 </div>
                 <div collapse="element.collapsed" class="panel-body">
+                    <input type="hidden" name="{$this->element->getName()}[{{ element.internIndex }}][dynamic_index]" value="{{ \$index }}">
+                    <input type="hidden" name="{$this->element->getName()}[{{ element.internIndex }}][dynamic_deleted]" ng-model="element.deleted" value="{{ element.deleted }}">
+                    <input type="hidden" name="{$this->element->getName()}[{{ element.internIndex }}][dynamic_type]" ng-model="element.type" value="{{ element.type }}">
                     <ng-include src="element.templateName"></ng-include>
                 </div>
             </div>
@@ -65,6 +67,7 @@ $prototypesElements = [];
         'type' => $element['element']->getOption('dynamic_type'),
         'name' => $element['element']->getName(),
         'initial' => true,
+        'internIndex' => $element['element']->getOption('internIndex'),
     ];
     ?>
 
@@ -80,8 +83,9 @@ $prototypesElements = [];
         'templateName' => $prototypeFormElementTemplateName,
         'label' => $element['element']->getLabel(),
         'type' => $element['element']->getOption('dynamic_type'),
-        'name' => $element['element']->getName(), //remove templatePlaceholder from Name
+        'name' => $element['element']->getName(),
         'initial' => false,
+        'internIndex' => 0,
     ];
     ?>
 

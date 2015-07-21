@@ -59,5 +59,16 @@ class UploadCommand extends AbstractCommand
             ->setCreated($dateTime);
 
         $this->getTableGateway('Admin42\Media')->insert($media);
+
+        if (substr($media->getMimeType(), 0, 6) == "image/") {
+            $mediaOptions = $this->getServiceManager()->get('Admin42\MediaOptions');
+
+            foreach(array_keys($mediaOptions->getDimensions()) as $dimension) {
+                $cmd = $this->getCommand('Admin42\Media\ImageResize');
+                $cmd->setMedia($media)
+                    ->setDimensionName($dimension)
+                    ->run();
+            }
+        }
     }
 }

@@ -9,8 +9,7 @@ angular.module('admin42', [
     'ngStorage',
     'ui.sortable',
     'ui.select',
-    'angularFileUpload',
-    'ui.tinymce'
+    'angularFileUpload'
 ]);
 
 angular.module('admin42').config(['$httpProvider', function($httpProvider) {

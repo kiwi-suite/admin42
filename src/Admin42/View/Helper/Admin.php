@@ -155,12 +155,13 @@ class Admin extends AbstractHelper
      */
     public function generateAngularModelName($name)
     {
-        $name = str_replace('[{{ $index }}]', "", $name);
+        $name = preg_replace('#\{\{(.*?)\}\}#', '${1}', $name);
         $name = str_replace("]", "", str_replace("[", ".", $name));
 
         $parts = explode(".", $name);
         $newName = "formElement";
         foreach ($parts as $_part) {
+            $_part = trim($_part);
             if (is_numeric($_part)) {
                 $newName .= '[' . $_part . ']';
                 continue;
