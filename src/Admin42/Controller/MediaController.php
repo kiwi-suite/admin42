@@ -10,6 +10,7 @@
 namespace Admin42\Controller;
 
 use Admin42\Mvc\Controller\AbstractAdminController;
+use Core42\Stdlib\MaxUploadFileSize;
 use Core42\View\Model\JsonModel;
 use Zend\Http\PhpEnvironment\Response;
 use Zend\Json\Json;
@@ -30,6 +31,8 @@ class MediaController extends AbstractAdminController
         $viewModel = new ViewModel([
             'uploadForm' => $this->getForm('Admin42\Media\Upload')
         ]);
+
+        $viewModel->maxFileSize = MaxUploadFileSize::getSize();
 
         if ($this->params('referrer') === "modal") {
             $viewModel->setTerminal(true);

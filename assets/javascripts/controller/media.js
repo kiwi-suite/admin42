@@ -1,5 +1,5 @@
 angular.module('admin42')
-    .controller('MediaController', ['$scope', 'FileUploader', '$attrs', '$http', function ($scope, FileUploader, $attrs, $http) {
+    .controller('MediaController', ['$scope', 'FileUploader', '$attrs', '$http', 'toaster', function ($scope, FileUploader, $attrs, $http, toaster) {
         var currentTableState = {};
         var url = $attrs.url;
 
@@ -8,12 +8,37 @@ angular.module('admin42')
         $scope.isLoading = true;
         $scope.displayedPages = 1;
 
+        $scope.errorFiles = [];
+
         var uploader = $scope.uploader = new FileUploader({
-            url: $attrs.uploadUrl
+            url: $attrs.uploadUrl,
+            filters: [{
+                name: 'filesize',
+                fn: function(item) {
+                    console.log(item.size);
+
+                    if (item.size > $attrs.maxFileSize) {
+                        $scope.errorFiles.push(item);
+
+                        /*
+                        toaster.pop({
+                            type: 'error',
+                            title: 'Title text',
+                            body: 'Body text',
+                            showCloseButton: true
+                        });
+                        */
+                        return false;
+                    }
+
+                    return true;
+                }
+            }]
         });
 
         uploader.onCompleteAll = function() {
             requestFromServer(url, currentTableState);
+            $scope.errorFiles = [];
         };
 
         $scope.isImage = function(item) {

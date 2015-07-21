@@ -74,4 +74,6 @@ return array(
     'start.upload'                  => 'Click here to start an upload',
     'title.upload'                  => 'Upload',
     'media.info-dropzone'           => 'Drag your files into this area',
+    'media.maxfilesize'             => 'maximal file size:',
+    'media.error.filesize'          => 'At least one of your files exceeds the max. file size of ',
 );

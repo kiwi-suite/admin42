@@ -6,13 +6,23 @@
     </h1>
 </div>
 <?php endif; ?>
-<div class="<?= ($this->params()->fromRoute('referrer') == "index") ? "wrapper-md" : ""?>" ng-controller="MediaController" data-upload-url="<?= $this->url('admin/media/upload') ?>" data-url="<?= $this->url()?>">
+<div class="<?= ($this->params()->fromRoute('referrer') == "index") ? "wrapper-md" : ""?>" ng-controller="MediaController" data-upload-url="<?= $this->url('admin/media/upload') ?>" data-url="<?= $this->url()?>" data-max-file-size="<?= $this->maxFileSize ?>">
+
     <div class="panel panel-default">
         <div class="panel-heading" ng-click="isCollapsed = !isCollapsed">
             <span ng-if="!isCollapsed"><?= $this->translate('title.upload', 'admin') ?></span>
             <h5 ng-if="isCollapsed"><?= $this->translate('start.upload', 'admin') ?></h5>
         </div>
+
         <div class="panel-body" collapse="isCollapsed">
+
+            <div class="alert alert-danger" ng-show="errorFiles.length != 0">
+                <strong><?= $this->translate('media.error.filesize', 'admin') ?> {{ '<?= $this->maxFileSize ?>' | bytes }}</strong>
+                <div ng-repeat="item in errorFiles">
+                    <span>{{item.name}} ( {{item.size | bytes }} )</span>
+                </div>
+            </div>
+
             <div class="row">
                 <div class="col-sm-12 col-xs-12 col-md-3">
                     <div class="m-b-md">
@@ -21,6 +31,7 @@
                         </div>
                     </div>
                     <input type="file" nv-file-select="" uploader="uploader" multiple  />
+                    <div class="text-xs m-l-xs"><?= $this->translate('media.maxfilesize', 'admin'); ?> {{ '<?= $this->maxFileSize ?>' | bytes }}</div>
                 </div>
                 <div class="col-sm-12 col-xs-12 col-md-9">
                     <table ng-show="uploader.queue.length > 0" class="table bg-white-only b-a">
@@ -33,7 +44,7 @@
                         </tr>
                         <tr ng-repeat="item in uploader.queue">
                             <td><strong>{{ item.file.name }}</strong></td>
-                            <td ng-show="uploader.isHTML5" nowrap>{{ item.file.size/1024/1024|number:2 }} MB</td>
+                            <td ng-show="uploader.isHTML5" nowrap>{{ item.file.size | bytes}}</td>
                             <td ng-show="uploader.isHTML5">
                                 <div class="progress progress-sm m-b-none m-t-xs">
                                     <div class="progress-bar bg-info" role="progressbar" ng-style="{ 'width': item.progress + '%' }"></div>
