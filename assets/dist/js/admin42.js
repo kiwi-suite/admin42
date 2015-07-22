@@ -500,7 +500,9 @@ angular.module('smart-table')
 
         $scope.dimensions = jsonCache.get($attrs.json)['dimension'];
         $scope.meta = jsonCache.get($attrs.json)['meta'];
-        $scope.selectedHandle = $attrs.mediaSelector;
+        $scope.selectedHandle = null;
+
+        var imageSize = jsonCache.get($attrs.json)['imageSize'];
 
         $scope.isActive = function(handle) {
             if (handle == $scope.selectedHandle) {
@@ -518,6 +520,26 @@ angular.module('smart-table')
             return true;
         };
 
+        $scope.checkImageSize = function(currentDimension){
+            if (imageSize.width < currentDimension.width || imageSize.height < currentDimension.height) {
+                return false;
+            }
+
+            return true;
+        };
+
+        angular.forEach($scope.dimensions, function(value, key) {
+            if (this.selectedHandle !== null) {
+                return;
+            }
+
+            if (!this.checkImageSize(key)) {
+                return;
+            }
+
+            this.selectedHandle = key;
+        }, $scope);
+
         $scope.saveCroppedImage = function(handle, url) {
             if (angular.isUndefined($scope.data[handle])) {
                 return false;
@@ -529,11 +551,11 @@ angular.module('smart-table')
         };
 
         $scope.selectDimension = function(handle) {
-            $scope.selectedHandle = handle;
+            var dimension = $scope.dimensions[handle];
 
             Cropper.getJqueryCrop().cropper("destroy");
 
-            var dimension = $scope.dimensions[handle];
+            $scope.selectedHandle = handle;
 
             var options = {
                 crop: function(dataNew) {
@@ -546,7 +568,6 @@ angular.module('smart-table')
                 guides: false,
                 built: function(e) {
                     if (!angular.isUndefined($scope.meta[handle])) {
-                        console.log($scope.meta[handle]);
                         $(this).cropper('setCropBoxData', {
                             x:0,
                             y:0,

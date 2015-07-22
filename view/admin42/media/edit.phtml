@@ -36,11 +36,13 @@
 <?php if (substr($this->media->getMimeType(), 0, 6) == "image/"): ?>
 <?php
 $jsonDataId = uniqid('crop/') . '.json';
-$this->admin()->addJsonTemplate($jsonDataId, ['dimension' => $this->dimensions, 'meta' => \Zend\Json\Json::decode($this->media->getMeta())]);
-$selected = array_keys($this->dimensions);
-$selected = current($selected);
+$this->admin()->addJsonTemplate($jsonDataId, [
+    'dimension' => $this->dimensions,
+    'meta' => \Zend\Json\Json::decode($this->media->getMeta()),
+    'imageSize' => $this->imageSize
+]);
 ?>
-<div class="wrapper-md hidden-xs hidden-sm" ng-controller="CropController" data-json="<?= $jsonDataId ?>" data-media-selector="<?= $selected ?>">
+<div class="wrapper-md hidden-xs hidden-sm" ng-controller="CropController" data-json="<?= $jsonDataId ?>">
     <div class="panel b-a">
         <div class="panel-body">
             <div class="row">
@@ -48,6 +50,7 @@ $selected = current($selected);
                     <div class="img-container" style="max-height: 700px; max-width: 1200px;">
                         <img
                             ng-cropper
+                            ng-if="selectedHandle"
                             src="<?= $this->url('admin/media/stream', ['id' => $this->media->getId(), 'dimension' => 'original'])?>">
                     </div>
 
@@ -56,25 +59,44 @@ $selected = current($selected);
                 <div class="col-md-4">
                     <ul class="list-group">
                         <li class="list-group-item" ng-repeat="(name, data) in dimensions" ng-class="isActive(name)">
-                            <div class="media">
-                                <div class="pull-right text-success m-t-sm">
-                                    <button
-                                        ng-if="hasChanges(name)"
-                                        class="btn btn-success btn-sm"
-                                        ng-click="saveCroppedImage(name, '<?= $this->url('admin/media/crop', ['id' => $this->media->getId(), 'dimension' => '{{ name }}'])?>')">
-                                        <span class="fa fa-save"></span>
-                                        <?= $this->translate('button.save', 'admin') ?>
-                                    </button>
-                                </div>
+                            <div ng-if="!checkImageSize(data)" class="media">
                                 <div class="media-body">
-                                    <a ng-click="selectDimension(name)">
-                                        {{ data.name }}<br/>
-                                        <small class="text-muted">({{data.width}} x {{data.height}})</small>
-                                    </a>
+                                    <div class="row">
+                                        <div class="col-md-10 col-md-offset-2">
+                                            {{ data.name }}<br/>
+                                            <small class="text-muted">({{data.width}} x {{data.height}})</small>
+                                            <div class="text-warning">
+                                                <span class="fa fa-warning"></span> <?= $this->translate('media.warning.image-too-small') ?>
+                                            </div>
+                                        </div>
+                                    </div>
+
                                 </div>
                             </div>
-
-
+                            <div ng-if="checkImageSize(data)" class="media">
+                                <div class="media-body">
+                                    <div class="row">
+                                        <div class="col-md-2">
+                                            <a class="btn btn-default" ng-click="selectDimension(name)">
+                                                <span class="fa fa-crop"></span>
+                                            </a>
+                                        </div>
+                                        <div class="col-md-6">
+                                            {{ data.name }}<br/>
+                                            <small class="text-muted">({{data.width}} x {{data.height}})</small>
+                                        </div>
+                                        <div class="col-md-4 text-right">
+                                            <button
+                                                ng-if="hasChanges(name) && checkImageSize(data)"
+                                                class="btn btn-success btn-sm"
+                                                ng-click="saveCroppedImage(name, '<?= $this->url('admin/media/crop', ['id' => $this->media->getId(), 'dimension' => '{{ name }}'])?>')">
+                                                <span class="fa fa-save"></span>
+                                                <?= $this->translate('button.save', 'admin') ?>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </li>
                     </ul>
                 </div>

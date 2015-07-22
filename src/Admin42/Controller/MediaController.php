@@ -73,10 +73,21 @@ class MediaController extends AbstractAdminController
 
         $mediaOptions = $this->getServiceLocator()->get('Admin42\MediaOptions');
 
+        $imageSize = null;
+        if (substr($media->getMimeType(), 0, 6) == "image/") {
+            $imagine = $this->getServiceLocator()->get('Imagine');
+            $box = $imagine->open($media->getDirectory() . $media->getFilename())->getSize();
+            $imageSize = [
+                'width' => $box->getWidth(),
+                'height' => $box->getHeight(),
+            ];
+        }
+
         return [
             'editForm' => $editForm,
             'media' => $media,
-            'dimensions' => $mediaOptions->getDimensions(false)
+            'dimensions' => $mediaOptions->getDimensions(false),
+            'imageSize' => $imageSize,
         ];
     }
 
