@@ -47,6 +47,7 @@ return array(
             'fileSelect' => 'Admin42\FormElements\FileSelect',
             'datetime'   => 'Admin42\FormElements\DateTime',
             'wysiwyg'    => 'Admin42\FormElements\Wysiwyg',
+            'youtube'    => 'Admin42\FormElements\YouTube',
         ],
         'factories' => array(
             'role'      => 'Admin42\FormElements\Service\RoleFactory',
