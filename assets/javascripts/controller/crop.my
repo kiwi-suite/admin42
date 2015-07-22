@@ -21,20 +21,23 @@ angular.module('admin42')
         $scope.checkChanges = function(handle) {
             console.log('changes for ' + handle);
             if (angular.isUndefined($scope.data[handle])) {
-                return false;
+                $scope.hasChanges[handle] = true;
+                return;
             }
             if (angular.isUndefined($scope.meta[handle])) {
-                return true;
+                $scope.hasChanges[handle] = true;
+                return;
             }
             if ($scope.data[handle].x == $scope.meta[handle].x &&
                 $scope.data[handle].y == $scope.meta[handle].y &&
                 $scope.data[handle].width == $scope.meta[handle].width &&
                 $scope.data[handle].height == $scope.meta[handle].height
             ) {
-                return false;
+                $scope.hasChanges[handle] = true;
+                return;
             }
 
-            return true;
+            $scope.hasChanges[handle] = true;
         };
 
         $scope.checkImageSize = function(currentDimension){
@@ -44,19 +47,19 @@ angular.module('admin42')
 
             return true;
         };
-/*
+
         angular.forEach($scope.dimensions, function(value, key) {
             if (this.selectedHandle !== null) {
                 return;
             }
 
-            if (!this.checkImageSize(value)) {
+            if (!this.checkImageSize(key)) {
                 return;
             }
 
             this.selectedHandle = key;
         }, $scope);
-*/
+
         $scope.saveCroppedImage = function(handle, url) {
             if (angular.isUndefined($scope.data[handle])) {
                 return false;
@@ -86,9 +89,9 @@ angular.module('admin42')
                 guides: false
             };
 
-            if (!angular.isUndefined($scope.data[handle])) {
-                options.data = $scope.data[handle];
-            } else if (!angular.isUndefined($scope.meta[handle])) {
+            if (!angular.isUndefined($scope.meta[handle])) {
+                console.log('meta');
+                console.log($scope.meta[handle]);
                 options.data = {"x": $scope.meta[handle].x, "y": $scope.meta[handle].y, "width":$scope.meta[handle].width, "height":$scope.meta[handle].height, "rotate":0};
             } else {
                 options.data = { "width": dimension.width, "height": dimension.height,  "rotate":0};
@@ -115,27 +118,27 @@ angular.module('admin42')
             Cropper.getJqueryCrop().on('dragmove.cropper', function (e) {
                 var $cropper = $(e.target);
 
-                var data = $cropper.cropper('getCropBoxData');
+                var data = $cropper.cropper('getData');
                 var imageData = $cropper.cropper('getImageData');
 
-                if (dimension.width != 'auto' && data.width < dimension.width / (imageData.naturalWidth/imageData.width)) {
+                if (dimension.width != 'auto' && (data.width < dimension.width && data.width != imageData.naturalWidth) ) {
                     return false;
                 }
 
-                if (dimension.height != 'auto' && data.height < dimension. height / (imageData.naturalHeight/imageData.height)) {
+                if (dimension.height != 'auto' && (data.height < dimension.height && data.height != imageData.naturalHeight) )  {
                     return false;
                 }
 
                 return true;
-            }).on('dragstart.cropper', function (e) {
+            }).on('dragend.cropper', function (e) {
                 var $cropper = $(e.target);
 
-                var data = $cropper.cropper('getCropBoxData');
+                var data = $cropper.cropper('getData');
                 var imageData = $cropper.cropper('getImageData');
                 var hasChanged = false;
 
                 if (dimension.width != 'auto') {
-                    var width = dimension.width / (imageData.naturalWidth/imageData.width);
+                    var width = dimension.width ;
                     if (angular.isUndefined(data.width) || data.width < width) {
                         data.width = width;
                         hasChanged = true;
@@ -143,7 +146,7 @@ angular.module('admin42')
                 }
 
                 if (dimension.height != 'auto') {
-                    var height = dimension.height / (imageData.naturalHeight/imageData.height);
+                    var height = dimension.height ;
                     if (angular.isUndefined(data.height) || data.height < height) {
                         data.height = height;
                         hasChanged = true;
@@ -151,17 +154,16 @@ angular.module('admin42')
 
                 }
 
-                $scope.hasChanges[handle] = true;
-                $scope.$apply();
+                $scope.checkChanges($scope.selectedHandle);
 
                 if (hasChanged) {
-                    $(e.target).cropper('setCropBoxData', data);
+                    $(e.target).cropper('setData', data);
                 }
             });
         };
 
         var stop = $interval(function() {
-            if (Cropper.getJqueryCrop() != null && $scope.selectedHandle != null) {
+            if (Cropper.getJqueryCrop() != null) {
                 $scope.selectDimension($scope.selectedHandle);
                 stopInterval();
             }

@@ -504,6 +504,8 @@ angular.module('smart-table')
 
         var imageSize = jsonCache.get($attrs.json)['imageSize'];
 
+        $scope.hasChanges = {};
+
         $scope.isActive = function(handle) {
             if (handle == $scope.selectedHandle) {
                 return 'active';
@@ -512,8 +514,19 @@ angular.module('smart-table')
             return '';
         };
 
-        $scope.hasChanges = function(handle) {
+        $scope.checkChanges = function(handle) {
+            console.log('changes for ' + handle);
             if (angular.isUndefined($scope.data[handle])) {
+                return false;
+            }
+            if (angular.isUndefined($scope.meta[handle])) {
+                return true;
+            }
+            if ($scope.data[handle].x == $scope.meta[handle].x &&
+                $scope.data[handle].y == $scope.meta[handle].y &&
+                $scope.data[handle].width == $scope.meta[handle].width &&
+                $scope.data[handle].height == $scope.meta[handle].height
+            ) {
                 return false;
             }
 
@@ -527,19 +540,19 @@ angular.module('smart-table')
 
             return true;
         };
-
+/*
         angular.forEach($scope.dimensions, function(value, key) {
             if (this.selectedHandle !== null) {
                 return;
             }
 
-            if (!this.checkImageSize(key)) {
+            if (!this.checkImageSize(value)) {
                 return;
             }
 
             this.selectedHandle = key;
         }, $scope);
-
+*/
         $scope.saveCroppedImage = function(handle, url) {
             if (angular.isUndefined($scope.data[handle])) {
                 return false;
@@ -561,34 +574,39 @@ angular.module('smart-table')
                 crop: function(dataNew) {
                     $scope.data[$scope.selectedHandle] = dataNew;
                 },
-                responsive: true,
-                autoCrop: false,
-                rotatable: false,
+
+                strict: true,
                 zoomable: false,
-                guides: false,
-                built: function(e) {
-                    if (!angular.isUndefined($scope.meta[handle])) {
-                        $(this).cropper('setCropBoxData', {
-                            x:0,
-                            y:0,
-                            width: 500,
-                            height: 500
-                        });
-                    } else {
-                        $(this).cropper('setCropBoxData', {
-                            x:0,
-                            y:0,
-                            width: dimension.width,
-                            height: dimension.height
-                        });
-                    }
-                    $(this).cropper('crop');
+                responsive: true,
+                rotatable: false,
+                guides: false
+            };
+
+            if (!angular.isUndefined($scope.data[handle])) {
+                options.data = $scope.data[handle];
+            } else if (!angular.isUndefined($scope.meta[handle])) {
+                options.data = {"x": $scope.meta[handle].x, "y": $scope.meta[handle].y, "width":$scope.meta[handle].width, "height":$scope.meta[handle].height, "rotate":0};
+            } else {
+                options.data = { "width": dimension.width, "height": dimension.height,  "rotate":0};
+                options.built = function(e) {
+                    var data = $(this).cropper('getData');
+                    var imageData = $(this).cropper('getImageData');
+
+                    var x = (imageData.naturalWidth - data.width) / 2;
+                    var y = (imageData.naturalHeight - data.height) / 2;
+
+                    $(this).cropper("setData", {"x": x, "y": y});
                 }
             }
 
             if (dimension.width != 'auto' && dimension.height != 'auto') {
                 options.aspectRatio = dimension.width / dimension.height;
             }
+
+            Cropper.getJqueryCrop().off('dragmove.cropper');
+            Cropper.getJqueryCrop().off('dragstart.cropper');
+
+            Cropper.getJqueryCrop().cropper(options);
 
             Cropper.getJqueryCrop().on('dragmove.cropper', function (e) {
                 var $cropper = $(e.target);
@@ -600,7 +618,7 @@ angular.module('smart-table')
                     return false;
                 }
 
-                if (dimension.height != 'auto' && data.height < dimension.height / (imageData.naturalHeight/imageData.height)) {
+                if (dimension.height != 'auto' && data.height < dimension. height / (imageData.naturalHeight/imageData.height)) {
                     return false;
                 }
 
@@ -629,16 +647,17 @@ angular.module('smart-table')
 
                 }
 
+                $scope.hasChanges[handle] = true;
+                $scope.$apply();
+
                 if (hasChanged) {
                     $(e.target).cropper('setCropBoxData', data);
                 }
             });
-
-            Cropper.getJqueryCrop().cropper(options);
         };
 
         var stop = $interval(function() {
-            if (Cropper.getJqueryCrop() != null) {
+            if (Cropper.getJqueryCrop() != null && $scope.selectedHandle != null) {
                 $scope.selectDimension($scope.selectedHandle);
                 stopInterval();
             }

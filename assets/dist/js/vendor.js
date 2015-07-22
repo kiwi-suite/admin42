@@ -59219,7 +59219,210 @@ module
   };
 
 });
-;// 4.2.1 (2015-06-29)
+;(function() {
+'use strict';
+
+angular.module('ngCropper', ['ng'])
+.directive('ngCropper', ['$q', function($q) {
+  return {
+    restrict: 'A',
+    scope: {options: '=ngOptions'},
+    link: function(scope, element, atts) {
+      var shown = false;
+
+      scope.$on(atts.ngShow, function() {
+        if (shown) return;
+        shown = true;
+
+        preprocess(scope.options, element[0])
+          .then(function(options) {
+            element.cropper(options);
+          })
+      });
+
+      scope.$on(atts.ngHide, function() {
+        if (!shown) return;
+        shown = false;
+        element.cropper('destroy');
+      });
+
+      scope.$watch('options.disabled', function(disabled) {
+        if (!shown) return;
+        if (disabled) element.cropper('disable');
+        if (!disabled) element.cropper('enable');
+      });
+    }
+  };
+
+  function preprocess(options, img) {
+    options = options || {};
+
+    var defer = $q.defer();
+    var toResolve = [passInitial(options)];
+
+    if (options.maximize) toResolve.push(maximizeSelection(options, img));
+
+    $q.all(toResolve).then(function(values) {
+      var lastUpdatedOptions = values[values.length-1];
+      defer.resolve(lastUpdatedOptions);
+    });
+
+    return defer.promise;
+  }
+
+  /**
+   * The only promise to resolve when no more processing promiseses passed.
+   */
+  function passInitial(options) {
+    var defer = $q.defer();
+    defer.resolve(options);
+    return defer.promise;
+  }
+
+  /**
+   * Change options to make selection maximum for the image.
+   * fengyuanchen/cropper calculates valid selection's height & width
+   * with respect to `aspectRatio`.
+   */
+  function maximizeSelection(options, img) {
+    var defer = $q.defer();
+
+    getRealSize(img).then(function(size) {
+      options.data = size;
+      defer.resolve(options);
+    });
+
+    return defer.promise;
+  }
+
+  /**
+   * Returns real image size (without changes by css, attributes).
+   */
+  function getRealSize(img) {
+    var defer = $q.defer();
+    var size = {height: null, width: null};
+    var image = new Image();
+
+    image.onload = function() {
+      defer.resolve({width: image.width, height: image.height});
+    }
+
+    image.src = img.src;
+    return defer.promise;
+  }
+}])
+.service('Cropper', ['$q', function($q) {
+
+  this.encode = function(blob) {
+    var defer = $q.defer();
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      defer.resolve(e.target.result);
+    };
+    reader.readAsDataURL(blob);
+    return defer.promise;
+  };
+
+  this.decode = function(dataUrl) {
+    var meta = dataUrl.split(';')[0];
+    var type = meta.split(':')[1];
+    var binary = atob(dataUrl.split(',')[1]);
+    var array = new Uint8Array(binary.length);
+    for (var i = 0; i < binary.length; i++) {
+        array[i] = binary.charCodeAt(i);
+    }
+    return new Blob([array], {type: type});
+  };
+
+  this.crop = function(file, data) {
+    var defer = $q.defer();
+    var _decode = this.decode;
+
+    this.encode(file).then(_createImage).then(function(image) {
+      var canvas = createCanvas(data);
+      var context = canvas.getContext('2d');
+
+      context.drawImage(image, data.x, data.y, data.width, data.height, 0, 0, data.width, data.height);
+
+      var encoded = canvas.toDataURL(file.type);
+      var blob = _decode(encoded);
+
+      defer.resolve(blob);
+      removeElement(canvas);
+    });
+
+    return defer.promise;
+  };
+
+  this.scale = function(file, data) {
+    var defer = $q.defer();
+    var _decode = this.decode;
+
+    this.encode(file).then(_createImage).then(function(image) {
+      var heightOrig = image.height;
+      var widthOrig = image.width;
+      var ratio, height, width;
+
+      if (angular.isNumber(data)) {
+        ratio = data;
+        height = heightOrig * ratio;
+        width = widthOrig * ratio;
+      }
+
+      if (angular.isObject(data)) {
+        ratio = widthOrig / heightOrig;
+        height = data.height;
+        width = data.width;
+
+        if (height && !width)
+          width = height * ratio;
+        else if (width && !height)
+          height = width / ratio;
+      }
+
+      var canvas = createCanvas(data);
+      var context = canvas.getContext('2d');
+
+      canvas.height = height;
+      canvas.width = width;
+
+      context.drawImage(image, 0, 0, widthOrig, heightOrig, 0, 0, width, height);
+
+      var encoded = canvas.toDataURL(file.type);
+      var blob = _decode(encoded);
+
+      defer.resolve(blob);
+      removeElement(canvas);
+    });
+
+    return defer.promise;
+  };
+
+
+  function _createImage(source) {
+    var defer = $q.defer();
+    var image = new Image();
+    image.onload = function(e) { defer.resolve(e.target); };
+    image.src = source;
+    return defer.promise;
+  }
+
+  function createCanvas(data) {
+    var canvas = document.createElement('canvas');
+    canvas.width = data.width;
+    canvas.height = data.height;
+    canvas.style.display = 'none';
+    document.body.appendChild(canvas);
+    return canvas;
+  }
+
+  function removeElement(el) {
+    el.parentElement.removeChild(el);
+  }
+
+}]);
+
+})();;// 4.1.10 (2015-05-05)
 
 /**
  * Compiled inline version. (Library mode)
@@ -59308,8 +59511,8 @@ module
 /**
  * EventUtils.js
  *
+ * Copyright, Moxiecode Systems AB
  * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
  *
  * License: http://www.tinymce.com/license
  * Contributing: http://www.tinymce.com/contributing
@@ -59328,7 +59531,7 @@ define("tinymce/dom/EventUtils", [], function() {
 
 	var eventExpandoPrefix = "mce-data-";
 	var mouseEventRe = /^(?:mouse|contextmenu)|click/;
-	var deprecated = {keyLocation: 1, layerX: 1, layerY: 1, returnValue: 1, webkitMovementX: 1, webkitMovementY: 1};
+	var deprecated = {keyLocation: 1, layerX: 1, layerY: 1, returnValue: 1};
 
 	/**
 	 * Binds a native event to a callback on the speified target.
@@ -59874,8 +60077,8 @@ define("tinymce/dom/EventUtils", [], function() {
 /**
  * Sizzle.js
  *
+ * Copyright, Moxiecode Systems AB
  * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
  *
  * License: http://www.tinymce.com/license
  * Contributing: http://www.tinymce.com/contributing
@@ -61915,8 +62118,8 @@ return Sizzle;
 /**
  * Env.js
  *
+ * Copyright, Moxiecode Systems AB
  * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
  *
  * License: http://www.tinymce.com/license
  * Contributing: http://www.tinymce.com/contributing
@@ -61932,7 +62135,7 @@ return Sizzle;
  */
 define("tinymce/Env", [], function() {
 	var nav = navigator, userAgent = nav.userAgent;
-	var opera, webkit, ie, ie11, ie12, gecko, mac, iDevice, android, fileApi;
+	var opera, webkit, ie, ie11, ie12, gecko, mac, iDevice, android;
 
 	opera = window.opera && window.opera.buildNumber;
 	android = /Android/.test(userAgent);
@@ -61945,7 +62148,6 @@ define("tinymce/Env", [], function() {
 	gecko = !webkit && !ie11 && /Gecko/.test(userAgent);
 	mac = userAgent.indexOf('Mac') != -1;
 	iDevice = /(iPad|iPhone)/.test(userAgent);
-	fileApi = "FormData" in window && "FileReader" in window && "URL" in window && !!URL.createObjectURL;
 
 	if (ie12) {
 		webkit = false;
@@ -61953,7 +62155,7 @@ define("tinymce/Env", [], function() {
 
 	// Is a iPad/iPhone and not on iOS5 sniff the WebKit version since older iOS WebKit versions
 	// says it has contentEditable support but there is no visible caret.
-	var contentEditable = !iDevice || fileApi || userAgent.match(/AppleWebKit\/(\d*)/)[1] >= 534;
+	var contentEditable = !iDevice || userAgent.match(/AppleWebKit\/(\d*)/)[1] >= 534;
 
 	return {
 		/**
@@ -62060,15 +62262,7 @@ define("tinymce/Env", [], function() {
 		 * @property documentMode
 		 * @type Number
 		 */
-		documentMode: ie && !ie12 ? (document.documentMode || 7) : 10,
-
-		/**
-		 * Constant that is true if the browser has a modern file api.
-		 *
-		 * @property fileApi
-		 * @type Boolean
-		 */
-		fileApi: fileApi
+		documentMode: ie && !ie12 ? (document.documentMode || 7) : 10
 	};
 });
 
@@ -62077,8 +62271,8 @@ define("tinymce/Env", [], function() {
 /**
  * Tools.js
  *
+ * Copyright, Moxiecode Systems AB
  * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
  *
  * License: http://www.tinymce.com/license
  * Contributing: http://www.tinymce.com/contributing
@@ -62565,12 +62759,6 @@ define("tinymce/util/Tools", [
 		return map(s.split(d || ','), trim);
 	}
 
-	function constant(value) {
-		return function() {
-			return value;
-		};
-	}
-
 	function _addCacheSuffix(url) {
 		var cacheSuffix = Env.cacheSuffix;
 
@@ -62590,7 +62778,6 @@ define("tinymce/util/Tools", [
 		each: each,
 		map: map,
 		grep: grep,
-		filter: grep,
 		inArray: inArray,
 		extend: extend,
 		create: create,
@@ -62598,7 +62785,6 @@ define("tinymce/util/Tools", [
 		createNS: createNS,
 		resolve: resolve,
 		explode: explode,
-		constant: constant,
 		_addCacheSuffix: _addCacheSuffix
 	};
 });
@@ -62608,8 +62794,8 @@ define("tinymce/util/Tools", [
 /**
  * DomQuery.js
  *
+ * Copyright, Moxiecode Systems AB
  * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
  *
  * License: http://www.tinymce.com/license
  * Contributing: http://www.tinymce.com/contributing
@@ -64179,8 +64365,8 @@ define("tinymce/dom/DomQuery", [
 /**
  * Styles.js
  *
+ * Copyright, Moxiecode Systems AB
  * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
  *
  * License: http://www.tinymce.com/license
  * Contributing: http://www.tinymce.com/contributing
@@ -64545,8 +64731,8 @@ define("tinymce/html/Styles", [], function() {
 /**
  * TreeWalker.js
  *
+ * Copyright, Moxiecode Systems AB
  * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
  *
  * License: http://www.tinymce.com/license
  * Contributing: http://www.tinymce.com/contributing
@@ -64641,8 +64827,8 @@ define("tinymce/dom/TreeWalker", [], function() {
 /**
  * Range.js
  *
+ * Copyright, Moxiecode Systems AB
  * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
  *
  * License: http://www.tinymce.com/license
  * Contributing: http://www.tinymce.com/contributing
@@ -65421,8 +65607,8 @@ define("tinymce/dom/Range", [
 /**
  * Entities.js
  *
+ * Copyright, Moxiecode Systems AB
  * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
  *
  * License: http://www.tinymce.com/license
  * Contributing: http://www.tinymce.com/contributing
@@ -65692,8 +65878,8 @@ define("tinymce/html/Entities", [
 /**
  * StyleSheetLoader.js
  *
+ * Copyright, Moxiecode Systems AB
  * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
  *
  * License: http://www.tinymce.com/license
  * Contributing: http://www.tinymce.com/contributing
@@ -65884,8 +66070,8 @@ define("tinymce/dom/StyleSheetLoader", [
 /**
  * DOMUtils.js
  *
+ * Copyright, Moxiecode Systems AB
  * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
  *
  * License: http://www.tinymce.com/license
  * Contributing: http://www.tinymce.com/contributing
@@ -67722,8 +67908,8 @@ define("tinymce/dom/DOMUtils", [
 /**
  * ScriptLoader.js
  *
+ * Copyright, Moxiecode Systems AB
  * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
  *
  * License: http://www.tinymce.com/license
  * Contributing: http://www.tinymce.com/contributing
@@ -67980,8 +68166,8 @@ define("tinymce/dom/ScriptLoader", [
 /**
  * AddOnManager.js
  *
+ * Copyright, Moxiecode Systems AB
  * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
  *
  * License: http://www.tinymce.com/license
  * Contributing: http://www.tinymce.com/contributing
@@ -68248,8 +68434,8 @@ define("tinymce/AddOnManager", [
 /**
  * RangeUtils.js
  *
+ * Copyright, Moxiecode Systems AB
  * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
  *
  * License: http://www.tinymce.com/license
  * Contributing: http://www.tinymce.com/contributing
@@ -68284,7 +68470,6 @@ define("tinymce/dom/RangeUtils", [
 		/**
 		 * Walks the specified range like object and executes the callback for each sibling collection it finds.
 		 *
-		 * @private
 		 * @method walk
 		 * @param {Object} rng Range like object.
 		 * @param {function} callback Callback function to execute for each sibling collection.
@@ -68792,8 +68977,8 @@ define("tinymce/dom/RangeUtils", [
 /**
  * NodeChange.js
  *
+ * Copyright, Moxiecode Systems AB
  * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
  *
  * License: http://www.tinymce.com/license
  * Contributing: http://www.tinymce.com/contributing
@@ -68948,8 +69133,8 @@ define("tinymce/NodeChange", [
 /**
  * Node.js
  *
+ * Copyright, Moxiecode Systems AB
  * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
  *
  * License: http://www.tinymce.com/license
  * Contributing: http://www.tinymce.com/contributing
@@ -69447,8 +69632,8 @@ define("tinymce/html/Node", [], function() {
 /**
  * Schema.js
  *
+ * Copyright, Moxiecode Systems AB
  * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
  *
  * License: http://www.tinymce.com/license
  * Contributing: http://www.tinymce.com/contributing
@@ -69750,9 +69935,6 @@ define("tinymce/html/Schema", [
 
 		// Caption can't have tables
 		delete schema.caption.children.table;
-
-		// Delete scripts by default due to possible XSS
-		delete schema.script;
 
 		// TODO: LI:s can only have value if parent is OL
 
@@ -70455,8 +70637,8 @@ define("tinymce/html/Schema", [
 /**
  * SaxParser.js
  *
+ * Copyright, Moxiecode Systems AB
  * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
  *
  * License: http://www.tinymce.com/license
  * Contributing: http://www.tinymce.com/contributing
@@ -70932,8 +71114,8 @@ define("tinymce/html/SaxParser", [
 /**
  * DomParser.js
  *
+ * Copyright, Moxiecode Systems AB
  * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
  *
  * License: http://www.tinymce.com/license
  * Contributing: http://www.tinymce.com/contributing
@@ -71284,7 +71466,7 @@ define("tinymce/html/DomParser", [
 			}
 
 			function removeWhitespaceBefore(node) {
-				var textNode, textNodeNext, textVal, sibling, blockElements = schema.getBlockElements();
+				var textNode, textVal, sibling;
 
 				for (textNode = node.prev; textNode && textNode.type === 3;) {
 					textVal = textNode.value.replace(endWhiteSpaceRegExp, '');
@@ -71293,22 +71475,6 @@ define("tinymce/html/DomParser", [
 						textNode.value = textVal;
 						textNode = textNode.prev;
 					} else {
-						textNodeNext = textNode.next;
-
-						// Fix for bug #7543 where bogus nodes would produce empty
-						// text nodes and these would be removed if a nested list was before it
-						if (textNodeNext) {
-							if (textNodeNext.type == 3 && textNodeNext.value.length) {
-								textNode = textNode.prev;
-								continue;
-							}
-
-							if (!blockElements[textNodeNext.name] && textNodeNext.name != 'script' && textNodeNext.name != 'style') {
-								textNode = textNode.prev;
-								continue;
-							}
-						}
-
 						sibling = textNode.prev;
 						textNode.remove();
 						textNode = sibling;
@@ -71755,8 +71921,8 @@ define("tinymce/html/DomParser", [
 /**
  * Writer.js
  *
+ * Copyright, Moxiecode Systems AB
  * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
  *
  * License: http://www.tinymce.com/license
  * Contributing: http://www.tinymce.com/contributing
@@ -71957,8 +72123,8 @@ define("tinymce/html/Writer", [
 /**
  * Serializer.js
  *
+ * Copyright, Moxiecode Systems AB
  * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
  *
  * License: http://www.tinymce.com/license
  * Contributing: http://www.tinymce.com/contributing
@@ -72116,8 +72282,8 @@ define("tinymce/html/Serializer", [
 /**
  * Serializer.js
  *
+ * Copyright, Moxiecode Systems AB
  * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
  *
  * License: http://www.tinymce.com/license
  * Contributing: http://www.tinymce.com/contributing
@@ -72521,8 +72687,8 @@ define("tinymce/dom/Serializer", [
 /**
  * TridentSelection.js
  *
+ * Copyright, Moxiecode Systems AB
  * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
  *
  * License: http://www.tinymce.com/license
  * Contributing: http://www.tinymce.com/contributing
@@ -73030,15 +73196,15 @@ define("tinymce/dom/TridentSelection", [], function() {
 /**
  * VK.js
  *
+ * Copyright, Moxiecode Systems AB
  * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
  *
  * License: http://www.tinymce.com/license
  * Contributing: http://www.tinymce.com/contributing
  */
 
 /**
- * This file exposes a set of the common KeyCodes for use. Please grow it as needed.
+ * This file exposes a set of the common KeyCodes for use.  Please grow it as needed.
  */
 define("tinymce/util/VK", [
 	"tinymce/Env"
@@ -73070,8 +73236,8 @@ define("tinymce/util/VK", [
 /**
  * ControlSelection.js
  *
+ * Copyright, Moxiecode Systems AB
  * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
  *
  * License: http://www.tinymce.com/license
  * Contributing: http://www.tinymce.com/contributing
@@ -73099,10 +73265,10 @@ define("tinymce/dom/ControlSelection", [
 		// Details about each resize handle how to scale etc
 		resizeHandles = {
 			// Name: x multiplier, y multiplier, delta size x, delta size y
-			/*n: [0.5, 0, 0, -1],
+			n: [0.5, 0, 0, -1],
 			e: [1, 0.5, 1, 0],
 			s: [0.5, 1, 0, 1],
-			w: [0, 0.5, -1, 0],*/
+			w: [0, 0.5, -1, 0],
 			nw: [0, 0, -1, -1],
 			ne: [1, 0, 1, -1],
 			se: [1, 1, 1, 1],
@@ -73116,8 +73282,8 @@ define("tinymce/dom/ControlSelection", [
 				'position: absolute;' +
 				'border: 1px solid black;' +
 				'background: #FFF;' +
-				'width: 7px;' +
-				'height: 7px;' +
+				'width: 5px;' +
+				'height: 5px;' +
 				'z-index: 10000' +
 			'}' +
 			rootClass + ' .mce-resizehandle:hover {' +
@@ -73315,7 +73481,7 @@ define("tinymce/dom/ControlSelection", [
 
 			if (isResizable(targetElm) && !e.isDefaultPrevented()) {
 				each(resizeHandles, function(handle, name) {
-					var handleElm;
+					var handleElm, handlerContainerElm;
 
 					function startDrag(e) {
 						startX = e.screenX;
@@ -73372,31 +73538,35 @@ define("tinymce/dom/ControlSelection", [
 
 					// Get existing or render resize handle
 					handleElm = dom.get('mceResizeHandle' + name);
-					if (handleElm) {
-						dom.remove(handleElm);
+					if (!handleElm) {
+						handlerContainerElm = rootElement;
+
+						handleElm = dom.add(handlerContainerElm, 'div', {
+							id: 'mceResizeHandle' + name,
+							'data-mce-bogus': 'all',
+							'class': 'mce-resizehandle',
+							unselectable: true,
+							style: 'cursor:' + name + '-resize; margin:0; padding:0'
+						});
+
+						// Hides IE move layer cursor
+						// If we set it on Chrome we get this wounderful bug: #6725
+						if (Env.ie) {
+							handleElm.contentEditable = false;
+						}
+					} else {
+						dom.show(handleElm);
 					}
 
-					handleElm = dom.add(rootElement, 'div', {
-						id: 'mceResizeHandle' + name,
-						'data-mce-bogus': 'all',
-						'class': 'mce-resizehandle',
-						unselectable: true,
-						style: 'cursor:' + name + '-resize; margin:0; padding:0'
-					});
+					if (!handle.elm) {
+						dom.bind(handleElm, 'mousedown', function(e) {
+							e.stopImmediatePropagation();
+							e.preventDefault();
+							startDrag(e);
+						});
 
-					// Hides IE move layer cursor
-					// If we set it on Chrome we get this wounderful bug: #6725
-					if (Env.ie) {
-						handleElm.contentEditable = false;
+						handle.elm = handleElm;
 					}
-
-					dom.bind(handleElm, 'mousedown', function(e) {
-						e.stopImmediatePropagation();
-						e.preventDefault();
-						startDrag(e);
-					});
-
-					handle.elm = handleElm;
 
 					// Position element
 					dom.setStyles(handleElm, {
@@ -73442,8 +73612,8 @@ define("tinymce/dom/ControlSelection", [
 				}
 			}
 
-			// Ignore all events while resizing or if the editor instance was removed
-			if (resizeStarted || editor.removed) {
+			// Ignore all events while resizing
+			if (resizeStarted) {
 				return;
 			}
 
@@ -73620,15 +73790,7 @@ define("tinymce/dom/ControlSelection", [
 				}
 			}
 
-			editor.on('nodechange ResizeEditor ResizeWindow', function(e) {
-				if (window.requestAnimationFrame) {
-					window.requestAnimationFrame(function() {
-						updateResizeRect(e);
-					});
-				} else {
-					updateResizeRect(e);
-				}
-			});
+			editor.on('nodechange ResizeEditor', updateResizeRect);
 
 			// Update resize rect while typing in a table
 			editor.on('keydown keyup', function(e) {
@@ -73670,8 +73832,8 @@ define("tinymce/dom/ControlSelection", [
 /**
  * BookmarkManager.js
  *
+ * Copyright, Moxiecode Systems AB
  * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
  *
  * License: http://www.tinymce.com/license
  * Contributing: http://www.tinymce.com/contributing
@@ -74062,8 +74224,8 @@ define("tinymce/dom/BookmarkManager", [
 /**
  * Selection.js
  *
+ * Copyright, Moxiecode Systems AB
  * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
  *
  * License: http://www.tinymce.com/license
  * Contributing: http://www.tinymce.com/contributing
@@ -74638,7 +74800,7 @@ define("tinymce/dom/Selection", [
 		 * @param {Range} rng Range to select.
 		 */
 		setRng: function(rng, forward) {
-			var self = this, sel, node;
+			var self = this, sel;
 
 			if (!rng) {
 				return;
@@ -74676,18 +74838,6 @@ define("tinymce/dom/Selection", [
 
 					// adding range isn't always successful so we need to check range count otherwise an exception can occur
 					self.selectedRange = sel.rangeCount > 0 ? sel.getRangeAt(0) : null;
-				}
-
-				// WebKit egde case selecting images works better using setBaseAndExtent
-				if (!rng.collapsed && rng.startContainer == rng.endContainer && sel.setBaseAndExtent) {
-					if (rng.endOffset - rng.startOffset < 2) {
-						if (rng.startContainer.hasChildNodes()) {
-							node = rng.startContainer.childNodes[rng.startOffset];
-							if (node && node.tagName == 'IMG') {
-								self.getSel().setBaseAndExtent(node, 0, node, 1);
-							}
-						}
-					}
 				}
 			} else {
 				// Is W3C Range fake range on IE
@@ -75067,8 +75217,8 @@ define("tinymce/dom/Selection", [
 /**
  * ElementUtils.js
  *
+ * Copyright, Moxiecode Systems AB
  * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
  *
  * License: http://www.tinymce.com/license
  * Contributing: http://www.tinymce.com/contributing
@@ -75187,8 +75337,8 @@ define("tinymce/dom/ElementUtils", [
 /**
  * Preview.js
  *
+ * Copyright, Moxiecode Systems AB
  * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
  *
  * License: http://www.tinymce.com/license
  * Contributing: http://www.tinymce.com/contributing
@@ -75341,8 +75491,8 @@ define("tinymce/fmt/Preview", [
 /**
  * Formatter.js
  *
+ * Copyright, Moxiecode Systems AB
  * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
  *
  * License: http://www.tinymce.com/license
  * Contributing: http://www.tinymce.com/contributing
@@ -75411,10 +75561,6 @@ define("tinymce/Formatter", [
 
 		function isTableCell(node) {
 			return /^(TH|TD)$/.test(node.nodeName);
-		}
-
-		function isInlineBlock(node) {
-			return node && /^(IMG)$/.test(node.nodeName);
 		}
 
 		function getParents(node, selector) {
@@ -76153,8 +76299,7 @@ define("tinymce/Formatter", [
 							endContainer = endContainer.firstChild || endContainer;
 						}
 
-						if (dom.isChildOf(startContainer, endContainer) && !isBlock(endContainer) &&
-							!isTableCell(startContainer) && !isTableCell(endContainer)) {
+						if (dom.isChildOf(startContainer, endContainer) && !isTableCell(startContainer) && !isTableCell(endContainer)) {
 							startContainer = wrap(startContainer, 'span', {id: '_start', 'data-mce-type': 'bookmark'});
 							splitToFormatRoot(startContainer);
 							startContainer = unwrap(TRUE);
@@ -77635,12 +77780,6 @@ define("tinymce/Formatter", [
 					offset = rng.startOffset, isAtEndOfText,
 					walker, node, nodes, tmpNode;
 
-			if (rng.startContainer == rng.endContainer) {
-				if (isInlineBlock(rng.startContainer.childNodes[rng.startOffset])) {
-					return;
-				}
-			}
-
 			// Convert text node into index if possible
 			if (container.nodeType == 3 && offset >= container.nodeValue.length) {
 				// Get the parent container location and walk from there
@@ -77685,8 +77824,8 @@ define("tinymce/Formatter", [
 /**
  * UndoManager.js
  *
+ * Copyright, Moxiecode Systems AB
  * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
  *
  * License: http://www.tinymce.com/license
  * Contributing: http://www.tinymce.com/contributing
@@ -78067,8 +78206,8 @@ define("tinymce/UndoManager", [
 /**
  * EnterKey.js
  *
+ * Copyright, Moxiecode Systems AB
  * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
  *
  * License: http://www.tinymce.com/license
  * Contributing: http://www.tinymce.com/contributing
@@ -78708,8 +78847,8 @@ define("tinymce/EnterKey", [
 /**
  * ForceBlocks.js
  *
+ * Copyright, Moxiecode Systems AB
  * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
  *
  * License: http://www.tinymce.com/license
  * Contributing: http://www.tinymce.com/contributing
@@ -78843,8 +78982,8 @@ define("tinymce/ForceBlocks", [], function() {
 /**
  * EditorCommands.js
  *
+ * Copyright, Moxiecode Systems AB
  * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
  *
  * License: http://www.tinymce.com/license
  * Contributing: http://www.tinymce.com/contributing
@@ -79166,7 +79305,7 @@ define("tinymce/EditorCommands", [
 			},
 
 			// Override justify commands to use the text formatter engine
-			'JustifyLeft,JustifyCenter,JustifyRight,JustifyFull,JustifyNone': function(command) {
+			'JustifyLeft,JustifyCenter,JustifyRight,JustifyFull': function(command) {
 				var align = command.substring(7);
 
 				if (align == 'full') {
@@ -79180,10 +79319,8 @@ define("tinymce/EditorCommands", [
 					}
 				});
 
-				if (align != 'none') {
-					toggleFormat('align' + align);
-					execCommand('mceRepaint');
-				}
+				toggleFormat('align' + align);
+				execCommand('mceRepaint');
 			},
 
 			// Override list commands to fix WebKit bug
@@ -79284,7 +79421,7 @@ define("tinymce/EditorCommands", [
 
 			mceInsertContent: function(command, ui, value) {
 				var parser, serializer, parentNode, rootNode, fragment, args;
-				var marker, rng, node, node2, bookmarkHtml, merge, data;
+				var marker, rng, node, node2, bookmarkHtml, merge;
 				var textInlineElements = editor.schema.getTextInlineElements();
 
 				function trimOrPaddLeftRight(html) {
@@ -79368,7 +79505,6 @@ define("tinymce/EditorCommands", [
 
 				if (typeof value != 'string') {
 					merge = value.merge;
-					data = value.data;
 					value = value.content;
 				}
 
@@ -79417,7 +79553,7 @@ define("tinymce/EditorCommands", [
 				parentNode = selection.getNode();
 
 				// Parse the fragment within the context of the parent node
-				var parserArgs = {context: parentNode.nodeName.toLowerCase(), data: data};
+				var parserArgs = {context: parentNode.nodeName.toLowerCase()};
 				fragment = parser.parse(value, parserArgs);
 
 				markInlineFormatElements(fragment);
@@ -79848,8 +79984,8 @@ define("tinymce/EditorCommands", [
 /**
  * URI.js
  *
+ * Copyright, Moxiecode Systems AB
  * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
  *
  * License: http://www.tinymce.com/license
  * Contributing: http://www.tinymce.com/contributing
@@ -80238,22 +80374,6 @@ define("tinymce/util/URI", [
 		}
 	};
 
-	URI.parseDataUri = function(uri) {
-		var type, matches;
-
-		uri = decodeURIComponent(uri).split(',');
-
-		matches = /data:([^;]+)/.exec(uri[0]);
-		if (matches) {
-			type = matches[1];
-		}
-
-		return {
-			type: type,
-			data: uri[1]
-		};
-	};
-
 	return URI;
 });
 
@@ -80262,11 +80382,7 @@ define("tinymce/util/URI", [
 /**
  * Class.js
  *
- * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
- *
- * License: http://www.tinymce.com/license
- * Contributing: http://www.tinymce.com/contributing
+ * Copyright 2003-2012, Moxiecode Systems AB, All rights reserved.
  */
 
 /**
@@ -80434,8 +80550,8 @@ define("tinymce/util/Class", [
 /**
  * EventDispatcher.js
  *
+ * Copyright, Moxiecode Systems AB
  * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
  *
  * License: http://www.tinymce.com/license
  * Contributing: http://www.tinymce.com/contributing
@@ -80726,412 +80842,13 @@ define("tinymce/util/EventDispatcher", [
 	return Dispatcher;
 });
 
-// Included from: js/tinymce/classes/data/Binding.js
-
-/**
- * Binding.js
- *
- * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
- *
- * License: http://www.tinymce.com/license
- * Contributing: http://www.tinymce.com/contributing
- */
-
-/**
- * This class gets dynamically extended to provide a binding between two models. This makes it possible to
- * sync the state of two properties in two models by a layer of abstraction.
- *
- * @class tinymce.data.Binding
- */
-define("tinymce/data/Binding", [], function() {
-	/**
-	 * Constructs a new bidning.
-	 *
-	 * @constructor
-	 * @method Binding
-	 * @param {Object} settings Settings to the binding.
-	 */
-	function Binding(settings) {
-		this.create = settings.create;
-	}
-
-	/**
-	 * Creates a binding for a property on a model.
-	 *
-	 * @method create
-	 * @param {tinymce.data.ObservableObject} model Model to create binding to.
-	 * @param {String} name Name of property to bind.
-	 * @return {tinymce.data.Binding} Binding instance.
-	 */
-	Binding.create = function(model, name) {
-		return new Binding({
-			create: function(otherModel, otherName) {
-				var bindings;
-
-				function fromSelfToOther(e) {
-					otherModel.set(otherName, e.value);
-				}
-
-				function fromOtherToSelf(e) {
-					model.set(name, e.value);
-				}
-
-				otherModel.on('change:' + otherName, fromOtherToSelf);
-				model.on('change:' + name, fromSelfToOther);
-
-				// Keep track of the bindings
-				bindings = otherModel._bindings;
-
-				if (!bindings) {
-					bindings = otherModel._bindings = [];
-
-					otherModel.on('destroy', function() {
-						var i = bindings.length;
-
-						while (i--) {
-							bindings[i]();
-						}
-					});
-				}
-
-				bindings.push(function() {
-					model.off('change:' + name, fromSelfToOther);
-				});
-
-				return model.get(name);
-			}
-		});
-	};
-
-	return Binding;
-});
-
-// Included from: js/tinymce/classes/util/Observable.js
-
-/**
- * Observable.js
- *
- * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
- *
- * License: http://www.tinymce.com/license
- * Contributing: http://www.tinymce.com/contributing
- */
-
-/**
- * This mixin will add event binding logic to classes.
- *
- * @mixin tinymce.util.Observable
- */
-define("tinymce/util/Observable", [
-	"tinymce/util/EventDispatcher"
-], function(EventDispatcher) {
-	function getEventDispatcher(obj) {
-		if (!obj._eventDispatcher) {
-			obj._eventDispatcher = new EventDispatcher({
-				scope: obj,
-				toggleEvent: function(name, state) {
-					if (EventDispatcher.isNative(name) && obj.toggleNativeEvent) {
-						obj.toggleNativeEvent(name, state);
-					}
-				}
-			});
-		}
-
-		return obj._eventDispatcher;
-	}
-
-	return {
-		/**
-		 * Fires the specified event by name.
-		 *
-		 * @method fire
-		 * @param {String} name Name of the event to fire.
-		 * @param {Object?} args Event arguments.
-		 * @param {Boolean?} bubble True/false if the event is to be bubbled.
-		 * @return {Object} Event args instance passed in.
-		 * @example
-		 * instance.fire('event', {...});
-		 */
-		fire: function(name, args, bubble) {
-			var self = this;
-
-			// Prevent all events except the remove event after the instance has been removed
-			if (self.removed && name !== "remove") {
-				return args;
-			}
-
-			args = getEventDispatcher(self).fire(name, args, bubble);
-
-			// Bubble event up to parents
-			if (bubble !== false && self.parent) {
-				var parent = self.parent();
-				while (parent && !args.isPropagationStopped()) {
-					parent.fire(name, args, false);
-					parent = parent.parent();
-				}
-			}
-
-			return args;
-		},
-
-		/**
-		 * Binds an event listener to a specific event by name.
-		 *
-		 * @method on
-		 * @param {String} name Event name or space separated list of events to bind.
-		 * @param {callback} callback Callback to be executed when the event occurs.
-		 * @param {Boolean} first Optional flag if the event should be prepended. Use this with care.
-		 * @return {Object} Current class instance.
-		 * @example
-		 * instance.on('event', function(e) {
-		 *     // Callback logic
-		 * });
-		 */
-		on: function(name, callback, prepend) {
-			return getEventDispatcher(this).on(name, callback, prepend);
-		},
-
-		/**
-		 * Unbinds an event listener to a specific event by name.
-		 *
-		 * @method off
-		 * @param {String?} name Name of the event to unbind.
-		 * @param {callback?} callback Callback to unbind.
-		 * @return {Object} Current class instance.
-		 * @example
-		 * // Unbind specific callback
-		 * instance.off('event', handler);
-		 *
-		 * // Unbind all listeners by name
-		 * instance.off('event');
-		 *
-		 * // Unbind all events
-		 * instance.off();
-		 */
-		off: function(name, callback) {
-			return getEventDispatcher(this).off(name, callback);
-		},
-
-		/**
-		 * Bind the event callback and once it fires the callback is removed.
-		 *
-		 * @method once
-		 * @param {String} name Name of the event to bind.
-		 * @param {callback} callback Callback to bind only once.
-		 * @return {Object} Current class instance.
-		 */
-		once: function(name, callback) {
-			return getEventDispatcher(this).once(name, callback);
-		},
-
-		/**
-		 * Returns true/false if the object has a event of the specified name.
-		 *
-		 * @method hasEventListeners
-		 * @param {String} name Name of the event to check for.
-		 * @return {Boolean} true/false if the event exists or not.
-		 */
-		hasEventListeners: function(name) {
-			return getEventDispatcher(this).has(name);
-		}
-	};
-});
-
-// Included from: js/tinymce/classes/data/ObservableObject.js
-
-/**
- * ObservableObject.js
- *
- * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
- *
- * License: http://www.tinymce.com/license
- * Contributing: http://www.tinymce.com/contributing
- */
-
-/**
- * This class is a object that is observable when properties changes a change event gets emitted.
- *
- * @class tinymce.data.ObservableObject
- */
-define("tinymce/data/ObservableObject", [
-	"tinymce/data/Binding",
-	"tinymce/util/Observable",
-	"tinymce/util/Class",
-	"tinymce/util/Tools"
-], function(Binding, Observable, Class, Tools) {
-	function isEqual(a, b) {
-		var k, checked;
-
-		// Strict equals
-		if (a === b) {
-			return true;
-		}
-
-		// Compare null
-		if (a === null || b === null) {
-			return a === b;
-		}
-
-		// Compare number, boolean, string, undefined
-		if (typeof a !== "object" || typeof b !== "object") {
-			return a === b;
-		}
-
-		// Compare arrays
-		if (Tools.isArray(b)) {
-			if (a.length !== b.length) {
-				return false;
-			}
-
-			k = a.length;
-			while (k--) {
-				if (!isEqual(a[k], b[k])) {
-					return false;
-				}
-			}
-		}
-
-		// Compare objects
-		checked = {};
-		for (k in b) {
-			if (!isEqual(a[k], b[k])) {
-				return false;
-			}
-
-			checked[k] = true;
-		}
-
-		for (k in a) {
-			if (!checked[k] && !isEqual(a[k], b[k])) {
-				return false;
-			}
-		}
-
-		return true;
-	}
-
-	return Class.extend({
-		Mixins: [Observable],
-
-		/**
-		 * Constructs a new observable object instance.
-		 *
-		 * @constructor
-		 * @param {Object} data Initial data for the object.
-		 */
-		init: function(data) {
-			var name, value;
-
-			data = data || {};
-
-			for (name in data) {
-				value = data[name];
-
-				if (value instanceof Binding) {
-					data[name] = value.create(this, name);
-				}
-			}
-
-			this.data = data;
-		},
-
-		/**
-		 * Sets a property on the value this will call
-		 * observers if the value is a change from the current value.
-		 *
-		 * @method set
-		 * @param {String/object} name Name of the property to set or a object of items to set.
-		 * @param {Object} value Value to set for the property.
-		 * @return {tinymce.data.ObservableObject} Observable object instance.
-		 */
-		set: function(name, value) {
-			var key, args, oldValue = this.data[name];
-
-			if (value instanceof Binding) {
-				value = value.create(this, name);
-			}
-
-			if (typeof name === "object") {
-				for (key in name) {
-					this.set(key, name[key]);
-				}
-
-				return this;
-			}
-
-			if (!isEqual(oldValue, value)) {
-				this.data[name] = value;
-
-				args = {
-					target: this,
-					name: name,
-					value: value,
-					oldValue: oldValue
-				};
-
-				this.fire('change:' + name, args);
-				this.fire('change', args);
-			}
-
-			return this;
-		},
-
-		/**
-		 * Gets a property by name.
-		 *
-		 * @method get
-		 * @param {String} name Name of the property to get.
-		 * @return {Object} Object value of propery.
-		 */
-		get: function(name) {
-			return this.data[name];
-		},
-
-		/**
-		 * Returns true/false if the specified property exists.
-		 *
-		 * @method has
-		 * @param {String} name Name of the property to check for.
-		 * @return {Boolean} true/false if the item exists.
-		 */
-		has: function(name) {
-			return name in this.data;
-		},
-
-		/**
-		 * Returns a dynamic property binding for the specified property name. This makes
-		 * it possible to sync the state of two properties in two ObservableObject instances.
-		 *
-		 * @method bind
-		 * @param {String} name Name of the property to sync with the property it's inserted to.
-		 * @return {tinymce.data.Binding} Data binding instance.
-		 */
-		bind: function(name) {
-			return Binding.create(this, name);
-		},
-
-		/**
-		 * Destroys the observable object and fires the "destroy"
-		 * event and clean up any internal resources.
-		 *
-		 * @method destroy
-		 */
-		destroy: function() {
-			this.fire('destroy');
-		}
-	});
-});
-
 // Included from: js/tinymce/classes/ui/Selector.js
 
 /**
  * Selector.js
  *
+ * Copyright, Moxiecode Systems AB
  * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
  *
  * License: http://www.tinymce.com/license
  * Contributing: http://www.tinymce.com/contributing
@@ -81245,7 +80962,7 @@ define("tinymce/ui/Selector", [
 						var i = classes.length;
 
 						while (i--) {
-							if (!item.classes.contains(classes[i])) {
+							if (!item.hasClass(classes[i])) {
 								return false;
 							}
 						}
@@ -81502,8 +81219,8 @@ define("tinymce/ui/Selector", [
 /**
  * Collection.js
  *
+ * Copyright, Moxiecode Systems AB
  * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
  *
  * License: http://www.tinymce.com/license
  * Contributing: http://www.tinymce.com/contributing
@@ -81711,7 +81428,7 @@ define("tinymce/ui/Collection", [
 		 * @return {Boolean} true/false state if the class exists or not.
 		 */
 		hasClass: function(cls) {
-			return this[0] ? this[0].classes.contains(cls) : false;
+			return this[0] ? this[0].hasClass(cls) : false;
 		},
 
 		/**
@@ -81777,32 +81494,6 @@ define("tinymce/ui/Collection", [
 			}
 
 			return this;
-		},
-
-		/**
-		 * Adds a class to all items in the collection.
-		 *
-		 * @method addClass
-		 * @param {String} cls Class to add to each item.
-		 * @return {tinymce.ui.Collection} Current collection instance.
-		 */
-		addClass: function(cls) {
-			return this.each(function(item) {
-				item.classes.add(cls);
-			});
-		},
-
-		/**
-		 * Removes the specified class from all items in collection.
-		 *
-		 * @method removeClass
-		 * @param {String} cls Class to remove from each item.
-		 * @return {tinymce.ui.Collection} Current collection instance.
-		 */
-		removeClass: function(cls) {
-			return this.each(function(item) {
-				item.classes.remove(cls);
-			});
 		}
 
 		/**
@@ -81905,10 +81596,28 @@ define("tinymce/ui/Collection", [
 		 * @return {tinymce.ui.Collection} Current collection instance or visible state of the first item on a get operation.
 		 */
 		// visible: function(state) {}, -- Generated by code below
+
+		/**
+		 * Adds a class to all items in the collection.
+		 *
+		 * @method addClass
+		 * @param {String} cls Class to add to each item.
+		 * @return {tinymce.ui.Collection} Current collection instance.
+		 */
+		// addClass: function(cls) {}, -- Generated by code below
+
+		/**
+		 * Removes the specified class from all items in collection.
+		 *
+		 * @method removeClass
+		 * @param {String} cls Class to remove from each item.
+		 * @return {tinymce.ui.Collection} Current collection instance.
+		 */
+		// removeClass: function(cls) {}, -- Generated by code below
 	};
 
 	// Extend tinymce.ui.Collection prototype with some generated control specific methods
-	Tools.each('fire on off show hide append prepend before after reflow'.split(' '), function(name) {
+	Tools.each('fire on off show hide addClass removeClass append prepend before after reflow'.split(' '), function(name) {
 		proto[name] = function() {
 			var args = Tools.toArray(arguments);
 
@@ -81941,10 +81650,10 @@ define("tinymce/ui/Collection", [
 // Included from: js/tinymce/classes/ui/DomUtils.js
 
 /**
- * DomUtils.js
+ * DOMUtils.js
  *
+ * Copyright, Moxiecode Systems AB
  * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
  *
  * License: http://www.tinymce.com/license
  * Contributing: http://www.tinymce.com/contributing
@@ -82042,28 +81751,200 @@ define("tinymce/ui/DomUtils", [
 	};
 });
 
-// Included from: js/tinymce/classes/ui/BoxUtils.js
+// Included from: js/tinymce/classes/ui/Control.js
 
 /**
- * BoxUtils.js
+ * Control.js
  *
+ * Copyright, Moxiecode Systems AB
  * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
  *
  * License: http://www.tinymce.com/license
  * Contributing: http://www.tinymce.com/contributing
  */
 
+/*eslint consistent-this:0 */
+
 /**
- * Utility class for box parsing and measuing.
+ * This is the base class for all controls and containers. All UI control instances inherit
+ * from this one as it has the base logic needed by all of them.
  *
- * @class tinymce.ui.BoxUtils
+ * @class tinymce.ui.Control
  */
-define("tinymce/ui/BoxUtils", [
-], function() {
+define("tinymce/ui/Control", [
+	"tinymce/util/Class",
+	"tinymce/util/Tools",
+	"tinymce/util/EventDispatcher",
+	"tinymce/ui/Collection",
+	"tinymce/ui/DomUtils"
+], function(Class, Tools, EventDispatcher, Collection, DomUtils) {
 	"use strict";
 
-	return {
+	var hasMouseWheelEventSupport = "onmousewheel" in document;
+	var hasWheelEventSupport = false;
+	var classPrefix = "mce-";
+
+	function getEventDispatcher(obj) {
+		if (!obj._eventDispatcher) {
+			obj._eventDispatcher = new EventDispatcher({
+				scope: obj,
+				toggleEvent: function(name, state) {
+					if (state && EventDispatcher.isNative(name)) {
+						if (!obj._nativeEvents) {
+							obj._nativeEvents = {};
+						}
+
+						obj._nativeEvents[name] = true;
+
+						if (obj._rendered) {
+							obj.bindPendingEvents();
+						}
+					}
+				}
+			});
+		}
+
+		return obj._eventDispatcher;
+	}
+
+	var Control = Class.extend({
+		Statics: {
+			classPrefix: classPrefix
+		},
+
+		isRtl: function() {
+			return Control.rtl;
+		},
+
+		/**
+		 * Class/id prefix to use for all controls.
+		 *
+		 * @final
+		 * @field {String} classPrefix
+		 */
+		classPrefix: classPrefix,
+
+		/**
+		 * Constructs a new control instance with the specified settings.
+		 *
+		 * @constructor
+		 * @param {Object} settings Name/value object with settings.
+		 * @setting {String} style Style CSS properties to add.
+		 * @setting {String} border Border box values example: 1 1 1 1
+		 * @setting {String} padding Padding box values example: 1 1 1 1
+		 * @setting {String} margin Margin box values example: 1 1 1 1
+		 * @setting {Number} minWidth Minimal width for the control.
+		 * @setting {Number} minHeight Minimal height for the control.
+		 * @setting {String} classes Space separated list of classes to add.
+		 * @setting {String} role WAI-ARIA role to use for control.
+		 * @setting {Boolean} hidden Is the control hidden by default.
+		 * @setting {Boolean} disabled Is the control disabled by default.
+		 * @setting {String} name Name of the control instance.
+		 */
+		init: function(settings) {
+			var self = this, classes, i;
+
+			self.settings = settings = Tools.extend({}, self.Defaults, settings);
+
+			// Initial states
+			self._id = settings.id || DomUtils.id();
+			self._text = self._name = '';
+			self._width = self._height = 0;
+			self._aria = {role: settings.role};
+			this._elmCache = {};
+
+			// Setup classes
+			classes = settings.classes;
+			if (classes) {
+				classes = classes.split(' ');
+				classes.map = {};
+				i = classes.length;
+				while (i--) {
+					classes.map[classes[i]] = true;
+				}
+			}
+
+			self._classes = classes || [];
+			self.visible(true);
+
+			// Set some properties
+			Tools.each('title text width height name classes visible disabled active value'.split(' '), function(name) {
+				var value = settings[name], undef;
+
+				if (value !== undef) {
+					self[name](value);
+				} else if (self['_' + name] === undef) {
+					self['_' + name] = false;
+				}
+			});
+
+			self.on('click', function() {
+				if (self.disabled()) {
+					return false;
+				}
+			});
+
+			// TODO: Is this needed duplicate code see above?
+			if (settings.classes) {
+				Tools.each(settings.classes.split(' '), function(cls) {
+					self.addClass(cls);
+				});
+			}
+
+			/**
+			 * Name/value object with settings for the current control.
+			 *
+			 * @field {Object} settings
+			 */
+			self.settings = settings;
+
+			self._borderBox = self.parseBox(settings.border);
+			self._paddingBox = self.parseBox(settings.padding);
+			self._marginBox = self.parseBox(settings.margin);
+
+			if (settings.hidden) {
+				self.hide();
+			}
+		},
+
+		// Will generate getter/setter methods for these properties
+		Properties: 'parent,title,text,width,height,disabled,active,name,value',
+
+		// Will generate empty dummy functions for these
+		Methods: 'renderHtml',
+
+		/**
+		 * Returns the root element to render controls into.
+		 *
+		 * @method getContainerElm
+		 * @return {Element} HTML DOM element to render into.
+		 */
+		getContainerElm: function() {
+			return document.body;
+		},
+
+		/**
+		 * Returns a control instance for the current DOM element.
+		 *
+		 * @method getParentCtrl
+		 * @param {Element} elm HTML dom element to get parent control from.
+		 * @return {tinymce.ui.Control} Control instance or undefined.
+		 */
+		getParentCtrl: function(elm) {
+			var ctrl, lookup = this.getRoot().controlIdLookup;
+
+			while (elm && lookup) {
+				ctrl = lookup[elm.id];
+				if (ctrl) {
+					break;
+				}
+
+				elm = elm.parentNode;
+			}
+
+			return ctrl;
+		},
+
 		/**
 		 * Parses the specified box value. A box value contains 1-4 properties in clockwise order.
 		 *
@@ -82110,6 +81991,18 @@ define("tinymce/ui/BoxUtils", [
 			};
 		},
 
+		borderBox: function() {
+			return this._borderBox;
+		},
+
+		paddingBox: function() {
+			return this._paddingBox;
+		},
+
+		marginBox: function() {
+			return this._marginBox;
+		},
+
 		measureBox: function(elm, prefix) {
 			function getStyle(name) {
 				var defaultView = document.defaultView;
@@ -82138,444 +82031,6 @@ define("tinymce/ui/BoxUtils", [
 				bottom: getSide(prefix + "BottomWidth"),
 				left: getSide(prefix + "LeftWidth")
 			};
-		}
-	};
-});
-
-// Included from: js/tinymce/classes/ui/ClassList.js
-
-/**
- * ClassList.js
- *
- * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
- *
- * License: http://www.tinymce.com/license
- * Contributing: http://www.tinymce.com/contributing
- */
-
-/**
- * Handles adding and removal of classes.
- *
- * @class tinymce.ui.ClassList
- */
-define("tinymce/ui/ClassList", [
-	"tinymce/util/Tools"
-], function(Tools) {
-	"use strict";
-
-	function noop() {
-	}
-
-	/**
-	 * Constructs a new class list the specified onchange
-	 * callback will be executed when the class list gets modifed.
-	 *
-	 * @constructor ClassList
-	 * @param {function} onchange Onchange callback to be executed.
-	 */
-	function ClassList(onchange) {
-		this.cls = [];
-		this.cls._map = {};
-		this.onchange = onchange || noop;
-		this.prefix = '';
-	}
-
-	Tools.extend(ClassList.prototype, {
-		/**
-		 * Adds a new class to the class list.
-		 *
-		 * @method add
-		 * @param {String} cls Class to be added.
-		 * @return {tinymce.ui.ClassList} Current class list instance.
-		 */
-		add: function(cls) {
-			if (cls && !this.contains(cls)) {
-				this.cls._map[cls] = true;
-				this.cls.push(cls);
-				this._change();
-			}
-
-			return this;
-		},
-
-		/**
-		 * Removes the specified class from the class list.
-		 *
-		 * @method remove
-		 * @param {String} cls Class to be removed.
-		 * @return {tinymce.ui.ClassList} Current class list instance.
-		 */
-		remove: function(cls) {
-			if (this.contains(cls)) {
-				for (var i = 0; i < this.cls.length; i++) {
-					if (this.cls[i] === cls) {
-						break;
-					}
-				}
-
-				this.cls.splice(i, 1);
-				delete this.cls._map[cls];
-				this._change();
-			}
-
-			return this;
-		},
-
-		/**
-		 * Toggles a class in the class list.
-		 *
-		 * @method toggle
-		 * @param {String} cls Class to be added/removed.
-		 * @param {Boolean} state Optional state if it should be added/removed.
-		 * @return {tinymce.ui.ClassList} Current class list instance.
-		 */
-		toggle: function(cls, state) {
-			var curState = this.contains(cls);
-
-			if (curState !== state) {
-				if (curState) {
-					this.remove(cls);
-				} else {
-					this.add(cls);
-				}
-
-				this._change();
-			}
-
-			return this;
-		},
-
-		/**
-		 * Returns true if the class list has the specified class.
-		 *
-		 * @method contains
-		 * @param {String} cls Class to look for.
-		 * @return {Boolean} true/false if the class exists or not.
-		 */
-		contains: function(cls) {
-			return !!this.cls._map[cls];
-		},
-
-		/**
-		 * Returns a space separated list of classes.
-		 *
-		 * @method toString
-		 * @return {String} Space separated list of classes.
-		 */
-
-		_change: function() {
-			delete this.clsValue;
-			this.onchange.call(this);
-		}
-	});
-
-	// IE 8 compatibility
-	ClassList.prototype.toString = function() {
-		var value;
-
-		if (this.clsValue) {
-			return this.clsValue;
-		}
-
-		value = '';
-		for (var i = 0; i < this.cls.length; i++) {
-			if (i > 0) {
-				value += ' ';
-			}
-
-			value += this.prefix + this.cls[i];
-		}
-
-		return value;
-	};
-
-	return ClassList;
-});
-
-// Included from: js/tinymce/classes/ui/ReflowQueue.js
-
-/**
- * ReflowQueue.js
- *
- * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
- *
- * License: http://www.tinymce.com/license
- * Contributing: http://www.tinymce.com/contributing
- */
-
-/**
- * This class will automatically reflow controls on the next animation frame within a few milliseconds on older browsers.
- * If the user manually reflows then the automatic reflow will be cancelled. This class is unsed internally when various control states
- * changes that triggers a reflow.
- *
- * @class tinymce.ui.ReflowQueue
- * @static
- */
-define("tinymce/ui/ReflowQueue", [
-], function() {
-	var dirtyCtrls = {}, animationFrameRequested;
-
-	function requestAnimationFrame(callback, element) {
-		var i, requestAnimationFrameFunc = window.requestAnimationFrame, vendors = ['ms', 'moz', 'webkit'];
-
-		function featurefill(callback) {
-			window.setTimeout(callback, 0);
-		}
-
-		for (i = 0; i < vendors.length && !requestAnimationFrameFunc; i++) {
-			requestAnimationFrameFunc = window[vendors[i] + 'RequestAnimationFrame'];
-		}
-
-		if (!requestAnimationFrameFunc) {
-			requestAnimationFrameFunc = featurefill;
-		}
-
-		requestAnimationFrameFunc(callback, element);
-	}
-
-	return {
-		/**
-		 * Adds a control to the next automatic reflow call. This is the control that had a state
-		 * change for example if the control was hidden/shown.
-		 *
-		 * @method add
-		 * @param {tinymce.ui.Control} ctrl Control to add to queue.
-		 */
-		add: function(ctrl) {
-			var parent = ctrl.parent();
-
-			if (parent) {
-				if (!parent._layout || parent._layout.isNative()) {
-					return;
-				}
-
-				if (!dirtyCtrls[parent._id]) {
-					dirtyCtrls[parent._id] = parent;
-				}
-
-				if (!animationFrameRequested) {
-					animationFrameRequested = true;
-
-					requestAnimationFrame(function() {
-						var id, ctrl;
-
-						animationFrameRequested = false;
-
-						for (id in dirtyCtrls) {
-							ctrl = dirtyCtrls[id];
-
-							if (ctrl.state.get('rendered')) {
-								ctrl.reflow();
-							}
-						}
-
-						dirtyCtrls = {};
-					}, document.body);
-				}
-			}
-		},
-
-		/**
-		 * Removes the specified control from the automatic reflow. This will happen when for example the user
-		 * manually triggers a reflow.
-		 *
-		 * @method remove
-		 * @param {tinymce.ui.Control} ctrl Control to remove from queue.
-		 */
-		remove: function(ctrl) {
-			if (dirtyCtrls[ctrl._id]) {
-				delete dirtyCtrls[ctrl._id];
-			}
-		}
-	};
-});
-
-// Included from: js/tinymce/classes/ui/Control.js
-
-/**
- * Control.js
- *
- * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
- *
- * License: http://www.tinymce.com/license
- * Contributing: http://www.tinymce.com/contributing
- */
-
-/*eslint consistent-this:0 */
-
-/**
- * This is the base class for all controls and containers. All UI control instances inherit
- * from this one as it has the base logic needed by all of them.
- *
- * @class tinymce.ui.Control
- */
-define("tinymce/ui/Control", [
-	"tinymce/util/Class",
-	"tinymce/util/Tools",
-	"tinymce/util/EventDispatcher",
-	"tinymce/data/ObservableObject",
-	"tinymce/ui/Collection",
-	"tinymce/ui/DomUtils",
-	"tinymce/dom/DomQuery",
-	"tinymce/ui/BoxUtils",
-	"tinymce/ui/ClassList",
-	"tinymce/ui/ReflowQueue"
-], function(Class, Tools, EventDispatcher, ObservableObject, Collection, DomUtils, $, BoxUtils, ClassList, ReflowQueue) {
-	"use strict";
-
-	var hasMouseWheelEventSupport = "onmousewheel" in document;
-	var hasWheelEventSupport = false;
-	var classPrefix = "mce-";
-	var Control, idCounter = 0;
-
-	var proto = {
-		Statics: {
-			classPrefix: classPrefix
-		},
-
-		isRtl: function() {
-			return Control.rtl;
-		},
-
-		/**
-		 * Class/id prefix to use for all controls.
-		 *
-		 * @final
-		 * @field {String} classPrefix
-		 */
-		classPrefix: classPrefix,
-
-		/**
-		 * Constructs a new control instance with the specified settings.
-		 *
-		 * @constructor
-		 * @param {Object} settings Name/value object with settings.
-		 * @setting {String} style Style CSS properties to add.
-		 * @setting {String} border Border box values example: 1 1 1 1
-		 * @setting {String} padding Padding box values example: 1 1 1 1
-		 * @setting {String} margin Margin box values example: 1 1 1 1
-		 * @setting {Number} minWidth Minimal width for the control.
-		 * @setting {Number} minHeight Minimal height for the control.
-		 * @setting {String} classes Space separated list of classes to add.
-		 * @setting {String} role WAI-ARIA role to use for control.
-		 * @setting {Boolean} hidden Is the control hidden by default.
-		 * @setting {Boolean} disabled Is the control disabled by default.
-		 * @setting {String} name Name of the control instance.
-		 */
-		init: function(settings) {
-			var self = this, classes, defaultClasses;
-
-			function applyClasses(classes) {
-				var i;
-
-				classes = classes.split(' ');
-				for (i = 0; i < classes.length; i++) {
-					self.classes.add(classes[i]);
-				}
-			}
-
-			self.settings = settings = Tools.extend({}, self.Defaults, settings);
-
-			// Initial states
-			self._id = settings.id || ("tinymce-" + (idCounter++));
-			self._aria = {role: settings.role};
-			self._elmCache = {};
-			self.$ = $;
-
-			self.state = new ObservableObject({
-				visible: true,
-				active: false,
-				disabled: false,
-				value: ''
-			});
-
-			self.data = new ObservableObject(settings.data);
-
-			self.classes = new ClassList(function() {
-				if (self.state.get('rendered')) {
-					self.getEl().className = this.toString();
-				}
-			});
-			self.classes.prefix = self.classPrefix;
-
-			// Setup classes
-			classes = settings.classes;
-			if (classes) {
-				if (self.Defaults) {
-					defaultClasses = self.Defaults.classes;
-
-					if (defaultClasses && classes != defaultClasses) {
-						applyClasses(defaultClasses);
-					}
-				}
-
-				applyClasses(classes);
-			}
-
-			Tools.each('title text name visible disabled active value'.split(' '), function(name) {
-				if (name in settings) {
-					self[name](settings[name]);
-				}
-			});
-
-			self.on('click', function() {
-				if (self.disabled()) {
-					return false;
-				}
-			});
-
-			/**
-			 * Name/value object with settings for the current control.
-			 *
-			 * @field {Object} settings
-			 */
-			self.settings = settings;
-
-			self.borderBox = BoxUtils.parseBox(settings.border);
-			self.paddingBox = BoxUtils.parseBox(settings.padding);
-			self.marginBox = BoxUtils.parseBox(settings.margin);
-
-			if (settings.hidden) {
-				self.hide();
-			}
-		},
-
-		// Will generate getter/setter methods for these properties
-		Properties: 'parent,name',
-
-		/**
-		 * Returns the root element to render controls into.
-		 *
-		 * @method getContainerElm
-		 * @return {Element} HTML DOM element to render into.
-		 */
-		getContainerElm: function() {
-			return document.body;
-		},
-
-		/**
-		 * Returns a control instance for the current DOM element.
-		 *
-		 * @method getParentCtrl
-		 * @param {Element} elm HTML dom element to get parent control from.
-		 * @return {tinymce.ui.Control} Control instance or undefined.
-		 */
-		getParentCtrl: function(elm) {
-			var ctrl, lookup = this.getRoot().controlIdLookup;
-
-			while (elm && lookup) {
-				ctrl = lookup[elm.id];
-				if (ctrl) {
-					break;
-				}
-
-				elm = elm.parentNode;
-			}
-
-			return ctrl;
 		},
 
 		/**
@@ -82592,9 +82047,9 @@ define("tinymce/ui/Control", [
 			var startMinWidth, startMinHeight, initialSize;
 
 			// Measure the current element
-			borderBox = self.borderBox = self.borderBox || BoxUtils.measureBox(elm, 'border');
-			self.paddingBox = self.paddingBox || BoxUtils.measureBox(elm, 'padding');
-			self.marginBox = self.marginBox || BoxUtils.measureBox(elm, 'margin');
+			borderBox = self._borderBox = self._borderBox || self.measureBox(elm, 'border');
+			self._paddingBox = self._paddingBox || self.measureBox(elm, 'padding');
+			self._marginBox = self._marginBox || self.measureBox(elm, 'margin');
 			initialSize = DomUtils.getSize(elm);
 
 			// Setup minWidth/minHeight and width/height
@@ -82761,8 +82216,7 @@ define("tinymce/ui/Control", [
 		 * @method repaint
 		 */
 		repaint: function() {
-			var self = this, style, bodyStyle, bodyElm, rect, borderBox;
-			var borderW = 0, borderH = 0, lastRepaintRect, round, value;
+			var self = this, style, bodyStyle, rect, borderBox, borderW = 0, borderH = 0, lastRepaintRect, round;
 
 			// Use Math.round on all values on IE < 9
 			round = !document.createRange ? Math.round : function(value) {
@@ -82773,7 +82227,7 @@ define("tinymce/ui/Control", [
 			rect = self._layoutRect;
 			lastRepaintRect = self._lastRepaintRect || {};
 
-			borderBox = self.borderBox;
+			borderBox = self._borderBox;
 			borderW = borderBox.left + borderBox.right;
 			borderH = borderBox.top + borderBox.bottom;
 
@@ -82788,39 +82242,25 @@ define("tinymce/ui/Control", [
 			}
 
 			if (rect.w !== lastRepaintRect.w) {
-				value = round(rect.w - borderW);
-				style.width = (value >= 0 ? value : 0) + 'px';
+				style.width = round(rect.w - borderW) + 'px';
 				lastRepaintRect.w = rect.w;
 			}
 
 			if (rect.h !== lastRepaintRect.h) {
-				value = round(rect.h - borderH);
-				style.height = (value >= 0 ? value : 0) + 'px';
+				style.height = round(rect.h - borderH) + 'px';
 				lastRepaintRect.h = rect.h;
 			}
 
 			// Update body if needed
 			if (self._hasBody && rect.innerW !== lastRepaintRect.innerW) {
-				value = round(rect.innerW);
-
-				bodyElm = self.getEl('body');
-				if (bodyElm) {
-					bodyStyle = bodyElm.style;
-					bodyStyle.width = (value >= 0 ? value : 0) + 'px';
-				}
-
+				bodyStyle = self.getEl('body').style;
+				bodyStyle.width = round(rect.innerW) + 'px';
 				lastRepaintRect.innerW = rect.innerW;
 			}
 
 			if (self._hasBody && rect.innerH !== lastRepaintRect.innerH) {
-				value = round(rect.innerH);
-
-				bodyElm = bodyElm || self.getEl('body');
-				if (bodyElm) {
-					bodyStyle = bodyStyle || bodyElm.style;
-					bodyStyle.height = (value >= 0 ? value : 0) + 'px';
-				}
-
+				bodyStyle = bodyStyle || self.getEl('body').style;
+				bodyStyle.height = round(rect.innerH) + 'px';
 				lastRepaintRect.innerH = rect.innerH;
 			}
 
@@ -82859,12 +82299,6 @@ define("tinymce/ui/Control", [
 								return false;
 							}
 						});
-					}
-
-					if (!callback) {
-						e.action = name;
-						this.fire('execute', e);
-						return;
 					}
 
 					return callback.call(scope, e);
@@ -82994,6 +82428,155 @@ define("tinymce/ui/Control", [
 		},
 
 		/**
+		 * Find the common ancestor for two control instances.
+		 *
+		 * @method findCommonAncestor
+		 * @param {tinymce.ui.Control} ctrl1 First control.
+		 * @param {tinymce.ui.Control} ctrl2 Second control.
+		 * @return {tinymce.ui.Control} Ancestor control instance.
+		 */
+		findCommonAncestor: function(ctrl1, ctrl2) {
+			var parentCtrl;
+
+			while (ctrl1) {
+				parentCtrl = ctrl2;
+
+				while (parentCtrl && ctrl1 != parentCtrl) {
+					parentCtrl = parentCtrl.parent();
+				}
+
+				if (ctrl1 == parentCtrl) {
+					break;
+				}
+
+				ctrl1 = ctrl1.parent();
+			}
+
+			return ctrl1;
+		},
+
+		/**
+		 * Returns true/false if the specific control has the specific class.
+		 *
+		 * @method hasClass
+		 * @param {String} cls Class to check for.
+		 * @param {String} [group] Sub element group name.
+		 * @return {Boolean} True/false if the control has the specified class.
+		 */
+		hasClass: function(cls, group) {
+			var classes = this._classes[group || 'control'];
+
+			cls = this.classPrefix + cls;
+
+			return classes && !!classes.map[cls];
+		},
+
+		/**
+		 * Adds the specified class to the control
+		 *
+		 * @method addClass
+		 * @param {String} cls Class to check for.
+		 * @param {String} [group] Sub element group name.
+		 * @return {tinymce.ui.Control} Current control object.
+		 */
+		addClass: function(cls, group) {
+			var self = this, classes, elm;
+
+			cls = this.classPrefix + cls;
+			classes = self._classes[group || 'control'];
+
+			if (!classes) {
+				classes = [];
+				classes.map = {};
+				self._classes[group || 'control'] = classes;
+			}
+
+			if (!classes.map[cls]) {
+				classes.map[cls] = cls;
+				classes.push(cls);
+
+				if (self._rendered) {
+					elm = self.getEl(group);
+
+					if (elm) {
+						elm.className = classes.join(' ');
+					}
+				}
+			}
+
+			return self;
+		},
+
+		/**
+		 * Removes the specified class from the control.
+		 *
+		 * @method removeClass
+		 * @param {String} cls Class to remove.
+		 * @param {String} [group] Sub element group name.
+		 * @return {tinymce.ui.Control} Current control object.
+		 */
+		removeClass: function(cls, group) {
+			var self = this, classes, i, elm;
+
+			cls = this.classPrefix + cls;
+			classes = self._classes[group || 'control'];
+			if (classes && classes.map[cls]) {
+				delete classes.map[cls];
+
+				i = classes.length;
+				while (i--) {
+					if (classes[i] === cls) {
+						classes.splice(i, 1);
+					}
+				}
+			}
+
+			if (self._rendered) {
+				elm = self.getEl(group);
+
+				if (elm) {
+					elm.className = classes.join(' ');
+				}
+			}
+
+			return self;
+		},
+
+		/**
+		 * Toggles the specified class on the control.
+		 *
+		 * @method toggleClass
+		 * @param {String} cls Class to remove.
+		 * @param {Boolean} state True/false state to add/remove class.
+		 * @param {String} [group] Sub element group name.
+		 * @return {tinymce.ui.Control} Current control object.
+		 */
+		toggleClass: function(cls, state, group) {
+			var self = this;
+
+			if (state) {
+				self.addClass(cls, group);
+			} else {
+				self.removeClass(cls, group);
+			}
+
+			return self;
+		},
+
+		/**
+		 * Returns the class string for the specified group name.
+		 *
+		 * @method classes
+		 * @param {String} [group] Group to get clases by.
+		 * @return {String} Classes for the specified group.
+		 */
+		classes: function(group) {
+			var classes = this._classes[group || 'control'];
+
+			return classes ? classes.join(' ') : '';
+		},
+
+		/**
 		 * Sets the inner HTML of the control element.
 		 *
 		 * @method innerHtml
@@ -83001,7 +82584,7 @@ define("tinymce/ui/Control", [
 		 * @return {tinymce.ui.Control} Current control object.
 		 */
 		innerHtml: function(html) {
-			this.$el.html(html);
+			DomUtils.innerHtml(this.getEl(), html);
 			return this;
 		},
 
@@ -83016,10 +82599,43 @@ define("tinymce/ui/Control", [
 			var id = suffix ? this._id + '-' + suffix : this._id;
 
 			if (!this._elmCache[id]) {
-				this._elmCache[id] = $('#' + id)[0];
+				this._elmCache[id] = DomUtils.get(id);
 			}
 
 			return this._elmCache[id];
+		},
+
+		/**
+		 * Sets/gets the visible for the control.
+		 *
+		 * @method visible
+		 * @param {Boolean} state Value to set to control.
+		 * @return {Boolean/tinymce.ui.Control} Current control on a set operation or current state on a get.
+		 */
+		visible: function(state) {
+			var self = this, parentCtrl;
+
+			if (typeof state !== "undefined") {
+				if (self._visible !== state) {
+					if (self._rendered) {
+						self.getEl().style.display = state ? '' : 'none';
+					}
+
+					self._visible = state;
+
+					// Parent container needs to reflow
+					parentCtrl = self.parent();
+					if (parentCtrl) {
+						parentCtrl._lastRect = null;
+					}
+
+					self.fire(state ? 'show' : 'hide');
+				}
+
+				return self;
+			}
+
+			return self._visible;
 		},
 
 		/**
@@ -83087,7 +82703,7 @@ define("tinymce/ui/Control", [
 				self._aria[name] = value;
 			}
 
-			if (self.state.get('rendered')) {
+			if (self._rendered) {
 				elm.setAttribute(name == 'role' ? name : 'aria-' + name, value);
 			}
 
@@ -83189,7 +82805,7 @@ define("tinymce/ui/Control", [
 			}
 
 			if (self._eventsRoot && self._eventsRoot == self) {
-				$(elm).off();
+				DomUtils.off(elm);
 			}
 
 			var lookup = self.getRoot().controlIdLookup;
@@ -83201,10 +82817,7 @@ define("tinymce/ui/Control", [
 				elm.parentNode.removeChild(elm);
 			}
 
-			self.state.set('rendered', false);
-			self.state.destroy();
-
-			self.fire('remove');
+			self._rendered = false;
 
 			return self;
 		},
@@ -83217,9 +82830,12 @@ define("tinymce/ui/Control", [
 		 * @return {tinymce.ui.Control} Current control instance.
 		 */
 		renderBefore: function(elm) {
-			$(elm).before(this.renderHtml());
-			this.postRender();
-			return this;
+			var self = this;
+
+			elm.parentNode.insertBefore(DomUtils.createFragment(self.renderHtml()), elm);
+			self.postRender();
+
+			return self;
 		},
 
 		/**
@@ -83230,19 +82846,13 @@ define("tinymce/ui/Control", [
 		 * @return {tinymce.ui.Control} Current control instance.
 		 */
 		renderTo: function(elm) {
-			$(elm || this.getContainerElm()).append(this.renderHtml());
-			this.postRender();
-			return this;
-		},
+			var self = this;
 
-		preRender: function() {
-		},
+			elm = elm || self.getContainerElm();
+			elm.appendChild(DomUtils.createFragment(self.renderHtml()));
+			self.postRender();
 
-		render: function() {
-		},
-
-		renderHtml: function() {
-			return '<div id="' + this._id + '" class="' + this.classes + '"></div>';
+			return self;
 		},
 
 		/**
@@ -83253,9 +82863,6 @@ define("tinymce/ui/Control", [
 		 */
 		postRender: function() {
 			var self = this, settings = self.settings, elm, box, parent, name, parentEventsRoot;
-
-			self.$el = $(self.getEl());
-			self.state.set('rendered', true);
 
 			// Bind on<event> settings
 			for (name in settings) {
@@ -83276,7 +82883,7 @@ define("tinymce/ui/Control", [
 				}
 			}
 
-			bindPendingEvents(self);
+			self.bindPendingEvents();
 
 			if (settings.style) {
 				elm = self.getEl();
@@ -83286,9 +82893,13 @@ define("tinymce/ui/Control", [
 				}
 			}
 
+			if (!self._visible) {
+				DomUtils.css(self.getEl(), 'display', 'none');
+			}
+
 			if (self.settings.border) {
-				box = self.borderBox;
-				self.$el.css({
+				box = self.borderBox();
+				DomUtils.css(self.getEl(), {
 					'border-top-width': box.top,
 					'border-right-width': box.right,
 					'border-bottom-width': box.bottom,
@@ -83308,37 +82919,7 @@ define("tinymce/ui/Control", [
 				self.aria(key, self._aria[key]);
 			}
 
-			if (self.state.get('visible') === false) {
-				self.getEl().style.display = 'none';
-			}
-
-			self.bindStates();
-
-			self.state.on('change:visible', function(e) {
-				var state = e.value, parentCtrl;
-
-				if (self.state.get('rendered')) {
-					self.getEl().style.display = state === false ? 'none' : '';
-
-					// Need to force a reflow here on IE 8
-					self.getEl().getBoundingClientRect();
-				}
-
-				// Parent container needs to reflow
-				parentCtrl = self.parent();
-				if (parentCtrl) {
-					parentCtrl._lastRect = null;
-				}
-
-				self.fire(state ? 'show' : 'hide');
-
-				ReflowQueue.add(self);
-			});
-
 			self.fire('postrender', {}, false);
-		},
-
-		bindStates: function() {
 		},
 
 		/**
@@ -83387,6 +82968,152 @@ define("tinymce/ui/Control", [
 			return this;
 		},
 
+		/**
+		 * Binds pending DOM events.
+		 *
+		 * @private
+		 */
+		bindPendingEvents: function() {
+			var self = this, i, l, parents, eventRootCtrl, nativeEvents, name;
+
+			function delegate(e) {
+				var control = self.getParentCtrl(e.target);
+
+				if (control) {
+					control.fire(e.type, e);
+				}
+			}
+
+			function mouseLeaveHandler() {
+				var ctrl = eventRootCtrl._lastHoverCtrl;
+
+				if (ctrl) {
+					ctrl.fire("mouseleave", {target: ctrl.getEl()});
+
+					ctrl.parents().each(function(ctrl) {
+						ctrl.fire("mouseleave", {target: ctrl.getEl()});
+					});
+
+					eventRootCtrl._lastHoverCtrl = null;
+				}
+			}
+
+			function mouseEnterHandler(e) {
+				var ctrl = self.getParentCtrl(e.target), lastCtrl = eventRootCtrl._lastHoverCtrl, idx = 0, i, parents, lastParents;
+
+				// Over on a new control
+				if (ctrl !== lastCtrl) {
+					eventRootCtrl._lastHoverCtrl = ctrl;
+
+					parents = ctrl.parents().toArray().reverse();
+					parents.push(ctrl);
+
+					if (lastCtrl) {
+						lastParents = lastCtrl.parents().toArray().reverse();
+						lastParents.push(lastCtrl);
+
+						for (idx = 0; idx < lastParents.length; idx++) {
+							if (parents[idx] !== lastParents[idx]) {
+								break;
+							}
+						}
+
+						for (i = lastParents.length - 1; i >= idx; i--) {
+							lastCtrl = lastParents[i];
+							lastCtrl.fire("mouseleave", {
+								target: lastCtrl.getEl()
+							});
+						}
+					}
+
+					for (i = idx; i < parents.length; i++) {
+						ctrl = parents[i];
+						ctrl.fire("mouseenter", {
+							target: ctrl.getEl()
+						});
+					}
+				}
+			}
+
+			function fixWheelEvent(e) {
+				e.preventDefault();
+
+				if (e.type == "mousewheel") {
+					e.deltaY = -1 / 40 * e.wheelDelta;
+
+					if (e.wheelDeltaX) {
+						e.deltaX = -1 / 40 * e.wheelDeltaX;
+					}
+				} else {
+					e.deltaX = 0;
+					e.deltaY = e.detail;
+				}
+
+				e = self.fire("wheel", e);
+			}
+
+			self._rendered = true;
+
+			nativeEvents = self._nativeEvents;
+			if (nativeEvents) {
+				// Find event root element if it exists
+				parents = self.parents().toArray();
+				parents.unshift(self);
+				for (i = 0, l = parents.length; !eventRootCtrl && i < l; i++) {
+					eventRootCtrl = parents[i]._eventsRoot;
+				}
+
+				// Event root wasn't found the use the root control
+				if (!eventRootCtrl) {
+					eventRootCtrl = parents[parents.length - 1] || self;
+				}
+
+				// Set the eventsRoot property on children that didn't have it
+				self._eventsRoot = eventRootCtrl;
+				for (l = i, i = 0; i < l; i++) {
+					parents[i]._eventsRoot = eventRootCtrl;
+				}
+
+				var eventRootDelegates = eventRootCtrl._delegates;
+				if (!eventRootDelegates) {
+					eventRootDelegates = eventRootCtrl._delegates = {};
+				}
+
+				// Bind native event delegates
+				for (name in nativeEvents) {
+					if (!nativeEvents) {
+						return false;
+					}
+
+					if (name === "wheel" && !hasWheelEventSupport) {
+						if (hasMouseWheelEventSupport) {
+							DomUtils.on(self.getEl(), "mousewheel", fixWheelEvent);
+						} else {
+							DomUtils.on(self.getEl(), "DOMMouseScroll", fixWheelEvent);
+						}
+
+						continue;
+					}
+
+					// Special treatment for mousenter/mouseleave since these doesn't bubble
+					if (name === "mouseenter" || name === "mouseleave") {
+						// Fake mousenter/mouseleave
+						if (!eventRootCtrl._hasMouseEnter) {
+							DomUtils.on(eventRootCtrl.getEl(), "mouseleave", mouseLeaveHandler);
+							DomUtils.on(eventRootCtrl.getEl(), "mouseover", mouseEnterHandler);
+							eventRootCtrl._hasMouseEnter = 1;
+						}
+					} else if (!eventRootDelegates[name]) {
+						DomUtils.on(eventRootCtrl.getEl(), name, delegate);
+						eventRootDelegates[name] = true;
+					}
+
+					// Remove the event once it's bound
+					nativeEvents[name] = false;
+				}
+			}
+		},
+
 		getRoot: function() {
 			var ctrl = this, rootControl, parents = [];
 
@@ -83425,12 +83152,7 @@ define("tinymce/ui/Control", [
 		 * @return {tinymce.ui.Control} Current control instance.
 		 */
 		reflow: function() {
-			ReflowQueue.remove(this);
-
-			var parent = this.parent();
-			if (parent._layout && !parent._layout.isNative()) {
-				parent.reflow();
-			}
+			this.repaint();
 
 			return this;
 		}
@@ -83452,6 +83174,24 @@ define("tinymce/ui/Control", [
 		 * @return {String/tinymce.ui.Control} Current control on a set operation or current value on a get.
 		 */
 		// text: function(value) {} -- Generated
+
+		/**
+		 * Sets/gets the width for the control.
+		 *
+		 * @method width
+		 * @param {Number} value Value to set to control.
+		 * @return {Number/tinymce.ui.Control} Current control on a set operation or current value on a get.
+		 */
+		// width: function(value) {} -- Generated
+
+		/**
+		 * Sets/gets the height for the control.
+		 *
+		 * @method height
+		 * @param {Number} value Value to set to control.
+		 * @return {Number/tinymce.ui.Control} Current control on a set operation or current value on a get.
+		 */
+		// height: function(value) {} -- Generated
 
 		/**
 		 * Sets/gets the disabled state on the control.
@@ -83488,196 +83228,7 @@ define("tinymce/ui/Control", [
 		 * @return {String/tinymce.ui.Control} Current control on a set operation or current value on a get.
 		 */
 		// title: function(value) {} -- Generated
-
-		/**
-		 * Sets/gets the visible for the control.
-		 *
-		 * @method visible
-		 * @param {Boolean} state Value to set to control.
-		 * @return {Boolean/tinymce.ui.Control} Current control on a set operation or current state on a get.
-		 */
-		// visible: function(value) {} -- Generated
-	};
-
-	/**
-	 * Setup state properties.
-	 */
-	Tools.each('text title visible disabled active value'.split(' '), function(name) {
-		proto[name] = function(value) {
-			if (arguments.length === 0) {
-				return this.state.get(name);
-			}
-
-			if (typeof value != "undefined") {
-				this.state.set(name, value);
-			}
-
-			return this;
-		};
 	});
-
-	Control = Class.extend(proto);
-
-	function getEventDispatcher(obj) {
-		if (!obj._eventDispatcher) {
-			obj._eventDispatcher = new EventDispatcher({
-				scope: obj,
-				toggleEvent: function(name, state) {
-					if (state && EventDispatcher.isNative(name)) {
-						if (!obj._nativeEvents) {
-							obj._nativeEvents = {};
-						}
-
-						obj._nativeEvents[name] = true;
-
-						if (obj.state.get('rendered')) {
-							bindPendingEvents(obj);
-						}
-					}
-				}
-			});
-		}
-
-		return obj._eventDispatcher;
-	}
-
-	function bindPendingEvents(eventCtrl) {
-		var i, l, parents, eventRootCtrl, nativeEvents, name;
-
-		function delegate(e) {
-			var control = eventCtrl.getParentCtrl(e.target);
-
-			if (control) {
-				control.fire(e.type, e);
-			}
-		}
-
-		function mouseLeaveHandler() {
-			var ctrl = eventRootCtrl._lastHoverCtrl;
-
-			if (ctrl) {
-				ctrl.fire("mouseleave", {target: ctrl.getEl()});
-
-				ctrl.parents().each(function(ctrl) {
-					ctrl.fire("mouseleave", {target: ctrl.getEl()});
-				});
-
-				eventRootCtrl._lastHoverCtrl = null;
-			}
-		}
-
-		function mouseEnterHandler(e) {
-			var ctrl = eventCtrl.getParentCtrl(e.target), lastCtrl = eventRootCtrl._lastHoverCtrl, idx = 0, i, parents, lastParents;
-
-			// Over on a new control
-			if (ctrl !== lastCtrl) {
-				eventRootCtrl._lastHoverCtrl = ctrl;
-
-				parents = ctrl.parents().toArray().reverse();
-				parents.push(ctrl);
-
-				if (lastCtrl) {
-					lastParents = lastCtrl.parents().toArray().reverse();
-					lastParents.push(lastCtrl);
-
-					for (idx = 0; idx < lastParents.length; idx++) {
-						if (parents[idx] !== lastParents[idx]) {
-							break;
-						}
-					}
-
-					for (i = lastParents.length - 1; i >= idx; i--) {
-						lastCtrl = lastParents[i];
-						lastCtrl.fire("mouseleave", {
-							target: lastCtrl.getEl()
-						});
-					}
-				}
-
-				for (i = idx; i < parents.length; i++) {
-					ctrl = parents[i];
-					ctrl.fire("mouseenter", {
-						target: ctrl.getEl()
-					});
-				}
-			}
-		}
-
-		function fixWheelEvent(e) {
-			e.preventDefault();
-
-			if (e.type == "mousewheel") {
-				e.deltaY = -1 / 40 * e.wheelDelta;
-
-				if (e.wheelDeltaX) {
-					e.deltaX = -1 / 40 * e.wheelDeltaX;
-				}
-			} else {
-				e.deltaX = 0;
-				e.deltaY = e.detail;
-			}
-
-			e = eventCtrl.fire("wheel", e);
-		}
-
-		nativeEvents = eventCtrl._nativeEvents;
-		if (nativeEvents) {
-			// Find event root element if it exists
-			parents = eventCtrl.parents().toArray();
-			parents.unshift(eventCtrl);
-			for (i = 0, l = parents.length; !eventRootCtrl && i < l; i++) {
-				eventRootCtrl = parents[i]._eventsRoot;
-			}
-
-			// Event root wasn't found the use the root control
-			if (!eventRootCtrl) {
-				eventRootCtrl = parents[parents.length - 1] || eventCtrl;
-			}
-
-			// Set the eventsRoot property on children that didn't have it
-			eventCtrl._eventsRoot = eventRootCtrl;
-			for (l = i, i = 0; i < l; i++) {
-				parents[i]._eventsRoot = eventRootCtrl;
-			}
-
-			var eventRootDelegates = eventRootCtrl._delegates;
-			if (!eventRootDelegates) {
-				eventRootDelegates = eventRootCtrl._delegates = {};
-			}
-
-			// Bind native event delegates
-			for (name in nativeEvents) {
-				if (!nativeEvents) {
-					return false;
-				}
-
-				if (name === "wheel" && !hasWheelEventSupport) {
-					if (hasMouseWheelEventSupport) {
-						$(eventCtrl.getEl()).on("mousewheel", fixWheelEvent);
-					} else {
-						$(eventCtrl.getEl()).on("DOMMouseScroll", fixWheelEvent);
-					}
-
-					continue;
-				}
-
-				// Special treatment for mousenter/mouseleave since these doesn't bubble
-				if (name === "mouseenter" || name === "mouseleave") {
-					// Fake mousenter/mouseleave
-					if (!eventRootCtrl._hasMouseEnter) {
-						$(eventRootCtrl.getEl()).on("mouseleave", mouseLeaveHandler).on("mouseover", mouseEnterHandler);
-						eventRootCtrl._hasMouseEnter = 1;
-					}
-				} else if (!eventRootDelegates[name]) {
-					$(eventRootCtrl.getEl()).on(name, delegate);
-					eventRootDelegates[name] = true;
-				}
-
-				// Remove the event once it's bound
-				nativeEvents[name] = false;
-			}
-		}
-	}
 
 	return Control;
 });
@@ -83687,8 +83238,8 @@ define("tinymce/ui/Control", [
 /**
  * Factory.js
  *
+ * Copyright, Moxiecode Systems AB
  * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
  *
  * License: http://www.tinymce.com/license
  * Contributing: http://www.tinymce.com/contributing
@@ -83795,8 +83346,8 @@ define("tinymce/ui/Factory", [], function() {
 /**
  * KeyboardNavigation.js
  *
+ * Copyright, Moxiecode Systems AB
  * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
  *
  * License: http://www.tinymce.com/license
  * Contributing: http://www.tinymce.com/contributing
@@ -83820,10 +83371,6 @@ define("tinymce/ui/KeyboardNavigation", [
 	return function(settings) {
 		var root = settings.root, focusedElement, focusedControl;
 
-		function isElement(node) {
-			return node && node.nodeType === 1;
-		}
-
 		try {
 			focusedElement = document.activeElement;
 		} catch (ex) {
@@ -83844,11 +83391,7 @@ define("tinymce/ui/KeyboardNavigation", [
 		function getRole(elm) {
 			elm = elm || focusedElement;
 
-			if (isElement(elm)) {
-				return elm.getAttribute('role');
-			}
-
-			return null;
+			return elm && elm.getAttribute('role');
 		}
 
 		/**
@@ -83879,7 +83422,7 @@ define("tinymce/ui/KeyboardNavigation", [
 		function getAriaProp(name) {
 			var elm = focusedElement;
 
-			if (isElement(elm)) {
+			if (elm) {
 				return elm.getAttribute('aria-' + name);
 			}
 		}
@@ -84204,8 +83747,8 @@ define("tinymce/ui/KeyboardNavigation", [
 /**
  * Container.js
  *
+ * Copyright, Moxiecode Systems AB
  * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
  *
  * License: http://www.tinymce.com/license
  * Contributing: http://www.tinymce.com/contributing
@@ -84227,15 +83770,16 @@ define("tinymce/ui/Container", [
 	"tinymce/ui/Factory",
 	"tinymce/ui/KeyboardNavigation",
 	"tinymce/util/Tools",
-	"tinymce/dom/DomQuery",
-	"tinymce/ui/ClassList",
-	"tinymce/ui/ReflowQueue"
-], function(Control, Collection, Selector, Factory, KeyboardNavigation, Tools, $, ClassList, ReflowQueue) {
+	"tinymce/ui/DomUtils"
+], function(Control, Collection, Selector, Factory, KeyboardNavigation, Tools, DomUtils) {
 	"use strict";
 
 	var selectorCache = {};
 
 	return Control.extend({
+		layout: '',
+		innerClass: 'container-inner',
+
 		/**
 		 * Constructs a new control instance with the specified settings.
 		 *
@@ -84250,37 +83794,24 @@ define("tinymce/ui/Container", [
 
 			self._super(settings);
 			settings = self.settings;
-
-			if (settings.fixed) {
-				self.state.set('fixed', true);
-			}
-
+			self._fixed = settings.fixed;
 			self._items = new Collection();
 
 			if (self.isRtl()) {
-				self.classes.add('rtl');
+				self.addClass('rtl');
 			}
 
-			self.bodyClasses = new ClassList(function() {
-				if (self.state.get('rendered')) {
-					self.getEl('body').className = this.toString();
-				}
-			});
-			self.bodyClasses.prefix = self.classPrefix;
-
-			self.classes.add('container');
-			self.bodyClasses.add('container-body');
+			self.addClass('container');
+			self.addClass('container-body', 'body');
 
 			if (settings.containerCls) {
-				self.classes.add(settings.containerCls);
+				self.addClass(settings.containerCls);
 			}
 
-			self._layout = Factory.create((settings.layout || '') + 'layout');
+			self._layout = Factory.create((settings.layout || self.layout) + 'layout');
 
 			if (self.settings.items) {
 				self.add(self.settings.items);
-			} else {
-				self.add(self.render());
 			}
 
 			// TODO: Fix this!
@@ -84457,26 +83988,26 @@ define("tinymce/ui/Container", [
 
 			// Render any new items
 			self.items().each(function(ctrl, index) {
-				var containerElm;
+				var containerElm, fragment;
 
 				ctrl.parent(self);
 
-				if (!ctrl.state.get('rendered')) {
+				if (!ctrl._rendered) {
 					containerElm = self.getEl('body');
+					fragment = DomUtils.createFragment(ctrl.renderHtml());
 
 					// Insert or append the item
 					if (containerElm.hasChildNodes() && index <= containerElm.childNodes.length - 1) {
-						$(containerElm.childNodes[index]).before(ctrl.renderHtml());
+						containerElm.insertBefore(fragment, containerElm.childNodes[index]);
 					} else {
-						$(containerElm).append(ctrl.renderHtml());
+						containerElm.appendChild(fragment);
 					}
 
 					ctrl.postRender();
-					ReflowQueue.add(ctrl);
 				}
 			});
 
-			self._layout.applyClasses(self.items().filter(':visible'));
+			self._layout.applyClasses(self);
 			self._lastRect = null;
 
 			return self;
@@ -84575,6 +84106,9 @@ define("tinymce/ui/Container", [
 			return data;
 		},
 
+		preRender: function() {
+		},
+
 		/**
 		 * Renders the control as a HTML string.
 		 *
@@ -84588,8 +84122,8 @@ define("tinymce/ui/Container", [
 			layout.preRender(self);
 
 			return (
-				'<div id="' + self._id + '" class="' + self.classes + '"' + (role ? ' role="' + this.settings.role + '"' : '') + '>' +
-					'<div id="' + self._id + '-body" class="' + self.bodyClasses + '">' +
+				'<div id="' + self._id + '" class="' + self.classes() + '"' + (role ? ' role="' + this.settings.role + '"' : '') + '>' +
+					'<div id="' + self._id + '-body" class="' + self.classes('body') + '">' +
 						(self.settings.html || '') + layout.renderHtml(self) +
 					'</div>' +
 				'</div>'
@@ -84609,15 +84143,15 @@ define("tinymce/ui/Container", [
 			self._super();
 
 			self._layout.postRender(self);
-			self.state.set('rendered', true);
+			self._rendered = true;
 
 			if (self.settings.style) {
-				self.$el.css(self.settings.style);
+				DomUtils.css(self.getEl(), self.settings.style);
 			}
 
 			if (self.settings.border) {
-				box = self.borderBox;
-				self.$el.css({
+				box = self.borderBox();
+				DomUtils.css(self.getEl(), {
 					'border-top-width': box.top,
 					'border-right-width': box.right,
 					'border-bottom-width': box.bottom,
@@ -84682,8 +84216,6 @@ define("tinymce/ui/Container", [
 		reflow: function() {
 			var i;
 
-			ReflowQueue.remove(this);
-
 			if (this.visible()) {
 				Control.repaintControls = [];
 				Control.repaintControls.map = {};
@@ -84713,8 +84245,8 @@ define("tinymce/ui/Container", [
 /**
  * DragHelper.js
  *
+ * Copyright, Moxiecode Systems AB
  * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
  *
  * License: http://www.tinymce.com/license
  * Contributing: http://www.tinymce.com/contributing
@@ -84738,12 +84270,12 @@ define("tinymce/ui/Container", [
  * @class tinymce.ui.DragHelper
  */
 define("tinymce/ui/DragHelper", [
-	"tinymce/dom/DomQuery"
-], function($) {
+	"tinymce/ui/DomUtils"
+], function(DomUtils) {
 	"use strict";
 
-	function getDocumentSize(doc) {
-		var documentElement, body, scrollWidth, clientWidth;
+	function getDocumentSize() {
+		var doc = document, documentElement, body, scrollWidth, clientWidth;
 		var offsetWidth, scrollHeight, clientHeight, offsetHeight, max = Math.max;
 
 		documentElement = doc.documentElement;
@@ -84763,19 +84295,8 @@ define("tinymce/ui/DragHelper", [
 		};
 	}
 
-	function updateWithTouchData(e) {
-		var keys, i;
-
-		if (e.changedTouches) {
-			keys = "screenX screenY pageX pageY clientX clientY".split(' ');
-			for (i = 0; i < keys.length; i++) {
-				e[keys[i]] = e.changedTouches[0][keys[i]];
-			}
-		}
-	}
-
 	return function(id, settings) {
-		var $eventOverlay, doc = settings.document || document, downButton, start, stop, drag, startX, startY;
+		var eventOverlayElm, doc = document, downButton, start, stop, drag, startX, startY;
 
 		settings = settings || {};
 
@@ -84784,9 +84305,7 @@ define("tinymce/ui/DragHelper", [
 		}
 
 		start = function(e) {
-			var docSize = getDocumentSize(doc), handleElm, cursor;
-
-			updateWithTouchData(e);
+			var docSize = getDocumentSize(), handleElm, cursor;
 
 			e.preventDefault();
 			downButton = e.button;
@@ -84794,14 +84313,16 @@ define("tinymce/ui/DragHelper", [
 			startX = e.screenX;
 			startY = e.screenY;
 
-			// Grab cursor from handle so we can place it on overlay
+			// Grab cursor from handle
 			if (window.getComputedStyle) {
 				cursor = window.getComputedStyle(handleElm, null).getPropertyValue("cursor");
 			} else {
 				cursor = handleElm.runtimeStyle.cursor;
 			}
 
-			$eventOverlay = $('<div>').css({
+			// Create event overlay and add it to document
+			eventOverlayElm = doc.createElement('div');
+			DomUtils.css(eventOverlayElm, {
 				position: "absolute",
 				top: 0, left: 0,
 				width: docSize.width,
@@ -84809,16 +84330,19 @@ define("tinymce/ui/DragHelper", [
 				zIndex: 0x7FFFFFFF,
 				opacity: 0.0001,
 				cursor: cursor
-			}).appendTo(doc.body);
+			});
 
-			$(doc).on('mousemove touchmove', drag).on('mouseup touchend', stop);
+			doc.body.appendChild(eventOverlayElm);
 
+			// Bind mouse events
+			DomUtils.on(doc, 'mousemove', drag);
+			DomUtils.on(doc, 'mouseup', stop);
+
+			// Begin drag
 			settings.start(e);
 		};
 
 		drag = function(e) {
-			updateWithTouchData(e);
-
 			if (e.button !== downButton) {
 				return stop(e);
 			}
@@ -84831,11 +84355,10 @@ define("tinymce/ui/DragHelper", [
 		};
 
 		stop = function(e) {
-			updateWithTouchData(e);
+			DomUtils.off(doc, 'mousemove', drag);
+			DomUtils.off(doc, 'mouseup', stop);
 
-			$(doc).off('mousemove touchmove', drag).off('mouseup touchend', stop);
-
-			$eventOverlay.remove();
+			eventOverlayElm.parentNode.removeChild(eventOverlayElm);
 
 			if (settings.stop) {
 				settings.stop(e);
@@ -84848,10 +84371,10 @@ define("tinymce/ui/DragHelper", [
 		 * @method destroy
 		 */
 		this.destroy = function() {
-			$(getHandleElm()).off();
+			DomUtils.off(getHandleElm());
 		};
 
-		$(getHandleElm()).on('mousedown touchstart', start);
+		DomUtils.on(getHandleElm(), 'mousedown', start);
 	};
 });
 
@@ -84860,8 +84383,8 @@ define("tinymce/ui/DragHelper", [
 /**
  * Scrollable.js
  *
+ * Copyright, Moxiecode Systems AB
  * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
  *
  * License: http://www.tinymce.com/license
  * Contributing: http://www.tinymce.com/contributing
@@ -84874,9 +84397,9 @@ define("tinymce/ui/DragHelper", [
  * @mixin tinymce.ui.Scrollable
  */
 define("tinymce/ui/Scrollable", [
-	"tinymce/dom/DomQuery",
+	"tinymce/ui/DomUtils",
 	"tinymce/ui/DragHelper"
-], function($, DragHelper) {
+], function(DomUtils, DragHelper) {
 	"use strict";
 
 	return {
@@ -84901,14 +84424,16 @@ define("tinymce/ui/Scrollable", [
 						posNameLower = posName.toLowerCase();
 						sizeNameLower = sizeName.toLowerCase();
 
-						$(self.getEl('absend')).css(posNameLower, self.layoutRect()[contentSizeName] - 1);
+						if (self.getEl('absend')) {
+							DomUtils.css(self.getEl('absend'), posNameLower, self.layoutRect()[contentSizeName] - 1);
+						}
 
 						if (!hasScroll) {
-							$(scrollBarElm).css('display', 'none');
+							DomUtils.css(scrollBarElm, 'display', 'none');
 							return;
 						}
 
-						$(scrollBarElm).css('display', 'block');
+						DomUtils.css(scrollBarElm, 'display', 'block');
 						containerElm = self.getEl('body');
 						scrollThumbElm = self.getEl('scroll' + axisName + "t");
 						containerSize = containerElm["client" + sizeName] - (margin * 2);
@@ -84919,12 +84444,12 @@ define("tinymce/ui/Scrollable", [
 						rect = {};
 						rect[posNameLower] = containerElm["offset" + posName] + margin;
 						rect[sizeNameLower] = containerSize;
-						$(scrollBarElm).css(rect);
+						DomUtils.css(scrollBarElm, rect);
 
 						rect = {};
 						rect[posNameLower] = containerElm["scroll" + posName] * ratio;
 						rect[sizeNameLower] = containerSize * ratio;
-						$(scrollThumbElm).css(rect);
+						DomUtils.css(scrollThumbElm, rect);
 					}
 				}
 
@@ -84940,16 +84465,16 @@ define("tinymce/ui/Scrollable", [
 				function addScrollAxis(axisName, posName, sizeName, deltaPosName, ax) {
 					var scrollStart, axisId = self._id + '-scroll' + axisName, prefix = self.classPrefix;
 
-					$(self.getEl()).append(
+					self.getEl().appendChild(DomUtils.createFragment(
 						'<div id="' + axisId + '" class="' + prefix + 'scrollbar ' + prefix + 'scrollbar-' + axisName + '">' +
 							'<div id="' + axisId + 't" class="' + prefix + 'scrollbar-thumb"></div>' +
 						'</div>'
-					);
+					));
 
 					self.draghelper = new DragHelper(axisId + 't', {
 						start: function() {
 							scrollStart = self.getEl('body')["scroll" + posName];
-							$('#' + axisId).addClass(prefix + 'active');
+							DomUtils.addClass(DomUtils.get(axisId), prefix + 'active');
 						},
 
 						drag: function(e) {
@@ -84965,12 +84490,18 @@ define("tinymce/ui/Scrollable", [
 						},
 
 						stop: function() {
-							$('#' + axisId).removeClass(prefix + 'active');
+							DomUtils.removeClass(DomUtils.get(axisId), prefix + 'active');
 						}
 					});
+/*
+					self.on('click', function(e) {
+						if (e.target.id == self._id + '-scrollv') {
+
+						}
+					});*/
 				}
 
-				self.classes.add('scroll');
+				self.addClass('scroll');
 
 				addScrollAxis("v", "Top", "Height", "Y", "Width");
 				addScrollAxis("h", "Left", "Width", "X", "Height");
@@ -84990,7 +84521,7 @@ define("tinymce/ui/Scrollable", [
 						repaintScroll();
 					});
 
-					$(self.getEl('body')).on("scroll", repaintScroll);
+					DomUtils.on(self.getEl('body'), "scroll", repaintScroll);
 				}
 
 				repaintScroll();
@@ -85004,8 +84535,8 @@ define("tinymce/ui/Scrollable", [
 /**
  * Panel.js
  *
+ * Copyright, Moxiecode Systems AB
  * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
  *
  * License: http://www.tinymce.com/license
  * Contributing: http://www.tinymce.com/contributing
@@ -85047,7 +84578,7 @@ define("tinymce/ui/Panel", [
 
 			if (typeof innerHtml == "undefined") {
 				innerHtml = (
-					'<div id="' + self._id + '-body" class="' + self.bodyClasses + '">' +
+					'<div id="' + self._id + '-body" class="' + self.classes('body') + '">' +
 						layout.renderHtml(self) +
 					'</div>'
 				);
@@ -85060,7 +84591,7 @@ define("tinymce/ui/Panel", [
 			}
 
 			return (
-				'<div id="' + self._id + '" class="' + self.classes + '" hidefocus="1" tabindex="-1" role="group">' +
+				'<div id="' + self._id + '" class="' + self.classes() + '" hidefocus="1" tabindex="-1" role="group">' +
 					(self._preBodyHtml || '') +
 					innerHtml +
 				'</div>'
@@ -85074,8 +84605,8 @@ define("tinymce/ui/Panel", [
 /**
  * Movable.js
  *
+ * Copyright, Moxiecode Systems AB
  * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
  *
  * License: http://www.tinymce.com/license
  * Contributing: http://www.tinymce.com/contributing
@@ -85101,7 +84632,7 @@ define("tinymce/ui/Movable", [
 		x = pos.x;
 		y = pos.y;
 
-		if (ctrl.state.get('fixed') && DomUtils.getRuntimeStyle(document.body, 'position') == 'static') {
+		if (ctrl._fixed && DomUtils.getRuntimeStyle(document.body, 'position') == 'static') {
 			x -= viewport.x;
 			y -= viewport.y;
 		}
@@ -85177,7 +84708,7 @@ define("tinymce/ui/Movable", [
 			for (var i = 0; i < rels.length; i++) {
 				var pos = calculateRelativePosition(this, elm, rels[i]);
 
-				if (this.state.get('fixed')) {
+				if (this._fixed) {
 					if (pos.x > 0 && pos.x + pos.w < viewPortRect.w && pos.y > 0 && pos.y + pos.h < viewPortRect.h) {
 						return rels[i];
 					}
@@ -85237,7 +84768,7 @@ define("tinymce/ui/Movable", [
 			var self = this;
 
 			// TODO: Move this to some global class
-			function constrain(value, max, size) {
+			function contrain(value, max, size) {
 				if (value < 0) {
 					return 0;
 				}
@@ -85254,11 +84785,11 @@ define("tinymce/ui/Movable", [
 				var viewPortRect = DomUtils.getViewPort(window);
 				var layoutRect = self.layoutRect();
 
-				x = constrain(x, viewPortRect.w + viewPortRect.x, layoutRect.w);
-				y = constrain(y, viewPortRect.h + viewPortRect.y, layoutRect.h);
+				x = contrain(x, viewPortRect.w + viewPortRect.x, layoutRect.w);
+				y = contrain(y, viewPortRect.h + viewPortRect.y, layoutRect.h);
 			}
 
-			if (self.state.get('rendered')) {
+			if (self._rendered) {
 				self.layoutRect({x: x, y: y}).repaint();
 			} else {
 				self.settings.x = x;
@@ -85277,8 +84808,8 @@ define("tinymce/ui/Movable", [
 /**
  * Resizable.js
  *
+ * Copyright, Moxiecode Systems AB
  * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
  *
  * License: http://www.tinymce.com/license
  * Contributing: http://www.tinymce.com/contributing
@@ -85348,8 +84879,8 @@ define("tinymce/ui/Resizable", [
 /**
  * FloatPanel.js
  *
+ * Copyright, Moxiecode Systems AB
  * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
  *
  * License: http://www.tinymce.com/license
  * Contributing: http://www.tinymce.com/contributing
@@ -85368,48 +84899,23 @@ define("tinymce/ui/FloatPanel", [
 	"tinymce/ui/Panel",
 	"tinymce/ui/Movable",
 	"tinymce/ui/Resizable",
-	"tinymce/ui/DomUtils",
-	"tinymce/dom/DomQuery"
-], function(Panel, Movable, Resizable, DomUtils, $) {
+	"tinymce/ui/DomUtils"
+], function(Panel, Movable, Resizable, DomUtils) {
 	"use strict";
 
 	var documentClickHandler, documentScrollHandler, windowResizeHandler, visiblePanels = [];
 	var zOrder = [], hasModal;
 
-	function isChildOf(ctrl, parent) {
-		while (ctrl) {
-			if (ctrl == parent) {
-				return true;
-			}
-
-			ctrl = ctrl.parent();
-		}
-	}
-
-	function skipOrHidePanels(e) {
-		// Hide any float panel when a click/focus out is out side that float panel and the
-		// float panels direct parent for example a click on a menu button
-		var i = visiblePanels.length;
-
-		while (i--) {
-			var panel = visiblePanels[i], clickCtrl = panel.getParentCtrl(e.target);
-
-			if (panel.settings.autohide) {
-				if (clickCtrl) {
-					if (isChildOf(clickCtrl, panel) || panel.parent() === clickCtrl) {
-						continue;
-					}
-				}
-
-				e = panel.fire('autohide', {target: e.target});
-				if (!e.isDefaultPrevented()) {
-					panel.hide();
-				}
-			}
-		}
-	}
-
 	function bindDocumentClickHandler() {
+		function isChildOf(ctrl, parent) {
+			while (ctrl) {
+				if (ctrl == parent) {
+					return true;
+				}
+
+				ctrl = ctrl.parent();
+			}
+		}
 
 		if (!documentClickHandler) {
 			documentClickHandler = function(e) {
@@ -85418,10 +84924,28 @@ define("tinymce/ui/FloatPanel", [
 					return;
 				}
 
-				skipOrHidePanels(e);
+				// Hide any float panel when a click is out side that float panel and the
+				// float panels direct parent for example a click on a menu button
+				var i = visiblePanels.length;
+				while (i--) {
+					var panel = visiblePanels[i], clickCtrl = panel.getParentCtrl(e.target);
+
+					if (panel.settings.autohide) {
+						if (clickCtrl) {
+							if (isChildOf(clickCtrl, panel) || panel.parent() === clickCtrl) {
+								continue;
+							}
+						}
+
+						e = panel.fire('autohide', {target: e.target});
+						if (!e.isDefaultPrevented()) {
+							panel.hide();
+						}
+					}
+				}
 			};
 
-			$(document).on('click touchstart', documentClickHandler);
+			DomUtils.on(document, 'click', documentClickHandler);
 		}
 	}
 
@@ -85436,7 +84960,7 @@ define("tinymce/ui/FloatPanel", [
 				}
 			};
 
-			$(window).on('scroll', documentScrollHandler);
+			DomUtils.on(window, 'scroll', documentScrollHandler);
 		}
 	}
 
@@ -85453,7 +84977,7 @@ define("tinymce/ui/FloatPanel", [
 				}
 			};
 
-			$(window).on('resize', windowResizeHandler);
+			DomUtils.on(window, 'resize', windowResizeHandler);
 		}
 	}
 
@@ -85481,7 +85005,7 @@ define("tinymce/ui/FloatPanel", [
 		}
 
 		if (panel.settings.autofix) {
-			if (!panel.state.get('fixed')) {
+			if (!panel._fixed) {
 				panel._autoFixY = panel.layoutRect().y;
 
 				if (panel._autoFixY < scrollY) {
@@ -85528,7 +85052,7 @@ define("tinymce/ui/FloatPanel", [
 		var modalBlockEl = document.getElementById(ctrl.classPrefix + 'modal-block');
 
 		if (topModal) {
-			$(modalBlockEl).css('z-index', topModal.zIndex - 1);
+			DomUtils.css(modalBlockEl, 'z-index', topModal.zIndex - 1);
 		} else if (modalBlockEl) {
 			modalBlockEl.parentNode.removeChild(modalBlockEl);
 			hasModal = false;
@@ -85553,7 +85077,7 @@ define("tinymce/ui/FloatPanel", [
 			self._super(settings);
 			self._eventsRoot = self;
 
-			self.classes.add('floatpanel');
+			self.addClass('floatpanel');
 
 			// Hide floatpanes on click out side the root button
 			if (settings.autohide) {
@@ -85572,19 +85096,18 @@ define("tinymce/ui/FloatPanel", [
 
 			self.on('postrender show', function(e) {
 				if (e.control == self) {
-					var $modalBlockEl, prefix = self.classPrefix;
+					var modalBlockEl, prefix = self.classPrefix;
 
 					if (self.modal && !hasModal) {
-						$modalBlockEl = $('#' + prefix + 'modal-block');
-						if (!$modalBlockEl[0]) {
-							$modalBlockEl = $(
-								'<div id="' + prefix + 'modal-block" class="' + prefix + 'reset ' + prefix + 'fade"></div>'
-							).appendTo(self.getContainerElm());
-						}
+						modalBlockEl = DomUtils.createFragment('<div id="' + prefix + 'modal-block" class="' +
+							prefix + 'reset ' + prefix + 'fade"></div>');
+						modalBlockEl = modalBlockEl.firstChild;
+
+						self.getContainerElm().appendChild(modalBlockEl);
 
 						setTimeout(function() {
-							$modalBlockEl.addClass(prefix + 'in');
-							$(self.getEl()).addClass(prefix + 'in');
+							DomUtils.addClass(modalBlockEl, prefix + 'in');
+							DomUtils.addClass(self.getEl(), prefix + 'in');
 						}, 0);
 
 						hasModal = true;
@@ -85596,7 +85119,7 @@ define("tinymce/ui/FloatPanel", [
 
 			self.on('show', function() {
 				self.parents().each(function(ctrl) {
-					if (ctrl.state.get('fixed')) {
+					if (ctrl._fixed) {
 						self.fixed(true);
 						return false;
 					}
@@ -85605,15 +85128,15 @@ define("tinymce/ui/FloatPanel", [
 
 			if (settings.popover) {
 				self._preBodyHtml = '<div class="' + self.classPrefix + 'arrow"></div>';
-				self.classes.add('popover').add('bottom').add(self.isRtl() ? 'end' : 'start');
+				self.addClass('popover').addClass('bottom').addClass(self.isRtl() ? 'end' : 'start');
 			}
 		},
 
 		fixed: function(state) {
 			var self = this;
 
-			if (self.state.get('fixed') != state) {
-				if (self.state.get('rendered')) {
+			if (self._fixed != state) {
+				if (self._rendered) {
 					var viewport = DomUtils.getViewPort();
 
 					if (state) {
@@ -85623,8 +85146,8 @@ define("tinymce/ui/FloatPanel", [
 					}
 				}
 
-				self.classes.toggle('fixed', state);
-				self.state.set('fixed', state);
+				self.toggleClass('fixed', state);
+				self._fixed = state;
 			}
 
 			return self;
@@ -85759,8 +85282,8 @@ define("tinymce/ui/FloatPanel", [
 /**
  * Window.js
  *
+ * Copyright, Moxiecode Systems AB
  * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
  *
  * License: http://www.tinymce.com/license
  * Contributing: http://www.tinymce.com/contributing
@@ -85777,83 +85300,9 @@ define("tinymce/ui/Window", [
 	"tinymce/ui/FloatPanel",
 	"tinymce/ui/Panel",
 	"tinymce/ui/DomUtils",
-	"tinymce/dom/DomQuery",
-	"tinymce/ui/DragHelper",
-	"tinymce/ui/BoxUtils",
-	"tinymce/Env"
-], function(FloatPanel, Panel, DomUtils, $, DragHelper, BoxUtils, Env) {
+	"tinymce/ui/DragHelper"
+], function(FloatPanel, Panel, DomUtils, DragHelper) {
 	"use strict";
-
-	var windows = [], oldMetaValue = '';
-
-	function toggleFullScreenState(state) {
-		var noScaleMetaValue = 'width=device-width,initial-scale=1.0,user-scalable=0,minimum-scale=1.0,maximum-scale=1.0',
-			viewport = $("meta[name=viewport]")[0],
-			contentValue;
-
-		if (Env.overrideViewPort === false) {
-			return;
-		}
-
-		if (!viewport) {
-			viewport = document.createElement('meta');
-			viewport.setAttribute('name', 'viewport');
-			document.getElementsByTagName('head')[0].appendChild(viewport);
-		}
-
-		contentValue = viewport.getAttribute('content');
-		if (contentValue && typeof oldMetaValue != 'undefined') {
-			oldMetaValue = contentValue;
-		}
-
-		viewport.setAttribute('content', state ? noScaleMetaValue : oldMetaValue);
-	}
-
-	function toggleBodyFullScreenClasses(classPrefix) {
-		for (var i = 0; i < windows.length; i++) {
-			if (windows[i]._fullscreen) {
-				return;
-			}
-		}
-
-		$([document.documentElement, document.body]).removeClass(classPrefix + 'fullscreen');
-	}
-
-	function handleWindowResize() {
-		var lastSize = {
-			w: window.innerWidth,
-			h: window.innerHeight
-		};
-
-		window.setInterval(function() {
-			var w = window.innerWidth,
-				h = window.innerHeight;
-
-			if (lastSize.w != w || lastSize.h != h) {
-				lastSize = {
-					w: w,
-					h: h
-				};
-
-				$(window).trigger('resize');
-			}
-		}, 0);
-
-		function reposition() {
-			var i, rect = DomUtils.getWindowSize(), layoutRect;
-
-			for (i = 0; i < windows.length; i++) {
-				layoutRect = windows[i].layoutRect();
-
-				windows[i].moveTo(
-					windows[i].settings.x || Math.max(0, rect.w / 2 - layoutRect.w / 2),
-					windows[i].settings.y || Math.max(0, rect.h / 2 - layoutRect.h / 2)
-				);
-			}
-		}
-
-		$(window).on('resize', reposition);
-	}
 
 	var Window = FloatPanel.extend({
 		modal: true,
@@ -85886,12 +85335,11 @@ define("tinymce/ui/Window", [
 			self._super(settings);
 
 			if (self.isRtl()) {
-				self.classes.add('rtl');
+				self.addClass('rtl');
 			}
 
-			self.classes.add('window');
-			self.bodyClasses.add('window-body');
-			self.state.set('fixed', true);
+			self.addClass('window');
+			self._fixed = true;
 
 			// Create statusbar
 			if (settings.buttons) {
@@ -85908,7 +85356,7 @@ define("tinymce/ui/Window", [
 					items: settings.buttons
 				});
 
-				self.statusbar.classes.add('foot');
+				self.statusbar.addClass('foot');
 				self.statusbar.parent(self);
 			}
 
@@ -86008,8 +85456,8 @@ define("tinymce/ui/Window", [
 
 			var rect = DomUtils.getWindowSize();
 
-			layoutRect.x = self.settings.x || Math.max(0, rect.w / 2 - layoutRect.w / 2);
-			layoutRect.y = self.settings.y || Math.max(0, rect.h / 2 - layoutRect.h / 2);
+			layoutRect.x = Math.max(0, rect.w / 2 - layoutRect.w / 2);
+			layoutRect.y = Math.max(0, rect.h / 2 - layoutRect.h / 2);
 
 			return layoutRect;
 		},
@@ -86050,10 +85498,10 @@ define("tinymce/ui/Window", [
 			}
 
 			return (
-				'<div id="' + id + '" class="' + self.classes + '" hidefocus="1">' +
+				'<div id="' + id + '" class="' + self.classes() + '" hidefocus="1">' +
 					'<div class="' + self.classPrefix + 'reset" role="application">' +
 						headerHtml +
-						'<div id="' + id + '-body" class="' + self.bodyClasses + '">' +
+						'<div id="' + id + '-body" class="' + self.classes('body') + '">' +
 							html +
 						'</div>' +
 						footerHtml +
@@ -86073,7 +85521,7 @@ define("tinymce/ui/Window", [
 			var self = this, documentElement = document.documentElement, slowRendering, prefix = self.classPrefix, layoutRect;
 
 			if (state != self._fullscreen) {
-				$(window).on('resize', function() {
+				DomUtils.on(window, 'resize', function() {
 					var time;
 
 					if (self._fullscreen) {
@@ -86104,20 +85552,22 @@ define("tinymce/ui/Window", [
 				self._fullscreen = state;
 
 				if (!state) {
-					self.borderBox = BoxUtils.parseBox(self.settings.border);
+					self._borderBox = self.parseBox(self.settings.border);
 					self.getEl('head').style.display = '';
 					layoutRect.deltaH += layoutRect.headerH;
-					$([documentElement, document.body]).removeClass(prefix + 'fullscreen');
-					self.classes.remove('fullscreen');
+					DomUtils.removeClass(documentElement, prefix + 'fullscreen');
+					DomUtils.removeClass(document.body, prefix + 'fullscreen');
+					self.removeClass('fullscreen');
 					self.moveTo(self._initial.x, self._initial.y).resizeTo(self._initial.w, self._initial.h);
 				} else {
 					self._initial = {x: layoutRect.x, y: layoutRect.y, w: layoutRect.w, h: layoutRect.h};
 
-					self.borderBox = BoxUtils.parseBox('0');
+					self._borderBox = self.parseBox('0');
 					self.getEl('head').style.display = 'none';
 					layoutRect.deltaH -= layoutRect.headerH + 2;
-					$([documentElement, document.body]).addClass(prefix + 'fullscreen');
-					self.classes.add('fullscreen');
+					DomUtils.addClass(documentElement, prefix + 'fullscreen');
+					DomUtils.addClass(document.body, prefix + 'fullscreen');
+					self.addClass('fullscreen');
 
 					var rect = DomUtils.getWindowSize();
 					self.moveTo(0, 0).resizeTo(rect.w, rect.h);
@@ -86136,7 +85586,7 @@ define("tinymce/ui/Window", [
 			var self = this, startPos;
 
 			setTimeout(function() {
-				self.classes.add('in');
+				self.addClass('in');
 			}, 0);
 
 			self._super();
@@ -86165,9 +85615,6 @@ define("tinymce/ui/Window", [
 					self.close();
 				}
 			});
-
-			windows.push(self);
-			toggleFullScreenState(true);
 		},
 
 		/**
@@ -86187,7 +85634,7 @@ define("tinymce/ui/Window", [
 		 * @return {tinymce.ui.Control} Current control instance.
 		 */
 		remove: function() {
-			var self = this, i;
+			var self = this, prefix = self.classPrefix;
 
 			self.dragHelper.destroy();
 			self._super();
@@ -86196,15 +85643,10 @@ define("tinymce/ui/Window", [
 				this.statusbar.remove();
 			}
 
-			i = windows.length;
-			while (i--) {
-				if (windows[i] === self) {
-					windows.splice(i, 1);
-				}
+			if (self._fullscreen) {
+				DomUtils.removeClass(document.documentElement, prefix + 'fullscreen');
+				DomUtils.removeClass(document.body, prefix + 'fullscreen');
 			}
-
-			toggleFullScreenState(windows.length > 0);
-			toggleBodyFullScreenClasses(self.classPrefix);
 		},
 
 		/**
@@ -86219,10 +85661,6 @@ define("tinymce/ui/Window", [
 		}
 	});
 
-	if (!Env.desktop) {
-		handleWindowResize();
-	}
-
 	return Window;
 });
 
@@ -86231,8 +85669,8 @@ define("tinymce/ui/Window", [
 /**
  * MessageBox.js
  *
+ * Copyright, Moxiecode Systems AB
  * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
  *
  * License: http://www.tinymce.com/license
  * Contributing: http://www.tinymce.com/contributing
@@ -86241,8 +85679,8 @@ define("tinymce/ui/Window", [
 /**
  * This class is used to create MessageBoxes like alerts/confirms etc.
  *
- * @class tinymce.ui.Window
- * @extends tinymce.ui.FloatPanel
+ * @class tinymce.ui.MessageBox
+ * @extends tinymce.ui.Window
  */
 define("tinymce/ui/MessageBox", [
 	"tinymce/ui/Window"
@@ -86436,8 +85874,8 @@ define("tinymce/ui/MessageBox", [
 /**
  * WindowManager.js
  *
+ * Copyright, Moxiecode Systems AB
  * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
  *
  * License: http://www.tinymce.com/license
  * Contributing: http://www.tinymce.com/contributing
@@ -86680,8 +86118,8 @@ define("tinymce/WindowManager", [
 /**
  * Quirks.js
  *
+ * Copyright, Moxiecode Systems AB
  * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
  *
  * License: http://www.tinymce.com/license
  * Contributing: http://www.tinymce.com/contributing
@@ -87279,18 +86717,12 @@ define("tinymce/util/Quirks", [
 			});
 
 			editor.on('cut', function(e) {
-				if (!isDefaultPrevented(e) && e.clipboardData && !editor.selection.isCollapsed()) {
+				if (!isDefaultPrevented(e) && e.clipboardData) {
 					e.preventDefault();
 					e.clipboardData.clearData();
 					e.clipboardData.setData('text/html', editor.selection.getContent());
 					e.clipboardData.setData('text/plain', editor.selection.getContent({format: 'text'}));
-
-					// Needed delay for https://code.google.com/p/chromium/issues/detail?id=363288#c3
-					// Nested delete/forwardDelete not allowed on execCommand("cut")
-					// This is ugly but not sure how to work around it otherwise
-					window.setTimeout(function() {
-						customDelete(true);
-					}, 0);
+					customDelete(true);
 				}
 			});
 		}
@@ -88032,7 +87464,7 @@ define("tinymce/util/Quirks", [
 		function blockCmdArrowNavigation() {
 			if (Env.mac) {
 				editor.on('keydown', function(e) {
-					if (VK.metaKeyPressed(e) && !e.shiftKey && (e.keyCode == 37 || e.keyCode == 39)) {
+					if (VK.metaKeyPressed(e) && (e.keyCode == 37 || e.keyCode == 39)) {
 						e.preventDefault();
 						editor.selection.getSel().modify('move', e.keyCode == 37 ? 'backward' : 'forward', 'lineboundary');
 					}
@@ -88091,7 +87523,6 @@ define("tinymce/util/Quirks", [
 		 * a click event when a contentEditable is focused. This function fakes click events
 		 * by using touchstart/touchend and measuring the time and distance travelled.
 		 */
-		/*
 		function touchClickEvent() {
 			editor.on('touchstart', function(e) {
 				var elm, time, startTouch, changedTouches;
@@ -88141,7 +87572,6 @@ define("tinymce/util/Quirks", [
 				});
 			});
 		}
-		*/
 
 		/**
 		 * WebKit has a bug where it will allow forms to be submitted if they are inside a contentEditable element.
@@ -88212,7 +87642,7 @@ define("tinymce/util/Quirks", [
 			blockFormSubmitInsideEditor();
 			disableBackspaceIntoATable();
 			removeAppleInterchangeBrs();
-			//touchClickEvent();
+			touchClickEvent();
 
 			// iOS
 			if (Env.iOS) {
@@ -88263,13 +87693,145 @@ define("tinymce/util/Quirks", [
 	};
 });
 
+// Included from: js/tinymce/classes/util/Observable.js
+
+/**
+ * Observable.js
+ *
+ * Copyright, Moxiecode Systems AB
+ * Released under LGPL License.
+ *
+ * License: http://www.tinymce.com/license
+ * Contributing: http://www.tinymce.com/contributing
+ */
+
+/**
+ * This mixin will add event binding logic to classes.
+ *
+ * @mixin tinymce.util.Observable
+ */
+define("tinymce/util/Observable", [
+	"tinymce/util/EventDispatcher"
+], function(EventDispatcher) {
+	function getEventDispatcher(obj) {
+		if (!obj._eventDispatcher) {
+			obj._eventDispatcher = new EventDispatcher({
+				scope: obj,
+				toggleEvent: function(name, state) {
+					if (EventDispatcher.isNative(name) && obj.toggleNativeEvent) {
+						obj.toggleNativeEvent(name, state);
+					}
+				}
+			});
+		}
+
+		return obj._eventDispatcher;
+	}
+
+	return {
+		/**
+		 * Fires the specified event by name.
+		 *
+		 * @method fire
+		 * @param {String} name Name of the event to fire.
+		 * @param {Object?} args Event arguments.
+		 * @param {Boolean?} bubble True/false if the event is to be bubbled.
+		 * @return {Object} Event args instance passed in.
+		 * @example
+		 * instance.fire('event', {...});
+		 */
+		fire: function(name, args, bubble) {
+			var self = this;
+
+			// Prevent all events except the remove event after the instance has been removed
+			if (self.removed && name !== "remove") {
+				return args;
+			}
+
+			args = getEventDispatcher(self).fire(name, args, bubble);
+
+			// Bubble event up to parents
+			if (bubble !== false && self.parent) {
+				var parent = self.parent();
+				while (parent && !args.isPropagationStopped()) {
+					parent.fire(name, args, false);
+					parent = parent.parent();
+				}
+			}
+
+			return args;
+		},
+
+		/**
+		 * Binds an event listener to a specific event by name.
+		 *
+		 * @method on
+		 * @param {String} name Event name or space separated list of events to bind.
+		 * @param {callback} callback Callback to be executed when the event occurs.
+		 * @param {Boolean} first Optional flag if the event should be prepended. Use this with care.
+		 * @return {Object} Current class instance.
+		 * @example
+		 * instance.on('event', function(e) {
+		 *     // Callback logic
+		 * });
+		 */
+		on: function(name, callback, prepend) {
+			return getEventDispatcher(this).on(name, callback, prepend);
+		},
+
+		/**
+		 * Unbinds an event listener to a specific event by name.
+		 *
+		 * @method off
+		 * @param {String?} name Name of the event to unbind.
+		 * @param {callback?} callback Callback to unbind.
+		 * @return {Object} Current class instance.
+		 * @example
+		 * // Unbind specific callback
+		 * instance.off('event', handler);
+		 *
+		 * // Unbind all listeners by name
+		 * instance.off('event');
+		 *
+		 * // Unbind all events
+		 * instance.off();
+		 */
+		off: function(name, callback) {
+			return getEventDispatcher(this).off(name, callback);
+		},
+
+		/**
+		 * Bind the event callback and once it fires the callback is removed.
+		 *
+		 * @method once
+		 * @param {String} name Name of the event to bind.
+		 * @param {callback} callback Callback to bind only once.
+		 * @return {Object} Current class instance.
+		 */
+		once: function(name, callback) {
+			return getEventDispatcher(this).once(name, callback);
+		},
+
+		/**
+		 * Returns true/false if the object has a event of the specified name.
+		 *
+		 * @method hasEventListeners
+		 * @param {String} name Name of the event to check for.
+		 * @return {Boolean} true/false if the event exists or not.
+		 */
+		hasEventListeners: function(name) {
+			return getEventDispatcher(this).has(name);
+		}
+	};
+});
+
 // Included from: js/tinymce/classes/EditorObservable.js
 
 /**
  * EditorObservable.js
  *
+ * Copyright, Moxiecode Systems AB
  * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
  *
  * License: http://www.tinymce.com/license
  * Contributing: http://www.tinymce.com/contributing
@@ -88475,8 +88037,8 @@ define("tinymce/EditorObservable", [
 /**
  * Shortcuts.js
  *
+ * Copyright, Moxiecode Systems AB
  * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
  *
  * License: http://www.tinymce.com/license
  * Contributing: http://www.tinymce.com/contributing
@@ -88485,7 +88047,6 @@ define("tinymce/EditorObservable", [
 /**
  * Contains all logic for handling of keyboard shortcuts.
  *
- * @class tinymce.Shortcuts
  * @example
  * editor.shortcuts.add('ctrl+a', function() {});
  * editor.shortcuts.add('meta+a', function() {}); // "meta" maps to Command on Mac and Ctrl on PC
@@ -88645,803 +88206,13 @@ define("tinymce/Shortcuts", [
 	};
 });
 
-// Included from: js/tinymce/classes/util/Promise.js
-
-/**
- * Promise.js
- *
- * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
- *
- * Promise polyfill under MIT license: https://github.com/taylorhakes/promise-polyfill
- *
- * License: http://www.tinymce.com/license
- * Contributing: http://www.tinymce.com/contributing
- */
-
-/* eslint-disable */
-/* jshint ignore:start */
-
-/**
- * Modifed to be a feature fill and wrapped as tinymce module.
- */
-define("tinymce/util/Promise", [], function() {
-	if (window.Promise) {
-		return window.Promise;
-	}
-
-	// Use polyfill for setImmediate for performance gains
-	var asap = Promise.immediateFn || (typeof setImmediate === 'function' && setImmediate) ||
-		function(fn) { setTimeout(fn, 1); };
-
-	// Polyfill for Function.prototype.bind
-	function bind(fn, thisArg) {
-		return function() {
-			fn.apply(thisArg, arguments);
-		};
-	}
-
-	var isArray = Array.isArray || function(value) { return Object.prototype.toString.call(value) === "[object Array]"; };
-
-	function Promise(fn) {
-		if (typeof this !== 'object') throw new TypeError('Promises must be constructed via new');
-		if (typeof fn !== 'function') throw new TypeError('not a function');
-		this._state = null;
-		this._value = null;
-		this._deferreds = [];
-
-		doResolve(fn, bind(resolve, this), bind(reject, this));
-	}
-
-	function handle(deferred) {
-		var me = this;
-		if (this._state === null) {
-			this._deferreds.push(deferred);
-			return;
-		}
-		asap(function() {
-			var cb = me._state ? deferred.onFulfilled : deferred.onRejected;
-			if (cb === null) {
-				(me._state ? deferred.resolve : deferred.reject)(me._value);
-				return;
-			}
-			var ret;
-			try {
-				ret = cb(me._value);
-			}
-			catch (e) {
-				deferred.reject(e);
-				return;
-			}
-			deferred.resolve(ret);
-		});
-	}
-
-	function resolve(newValue) {
-		try { //Promise Resolution Procedure: https://github.com/promises-aplus/promises-spec#the-promise-resolution-procedure
-			if (newValue === this) throw new TypeError('A promise cannot be resolved with itself.');
-			if (newValue && (typeof newValue === 'object' || typeof newValue === 'function')) {
-				var then = newValue.then;
-				if (typeof then === 'function') {
-					doResolve(bind(then, newValue), bind(resolve, this), bind(reject, this));
-					return;
-				}
-			}
-			this._state = true;
-			this._value = newValue;
-			finale.call(this);
-		} catch (e) { reject.call(this, e); }
-	}
-
-	function reject(newValue) {
-		this._state = false;
-		this._value = newValue;
-		finale.call(this);
-	}
-
-	function finale() {
-		for (var i = 0, len = this._deferreds.length; i < len; i++) {
-			handle.call(this, this._deferreds[i]);
-		}
-		this._deferreds = null;
-	}
-
-	function Handler(onFulfilled, onRejected, resolve, reject){
-		this.onFulfilled = typeof onFulfilled === 'function' ? onFulfilled : null;
-		this.onRejected = typeof onRejected === 'function' ? onRejected : null;
-		this.resolve = resolve;
-		this.reject = reject;
-	}
-
-	/**
-	 * Take a potentially misbehaving resolver function and make sure
-	 * onFulfilled and onRejected are only called once.
-	 *
-	 * Makes no guarantees about asynchrony.
-	 */
-	function doResolve(fn, onFulfilled, onRejected) {
-		var done = false;
-		try {
-			fn(function (value) {
-				if (done) return;
-				done = true;
-				onFulfilled(value);
-			}, function (reason) {
-				if (done) return;
-				done = true;
-				onRejected(reason);
-			});
-		} catch (ex) {
-			if (done) return;
-			done = true;
-			onRejected(ex);
-		}
-	}
-
-	Promise.prototype['catch'] = function (onRejected) {
-		return this.then(null, onRejected);
-	};
-
-	Promise.prototype.then = function(onFulfilled, onRejected) {
-		var me = this;
-		return new Promise(function(resolve, reject) {
-			handle.call(me, new Handler(onFulfilled, onRejected, resolve, reject));
-		});
-	};
-
-	Promise.all = function () {
-		var args = Array.prototype.slice.call(arguments.length === 1 && isArray(arguments[0]) ? arguments[0] : arguments);
-
-		return new Promise(function (resolve, reject) {
-			if (args.length === 0) return resolve([]);
-			var remaining = args.length;
-			function res(i, val) {
-				try {
-					if (val && (typeof val === 'object' || typeof val === 'function')) {
-						var then = val.then;
-						if (typeof then === 'function') {
-							then.call(val, function (val) { res(i, val); }, reject);
-							return;
-						}
-					}
-					args[i] = val;
-					if (--remaining === 0) {
-						resolve(args);
-					}
-				} catch (ex) {
-					reject(ex);
-				}
-			}
-			for (var i = 0; i < args.length; i++) {
-				res(i, args[i]);
-			}
-		});
-	};
-
-	Promise.resolve = function (value) {
-		if (value && typeof value === 'object' && value.constructor === Promise) {
-			return value;
-		}
-
-		return new Promise(function (resolve) {
-			resolve(value);
-		});
-	};
-
-	Promise.reject = function (value) {
-		return new Promise(function (resolve, reject) {
-			reject(value);
-		});
-	};
-
-	Promise.race = function (values) {
-		return new Promise(function (resolve, reject) {
-			for(var i = 0, len = values.length; i < len; i++) {
-				values[i].then(resolve, reject);
-			}
-		});
-	};
-
-	return Promise;
-});
-
-/* jshint ignore:end */
-/* eslint-enable */
-
-// Included from: js/tinymce/classes/file/Uploader.js
-
-/**
- * Uploader.js
- *
- * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
- *
- * License: http://www.tinymce.com/license
- * Contributing: http://www.tinymce.com/contributing
- */
-
-/**
- * Upload blobs or blob infos to the specified URL or handler.
- *
- * @private
- * @class tinymce.file.Uploader
- * @example
- * var uploader = new Uploader({
- *     url: '/upload.php',
- *     basePath: '/base/path',
- *     credentials: true,
- *     handler: function(data, success, failure) {
- *         ...
- *     }
- * });
- *
- * uploader.upload(blobInfos).then(function(result) {
- *     ...
- * });
- */
-define("tinymce/file/Uploader", [
-	"tinymce/util/Promise",
-	"tinymce/util/Tools"
-], function(Promise, Tools) {
-	return function(settings) {
-		function fileName(blobInfo) {
-			var ext, extensions;
-
-			extensions = {
-				'image/jpeg': 'jpg',
-				'image/jpg': 'jpg',
-				'image/gif': 'gif',
-				'image/png': 'png'
-			};
-
-			ext = extensions[blobInfo.blob().type.toLowerCase()] || 'dat';
-
-			return blobInfo.id() + '.' + ext;
-		}
-
-		function pathJoin(path1, path2) {
-			if (path1) {
-				return path1.replace(/\/$/, '') + '/' + path2.replace(/^\//, '');
-			}
-
-			return path2;
-		}
-
-		function blobInfoToData(blobInfo) {
-			return {
-				id: blobInfo.id,
-				blob: blobInfo.blob,
-				base64: blobInfo.base64,
-				filename: Tools.constant(fileName(blobInfo))
-			};
-		}
-
-		function defaultHandler(blobInfo, success, failure) {
-			var xhr, formData;
-
-			xhr = new XMLHttpRequest();
-			xhr.withCredentials = settings.credentials;
-			xhr.open('POST', settings.url);
-
-			xhr.onload = function() {
-				var json;
-
-				if (xhr.status != 200) {
-					failure("HTTP Error: " + xhr.status);
-					return;
-				}
-
-				json = JSON.parse(xhr.responseText);
-
-				if (!json || typeof json.location != "string") {
-					failure("Invalid JSON: " + xhr.responseText);
-					return;
-				}
-
-				success(pathJoin(settings.basePath, json.location));
-			};
-
-			formData = new FormData();
-			formData.append('file', blobInfo.blob(), fileName(blobInfo));
-
-			xhr.send(formData);
-		}
-
-		function upload(blobInfos) {
-			return new Promise(function(resolve, reject) {
-				var handler = settings.handler, queue, index = 0, uploadedIdMap = {};
-
-				// If no url is configured then resolve
-				if (!settings.url && handler === defaultHandler) {
-					resolve([]);
-					return;
-				}
-
-				queue = Tools.map(blobInfos, function(blobInfo) {
-					return {
-						status: false,
-						blobInfo: blobInfo,
-						url: ''
-					};
-				});
-
-				function uploadNext() {
-					var previousResult, queueItem = queue[index++];
-
-					if (!queueItem) {
-						resolve(queue);
-						return;
-					}
-
-					// Only upload unique blob once
-					previousResult = uploadedIdMap[queueItem.blobInfo.id()];
-					if (previousResult) {
-						queueItem.url = previousResult;
-						queueItem.status = true;
-						uploadNext();
-						return;
-					}
-
-					handler(blobInfoToData(queueItem.blobInfo), function(url) {
-						uploadedIdMap[queueItem.blobInfo.id()] = url;
-						queueItem.url = url;
-						queueItem.status = true;
-						uploadNext();
-					}, function(failure) {
-						queueItem.status = false;
-						reject(failure);
-					});
-				}
-
-				uploadNext();
-			});
-		}
-
-		settings = Tools.extend({
-			credentials: false,
-			handler: defaultHandler
-		}, settings);
-
-		return {
-			upload: upload
-		};
-	};
-});
-
-// Included from: js/tinymce/classes/file/Conversions.js
-
-/**
- * Conversions.js
- *
- * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
- *
- * License: http://www.tinymce.com/license
- * Contributing: http://www.tinymce.com/contributing
- */
-
-/**
- * Converts blob/uris back and forth.
- */
-define("tinymce/file/Conversions", [
-	"tinymce/util/Promise"
-], function(Promise) {
-	function blobUriToBlob(url) {
-		return new Promise(function(resolve) {
-			var xhr = new XMLHttpRequest();
-
-			xhr.open('GET', url, true);
-			xhr.responseType = 'blob';
-
-			xhr.onload = function() {
-				if (this.status == 200) {
-					resolve(this.response);
-				}
-			};
-
-			xhr.send();
-		});
-	}
-
-	function parseDataUri(uri) {
-		var type, matches;
-
-		uri = decodeURIComponent(uri).split(',');
-
-		matches = /data:([^;]+)/.exec(uri[0]);
-		if (matches) {
-			type = matches[1];
-		}
-
-		return {
-			type: type,
-			data: uri[1]
-		};
-	}
-
-	function dataUriToBlob(uri) {
-		return new Promise(function(resolve) {
-			var str, arr, i;
-
-			uri = parseDataUri(uri);
-
-			// Might throw error if data isn't proper base64
-			try {
-				str = atob(uri.data);
-			} catch (e) {
-				resolve(new Blob([]));
-				return;
-			}
-
-			arr = new Uint8Array(str.length);
-
-			for (i = 0; i < arr.length; i++) {
-				arr[i] = str.charCodeAt(i);
-			}
-
-			resolve(new Blob([arr], {type: uri.type}));
-		});
-	}
-
-	function uriToBlob(url) {
-		if (url.indexOf('blob:') === 0) {
-			return blobUriToBlob(url);
-		}
-
-		if (url.indexOf('data:') === 0) {
-			return dataUriToBlob(url);
-		}
-
-		return null;
-	}
-
-	function blobToDataUri(blob) {
-		return new Promise(function(resolve) {
-			var reader = new FileReader();
-
-			reader.onloadend = function() {
-				resolve(reader.result);
-			};
-
-			reader.readAsDataURL(blob);
-		});
-	}
-
-	return {
-		uriToBlob: uriToBlob,
-		blobToDataUri: blobToDataUri,
-		parseDataUri: parseDataUri
-	};
-});
-
-// Included from: js/tinymce/classes/file/ImageScanner.js
-
-/**
- * ImageScanner.js
- *
- * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
- *
- * License: http://www.tinymce.com/license
- * Contributing: http://www.tinymce.com/contributing
- */
-
-/**
- * Finds images with data uris or blob uris. If data uris are found it will convert them into blob uris.
- *
- * @private
- * @class tinymce.file.ImageScanner
- */
-define("tinymce/file/ImageScanner", [
-	"tinymce/util/Promise",
-	"tinymce/util/Tools",
-	"tinymce/file/Conversions"
-], function(Promise, Tools, Conversions) {
-	var count = 0;
-
-	function mapAsync(array, fn) {
-		return new Promise(function(resolve) {
-			var result = [];
-
-			function next(index) {
-				fn(array[index], function(value) {
-					result.push(value);
-
-					if (index < array.length - 1) {
-						next(index + 1);
-					} else {
-						resolve(result);
-					}
-				});
-			}
-
-			if (array.length === 0) {
-				resolve(result);
-			} else {
-				next(0);
-			}
-		});
-	}
-
-	return {
-		findAll: function(elm, blobCache) {
-			function imageToBlobInfo(img, resolve) {
-				var base64, blobInfo, blobInfoId;
-
-				if (img.src.indexOf('blob:') === 0) {
-					blobInfo = blobCache.getByUri(img.src);
-
-					if (blobInfo) {
-						resolve({
-							image: img,
-							blobInfo: blobInfo
-						});
-					}
-
-					return;
-				}
-
-				blobInfoId = 'blobid' + (count++);
-				base64 = Conversions.parseDataUri(img.src).data;
-				blobInfo = blobCache.findFirst(function(cachedBlobInfo) {
-					return cachedBlobInfo.base64() === base64;
-				});
-
-				if (blobInfo) {
-					resolve({
-						image: img,
-						blobInfo: blobInfo
-					});
-				} else {
-					Conversions.uriToBlob(img.src).then(function(blob) {
-						var blobInfo = blobCache.create(blobInfoId, blob, base64);
-
-						blobCache.add(blobInfo);
-
-						resolve({
-							image: img,
-							blobInfo: blobInfo
-						});
-					});
-				}
-			}
-
-			return mapAsync(Tools.filter(elm.getElementsByTagName('img'), function(img) {
-				return img.src && (img.src.indexOf('data:') === 0 || img.src.indexOf('blob:') === 0);
-			}), imageToBlobInfo);
-		}
-	};
-});
-
-// Included from: js/tinymce/classes/file/BlobCache.js
-
-/**
- * BlobCache.js
- *
- * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
- *
- * License: http://www.tinymce.com/license
- * Contributing: http://www.tinymce.com/contributing
- */
-
-/**
- * Hold blob info objects where a blob has extra internal information.
- *
- * @private
- * @class tinymce.file.BlobCache
- */
-define("tinymce/file/BlobCache", [
-	"tinymce/util/Tools"
-], function(Tools) {
-	return function() {
-		var cache = [], constant = Tools.constant;
-
-		function create(id, blob, base64) {
-			return {
-				id: constant(id),
-				blob: constant(blob),
-				base64: constant(base64),
-				blobUri: constant(URL.createObjectURL(blob))
-			};
-		}
-
-		function add(blobInfo) {
-			if (!get(blobInfo.id())) {
-				cache.push(blobInfo);
-			}
-		}
-
-		function get(id) {
-			return findFirst(function(cachedBlobInfo) {
-				return cachedBlobInfo.id() === id;
-			});
-		}
-
-		function findFirst(predicate) {
-			return Tools.grep(cache, predicate)[0];
-		}
-
-		function getByUri(blobUri) {
-			return findFirst(function(blobInfo) {
-				return blobInfo.blobUri() == blobUri;
-			});
-		}
-
-		function destroy() {
-			Tools.each(cache, function(cachedBlobInfo) {
-				URL.revokeObjectURL(cachedBlobInfo.blobUri());
-			});
-
-			cache = [];
-		}
-
-		return {
-			create: create,
-			add: add,
-			get: get,
-			getByUri: getByUri,
-			findFirst: findFirst,
-			destroy: destroy
-		};
-	};
-});
-
-// Included from: js/tinymce/classes/EditorUpload.js
-
-/**
- * EditorUpload.js
- *
- * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
- *
- * License: http://www.tinymce.com/license
- * Contributing: http://www.tinymce.com/contributing
- */
-
-/**
- * Handles image uploads, updates undo stack and patches over various internal functions.
- *
- * @private
- * @class tinymce.EditorUpload
- */
-define("tinymce/EditorUpload", [
-	"tinymce/util/Tools",
-	"tinymce/file/Uploader",
-	"tinymce/file/ImageScanner",
-	"tinymce/file/BlobCache"
-], function(Tools, Uploader, ImageScanner, BlobCache) {
-	return function(editor) {
-		var blobCache = new BlobCache();
-
-		// Replaces strings without regexps to avoid FF regexp to big issue
-		function replaceString(content, search, replace) {
-			var index = 0;
-
-			do {
-				index = content.indexOf(search, index);
-
-				if (index !== -1) {
-					content = content.substring(0, index) + replace + content.substr(index + search.length);
-					index += replace.length - search.length + 1;
-				}
-			} while (index !== -1);
-
-			return content;
-		}
-
-		function replaceImageUrl(content, targetUrl, replacementUrl) {
-			content = replaceString(content, 'src="' + targetUrl + '"', 'src="' + replacementUrl + '"');
-			content = replaceString(content, 'data-mce-src="' + targetUrl + '"', 'data-mce-src="' + replacementUrl + '"');
-
-			return content;
-		}
-
-		function replaceUrlInUndoStack(targetUrl, replacementUrl) {
-			Tools.each(editor.undoManager.data, function(level) {
-				level.content = replaceImageUrl(level.content, targetUrl, replacementUrl);
-			});
-		}
-
-		function uploadImages(callback) {
-			var uploader = new Uploader({
-				url: editor.settings.images_upload_url,
-				basePath: editor.settings.images_upload_base_path,
-				credentials: editor.settings.images_upload_credentials,
-				handler: editor.settings.images_upload_handler
-			});
-
-			function imageInfosToBlobInfos(imageInfos) {
-				return Tools.map(imageInfos, function(imageInfo) {
-					return imageInfo.blobInfo;
-				});
-			}
-
-			return scanForImages().then(imageInfosToBlobInfos).then(uploader.upload).then(function(result) {
-				result = Tools.map(result, function(uploadInfo) {
-					var image;
-
-					image = editor.dom.select('img[src="' + uploadInfo.blobInfo.blobUri() + '"]')[0];
-
-					if (image) {
-						replaceUrlInUndoStack(image.src, uploadInfo.url);
-
-						editor.$(image).attr({
-							src: uploadInfo.url,
-							'data-mce-src': editor.convertURL(uploadInfo.url, 'src')
-						});
-					}
-
-					return {
-						element: image,
-						status: uploadInfo.status
-					};
-				});
-
-				if (callback) {
-					callback(result);
-				}
-
-				return result;
-			}, function() {
-				// Silent
-				// TODO: Maybe execute some failure callback here?
-			});
-		}
-
-		function scanForImages() {
-			return ImageScanner.findAll(editor.getBody(), blobCache).then(function(result) {
-				Tools.each(result, function(resultItem) {
-					replaceUrlInUndoStack(resultItem.image.src, resultItem.blobInfo.blobUri());
-					resultItem.image.src = resultItem.blobInfo.blobUri();
-				});
-
-				return result;
-			});
-		}
-
-		function destroy() {
-			blobCache.destroy();
-		}
-
-		function replaceBlobWithBase64(content) {
-			return content.replace(/src="(blob:[^"]+)"/g, function(match, blobUri) {
-				var blobInfo = blobCache.getByUri(blobUri);
-
-				return 'src="data:' + blobInfo.blob().type + ';base64,' + blobInfo.base64() + '"';
-			});
-		}
-
-		editor.on('setContent paste', scanForImages);
-
-		editor.on('RawSaveContent', function(e) {
-			e.content = replaceBlobWithBase64(e.content);
-		});
-
-		editor.on('getContent', function(e) {
-			if (e.source_view || e.format == 'raw') {
-				return;
-			}
-
-			e.content = replaceBlobWithBase64(e.content);
-		});
-
-		return {
-			blobCache: blobCache,
-			uploadImages: uploadImages,
-			scanForImages: scanForImages,
-			destroy: destroy
-		};
-	};
-});
-
 // Included from: js/tinymce/classes/Editor.js
 
 /**
  * Editor.js
  *
+ * Copyright, Moxiecode Systems AB
  * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
  *
  * License: http://www.tinymce.com/license
  * Contributing: http://www.tinymce.com/contributing
@@ -89503,13 +88274,12 @@ define("tinymce/Editor", [
 	"tinymce/Env",
 	"tinymce/util/Tools",
 	"tinymce/EditorObservable",
-	"tinymce/Shortcuts",
-	"tinymce/EditorUpload"
+	"tinymce/Shortcuts"
 ], function(
 	DOMUtils, DomQuery, AddOnManager, NodeChange, Node, DomSerializer, Serializer,
 	Selection, Formatter, UndoManager, EnterKey, ForceBlocks, EditorCommands,
 	URI, ScriptLoader, EventUtils, WindowManager,
-	Schema, DomParser, Quirks, Env, Tools, EditorObservable, Shortcuts, EditorUpload
+	Schema, DomParser, Quirks, Env, Tools, EditorObservable, Shortcuts
 ) {
 	// Shorten these names
 	var DOM = DOMUtils.DOM, ThemeManager = AddOnManager.ThemeManager, PluginManager = AddOnManager.PluginManager;
@@ -89532,6 +88302,7 @@ define("tinymce/Editor", [
 	 * @param {String} id Unique id for the editor.
 	 * @param {Object} settings Settings for the editor.
 	 * @param {tinymce.EditorManager} editorManager EditorManager instance.
+	 * @author Moxiecode
 	 */
 	function Editor(id, settings, editorManager) {
 		var self = this, documentBaseUrl, baseUri;
@@ -89690,10 +88461,6 @@ define("tinymce/Editor", [
 
 		if (settings.cache_suffix) {
 			Env.cacheSuffix = settings.cache_suffix.replace(/^[\?\&]+/, '');
-		}
-
-		if (settings.override_viewport === false) {
-			Env.overrideViewPort = false;
 		}
 
 		// Call setup
@@ -89921,7 +88688,7 @@ define("tinymce/Editor", [
 			var w, h, minHeight, n, o, Theme, url, bodyId, bodyClass, re, i, initializedPlugins = [];
 
 			this.editorManager.i18n.setCode(settings.language);
-			self.rtl = settings.rtl_ui || this.editorManager.i18n.rtl;
+			self.rtl = this.editorManager.i18n.rtl;
 			self.editorManager.add(self);
 
 			settings.aria_label = settings.aria_label || DOM.getAttrib(elm, 'aria-label', self.getLang('aria.rich_text_area'));
@@ -90214,8 +88981,6 @@ define("tinymce/Editor", [
 
 			body.disabled = false;
 
-			self.editorUpload = new EditorUpload(self);
-
 			/**
 			 * Schema instance, enables you to validate elements and it's children.
 			 *
@@ -90267,11 +89032,6 @@ define("tinymce/Editor", [
 
 					// Add internal attribute if we need to we don't on a refresh of the document
 					if (!node.attributes.map[internalName]) {
-						// Don't duplicate these since they won't get modified by any browser
-						if (value.indexOf('data:') === 0 || value.indexOf('blob:') === 0) {
-							continue;
-						}
-
 						if (name === "style") {
 							value = dom.serializeStyle(dom.parseStyle(value), node.name);
 
@@ -90740,32 +89500,6 @@ define("tinymce/Editor", [
 		},
 
 		/**
-		 * Adds a contextual toolbar to be rendered when the selector matches.
-		 *
-		 * @method addContextToolbar
-		 * @param {function/string} predicate Predicate that needs to return true if provided strings get converted into CSS predicates.
-		 * @param {String/Array} items String or array with items to add to the context toolbar.
-		 */
-		addContextToolbar: function(predicate, items) {
-			var self = this, selector;
-
-			self.contextToolbars = self.contextToolbars || [];
-
-			// Convert selector to predicate
-			if (typeof predicate == "string") {
-				selector = predicate;
-				predicate = function(elm) {
-					return self.dom.is(elm, selector);
-				};
-			}
-
-			self.contextToolbars.push({
-				predicate: predicate,
-				items: items
-			});
-		},
-
-		/**
 		 * Adds a custom command to the editor, you can also override existing commands with this method.
 		 * The command that you add can be executed with execCommand.
 		 *
@@ -91041,11 +89775,6 @@ define("tinymce/Editor", [
 
 			if (!args.no_events) {
 				self.fire('SaveContent', args);
-			}
-
-			// Always run this internal event
-			if (args.format == 'raw') {
-				self.fire('RawSaveContent', args);
 			}
 
 			html = args.content;
@@ -91454,7 +90183,6 @@ define("tinymce/Editor", [
 
 				self.editorManager.remove(self);
 				DOM.remove(self.getContainer());
-				self.editorUpload.destroy();
 				self.destroy();
 			}
 		},
@@ -91516,22 +90244,7 @@ define("tinymce/Editor", [
 			self.destroyed = 1;
 		},
 
-		/**
-		 * Uploads all data uri/blob uri images in the editor contents to server.
-		 *
-		 * @method uploadImages
-		 * @param {function} callback Optional callback with images and status for each image.
-		 * @return {tinymce.util.Promise} Promise instance.
-		 */
-		uploadImages: function(callback) {
-			return this.editorUpload.uploadImages(callback);
-		},
-
 		// Internal functions
-
-		_scanForImages: function() {
-			return this.editorUpload.scanForImages();
-		},
 
 		_refreshContentEditable: function() {
 			var self = this, body, parent;
@@ -91571,8 +90284,8 @@ define("tinymce/Editor", [
 /**
  * I18n.js
  *
+ * Copyright, Moxiecode Systems AB
  * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
  *
  * License: http://www.tinymce.com/license
  * Contributing: http://www.tinymce.com/contributing
@@ -91606,7 +90319,6 @@ define("tinymce/util/I18n", [], function() {
 		/**
 		 * Returns the current language code.
 		 *
-		 * @method getCode
 		 * @return {String} Current language code.
 		 */
 		getCode: function() {
@@ -91690,8 +90402,8 @@ define("tinymce/util/I18n", [], function() {
 /**
  * FocusManager.js
  *
+ * Copyright, Moxiecode Systems AB
  * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
  *
  * License: http://www.tinymce.com/license
  * Contributing: http://www.tinymce.com/contributing
@@ -91957,8 +90669,8 @@ define("tinymce/FocusManager", [
 /**
  * EditorManager.js
  *
+ * Copyright, Moxiecode Systems AB
  * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
  *
  * License: http://www.tinymce.com/license
  * Contributing: http://www.tinymce.com/contributing
@@ -91984,28 +90696,10 @@ define("tinymce/EditorManager", [
 	"tinymce/util/Observable",
 	"tinymce/util/I18n",
 	"tinymce/FocusManager"
-], function(Editor, $, DOMUtils, URI, Env, Tools, Observable, I18n, FocusManager) {
+], function(Editor, DomQuery, DOMUtils, URI, Env, Tools, Observable, I18n, FocusManager) {
 	var DOM = DOMUtils.DOM;
 	var explode = Tools.explode, each = Tools.each, extend = Tools.extend;
-	var instanceCounter = 0, beforeUnloadDelegate, EditorManager, boundGlobalEvents = false;
-
-	function globalEventDelegate(e) {
-		each(EditorManager.editors, function(editor) {
-			editor.fire('ResizeWindow', e);
-		});
-	}
-
-	function toggleGlobalEvents(editors, state) {
-		if (state !== boundGlobalEvents) {
-			if (state) {
-				$(window).on('resize', globalEventDelegate);
-			} else {
-				$(window).off('resize', globalEventDelegate);
-			}
-
-			boundGlobalEvents = state;
-		}
-	}
+	var instanceCounter = 0, beforeUnloadDelegate, EditorManager;
 
 	function removeEditorFromList(editor) {
 		var editors = EditorManager.editors, removedFromList;
@@ -92052,7 +90746,7 @@ define("tinymce/EditorManager", [
 		 * @property $
 		 * @type tinymce.dom.DomQuery
 		 */
-		$: $,
+		$: DomQuery,
 
 		/**
 		 * Major version of TinyMCE build.
@@ -92068,7 +90762,7 @@ define("tinymce/EditorManager", [
 		 * @property minorVersion
 		 * @type String
 		 */
-		minorVersion: '2.1',
+		minorVersion: '1.10',
 
 		/**
 		 * Release date of TinyMCE build.
@@ -92076,7 +90770,7 @@ define("tinymce/EditorManager", [
 		 * @property releaseDate
 		 * @type String
 		 */
-		releaseDate: '2015-06-29',
+		releaseDate: '2015-05-05',
 
 		/**
 		 * Collection of editor instances.
@@ -92400,8 +91094,6 @@ define("tinymce/EditorManager", [
 			editors[editor.id] = editor;
 			editors.push(editor);
 
-			toggleGlobalEvents(editors, true);
-
 			// Doesn't call setActive method since we don't want
 			// to fire a bunch of activate/deactivate calls while initializing
 			self.activeEditor = editor;
@@ -92507,8 +91199,6 @@ define("tinymce/EditorManager", [
 			}
 
 			editor.remove();
-
-			toggleGlobalEvents(editors, editors.length > 0);
 
 			return editor;
 		},
@@ -92636,8 +91326,8 @@ define("tinymce/EditorManager", [
 /**
  * LegacyInput.js
  *
+ * Copyright, Moxiecode Systems AB
  * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
  *
  * License: http://www.tinymce.com/license
  * Contributing: http://www.tinymce.com/contributing
@@ -92715,8 +91405,8 @@ define("tinymce/LegacyInput", [
 /**
  * XHR.js
  *
+ * Copyright, Moxiecode Systems AB
  * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
  *
  * License: http://www.tinymce.com/license
  * Contributing: http://www.tinymce.com/contributing
@@ -92820,8 +91510,8 @@ define("tinymce/util/XHR", [
 /**
  * JSON.js
  *
+ * Copyright, Moxiecode Systems AB
  * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
  *
  * License: http://www.tinymce.com/license
  * Contributing: http://www.tinymce.com/contributing
@@ -92932,8 +91622,8 @@ define("tinymce/util/JSON", [], function() {
 /**
  * JSONRequest.js
  *
+ * Copyright, Moxiecode Systems AB
  * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
  *
  * License: http://www.tinymce.com/license
  * Contributing: http://www.tinymce.com/contributing
@@ -93045,8 +91735,8 @@ define("tinymce/util/JSONRequest", [
 /**
  * JSONP.js
  *
+ * Copyright, Moxiecode Systems AB
  * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
  *
  * License: http://www.tinymce.com/license
  * Contributing: http://www.tinymce.com/contributing
@@ -93086,8 +91776,8 @@ define("tinymce/util/JSONP", [
 /**
  * LocalStorage.js
  *
+ * Copyright, Moxiecode Systems AB
  * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
  *
  * License: http://www.tinymce.com/license
  * Contributing: http://www.tinymce.com/contributing
@@ -93302,8 +91992,8 @@ define("tinymce/util/LocalStorage", [], function() {
 /**
  * Compat.js
  *
+ * Copyright, Moxiecode Systems AB
  * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
  *
  * License: http://www.tinymce.com/license
  * Contributing: http://www.tinymce.com/contributing
@@ -93389,8 +92079,8 @@ define("tinymce/Compat", [
 /**
  * Layout.js
  *
+ * Copyright, Moxiecode Systems AB
  * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
  *
  * License: http://www.tinymce.com/license
  * Contributing: http://www.tinymce.com/contributing
@@ -93430,7 +92120,7 @@ define("tinymce/ui/Layout", [
 		 * @param {tinymce.ui.Container} container Container instance to preRender.
 		 */
 		preRender: function(container) {
-			container.bodyClasses.add(this.settings.containerClass);
+			container.addClass(this.settings.containerClass, 'body');
 		},
 
 		/**
@@ -93438,31 +92128,23 @@ define("tinymce/ui/Layout", [
 		 *
 		 * @private
 		 */
-		applyClasses: function(items) {
-			var self = this, settings = self.settings, firstClass, lastClass, firstItem, lastItem;
+		applyClasses: function(container) {
+			var self = this, settings = self.settings, items, firstClass, lastClass;
 
+			items = container.items().filter(':visible');
 			firstClass = settings.firstControlClass;
 			lastClass = settings.lastControlClass;
 
 			items.each(function(item) {
-				item.classes.remove(firstClass).remove(lastClass).add(settings.controlClass);
+				item.removeClass(firstClass).removeClass(lastClass);
 
-				if (item.visible()) {
-					if (!firstItem) {
-						firstItem = item;
-					}
-
-					lastItem = item;
+				if (settings.controlClass) {
+					item.addClass(settings.controlClass);
 				}
 			});
 
-			if (firstItem) {
-				firstItem.classes.add(firstClass);
-			}
-
-			if (lastItem) {
-				lastItem.classes.add(lastClass);
-			}
+			items.eq(0).addClass(firstClass);
+			items.eq(-1).addClass(lastClass);
 		},
 
 		/**
@@ -93472,11 +92154,17 @@ define("tinymce/ui/Layout", [
 		 * @param {tinymce.ui.Container} container Container to render HTML for.
 		 */
 		renderHtml: function(container) {
-			var self = this, html = '';
+			var self = this, settings = self.settings, items, html = '';
 
-			self.applyClasses(container.items());
+			items = container.items();
+			items.eq(0).addClass(settings.firstControlClass);
+			items.eq(-1).addClass(settings.lastControlClass);
 
-			container.items().each(function(item) {
+			items.each(function(item) {
+				if (settings.controlClass) {
+					item.addClass(settings.controlClass);
+				}
+
 				html += item.renderHtml();
 			});
 
@@ -93499,10 +92187,6 @@ define("tinymce/ui/Layout", [
 		 * @param {tinymce.ui.Container} container Container instance to postRender.
 		 */
 		postRender: function() {
-		},
-
-		isNative: function() {
-			return false;
 		}
 	});
 });
@@ -93512,8 +92196,8 @@ define("tinymce/ui/Layout", [
 /**
  * AbsoluteLayout.js
  *
+ * Copyright, Moxiecode Systems AB
  * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
  *
  * License: http://www.tinymce.com/license
  * Contributing: http://www.tinymce.com/contributing
@@ -93578,8 +92262,8 @@ define("tinymce/ui/AbsoluteLayout", [
 /**
  * Tooltip.js
  *
+ * Copyright, Moxiecode Systems AB
  * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
  *
  * License: http://www.tinymce.com/license
  * Contributing: http://www.tinymce.com/contributing
@@ -93605,6 +92289,29 @@ define("tinymce/ui/Tooltip", [
 		},
 
 		/**
+		 * Sets/gets the current label text.
+		 *
+		 * @method text
+		 * @param {String} [text] New label text.
+		 * @return {String|tinymce.ui.Tooltip} Current text or current label instance.
+		 */
+		text: function(value) {
+			var self = this;
+
+			if (typeof value != "undefined") {
+				self._value = value;
+
+				if (self._rendered) {
+					self.getEl().lastChild.innerHTML = self.encode(value);
+				}
+
+				return self;
+			}
+
+			return self._value;
+		},
+
+		/**
 		 * Renders the control as a HTML string.
 		 *
 		 * @method renderHtml
@@ -93614,21 +92321,11 @@ define("tinymce/ui/Tooltip", [
 			var self = this, prefix = self.classPrefix;
 
 			return (
-				'<div id="' + self._id + '" class="' + self.classes + '" role="presentation">' +
+				'<div id="' + self._id + '" class="' + self.classes() + '" role="presentation">' +
 					'<div class="' + prefix + 'tooltip-arrow"></div>' +
-					'<div class="' + prefix + 'tooltip-inner">' + self.encode(self.state.get('text')) + '</div>' +
+					'<div class="' + prefix + 'tooltip-inner">' + self.encode(self._text) + '</div>' +
 				'</div>'
 			);
-		},
-
-		bindStates: function() {
-			var self = this;
-
-			self.state.on('change:text', function(e) {
-				self.getEl().lastChild.innerHTML = self.encode(e.value);
-			});
-
-			return self._super();
 		},
 
 		/**
@@ -93654,8 +92351,8 @@ define("tinymce/ui/Tooltip", [
 /**
  * Widget.js
  *
+ * Copyright, Moxiecode Systems AB
  * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
  *
  * License: http://www.tinymce.com/license
  * Contributing: http://www.tinymce.com/contributing
@@ -93699,9 +92396,9 @@ define("tinymce/ui/Widget", [
 					if (e.control == self) {
 						var rel = tooltip.text(settings.tooltip).show().testMoveRel(self.getEl(), ['bc-tc', 'bc-tl', 'bc-tr']);
 
-						tooltip.classes.toggle('tooltip-n', rel == 'bc-tc');
-						tooltip.classes.toggle('tooltip-nw', rel == 'bc-tl');
-						tooltip.classes.toggle('tooltip-ne', rel == 'bc-tr');
+						tooltip.toggleClass('tooltip-n', rel == 'bc-tc');
+						tooltip.toggleClass('tooltip-nw', rel == 'bc-tl');
+						tooltip.toggleClass('tooltip-ne', rel == 'bc-tr');
 
 						tooltip.moveRel(self.getEl(), rel);
 					} else {
@@ -93733,12 +92430,50 @@ define("tinymce/ui/Widget", [
 		},
 
 		/**
+		 * Sets/gets the active state of the widget.
+		 *
+		 * @method active
+		 * @param {Boolean} [state] State if the control is active.
+		 * @return {Boolean|tinymce.ui.Widget} True/false or current widget instance.
+		 */
+		active: function(state) {
+			var self = this, undef;
+
+			if (state !== undef) {
+				self.aria('pressed', state);
+				self.toggleClass('active', state);
+			}
+
+			return self._super(state);
+		},
+
+		/**
+		 * Sets/gets the disabled state of the widget.
+		 *
+		 * @method disabled
+		 * @param {Boolean} [state] State if the control is disabled.
+		 * @return {Boolean|tinymce.ui.Widget} True/false or current widget instance.
+		 */
+		disabled: function(state) {
+			var self = this, undef;
+
+			if (state !== undef) {
+				self.aria('disabled', state);
+				self.toggleClass('disabled', state);
+			}
+
+			return self._super(state);
+		},
+
+		/**
 		 * Called after the control has been rendered.
 		 *
 		 * @method postRender
 		 */
 		postRender: function() {
 			var self = this, settings = self.settings;
+
+			self._rendered = true;
 
 			self._super();
 
@@ -93750,38 +92485,6 @@ define("tinymce/ui/Widget", [
 			if (settings.autofocus) {
 				self.focus();
 			}
-		},
-
-		bindStates: function() {
-			var self = this;
-
-			function disable(state) {
-				self.aria('disabled', state);
-				self.classes.toggle('disabled', state);
-			}
-
-			function active(state) {
-				self.aria('pressed', state);
-				self.classes.toggle('active', state);
-			}
-
-			self.state.on('change:disabled', function(e) {
-				disable(e.value);
-			});
-
-			self.state.on('change:active', function(e) {
-				active(e.value);
-			});
-
-			if (self.state.get('disabled')) {
-				disable(true);
-			}
-
-			if (self.state.get('active')) {
-				active(true);
-			}
-
-			return self._super();
 		},
 
 		/**
@@ -93808,8 +92511,8 @@ define("tinymce/ui/Widget", [
 /**
  * Button.js
  *
+ * Copyright, Moxiecode Systems AB
  * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
  *
  * License: http://www.tinymce.com/license
  * Contributing: http://www.tinymce.com/contributing
@@ -93852,30 +92555,19 @@ define("tinymce/ui/Button", [
 		init: function(settings) {
 			var self = this, size;
 
-			self._super(settings);
-			settings = self.settings;
-
-			size = self.settings.size;
-
 			self.on('click mousedown', function(e) {
 				e.preventDefault();
 			});
 
-			self.on('touchstart', function(e) {
-				self.fire('click', e);
-				e.preventDefault();
-			});
+			self._super(settings);
+			size = settings.size;
 
 			if (settings.subtype) {
-				self.classes.add(settings.subtype);
+				self.addClass(settings.subtype);
 			}
 
 			if (size) {
-				self.classes.add('btn-' + size);
-			}
-
-			if (settings.icon) {
-				self.icon(settings.icon);
+				self.addClass('btn-' + size);
 			}
 		},
 
@@ -93887,13 +92579,33 @@ define("tinymce/ui/Button", [
 		 * @return {String|tinymce.ui.MenuButton} Current icon or current MenuButton instance.
 		 */
 		icon: function(icon) {
-			if (!arguments.length) {
-				return this.state.get('icon');
+			var self = this, prefix = self.classPrefix;
+
+			if (typeof icon == 'undefined') {
+				return self.settings.icon;
 			}
 
-			this.state.set('icon', icon);
+			self.settings.icon = icon;
+			icon = icon ? prefix + 'ico ' + prefix + 'i-' + self.settings.icon : '';
 
-			return this;
+			if (self._rendered) {
+				var btnElm = self.getEl().firstChild, iconElm = btnElm.getElementsByTagName('i')[0];
+
+				if (icon) {
+					if (!iconElm || iconElm != btnElm.firstChild) {
+						iconElm = document.createElement('i');
+						btnElm.insertBefore(iconElm, btnElm.firstChild);
+					}
+
+					iconElm.className = icon;
+				} else if (iconElm) {
+					btnElm.removeChild(iconElm);
+				}
+
+				self.text(self._text); // Set text again to fix whitespace between icon + text
+			}
+
+			return self;
 		},
 
 		/**
@@ -93910,6 +92622,26 @@ define("tinymce/ui/Button", [
 		},
 
 		/**
+		 * Sets/gets the current button text.
+		 *
+		 * @method text
+		 * @param {String} [text] New button text.
+		 * @return {String|tinymce.ui.Button} Current text or current Button instance.
+		 */
+		text: function(text) {
+			var self = this;
+
+			if (self._rendered) {
+				var textNode = self.getEl().lastChild.lastChild;
+				if (textNode) {
+					textNode.data = self.translate(text);
+				}
+			}
+
+			return self._super(text);
+		},
+
+		/**
 		 * Renders the control as a HTML string.
 		 *
 		 * @method renderHtml
@@ -93917,7 +92649,7 @@ define("tinymce/ui/Button", [
 		 */
 		renderHtml: function() {
 			var self = this, id = self._id, prefix = self.classPrefix;
-			var icon = self.state.get('icon'), image, text = self.state.get('text');
+			var icon = self.settings.icon, image;
 
 			image = self.settings.image;
 			if (image) {
@@ -93933,64 +92665,16 @@ define("tinymce/ui/Button", [
 				image = '';
 			}
 
-			if (text) {
-				self.classes.add('btn-has-text');
-			}
-
 			icon = self.settings.icon ? prefix + 'ico ' + prefix + 'i-' + icon : '';
 
 			return (
-				'<div id="' + id + '" class="' + self.classes + '" tabindex="-1" aria-labelledby="' + id + '">' +
+				'<div id="' + id + '" class="' + self.classes() + '" tabindex="-1" aria-labelledby="' + id + '">' +
 					'<button role="presentation" type="button" tabindex="-1">' +
 						(icon ? '<i class="' + icon + '"' + image + '></i>' : '') +
-						(text ? self.encode(text) : '') +
+						(self._text ? (icon ? '\u00a0' : '') + self.encode(self._text) : '') +
 					'</button>' +
 				'</div>'
 			);
-		},
-
-		bindStates: function() {
-			var self = this;
-
-			function setButtonText(text) {
-				var node = self.getEl().firstChild.firstChild;
-
-				for (; node; node = node.nextSibling) {
-					if (node.nodeType == 3) {
-						node.data = self.translate(text);
-					}
-				}
-
-				self.classes.toggle('btn-has-text', !!text);
-			}
-
-			self.state.on('change:text', function(e) {
-				setButtonText(e.value);
-			});
-
-			self.state.on('change:icon', function(e) {
-				var icon = e.value, prefix = self.classPrefix;
-
-				self.settings.icon = icon;
-				icon = icon ? prefix + 'ico ' + prefix + 'i-' + self.settings.icon : '';
-
-				var btnElm = self.getEl().firstChild, iconElm = btnElm.getElementsByTagName('i')[0];
-
-				if (icon) {
-					if (!iconElm || iconElm != btnElm.firstChild) {
-						iconElm = document.createElement('i');
-						btnElm.insertBefore(iconElm, btnElm.firstChild);
-					}
-
-					iconElm.className = icon;
-				} else if (iconElm) {
-					btnElm.removeChild(iconElm);
-				}
-
-				setButtonText(self.state.get('text'));
-			});
-
-			return self._super();
 		}
 	});
 });
@@ -94000,8 +92684,8 @@ define("tinymce/ui/Button", [
 /**
  * ButtonGroup.js
  *
+ * Copyright, Moxiecode Systems AB
  * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
  *
  * License: http://www.tinymce.com/license
  * Contributing: http://www.tinymce.com/contributing
@@ -94045,12 +92729,12 @@ define("tinymce/ui/ButtonGroup", [
 		renderHtml: function() {
 			var self = this, layout = self._layout;
 
-			self.classes.add('btn-group');
+			self.addClass('btn-group');
 			self.preRender();
 			layout.preRender(self);
 
 			return (
-				'<div id="' + self._id + '" class="' + self.classes + '">' +
+				'<div id="' + self._id + '" class="' + self.classes() + '">' +
 					'<div id="' + self._id + '-body">' +
 						(self.settings.html || '') + layout.renderHtml(self) +
 					'</div>' +
@@ -94065,8 +92749,8 @@ define("tinymce/ui/ButtonGroup", [
 /**
  * Checkbox.js
  *
+ * Copyright, Moxiecode Systems AB
  * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
  *
  * License: http://www.tinymce.com/license
  * Contributing: http://www.tinymce.com/contributing
@@ -94134,13 +92818,22 @@ define("tinymce/ui/Checkbox", [
 		 * @return {Boolean|tinymce.ui.Checkbox} True/false or checkbox if it's a set operation.
 		 */
 		checked: function(state) {
-			if (!arguments.length) {
-				return this.state.get('checked');
+			var self = this;
+
+			if (typeof state != "undefined") {
+				if (state) {
+					self.addClass('checked');
+				} else {
+					self.removeClass('checked');
+				}
+
+				self._checked = state;
+				self.aria('checked', state);
+
+				return self;
 			}
 
-			this.state.set('checked', state);
-
-			return this;
+			return self._checked;
 		},
 
 		/**
@@ -94151,10 +92844,6 @@ define("tinymce/ui/Checkbox", [
 		 * @return {Boolean|tinymce.ui.Checkbox} True/false or checkbox if it's a set operation.
 		 */
 		value: function(state) {
-			if (!arguments.length) {
-				return this.checked();
-			}
-
 			return this.checked(state);
 		},
 
@@ -94168,59 +92857,11 @@ define("tinymce/ui/Checkbox", [
 			var self = this, id = self._id, prefix = self.classPrefix;
 
 			return (
-				'<div id="' + id + '" class="' + self.classes + '" unselectable="on" aria-labelledby="' + id + '-al" tabindex="-1">' +
+				'<div id="' + id + '" class="' + self.classes() + '" unselectable="on" aria-labelledby="' + id + '-al" tabindex="-1">' +
 					'<i class="' + prefix + 'ico ' + prefix + 'i-checkbox"></i>' +
-					'<span id="' + id + '-al" class="' + prefix + 'label">' + self.encode(self.state.get('text')) + '</span>' +
+					'<span id="' + id + '-al" class="' + prefix + 'label">' + self.encode(self._text) + '</span>' +
 				'</div>'
 			);
-		},
-
-		bindStates: function() {
-			var self = this;
-
-			function checked(state) {
-				self.classes.toggle("checked", state);
-				self.aria('checked', state);
-			}
-
-			self.state.on('change:text', function(e) {
-				self.getEl('al').firstChild.data = self.translate(e.value);
-			});
-
-			self.state.on('change:checked change:value', function(e) {
-				self.fire('change');
-				checked(e.value);
-			});
-
-			self.state.on('change:icon', function(e) {
-				var icon = e.value, prefix = self.classPrefix;
-
-				if (typeof icon == 'undefined') {
-					return self.settings.icon;
-				}
-
-				self.settings.icon = icon;
-				icon = icon ? prefix + 'ico ' + prefix + 'i-' + self.settings.icon : '';
-
-				var btnElm = self.getEl().firstChild, iconElm = btnElm.getElementsByTagName('i')[0];
-
-				if (icon) {
-					if (!iconElm || iconElm != btnElm.firstChild) {
-						iconElm = document.createElement('i');
-						btnElm.insertBefore(iconElm, btnElm.firstChild);
-					}
-
-					iconElm.className = icon;
-				} else if (iconElm) {
-					btnElm.removeChild(iconElm);
-				}
-			});
-
-			if (self.state.get('checked')) {
-				checked(true);
-			}
-
-			return self._super();
 		}
 	});
 });
@@ -94230,8 +92871,8 @@ define("tinymce/ui/Checkbox", [
 /**
  * ComboBox.js
  *
+ * Copyright, Moxiecode Systems AB
  * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
  *
  * License: http://www.tinymce.com/license
  * Contributing: http://www.tinymce.com/contributing
@@ -94248,9 +92889,8 @@ define("tinymce/ui/Checkbox", [
 define("tinymce/ui/ComboBox", [
 	"tinymce/ui/Widget",
 	"tinymce/ui/Factory",
-	"tinymce/ui/DomUtils",
-	"tinymce/dom/DomQuery"
-], function(Widget, Factory, DomUtils, $) {
+	"tinymce/ui/DomUtils"
+], function(Widget, Factory, DomUtils) {
 	"use strict";
 
 	return Widget.extend({
@@ -94265,12 +92905,11 @@ define("tinymce/ui/ComboBox", [
 			var self = this;
 
 			self._super(settings);
-			settings = self.settings;
-
-			self.classes.add('combobox');
+			self.addClass('combobox');
 			self.subinput = true;
 			self.ariaTarget = 'inp'; // TODO: Figure out a better way
 
+			settings = self.settings;
 			settings.menu = settings.menu || settings.values;
 
 			if (settings.menu) {
@@ -94279,10 +92918,6 @@ define("tinymce/ui/ComboBox", [
 
 			self.on('click', function(e) {
 				var elm = e.target, root = self.getEl();
-
-				if (!$.contains(root, elm) && elm != root) {
-					return;
-				}
 
 				while (elm && elm != root) {
 					if (elm.id && elm.id.indexOf('-open') != -1) {
@@ -94305,15 +92940,8 @@ define("tinymce/ui/ComboBox", [
 			self.on('keydown', function(e) {
 				if (e.target.nodeName == "INPUT" && e.keyCode == 13) {
 					self.parents().reverse().each(function(ctrl) {
-						var stateValue = self.state.get('value'), inputValue = self.getEl('inp').value;
-
 						e.preventDefault();
-
-						self.state.set('value', inputValue);
-
-						if (stateValue != inputValue) {
-							self.fire('change');
-						}
+						self.fire('change');
 
 						if (ctrl.hasEventListeners('submit') && ctrl.toJSON) {
 							ctrl.fire('submit', {data: ctrl.toJSON()});
@@ -94323,11 +92951,31 @@ define("tinymce/ui/ComboBox", [
 				}
 			});
 
-			self.on('keyup', function(e) {
-				if (e.target.nodeName == "INPUT") {
-					self.state.set('value', e.target.value);
-				}
-			});
+			if (settings.placeholder) {
+				self.addClass('placeholder');
+
+				self.on('focusin', function() {
+					if (!self._hasOnChange) {
+						DomUtils.on(self.getEl('inp'), 'change', function() {
+							self.fire('change');
+						});
+
+						self._hasOnChange = true;
+					}
+
+					if (self.hasClass('placeholder')) {
+						self.getEl('inp').value = '';
+						self.removeClass('placeholder');
+					}
+				});
+
+				self.on('focusout', function() {
+					if (self.value().length === 0) {
+						self.getEl('inp').value = settings.placeholder;
+						self.addClass('placeholder');
+					}
+				});
+			}
 		},
 
 		showMenu: function() {
@@ -94380,6 +93028,57 @@ define("tinymce/ui/ComboBox", [
 		},
 
 		/**
+		 * Getter/setter function for the control value.
+		 *
+		 * @method value
+		 * @param {String} [value] Value to be set.
+		 * @return {String|tinymce.ui.ComboBox} Value or self if it's a set operation.
+		 */
+		value: function(value) {
+			var self = this;
+
+			if (typeof value != "undefined") {
+				self._value = value;
+				self.removeClass('placeholder');
+
+				if (self._rendered) {
+					self.getEl('inp').value = value;
+				}
+
+				return self;
+			}
+
+			if (self._rendered) {
+				value = self.getEl('inp').value;
+
+				if (value != self.settings.placeholder) {
+					return value;
+				}
+
+				return '';
+			}
+
+			return self._value;
+		},
+
+		/**
+		 * Getter/setter function for the disabled state.
+		 *
+		 * @method value
+		 * @param {Boolean} [state] State to be set.
+		 * @return {Boolean|tinymce.ui.ComboBox} True/false or self if it's a set operation.
+		 */
+		disabled: function(state) {
+			var self = this;
+
+			if (self._rendered && typeof state != 'undefined') {
+				self.getEl('inp').disabled = state;
+			}
+
+			return self._super(state);
+		},
+
+		/**
 		 * Focuses the input area of the control.
 		 *
 		 * @method focus
@@ -94409,7 +93108,7 @@ define("tinymce/ui/ComboBox", [
 				lineHeight = (self.layoutRect().h - 2) + 'px';
 			}
 
-			$(elm.firstChild).css({
+			DomUtils.css(elm.firstChild, {
 				width: width,
 				lineHeight: lineHeight
 			});
@@ -94428,12 +93127,16 @@ define("tinymce/ui/ComboBox", [
 		postRender: function() {
 			var self = this;
 
-			$(this.getEl('inp')).on('change', function(e) {
-				self.state.set('value', e.target.value);
-				self.fire('change', e);
+			DomUtils.on(this.getEl('inp'), 'change', function() {
+				self.fire('change');
 			});
 
 			return self._super();
+		},
+
+		remove: function() {
+			DomUtils.off(this.getEl('inp'));
+			this._super();
 		},
 
 		/**
@@ -94444,7 +93147,7 @@ define("tinymce/ui/ComboBox", [
 		 */
 		renderHtml: function() {
 			var self = this, id = self._id, settings = self.settings, prefix = self.classPrefix;
-			var value = self.state.get('value') || '';
+			var value = settings.value || settings.placeholder || '';
 			var icon, text, openBtnHtml = '', extraAttrs = '';
 
 			if ("spellcheck" in settings) {
@@ -94472,7 +93175,7 @@ define("tinymce/ui/ComboBox", [
 				icon = prefix + 'ico ' + prefix + 'i-' + settings.icon;
 			}
 
-			text = self.state.get('text');
+			text = self._text;
 
 			if (icon || text) {
 				openBtnHtml = (
@@ -94484,36 +93187,16 @@ define("tinymce/ui/ComboBox", [
 					'</div>'
 				);
 
-				self.classes.add('has-open');
+				self.addClass('has-open');
 			}
 
 			return (
-				'<div id="' + id + '" class="' + self.classes + '">' +
-					'<input id="' + id + '-inp" class="' + prefix + 'textbox" value="' +
-					self.encode(value, false) + '" hidefocus="1"' + extraAttrs + ' placeholder="' +
-					self.encode(settings.placeholder) + '" />' +
+				'<div id="' + id + '" class="' + self.classes() + '">' +
+					'<input id="' + id + '-inp" class="' + prefix + 'textbox ' + prefix + 'placeholder" value="' +
+					value + '" hidefocus="1"' + extraAttrs + ' />' +
 					openBtnHtml +
 				'</div>'
 			);
-		},
-
-		bindStates: function() {
-			var self = this;
-
-			self.state.on('change:value', function(e) {
-				self.getEl('inp').value = e.value;
-			});
-
-			self.state.on('change:disabled', function(e) {
-				self.getEl('inp').disabled = e.value;
-			});
-
-			return self._super();
-		},
-
-		remove: function() {
-			$(this.getEl('inp')).off();
-			this._super();
 		}
 	});
 });
@@ -94523,8 +93206,8 @@ define("tinymce/ui/ComboBox", [
 /**
  * ColorBox.js
  *
+ * Copyright, Moxiecode Systems AB
  * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
  *
  * License: http://www.tinymce.com/license
  * Contributing: http://www.tinymce.com/contributing
@@ -94561,7 +93244,7 @@ define("tinymce/ui/ColorBox", [
 
 			self._super(settings);
 
-			self.classes.add('colorbox');
+			self.addClass('colorbox');
 			self.on('change keyup postrender', function() {
 				self.repaintColor(self.value());
 			});
@@ -94579,16 +93262,16 @@ define("tinymce/ui/ColorBox", [
 			}
 		},
 
-		bindStates: function() {
+		value: function(value) {
 			var self = this;
 
-			self.state.on('change:value', function(e) {
+			if (typeof value != "undefined") {
 				if (self._rendered) {
-					self.repaintColor(e.value);
+					self.repaintColor(value);
 				}
-			});
+			}
 
-			return self._super();
+			return self._super(value);
 		}
 	});
 });
@@ -94598,8 +93281,8 @@ define("tinymce/ui/ColorBox", [
 /**
  * PanelButton.js
  *
+ * Copyright, Moxiecode Systems AB
  * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
  *
  * License: http://www.tinymce.com/license
  * Contributing: http://www.tinymce.com/contributing
@@ -94715,8 +93398,8 @@ define("tinymce/ui/PanelButton", [
 /**
  * ColorButton.js
  *
+ * Copyright, Moxiecode Systems AB
  * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
  *
  * License: http://www.tinymce.com/license
  * Contributing: http://www.tinymce.com/contributing
@@ -94748,7 +93431,7 @@ define("tinymce/ui/ColorButton", [
 		 */
 		init: function(settings) {
 			this._super(settings);
-			this.classes.add('colorbutton');
+			this.addClass('colorbutton');
 		},
 
 		/**
@@ -94787,16 +93470,16 @@ define("tinymce/ui/ColorButton", [
 		 * @return {String} HTML representing the control.
 		 */
 		renderHtml: function() {
-			var self = this, id = self._id, prefix = self.classPrefix, text = self.state.get('text');
+			var self = this, id = self._id, prefix = self.classPrefix;
 			var icon = self.settings.icon ? prefix + 'ico ' + prefix + 'i-' + self.settings.icon : '';
 			var image = self.settings.image ? ' style="background-image: url(\'' + self.settings.image + '\')"' : '';
 
 			return (
-				'<div id="' + id + '" class="' + self.classes + '" role="button" tabindex="-1" aria-haspopup="true">' +
+				'<div id="' + id + '" class="' + self.classes() + '" role="button" tabindex="-1" aria-haspopup="true">' +
 					'<button role="presentation" hidefocus="1" type="button" tabindex="-1">' +
 						(icon ? '<i class="' + icon + '"' + image + '></i>' : '') +
 						'<span id="' + id + '-preview" class="' + prefix + 'preview"></span>' +
-						(text ? (icon ? ' ' : '') + (text) : '') +
+						(self._text ? (icon ? ' ' : '') + (self._text) : '') +
 					'</button>' +
 					'<button type="button" class="' + prefix + 'open" hidefocus="1" tabindex="-1">' +
 						' <i class="' + prefix + 'caret"></i>' +
@@ -94836,8 +93519,8 @@ define("tinymce/ui/ColorButton", [
 /**
  * Color.js
  *
+ * Copyright, Moxiecode Systems AB
  * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
  *
  * License: http://www.tinymce.com/license
  * Contributing: http://www.tinymce.com/contributing
@@ -95074,8 +93757,8 @@ define("tinymce/util/Color", [], function() {
 /**
  * ColorPicker.js
  *
+ * Copyright, Moxiecode Systems AB
  * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
  *
  * License: http://www.tinymce.com/license
  * Contributing: http://www.tinymce.com/contributing
@@ -95261,7 +93944,7 @@ define("tinymce/ui/ColorPicker", [
 			);
 
 			return (
-				'<div id="' + id + '" class="' + self.classes + '">' +
+				'<div id="' + id + '" class="' + self.classes() + '">' +
 					'<div id="' + id + '-sv" class="' + prefix + 'colorpicker-sv">' +
 						'<div class="' + prefix + 'colorpicker-overlay1">' +
 							'<div class="' + prefix + 'colorpicker-overlay2">' +
@@ -95283,8 +93966,8 @@ define("tinymce/ui/ColorPicker", [
 /**
  * Path.js
  *
+ * Copyright, Moxiecode Systems AB
  * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
  *
  * License: http://www.tinymce.com/license
  * Contributing: http://www.tinymce.com/contributing
@@ -95308,7 +93991,7 @@ define("tinymce/ui/Path", [
 		 *
 		 * @constructor
 		 * @param {Object} settings Name/value object with settings.
-		 * @setting {String} delimiter Delimiter to display between row in path.
+		 * @setting {String} delimiter Delimiter to display between items in path.
 		 */
 		init: function(settings) {
 			var self = this;
@@ -95318,18 +94001,16 @@ define("tinymce/ui/Path", [
 			}
 
 			self._super(settings);
-			self.classes.add('path');
+			self.addClass('path');
 			self.canFocus = true;
 
 			self.on('click', function(e) {
 				var index, target = e.target;
 
 				if ((index = target.getAttribute('data-index'))) {
-					self.fire('select', {value: self.row()[index], index: index});
+					self.fire('select', {value: self.data()[index], index: index});
 				}
 			});
-
-			self.row(self.settings.row);
 		},
 
 		/**
@@ -95349,17 +94030,42 @@ define("tinymce/ui/Path", [
 		/**
 		 * Sets/gets the data to be used for the path.
 		 *
-		 * @method row
-		 * @param {Array} row Array with row name is rendered to path.
+		 * @method data
+		 * @param {Array} data Array with items name is rendered to path.
 		 */
-		row: function(row) {
-			if (!arguments.length) {
-				return this.state.get('row');
+		data: function(data) {
+			var self = this;
+
+			if (typeof data !== "undefined") {
+				self._data = data;
+				self.update();
+
+				return self;
 			}
 
-			this.state.set('row', row);
+			return self._data;
+		},
 
-			return this;
+		/**
+		 * Updated the path.
+		 *
+		 * @private
+		 */
+		update: function() {
+			this.innerHtml(this._getPathHtml());
+		},
+
+		/**
+		 * Called after the control has been rendered.
+		 *
+		 * @method postRender
+		 */
+		postRender: function() {
+			var self = this;
+
+			self._super();
+
+			self.data(self.settings.data);
 		},
 
 		/**
@@ -95372,24 +94078,14 @@ define("tinymce/ui/Path", [
 			var self = this;
 
 			return (
-				'<div id="' + self._id + '" class="' + self.classes + '">' +
-					self._getDataPathHtml(self.state.get('row')) +
+				'<div id="' + self._id + '" class="' + self.classes() + '">' +
+					self._getPathHtml() +
 				'</div>'
 			);
 		},
 
-		bindStates: function() {
-			var self = this;
-
-			self.state.on('change:row', function(e) {
-				self.innerHtml(self._getDataPathHtml(e.value));
-			});
-
-			return self._super();
-		},
-
-		_getDataPathHtml: function(data) {
-			var self = this, parts = data || [], i, l, html = '', prefix = self.classPrefix;
+		_getPathHtml: function() {
+			var self = this, parts = self._data || [], i, l, html = '', prefix = self.classPrefix;
 
 			for (i = 0, l = parts.length; i < l; i++) {
 				html += (
@@ -95413,8 +94109,8 @@ define("tinymce/ui/Path", [
 /**
  * ElementPath.js
  *
+ * Copyright, Moxiecode Systems AB
  * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
  *
  * License: http://www.tinymce.com/license
  * Contributing: http://www.tinymce.com/contributing
@@ -95481,7 +94177,7 @@ define("tinymce/ui/ElementPath", [
 						}
 					}
 
-					self.row(outParents);
+					self.data(outParents);
 				});
 			}
 
@@ -95495,8 +94191,8 @@ define("tinymce/ui/ElementPath", [
 /**
  * FormItem.js
  *
+ * Copyright, Moxiecode Systems AB
  * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
  *
  * License: http://www.tinymce.com/license
  * Contributing: http://www.tinymce.com/contributing
@@ -95533,14 +94229,14 @@ define("tinymce/ui/FormItem", [
 		renderHtml: function() {
 			var self = this, layout = self._layout, prefix = self.classPrefix;
 
-			self.classes.add('formitem');
+			self.addClass('formitem');
 			layout.preRender(self);
 
 			return (
-				'<div id="' + self._id + '" class="' + self.classes + '" hidefocus="1" tabindex="-1">' +
+				'<div id="' + self._id + '" class="' + self.classes() + '" hidefocus="1" tabindex="-1">' +
 					(self.settings.title ? ('<div id="' + self._id + '-title" class="' + prefix + 'title">' +
 						self.settings.title + '</div>') : '') +
-					'<div id="' + self._id + '-body" class="' + self.bodyClasses + '">' +
+					'<div id="' + self._id + '-body" class="' + self.classes('body') + '">' +
 						(self.settings.html || '') + layout.renderHtml(self) +
 					'</div>' +
 				'</div>'
@@ -95554,8 +94250,8 @@ define("tinymce/ui/FormItem", [
 /**
  * Form.js
  *
+ * Copyright, Moxiecode Systems AB
  * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
  *
  * License: http://www.tinymce.com/license
  * Contributing: http://www.tinymce.com/contributing
@@ -95648,6 +94344,56 @@ define("tinymce/ui/Form", [
 		},
 
 		/**
+		 * Recalcs label widths.
+		 *
+		 * @private
+		 */
+		recalcLabels: function() {
+			var self = this, maxLabelWidth = 0, labels = [], i, labelGap, items;
+
+			if (self.settings.labelGapCalc === false) {
+				return;
+			}
+
+			if (self.settings.labelGapCalc == "children") {
+				items = self.find('formitem');
+			} else {
+				items = self.items();
+			}
+
+			items.filter('formitem').each(function(item) {
+				var labelCtrl = item.items()[0], labelWidth = labelCtrl.getEl().clientWidth;
+
+				maxLabelWidth = labelWidth > maxLabelWidth ? labelWidth : maxLabelWidth;
+				labels.push(labelCtrl);
+			});
+
+			labelGap = self.settings.labelGap || 0;
+
+			i = labels.length;
+			while (i--) {
+				labels[i].settings.minWidth = maxLabelWidth + labelGap;
+			}
+		},
+
+		/**
+		 * Getter/setter for the visibility state.
+		 *
+		 * @method visible
+		 * @param {Boolean} [state] True/false state to show/hide.
+		 * @return {tinymce.ui.Form|Boolean} True/false state or current control.
+		 */
+		visible: function(state) {
+			var val = this._super(state);
+
+			if (state === true && this._rendered) {
+				this.recalcLabels();
+			}
+
+			return val;
+		},
+
+		/**
 		 * Fires a submit event with the serialized form.
 		 *
 		 * @method submit
@@ -95667,44 +94413,8 @@ define("tinymce/ui/Form", [
 			var self = this;
 
 			self._super();
+			self.recalcLabels();
 			self.fromJSON(self.settings.data);
-		},
-
-		bindStates: function() {
-			var self = this;
-
-			self._super();
-
-			function recalcLabels() {
-				var maxLabelWidth = 0, labels = [], i, labelGap, items;
-
-				if (self.settings.labelGapCalc === false) {
-					return;
-				}
-
-				if (self.settings.labelGapCalc == "children") {
-					items = self.find('formitem');
-				} else {
-					items = self.items();
-				}
-
-				items.filter('formitem').each(function(item) {
-					var labelCtrl = item.items()[0], labelWidth = labelCtrl.getEl().clientWidth;
-
-					maxLabelWidth = labelWidth > maxLabelWidth ? labelWidth : maxLabelWidth;
-					labels.push(labelCtrl);
-				});
-
-				labelGap = self.settings.labelGap || 0;
-
-				i = labels.length;
-				while (i--) {
-					labels[i].settings.minWidth = maxLabelWidth + labelGap;
-				}
-			}
-
-			self.on('show', recalcLabels);
-			recalcLabels();
 		}
 	});
 });
@@ -95714,8 +94424,8 @@ define("tinymce/ui/Form", [
 /**
  * FieldSet.js
  *
+ * Copyright, Moxiecode Systems AB
  * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
  *
  * License: http://www.tinymce.com/license
  * Contributing: http://www.tinymce.com/contributing
@@ -95759,10 +94469,10 @@ define("tinymce/ui/FieldSet", [
 			layout.preRender(self);
 
 			return (
-				'<fieldset id="' + self._id + '" class="' + self.classes + '" hidefocus="1" tabindex="-1">' +
+				'<fieldset id="' + self._id + '" class="' + self.classes() + '" hidefocus="1" tabindex="-1">' +
 					(self.settings.title ? ('<legend id="' + self._id + '-title" class="' + prefix + 'fieldset-title">' +
 						self.settings.title + '</legend>') : '') +
-					'<div id="' + self._id + '-body" class="' + self.bodyClasses + '">' +
+					'<div id="' + self._id + '-body" class="' + self.classes('body') + '">' +
 						(self.settings.html || '') + layout.renderHtml(self) +
 					'</div>' +
 				'</fieldset>'
@@ -95776,8 +94486,8 @@ define("tinymce/ui/FieldSet", [
 /**
  * FilePicker.js
  *
+ * Copyright, Moxiecode Systems AB
  * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
  *
  * License: http://www.tinymce.com/license
  * Contributing: http://www.tinymce.com/contributing
@@ -95864,8 +94574,8 @@ define("tinymce/ui/FilePicker", [
 /**
  * FitLayout.js
  *
+ * Copyright, Moxiecode Systems AB
  * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
  *
  * License: http://www.tinymce.com/license
  * Contributing: http://www.tinymce.com/contributing
@@ -95892,7 +94602,7 @@ define("tinymce/ui/FitLayout", [
 		 * @param {tinymce.ui.Container} container Container instance to recalc.
 		 */
 		recalc: function(container) {
-			var contLayoutRect = container.layoutRect(), paddingBox = container.paddingBox;
+			var contLayoutRect = container.layoutRect(), paddingBox = container.paddingBox();
 
 			container.items().filter(':visible').each(function(ctrl) {
 				ctrl.layoutRect({
@@ -95915,8 +94625,8 @@ define("tinymce/ui/FitLayout", [
 /**
  * FlexLayout.js
  *
+ * Copyright, Moxiecode Systems AB
  * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
  *
  * License: http://www.tinymce.com/license
  * Contributing: http://www.tinymce.com/contributing
@@ -95957,7 +94667,7 @@ define("tinymce/ui/FlexLayout", [
 			// Get container items, properties and settings
 			items = container.items().filter(':visible');
 			contLayoutRect = container.layoutRect();
-			contPaddingBox = container.paddingBox;
+			contPaddingBox = container._paddingBox;
 			contSettings = container.settings;
 			direction = container.isRtl() ? (contSettings.direction || 'row-reversed') : contSettings.direction;
 			align = contSettings.align;
@@ -96164,8 +94874,8 @@ define("tinymce/ui/FlexLayout", [
 /**
  * FlowLayout.js
  *
+ * Copyright, Moxiecode Systems AB
  * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
  *
  * License: http://www.tinymce.com/license
  * Contributing: http://www.tinymce.com/contributing
@@ -96200,10 +94910,6 @@ define("tinymce/ui/FlowLayout", [
 					ctrl.recalc();
 				}
 			});
-		},
-
-		isNative: function() {
-			return true;
 		}
 	});
 });
@@ -96213,8 +94919,8 @@ define("tinymce/ui/FlowLayout", [
 /**
  * FormatControls.js
  *
+ * Copyright, Moxiecode Systems AB
  * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
  *
  * License: http://www.tinymce.com/license
  * Contributing: http://www.tinymce.com/contributing
@@ -96503,8 +95209,7 @@ define("tinymce/ui/FormatControls", [
 			alignleft: ['Align left', 'JustifyLeft'],
 			aligncenter: ['Align center', 'JustifyCenter'],
 			alignright: ['Align right', 'JustifyRight'],
-			alignjustify: ['Justify', 'JustifyFull'],
-			alignnone: ['No alignment', 'JustifyNone']
+			alignjustify: ['Justify', 'JustifyFull']
 		}, function(item, name) {
 			editor.addButton(name, {
 				tooltip: item[0],
@@ -96594,12 +95299,6 @@ define("tinymce/ui/FormatControls", [
 			selectable: true,
 			onPostRender: toggleVisualAidState,
 			cmd: 'mceToggleVisualAid'
-		});
-
-		editor.addButton('remove', {
-			tooltip: 'Remove',
-			icon: 'remove',
-			cmd: 'Delete'
 		});
 
 		each({
@@ -96762,8 +95461,8 @@ define("tinymce/ui/FormatControls", [
 /**
  * GridLayout.js
  *
+ * Copyright, Moxiecode Systems AB
  * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
  *
  * License: http://www.tinymce.com/license
  * Contributing: http://www.tinymce.com/contributing
@@ -96810,7 +95509,7 @@ define("tinymce/ui/GridLayout", [
 			spacingV = settings.spacingV || settings.spacing || 0;
 			alignH = settings.alignH || settings.align;
 			alignV = settings.alignV || settings.align;
-			contPaddingBox = container.paddingBox;
+			contPaddingBox = container._paddingBox;
 			reverseRows = 'reverseRows' in settings ? settings.reverseRows : container.isRtl();
 
 			if (alignH && typeof alignH == "string") {
@@ -96998,8 +95697,8 @@ define("tinymce/ui/GridLayout", [
 /**
  * Iframe.js
  *
+ * Copyright, Moxiecode Systems AB
  * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
  *
  * License: http://www.tinymce.com/license
  * Contributing: http://www.tinymce.com/contributing
@@ -97031,12 +95730,12 @@ define("tinymce/ui/Iframe", [
 		renderHtml: function() {
 			var self = this;
 
-			self.classes.add('iframe');
+			self.addClass('iframe');
 			self.canFocus = false;
 
 			/*eslint no-script-url:0 */
 			return (
-				'<iframe id="' + self._id + '" class="' + self.classes + '" tabindex="-1" src="' +
+				'<iframe id="' + self._id + '" class="' + self.classes() + '" tabindex="-1" src="' +
 				(self.settings.url || "javascript:\'\'") + '" frameborder="0"></iframe>'
 			);
 		},
@@ -97085,8 +95784,8 @@ define("tinymce/ui/Iframe", [
 /**
  * Label.js
  *
+ * Copyright, Moxiecode Systems AB
  * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
  *
  * License: http://www.tinymce.com/license
  * Contributing: http://www.tinymce.com/contributing
@@ -97118,15 +95817,16 @@ define("tinymce/ui/Label", [
 			var self = this;
 
 			self._super(settings);
-			self.classes.add('widget').add('label');
+			self.addClass('widget');
+			self.addClass('label');
 			self.canFocus = false;
 
 			if (settings.multiline) {
-				self.classes.add('autoscroll');
+				self.addClass('autoscroll');
 			}
 
 			if (settings.strong) {
-				self.classes.add('strong');
+				self.addClass('strong');
 			}
 		},
 
@@ -97147,7 +95847,7 @@ define("tinymce/ui/Label", [
 				// Check if the text fits within maxW if not then try word wrapping it
 				if (size.width > layoutRect.maxW) {
 					layoutRect.minW = layoutRect.maxW;
-					self.classes.add('multiline');
+					self.addClass('multiline');
 				}
 
 				self.getEl().style.width = layoutRect.minW + 'px';
@@ -97173,6 +95873,23 @@ define("tinymce/ui/Label", [
 		},
 
 		/**
+		 * Sets/gets the current label text.
+		 *
+		 * @method text
+		 * @param {String} [text] New label text.
+		 * @return {String|tinymce.ui.Label} Current text or current label instance.
+		 */
+		text: function(text) {
+			var self = this;
+
+			if (self._rendered && text) {
+				this.innerHtml(self.encode(text));
+			}
+
+			return self._super(text);
+		},
+
+		/**
 		 * Renders the control as a HTML string.
 		 *
 		 * @method renderHtml
@@ -97182,20 +95899,10 @@ define("tinymce/ui/Label", [
 			var self = this, forId = self.settings.forId;
 
 			return (
-				'<label id="' + self._id + '" class="' + self.classes + '"' + (forId ? ' for="' + forId + '"' : '') + '>' +
-					self.encode(self.state.get('text')) +
+				'<label id="' + self._id + '" class="' + self.classes() + '"' + (forId ? ' for="' + forId + '"' : '') + '>' +
+					self.encode(self._text) +
 				'</label>'
 			);
-		},
-
-		bindStates: function() {
-			var self = this;
-
-			self.state.on('change:text', function(e) {
-				self.innerHtml(self.encode(e.value));
-			});
-
-			return self._super();
 		}
 	});
 });
@@ -97205,8 +95912,8 @@ define("tinymce/ui/Label", [
 /**
  * Toolbar.js
  *
+ * Copyright, Moxiecode Systems AB
  * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
  *
  * License: http://www.tinymce.com/license
  * Contributing: http://www.tinymce.com/contributing
@@ -97239,7 +95946,7 @@ define("tinymce/ui/Toolbar", [
 			var self = this;
 
 			self._super(settings);
-			self.classes.add('toolbar');
+			self.addClass('toolbar');
 		},
 
 		/**
@@ -97250,9 +95957,7 @@ define("tinymce/ui/Toolbar", [
 		postRender: function() {
 			var self = this;
 
-			self.items().each(function(ctrl) {
-				ctrl.classes.add('toolbar-item');
-			});
+			self.items().addClass('toolbar-item');
 
 			return self._super();
 		}
@@ -97264,8 +95969,8 @@ define("tinymce/ui/Toolbar", [
 /**
  * MenuBar.js
  *
+ * Copyright, Moxiecode Systems AB
  * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
  *
  * License: http://www.tinymce.com/license
  * Contributing: http://www.tinymce.com/contributing
@@ -97276,7 +95981,7 @@ define("tinymce/ui/Toolbar", [
  *
  * @-x-less MenuBar.less
  * @class tinymce.ui.MenuBar
- * @extends tinymce.ui.Container
+ * @extends tinymce.ui.Toolbar
  */
 define("tinymce/ui/MenuBar", [
 	"tinymce/ui/Toolbar"
@@ -97300,8 +96005,8 @@ define("tinymce/ui/MenuBar", [
 /**
  * MenuButton.js
  *
+ * Copyright, Moxiecode Systems AB
  * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
  *
  * License: http://www.tinymce.com/license
  * Contributing: http://www.tinymce.com/contributing
@@ -97345,19 +96050,16 @@ define("tinymce/ui/MenuButton", [
 			var self = this;
 
 			self._renderOpen = true;
-
 			self._super(settings);
-			settings = self.settings;
 
-			self.classes.add('menubtn');
+			self.addClass('menubtn');
 
 			if (settings.fixedWidth) {
-				self.classes.add('fixed-width');
+				self.addClass('fixed-width');
 			}
 
 			self.aria('haspopup', true);
-
-			self.state.set('menu', settings.menu || self.render());
+			self.hasPopup = true;
 		},
 
 		/**
@@ -97366,14 +96068,14 @@ define("tinymce/ui/MenuButton", [
 		 * @method showMenu
 		 */
 		showMenu: function() {
-			var self = this, menu;
+			var self = this, settings = self.settings, menu;
 
 			if (self.menu && self.menu.visible()) {
 				return self.hideMenu();
 			}
 
 			if (!self.menu) {
-				menu = self.state.get('menu') || [];
+				menu = settings.menu || [];
 
 				// Is menu array then auto constuct menu control
 				if (menu.length) {
@@ -97385,12 +96087,7 @@ define("tinymce/ui/MenuButton", [
 					menu.type = menu.type || 'menu';
 				}
 
-				if (!menu.renderTo) {
-					self.menu = Factory.create(menu).parent(self).renderTo();
-				} else {
-					self.menu = menu.parent(self).show().renderTo();
-				}
-
+				self.menu = Factory.create(menu).parent(self).renderTo();
 				self.fire('createmenu');
 				self.menu.reflow();
 				self.menu.on('cancel', function(e) {
@@ -97445,7 +96142,7 @@ define("tinymce/ui/MenuButton", [
 		 * @private
 		 */
 		activeMenu: function(state) {
-			this.classes.toggle('active', state);
+			this.toggleClass('active', state);
 		},
 
 		/**
@@ -97456,7 +96153,7 @@ define("tinymce/ui/MenuButton", [
 		 */
 		renderHtml: function() {
 			var self = this, id = self._id, prefix = self.classPrefix;
-			var icon = self.settings.icon, image, text = self.state.get('text');
+			var icon = self.settings.icon, image;
 
 			image = self.settings.image;
 			if (image) {
@@ -97477,10 +96174,10 @@ define("tinymce/ui/MenuButton", [
 			self.aria('role', self.parent() instanceof MenuBar ? 'menuitem' : 'button');
 
 			return (
-				'<div id="' + id + '" class="' + self.classes + '" tabindex="-1" aria-labelledby="' + id + '">' +
+				'<div id="' + id + '" class="' + self.classes() + '" tabindex="-1" aria-labelledby="' + id + '">' +
 					'<button id="' + id + '-open" role="presentation" type="button" tabindex="-1">' +
 						(icon ? '<i class="' + icon + '"' + image + '></i>' : '') +
-						(text ? (icon ? '\u00a0' : '') + self.encode(text) : '') +
+						'<span>' + (self._text ? (icon ? '\u00a0' : '') + self.encode(self._text) : '') + '</span>' +
 						' <i class="' + prefix + 'caret"></i>' +
 					'</button>' +
 				'</div>'
@@ -97529,18 +96226,24 @@ define("tinymce/ui/MenuButton", [
 			return self._super();
 		},
 
-		bindStates: function() {
-			var self = this;
+		/**
+		 * Sets/gets the current button text.
+		 *
+		 * @method text
+		 * @param {String} [text] New button text.
+		 * @return {String|tinymce.ui.MenuButton} Current text or current MenuButton instance.
+		 */
+		text: function(text) {
+			var self = this, i, children;
 
-			self.state.on('change:menu', function() {
-				if (self.menu) {
-					self.menu.remove();
+			if (self._rendered) {
+				children = self.getEl('open').getElementsByTagName('span');
+				for (i = 0; i < children.length; i++) {
+					children[i].innerHTML = (self.settings.icon && text ? '\u00a0' : '') + self.encode(text);
 				}
+			}
 
-				self.menu = null;
-			});
-
-			return self._super();
+			return this._super(text);
 		},
 
 		/**
@@ -97560,13 +96263,159 @@ define("tinymce/ui/MenuButton", [
 	return MenuButton;
 });
 
+// Included from: js/tinymce/classes/ui/ListBox.js
+
+/**
+ * ListBox.js
+ *
+ * Copyright, Moxiecode Systems AB
+ * Released under LGPL License.
+ *
+ * License: http://www.tinymce.com/license
+ * Contributing: http://www.tinymce.com/contributing
+ */
+
+/**
+ * Creates a new list box control.
+ *
+ * @-x-less ListBox.less
+ * @class tinymce.ui.ListBox
+ * @extends tinymce.ui.MenuButton
+ */
+define("tinymce/ui/ListBox", [
+	"tinymce/ui/MenuButton"
+], function(MenuButton) {
+	"use strict";
+
+	return MenuButton.extend({
+		/**
+		 * Constructs a instance with the specified settings.
+		 *
+		 * @constructor
+		 * @param {Object} settings Name/value object with settings.
+		 * @setting {Array} values Array with values to add to list box.
+		 */
+		init: function(settings) {
+			var self = this, values, selected, selectedText, lastItemCtrl;
+
+			function setSelected(menuValues) {
+				// Try to find a selected value
+				for (var i = 0; i < menuValues.length; i++) {
+					selected = menuValues[i].selected || settings.value === menuValues[i].value;
+
+					if (selected) {
+						selectedText = selectedText || menuValues[i].text;
+						self._value = menuValues[i].value;
+						break;
+					}
+
+					// If the value has a submenu, try to find the selected values in that menu
+					if (menuValues[i].menu) {
+						setSelected(menuValues[i].menu);
+					}
+				}
+			}
+
+			self._values = values = settings.values;
+			if (values) {
+				setSelected(values);
+
+				// Default with first item
+				if (!selected && values.length > 0) {
+					selectedText = values[0].text;
+					self._value = values[0].value;
+				}
+
+				settings.menu = values;
+			}
+
+			settings.text = settings.text || selectedText || values[0].text;
+
+			self._super(settings);
+			self.addClass('listbox');
+
+			self.on('select', function(e) {
+				var ctrl = e.control;
+
+				if (lastItemCtrl) {
+					e.lastControl = lastItemCtrl;
+				}
+
+				if (settings.multiple) {
+					ctrl.active(!ctrl.active());
+				} else {
+					self.value(e.control.settings.value);
+				}
+
+				lastItemCtrl = ctrl;
+			});
+		},
+
+		/**
+		 * Getter/setter function for the control value.
+		 *
+		 * @method value
+		 * @param {String} [value] Value to be set.
+		 * @return {Boolean/tinymce.ui.ListBox} Value or self if it's a set operation.
+		 */
+		value: function(value) {
+			var self = this, active, selectedText, menu;
+
+			function activateByValue(menu, value) {
+				menu.items().each(function(ctrl) {
+					active = ctrl.value() === value;
+
+					if (active) {
+						selectedText = selectedText || ctrl.text();
+					}
+
+					ctrl.active(active);
+
+					if (ctrl.menu) {
+						activateByValue(ctrl.menu, value);
+					}
+				});
+			}
+
+			function setActiveValues(menuValues) {
+				for (var i = 0; i < menuValues.length; i++) {
+					active = menuValues[i].value == value;
+
+					if (active) {
+						selectedText = selectedText || menuValues[i].text;
+					}
+
+					menuValues[i].active = active;
+
+					if (menuValues[i].menu) {
+						setActiveValues(menuValues[i].menu);
+					}
+				}
+			}
+
+			if (typeof value != "undefined") {
+				if (self.menu) {
+					activateByValue(self.menu, value);
+				} else {
+					menu = self.settings.menu;
+					setActiveValues(menu);
+				}
+
+				self.text(selectedText || this.settings.text);
+			}
+
+			return self._super(value);
+		}
+	});
+});
+
 // Included from: js/tinymce/classes/ui/MenuItem.js
 
 /**
  * MenuItem.js
  *
+ * Copyright, Moxiecode Systems AB
  * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
  *
  * License: http://www.tinymce.com/license
  * Contributing: http://www.tinymce.com/contributing
@@ -97577,7 +96426,7 @@ define("tinymce/ui/MenuButton", [
  *
  * @-x-less MenuItem.less
  * @class tinymce.ui.MenuItem
- * @extends tinymce.ui.Control
+ * @extends tinymce.ui.Widget
  */
 define("tinymce/ui/MenuItem", [
 	"tinymce/ui/Widget",
@@ -97602,37 +96451,38 @@ define("tinymce/ui/MenuItem", [
 		 * @setting {String} shortcut Shortcut to display for menu item. Example: Ctrl+X
 		 */
 		init: function(settings) {
-			var self = this, text;
+			var self = this;
+
+			self.hasPopup = true;
 
 			self._super(settings);
 
 			settings = self.settings;
 
-			self.classes.add('menu-item');
+			self.addClass('menu-item');
 
 			if (settings.menu) {
-				self.classes.add('menu-item-expand');
+				self.addClass('menu-item-expand');
 			}
 
 			if (settings.preview) {
-				self.classes.add('menu-item-preview');
+				self.addClass('menu-item-preview');
 			}
 
-			text = self.state.get('text');
-			if (text === '-' || text === '|') {
-				self.classes.add('menu-item-sep');
+			if (self._text === '-' || self._text === '|') {
+				self.addClass('menu-item-sep');
 				self.aria('role', 'separator');
-				self.state.set('text', '-');
+				self._text = '-';
 			}
 
 			if (settings.selectable) {
 				self.aria('role', 'menuitemcheckbox');
-				self.classes.add('menu-item-checkbox');
+				self.addClass('menu-item-checkbox');
 				settings.icon = 'selected';
 			}
 
 			if (!settings.preview && !settings.selectable) {
-				self.classes.add('menu-item-normal');
+				self.addClass('menu-item-normal');
 			}
 
 			self.on('mousedown', function(e) {
@@ -97703,7 +96553,7 @@ define("tinymce/ui/MenuItem", [
 
 					menu.on('hide', function(e) {
 						if (e.control === menu) {
-							self.classes.remove('selected');
+							self.removeClass('selected');
 						}
 					});
 
@@ -97714,7 +96564,7 @@ define("tinymce/ui/MenuItem", [
 
 				menu._parentMenu = parent;
 
-				menu.classes.add('menu-sub');
+				menu.addClass('menu-sub');
 
 				var rel = menu.testMoveRel(
 					self.getEl(),
@@ -97725,10 +96575,11 @@ define("tinymce/ui/MenuItem", [
 				menu.rel = rel;
 
 				rel = 'menu-sub-' + rel;
-				menu.classes.remove(menu._lastRel).add(rel);
+				menu.removeClass(menu._lastRel);
+				menu.addClass(rel);
 				menu._lastRel = rel;
 
-				self.classes.add('selected');
+				self.addClass('selected');
 				self.aria('expanded', true);
 			}
 		},
@@ -97762,7 +96613,7 @@ define("tinymce/ui/MenuItem", [
 		 * @return {String} HTML representing the control.
 		 */
 		renderHtml: function() {
-			var self = this, id = self._id, settings = self.settings, prefix = self.classPrefix, text = self.encode(self.state.get('text'));
+			var self = this, id = self._id, settings = self.settings, prefix = self.classPrefix, text = self.encode(self._text);
 			var icon = self.settings.icon, image = '', shortcut = settings.shortcut;
 
 			// Converts shortcut format to Mac/PC variants
@@ -97796,7 +96647,7 @@ define("tinymce/ui/MenuItem", [
 			}
 
 			if (icon) {
-				self.parent().classes.add('menu-has-icons');
+				self.parent().addClass('menu-has-icons');
 			}
 
 			if (settings.image) {
@@ -97811,7 +96662,7 @@ define("tinymce/ui/MenuItem", [
 			icon = prefix + 'ico ' + prefix + 'i-' + (self.settings.icon || 'none');
 
 			return (
-				'<div id="' + id + '" class="' + self.classes + '" tabindex="-1">' +
+				'<div id="' + id + '" class="' + self.classes() + '" tabindex="-1">' +
 					(text !== '-' ? '<i class="' + icon + '"' + image + '></i>\u00a0' : '') +
 					(text !== '-' ? '<span id="' + id + '-text" class="' + prefix + 'text">' + text + '</span>' : '') +
 					(shortcut ? '<div id="' + id + '-shortcut" class="' + prefix + 'menu-shortcut">' + shortcut + '</div>' : '') +
@@ -97888,8 +96739,8 @@ define("tinymce/ui/MenuItem", [
 /**
  * Menu.js
  *
+ * Copyright, Moxiecode Systems AB
  * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
  *
  * License: http://www.tinymce.com/license
  * Contributing: http://www.tinymce.com/contributing
@@ -97940,7 +96791,7 @@ define("tinymce/ui/Menu", [
 			}
 
 			self._super(settings);
-			self.classes.add('menu');
+			self.addClass('menu');
 		},
 
 		/**
@@ -97949,7 +96800,7 @@ define("tinymce/ui/Menu", [
 		 * @method repaint
 		 */
 		repaint: function() {
-			this.classes.toggle('menu-align', true);
+			this.toggleClass('menu-align', true);
 
 			this._super();
 
@@ -97983,7 +96834,25 @@ define("tinymce/ui/Menu", [
 
 			return self._super();
 		},
+/*
+		getContainerElm: function() {
+			var doc = document, id = this.classPrefix + 'menucontainer';
 
+			var elm = doc.getElementById(id);
+			if (!elm) {
+				elm = doc.createElement('div');
+				elm.id = id;
+				elm.setAttribute('role', 'application');
+				elm.className = this.classPrefix + '-reset';
+				elm.style.position = 'absolute';
+				elm.style.top = elm.style.left = '0';
+				elm.style.overflow = 'visible';
+				doc.body.appendChild(elm);
+			}
+
+			return elm;
+		},
+*/
 		/**
 		 * Invoked before the menu is rendered.
 		 *
@@ -98008,168 +96877,13 @@ define("tinymce/ui/Menu", [
 	return Menu;
 });
 
-// Included from: js/tinymce/classes/ui/ListBox.js
-
-/**
- * ListBox.js
- *
- * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
- *
- * License: http://www.tinymce.com/license
- * Contributing: http://www.tinymce.com/contributing
- */
-
-/**
- * Creates a new list box control.
- *
- * @-x-less ListBox.less
- * @class tinymce.ui.ListBox
- * @extends tinymce.ui.MenuButton
- */
-define("tinymce/ui/ListBox", [
-	"tinymce/ui/MenuButton",
-	"tinymce/ui/Menu"
-], function(MenuButton, Menu) {
-	"use strict";
-
-	return MenuButton.extend({
-		/**
-		 * Constructs a instance with the specified settings.
-		 *
-		 * @constructor
-		 * @param {Object} settings Name/value object with settings.
-		 * @setting {Array} values Array with values to add to list box.
-		 */
-		init: function(settings) {
-			var self = this, values, selected, selectedText, lastItemCtrl;
-
-			function setSelected(menuValues) {
-				// Try to find a selected value
-				for (var i = 0; i < menuValues.length; i++) {
-					selected = menuValues[i].selected || settings.value === menuValues[i].value;
-
-					if (selected) {
-						selectedText = selectedText || menuValues[i].text;
-						self.state.set('value', menuValues[i].value);
-						return true;
-					}
-
-					// If the value has a submenu, try to find the selected values in that menu
-					if (menuValues[i].menu) {
-						if (setSelected(menuValues[i].menu)) {
-							return true;
-						}
-					}
-				}
-			}
-
-			self._super(settings);
-			settings = self.settings;
-
-			self._values = values = settings.values;
-			if (values) {
-				if (typeof settings.value != "undefined") {
-					setSelected(values);
-				}
-
-				// Default with first item
-				if (!selected && values.length > 0) {
-					selectedText = values[0].text;
-					self.state.set('value', values[0].value);
-				}
-
-				self.state.set('menu', values);
-			}
-
-			self.state.set('text', settings.text || selectedText || values[0].text);
-
-			self.classes.add('listbox');
-
-			self.on('select', function(e) {
-				var ctrl = e.control;
-
-				if (lastItemCtrl) {
-					e.lastControl = lastItemCtrl;
-				}
-
-				if (settings.multiple) {
-					ctrl.active(!ctrl.active());
-				} else {
-					self.value(e.control.value());
-				}
-
-				lastItemCtrl = ctrl;
-			});
-		},
-
-		/**
-		 * Getter/setter function for the control value.
-		 *
-		 * @method value
-		 * @param {String} [value] Value to be set.
-		 * @return {Boolean/tinymce.ui.ListBox} Value or self if it's a set operation.
-		 */
-		bindStates: function() {
-			var self = this;
-
-			function activateMenuItemsByValue(menu, value) {
-				if (menu instanceof Menu) {
-					menu.items().each(function(ctrl) {
-						if (!ctrl.hasMenus()) {
-							ctrl.active(ctrl.value() === value);
-						}
-					});
-				}
-			}
-
-			function getSelectedItem(menuValues, value) {
-				var selectedItem;
-
-				if (!menuValues) {
-					return;
-				}
-
-				for (var i = 0; i < menuValues.length; i++) {
-					if (menuValues[i].value === value) {
-						return menuValues[i];
-					}
-
-					if (menuValues[i].menu) {
-						selectedItem = getSelectedItem(menuValues[i].menu, value);
-						if (selectedItem) {
-							return selectedItem;
-						}
-					}
-				}
-			}
-
-			self.on('show', function(e) {
-				activateMenuItemsByValue(e.control, self.value());
-			});
-
-			self.state.on('change:value', function(e) {
-				var selectedItem = getSelectedItem(self.state.get('menu'), e.value);
-
-				if (selectedItem) {
-					self.text(selectedItem.text);
-				} else {
-					self.text(self.settings.text);
-				}
-			});
-
-			return self._super();
-		}
-	});
-});
-
 // Included from: js/tinymce/classes/ui/Radio.js
 
 /**
  * Radio.js
  *
+ * Copyright, Moxiecode Systems AB
  * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
  *
  * License: http://www.tinymce.com/license
  * Contributing: http://www.tinymce.com/contributing
@@ -98195,206 +96909,13 @@ define("tinymce/ui/Radio", [
 	});
 });
 
-// Included from: js/tinymce/classes/ui/Rect.js
-
-/**
- * Rect.js
- *
- * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
- *
- * License: http://www.tinymce.com/license
- * Contributing: http://www.tinymce.com/contributing
- */
-
-/**
- * Contains various tools for rect/position calculation.
- *
- * @class tinymce.ui.Rect
- */
-define("tinymce/ui/Rect", [
-], function() {
-	"use strict";
-
-	var min = Math.min, max = Math.max, round = Math.round;
-
-	/**
-	 * Returns the rect positioned based on the relative position name
-	 * to the target rect.
-	 *
-	 * @method relativePosition
-	 * @param {Rect} rect Source rect to modify into a new rect.
-	 * @param {Rect} targetRect Rect to move relative to based on the rel option.
-	 * @param {String} rel Relative position. For example: tr-bl.
-	 */
-	function relativePosition(rect, targetRect, rel) {
-		var x, y, w, h, targetW, targetH;
-
-		x = targetRect.x;
-		y = targetRect.y;
-		w = rect.w;
-		h = rect.h;
-		targetW = targetRect.w;
-		targetH = targetRect.h;
-
-		rel = (rel || '').split('');
-
-		if (rel[0] === 'b') {
-			y += targetH;
-		}
-
-		if (rel[1] === 'r') {
-			x += targetW;
-		}
-
-		if (rel[0] === 'c') {
-			y += round(targetH / 2);
-		}
-
-		if (rel[1] === 'c') {
-			x += round(targetW / 2);
-		}
-
-		if (rel[3] === 'b') {
-			y -= h;
-		}
-
-		if (rel[4] === 'r') {
-			x -= w;
-		}
-
-		if (rel[3] === 'c') {
-			y -= round(h / 2);
-		}
-
-		if (rel[4] === 'c') {
-			x -= round(w / 2);
-		}
-
-		return {x: x, y: y, w: w, h: h};
-	}
-
-	/**
-	 * Tests various positions to get the most suitable one.
-	 *
-	 * @method findBestRelativePosition
-	 * @param {Rect} Rect Rect to use as source.
-	 * @param {Rect} targetRect Rect to move relative to.
-	 * @param {Rect} constrainRect Rect to constrain within.
-	 * @param {Array} Array of relative positions to test against.
-	 */
-	function findBestRelativePosition(rect, targetRect, constrainRect, rels) {
-		var pos, i;
-
-		for (i = 0; i < rels.length; i++) {
-			pos = relativePosition(rect, targetRect, rels[i]);
-
-			if (pos.x >= constrainRect.x && pos.x + pos.w <= constrainRect.w + constrainRect.x &&
-				pos.y >= constrainRect.y && pos.y + pos.h <= constrainRect.h + constrainRect.y) {
-				return rels[i];
-			}
-		}
-	}
-
-	/**
-	 * Inflates the rect in all directions.
-	 *
-	 * @method inflate
-	 * @param {Rect} rect Rect to expand.
-	 * @param {Number} w Relative width to expand by.
-	 * @param {Number} h Relative height to expand by.
-	 * @return {Rect} New expanded rect.
-	 */
-	function inflate(rect, w, h) {
-		return {
-			x: rect.x - w,
-			y: rect.y - h,
-			w: rect.w + w * 2,
-			h: rect.h + h * 2
-		};
-	}
-
-	/**
-	 * Returns the intersection of the specified rectangles.
-	 *
-	 * @method intersect
-	 * @param {Rect} rect The first rectangle to compare.
-	 * @param {Rect} cropRect The second rectangle to compare.
-	 * @return {Rect} The intersection of the two rectangles or null if they don't intersect.
-	 */
-	function intersect(rect1, rect2) {
-		var x1, y1, x2, y2;
-
-		x1 = max(rect1.x, rect2.x);
-		y1 = max(rect1.y, rect2.y);
-		x2 = min(rect1.x + rect1.w, rect2.x + rect2.w);
-		y2 = min(rect1.y + rect1.h, rect2.y + rect2.h);
-
-		if (x2 - x1 < 0 || y2 - y1 < 0) {
-			return null;
-		}
-
-		return {x: x1, y: y1, w: x2 - x1, h: y2 - y1};
-	}
-
-	/**
-	 * Returns a rect clamped within the specified clamp rect. This forces the
-	 * rect to be inside the clamp rect.
-	 *
-	 * @method clamp
-	 * @param {Rect} rect Rectangle to force within clamp rect.
-	 * @param {Rect} clampRect Rectable to force within.
-	 * @param {Boolean} fixedSize True/false if size should be fixed.
-	 * @return {Rect} Clamped rect.
-	 */
-	function clamp(rect, clampRect, fixedSize) {
-		var underflowX1, underflowY1, overflowX2, overflowY2,
-			x1, y1, x2, y2, cx2, cy2;
-
-		x1 = rect.x;
-		y1 = rect.y;
-		x2 = rect.x + rect.w;
-		y2 = rect.y + rect.h;
-		cx2 = clampRect.x + clampRect.w;
-		cy2 = clampRect.y + clampRect.h;
-
-		underflowX1 = max(0, clampRect.x - x1);
-		underflowY1 = max(0, clampRect.y - y1);
-		overflowX2 = max(0, x2 - cx2);
-		overflowY2 = max(0, y2 - cy2);
-
-		x1 += underflowX1;
-		y1 += underflowY1;
-
-		if (fixedSize) {
-			x2 += underflowX1;
-			y2 += underflowY1;
-			x1 -= overflowX2;
-			y1 -= overflowY2;
-		}
-
-		x2 -= overflowX2;
-		y2 -= overflowY2;
-
-		return {x: x1, y: y1, w: x2 - x1, h: y2 - y1};
-	}
-
-	return {
-		inflate: inflate,
-		relativePosition: relativePosition,
-		findBestRelativePosition: findBestRelativePosition,
-		intersect: intersect,
-		clamp: clamp
-	};
-});
-
 // Included from: js/tinymce/classes/ui/ResizeHandle.js
 
 /**
  * ResizeHandle.js
  *
+ * Copyright, Moxiecode Systems AB
  * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
  *
  * License: http://www.tinymce.com/license
  * Contributing: http://www.tinymce.com/contributing
@@ -98423,16 +96944,16 @@ define("tinymce/ui/ResizeHandle", [
 		renderHtml: function() {
 			var self = this, prefix = self.classPrefix;
 
-			self.classes.add('resizehandle');
+			self.addClass('resizehandle');
 
 			if (self.settings.direction == "both") {
-				self.classes.add('resizehandle-both');
+				self.addClass('resizehandle-both');
 			}
 
 			self.canFocus = false;
 
 			return (
-				'<div id="' + self._id + '" class="' + self.classes + '">' +
+				'<div id="' + self._id + '" class="' + self.classes() + '">' +
 					'<i class="' + prefix + 'ico ' + prefix + 'i-resize"></i>' +
 				'</div>'
 			);
@@ -98477,177 +96998,13 @@ define("tinymce/ui/ResizeHandle", [
 	});
 });
 
-// Included from: js/tinymce/classes/ui/Slider.js
-
-/**
- * Slider.js
- *
- * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
- *
- * License: http://www.tinymce.com/license
- * Contributing: http://www.tinymce.com/contributing
- */
-
-/**
- * Slider control.
- *
- * @-x-less Slider.less
- * @class tinymce.ui.Slider
- * @extends tinymce.ui.Widget
- */
-define("tinymce/ui/Slider", [
-	"tinymce/ui/Widget",
-	"tinymce/ui/DragHelper",
-	"tinymce/ui/DomUtils"
-], function(Widget, DragHelper, DomUtils) {
-	"use strict";
-
-	function constrain(value, minVal, maxVal) {
-		if (value < minVal) {
-			value = minVal;
-		}
-
-		if (value > maxVal) {
-			value = maxVal;
-		}
-
-		return value;
-	}
-
-	function updateSliderHandle(ctrl, value) {
-		var maxHandlePos, shortSizeName, sizeName, stylePosName, styleValue;
-
-		if (ctrl.settings.orientation == "v") {
-			stylePosName = "top";
-			sizeName = "height";
-			shortSizeName = "h";
-		} else {
-			stylePosName = "left";
-			sizeName = "width";
-			shortSizeName = "w";
-		}
-
-		maxHandlePos = (ctrl.layoutRect()[shortSizeName] || 100) - DomUtils.getSize(ctrl.getEl('handle'))[sizeName];
-
-		styleValue = (maxHandlePos * ((value - ctrl._minValue) / (ctrl._maxValue - ctrl._minValue))) + 'px';
-		ctrl.getEl('handle').style[stylePosName] = styleValue;
-		ctrl.getEl('handle').style.height = ctrl.layoutRect().h + 'px';
-	}
-
-	return Widget.extend({
-		init: function(settings) {
-			var self = this;
-
-			if (!settings.previewFilter) {
-				settings.previewFilter = function(value) {
-					return Math.round(value * 100) / 100.0;
-				};
-			}
-
-			self._super(settings);
-			self.classes.add('slider');
-
-			if (settings.orientation == "v") {
-				self.classes.add('vertical');
-			}
-
-			self._minValue = settings.minValue || 0;
-			self._maxValue = settings.maxValue || 100;
-			self._initValue = self.state.get('value');
-		},
-
-		renderHtml: function() {
-			var self = this, id = self._id, prefix = self.classPrefix;
-
-			return (
-				'<div id="' + id + '" class="' + self.classes + '">' +
-					'<div id="' + id + '-handle" class="' + prefix + 'slider-handle"></div>' +
-				'</div>'
-			);
-		},
-
-		reset: function() {
-			this.value(this._initValue).repaint();
-		},
-
-		postRender: function() {
-			var self = this, startPos, startHandlePos, handlePos = 0, value, minValue, maxValue, maxHandlePos;
-			var screenCordName, stylePosName, sizeName, shortSizeName;
-
-			minValue = self._minValue;
-			maxValue = self._maxValue;
-			value = self.value();
-
-			if (self.settings.orientation == "v") {
-				screenCordName = "screenY";
-				stylePosName = "top";
-				sizeName = "height";
-				shortSizeName = "h";
-			} else {
-				screenCordName = "screenX";
-				stylePosName = "left";
-				sizeName = "width";
-				shortSizeName = "w";
-			}
-
-			self._super();
-
-			self._dragHelper = new DragHelper(self._id, {
-				handle: self._id + "-handle",
-
-				start: function(e) {
-					startPos = e[screenCordName];
-					startHandlePos = parseInt(self.getEl('handle').style[stylePosName], 10);
-					maxHandlePos = (self.layoutRect()[shortSizeName] || 100) - DomUtils.getSize(self.getEl('handle'))[sizeName];
-					self.fire('dragstart', {value: value});
-				},
-
-				drag: function(e) {
-					var delta = e[screenCordName] - startPos, handleEl = self.getEl('handle');
-
-					handlePos = constrain(startHandlePos + delta, 0, maxHandlePos);
-					handleEl.style[stylePosName] = handlePos + 'px';
-
-					value = minValue + (handlePos / maxHandlePos) * (maxValue - minValue);
-					self.value(value);
-
-					self.tooltip().text('' + self.settings.previewFilter(value)).show().moveRel(handleEl, 'bc tc');
-
-					self.fire('drag', {value: value});
-				},
-
-				stop: function() {
-					self.tooltip().hide();
-					self.fire('dragend', {value: value});
-				}
-			});
-		},
-
-		repaint: function() {
-			this._super();
-			updateSliderHandle(this, this.value());
-		},
-
-		bindStates: function() {
-			var self = this;
-
-			self.state.on('change:value', function(e) {
-				updateSliderHandle(self, e.value);
-			});
-
-			return self._super();
-		}
-	});
-});
-
 // Included from: js/tinymce/classes/ui/Spacer.js
 
 /**
  * Spacer.js
  *
+ * Copyright, Moxiecode Systems AB
  * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
  *
  * License: http://www.tinymce.com/license
  * Contributing: http://www.tinymce.com/contributing
@@ -98675,10 +97032,10 @@ define("tinymce/ui/Spacer", [
 		renderHtml: function() {
 			var self = this;
 
-			self.classes.add('spacer');
+			self.addClass('spacer');
 			self.canFocus = false;
 
-			return '<div id="' + self._id + '" class="' + self.classes + '"></div>';
+			return '<div id="' + self._id + '" class="' + self.classes() + '"></div>';
 		}
 	});
 });
@@ -98688,8 +97045,8 @@ define("tinymce/ui/Spacer", [
 /**
  * SplitButton.js
  *
+ * Copyright, Moxiecode Systems AB
  * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
  *
  * License: http://www.tinymce.com/license
  * Contributing: http://www.tinymce.com/contributing
@@ -98700,13 +97057,12 @@ define("tinymce/ui/Spacer", [
  *
  * @-x-less SplitButton.less
  * @class tinymce.ui.SplitButton
- * @extends tinymce.ui.Button
+ * @extends tinymce.ui.MenuButton
  */
 define("tinymce/ui/SplitButton", [
 	"tinymce/ui/MenuButton",
-	"tinymce/ui/DomUtils",
-	"tinymce/dom/DomQuery"
-], function(MenuButton, DomUtils, $) {
+	"tinymce/ui/DomUtils"
+], function(MenuButton, DomUtils) {
 	return MenuButton.extend({
 		Defaults: {
 			classes: "widget btn splitbtn",
@@ -98726,12 +97082,12 @@ define("tinymce/ui/SplitButton", [
 			mainButtonElm = elm.firstChild;
 			menuButtonElm = elm.lastChild;
 
-			$(mainButtonElm).css({
+			DomUtils.css(mainButtonElm, {
 				width: rect.w - DomUtils.getSize(menuButtonElm).width,
 				height: rect.h - 2
 			});
 
-			$(menuButtonElm).css({
+			DomUtils.css(menuButtonElm, {
 				height: rect.h - 2
 			});
 
@@ -98746,7 +97102,7 @@ define("tinymce/ui/SplitButton", [
 		activeMenu: function(state) {
 			var self = this;
 
-			$(self.getEl().lastChild).toggleClass(self.classPrefix + 'active', state);
+			DomUtils.toggleClass(self.getEl().lastChild, self.classPrefix + 'active', state);
 		},
 
 		/**
@@ -98757,7 +97113,7 @@ define("tinymce/ui/SplitButton", [
 		 */
 		renderHtml: function() {
 			var self = this, id = self._id, prefix = self.classPrefix, image;
-			var icon = self.state.get('icon'), text = self.state.get('text');
+			var icon = self.settings.icon;
 
 			image = self.settings.image;
 			if (image) {
@@ -98776,10 +97132,10 @@ define("tinymce/ui/SplitButton", [
 			icon = self.settings.icon ? prefix + 'ico ' + prefix + 'i-' + icon : '';
 
 			return (
-				'<div id="' + id + '" class="' + self.classes + '" role="button" tabindex="-1">' +
+				'<div id="' + id + '" class="' + self.classes() + '" role="button" tabindex="-1">' +
 					'<button type="button" hidefocus="1" tabindex="-1">' +
 						(icon ? '<i class="' + icon + '"' + image + '></i>' : '') +
-						(text ? (icon ? ' ' : '') + text : '') +
+						(self._text ? (icon ? ' ' : '') + self._text : '') +
 					'</button>' +
 					'<button type="button" class="' + prefix + 'open" hidefocus="1" tabindex="-1">' +
 						//(icon ? '<i class="' + icon + '"></i>' : '') +
@@ -98806,11 +97162,7 @@ define("tinymce/ui/SplitButton", [
 					while (node) {
 						if ((e.aria && e.aria.key != 'down') || (node.nodeName == 'BUTTON' && node.className.indexOf('open') == -1)) {
 							e.stopImmediatePropagation();
-
-							if (onClickHandler) {
-								onClickHandler.call(this, e);
-							}
-
+							onClickHandler.call(this, e);
 							return;
 						}
 
@@ -98831,8 +97183,8 @@ define("tinymce/ui/SplitButton", [
 /**
  * StackLayout.js
  *
+ * Copyright, Moxiecode Systems AB
  * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
  *
  * License: http://www.tinymce.com/license
  * Contributing: http://www.tinymce.com/contributing
@@ -98855,10 +97207,6 @@ define("tinymce/ui/StackLayout", [
 			containerClass: 'stack-layout',
 			controlClass: 'stack-layout-item',
 			endClass: 'break'
-		},
-
-		isNative: function() {
-			return true;
 		}
 	});
 });
@@ -98868,8 +97216,8 @@ define("tinymce/ui/StackLayout", [
 /**
  * TabPanel.js
  *
+ * Copyright, Moxiecode Systems AB
  * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
  *
  * License: http://www.tinymce.com/license
  * Contributing: http://www.tinymce.com/contributing
@@ -98886,9 +97234,8 @@ define("tinymce/ui/StackLayout", [
  */
 define("tinymce/ui/TabPanel", [
 	"tinymce/ui/Panel",
-	"tinymce/dom/DomQuery",
 	"tinymce/ui/DomUtils"
-], function(Panel, $, DomUtils) {
+], function(Panel, DomUtils) {
 	"use strict";
 
 	return Panel.extend({
@@ -98910,7 +97257,7 @@ define("tinymce/ui/TabPanel", [
 
 			if (this.activeTabId) {
 				activeTabElm = this.getEl(this.activeTabId);
-				$(activeTabElm).removeClass(this.classPrefix + 'active');
+				DomUtils.removeClass(activeTabElm, this.classPrefix + 'active');
 				activeTabElm.setAttribute('aria-selected', "false");
 			}
 
@@ -98918,7 +97265,7 @@ define("tinymce/ui/TabPanel", [
 
 			activeTabElm = this.getEl('t' + idx);
 			activeTabElm.setAttribute('aria-selected', "true");
-			$(activeTabElm).addClass(this.classPrefix + 'active');
+			DomUtils.addClass(activeTabElm, this.classPrefix + 'active');
 
 			this.items()[idx].show().fire('showtab');
 			this.reflow();
@@ -98957,11 +97304,11 @@ define("tinymce/ui/TabPanel", [
 			});
 
 			return (
-				'<div id="' + self._id + '" class="' + self.classes + '" hidefocus="1" tabindex="-1">' +
+				'<div id="' + self._id + '" class="' + self.classes() + '" hidefocus="1" tabindex="-1">' +
 					'<div id="' + self._id + '-head" class="' + prefix + 'tabs" role="tablist">' +
 						tabsHtml +
 					'</div>' +
-					'<div id="' + self._id + '-body" class="' + self.bodyClasses + '">' +
+					'<div id="' + self._id + '-body" class="' + self.classes('body') + '">' +
 						layout.renderHtml(self) +
 					'</div>' +
 				'</div>'
@@ -99049,8 +97396,8 @@ define("tinymce/ui/TabPanel", [
 /**
  * TextBox.js
  *
+ * Copyright, Moxiecode Systems AB
  * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
  *
  * License: http://www.tinymce.com/license
  * Contributing: http://www.tinymce.com/contributing
@@ -99064,8 +97411,9 @@ define("tinymce/ui/TabPanel", [
  * @extends tinymce.ui.Widget
  */
 define("tinymce/ui/TextBox", [
-	"tinymce/ui/Widget"
-], function(Widget) {
+	"tinymce/ui/Widget",
+	"tinymce/ui/DomUtils"
+], function(Widget, DomUtils) {
 	"use strict";
 
 	return Widget.extend({
@@ -99083,34 +97431,70 @@ define("tinymce/ui/TextBox", [
 
 			self._super(settings);
 
-			self.classes.add('textbox');
+			self._value = settings.value || '';
+			self.addClass('textbox');
 
 			if (settings.multiline) {
-				self.classes.add('multiline');
+				self.addClass('multiline');
 			} else {
+				// TODO: Rework this
 				self.on('keydown', function(e) {
-					var rootControl;
-
 					if (e.keyCode == 13) {
-						e.preventDefault();
-
-						// Find root control that we can do toJSON on
 						self.parents().reverse().each(function(ctrl) {
-							if (ctrl.toJSON) {
-								rootControl = ctrl;
+							e.preventDefault();
+
+							if (ctrl.hasEventListeners('submit') && ctrl.toJSON) {
+								ctrl.fire('submit', {data: ctrl.toJSON()});
 								return false;
 							}
 						});
-
-						// Fire event on current text box with the serialized data of the whole form
-						self.fire('submit', {data: rootControl.toJSON()});
 					}
 				});
-
-				self.on('keyup', function(e) {
-					self.state.set('value', e.target.value);
-				});
 			}
+		},
+
+		/**
+		 * Getter/setter function for the disabled state.
+		 *
+		 * @method value
+		 * @param {Boolean} [state] State to be set.
+		 * @return {Boolean|tinymce.ui.ComboBox} True/false or self if it's a set operation.
+		 */
+		disabled: function(state) {
+			var self = this;
+
+			if (self._rendered && typeof state != 'undefined') {
+				self.getEl().disabled = state;
+			}
+
+			return self._super(state);
+		},
+
+		/**
+		 * Getter/setter function for the control value.
+		 *
+		 * @method value
+		 * @param {String} [value] Value to be set.
+		 * @return {String|tinymce.ui.ComboBox} Value or self if it's a set operation.
+		 */
+		value: function(value) {
+			var self = this;
+
+			if (typeof value != "undefined") {
+				self._value = value;
+
+				if (self._rendered) {
+					self.getEl().value = value;
+				}
+
+				return self;
+			}
+
+			if (self._rendered) {
+				return self.getEl().value;
+			}
+
+			return self._value;
 		},
 
 		/**
@@ -99131,7 +97515,7 @@ define("tinymce/ui/TextBox", [
 				style.lineHeight = (rect.h - borderH) + 'px';
 			}
 
-			borderBox = self.borderBox;
+			borderBox = self._borderBox;
 			borderW = borderBox.left + borderBox.right + 8;
 			borderH = borderBox.top + borderBox.bottom + (self.settings.multiline ? 8 : 0);
 
@@ -99168,7 +97552,7 @@ define("tinymce/ui/TextBox", [
 		 * @return {String} HTML representing the control.
 		 */
 		renderHtml: function() {
-			var self = this, id = self._id, settings = self.settings, value = self.encode(self.state.get('value'), false), extraAttrs = '';
+			var self = this, id = self._id, settings = self.settings, value = self.encode(self._value, false), extraAttrs = '';
 
 			if ("spellcheck" in settings) {
 				extraAttrs += ' spellcheck="' + settings.spellcheck + '"';
@@ -99192,28 +97576,14 @@ define("tinymce/ui/TextBox", [
 
 			if (settings.multiline) {
 				return (
-					'<textarea id="' + id + '" class="' + self.classes + '" ' +
+					'<textarea id="' + id + '" class="' + self.classes() + '" ' +
 					(settings.rows ? ' rows="' + settings.rows + '"' : '') +
 					' hidefocus="1"' + extraAttrs + '>' + value +
 					'</textarea>'
 				);
 			}
 
-			return '<input id="' + id + '" class="' + self.classes + '" value="' + value + '" hidefocus="1"' + extraAttrs + ' />';
-		},
-
-		value: function(value) {
-			if (arguments.length) {
-				this.state.set('value', value);
-				return this;
-			}
-
-			// Make sure the real state is in sync
-			if (this.state.get('rendered')) {
-				this.state.set('value', this.getEl().value);
-			}
-
-			return this.state.get('value');
+			return '<input id="' + id + '" class="' + self.classes() + '" value="' + value + '" hidefocus="1"' + extraAttrs + ' />';
 		},
 
 		/**
@@ -99224,30 +97594,15 @@ define("tinymce/ui/TextBox", [
 		postRender: function() {
 			var self = this;
 
-			self._super();
-
-			self.$el.on('change', function(e) {
-				self.state.set('value', e.target.value);
+			DomUtils.on(self.getEl(), 'change', function(e) {
 				self.fire('change', e);
-			});
-		},
-
-		bindStates: function() {
-			var self = this;
-
-			self.state.on('change:value', function(e) {
-				self.getEl().value = e.value;
-			});
-
-			self.state.on('change:disabled', function(e) {
-				self.getEl().disabled = e.value;
 			});
 
 			return self._super();
 		},
 
 		remove: function() {
-			this.$el.off();
+			DomUtils.off(this.getEl());
 			this._super();
 		}
 	});
@@ -99258,8 +97613,8 @@ define("tinymce/ui/TextBox", [
 /**
  * Throbber.js
  *
+ * Copyright, Moxiecode Systems AB
  * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
  *
  * License: http://www.tinymce.com/license
  * Contributing: http://www.tinymce.com/contributing
@@ -99272,9 +97627,9 @@ define("tinymce/ui/TextBox", [
  * @class tinymce.ui.Throbber
  */
 define("tinymce/ui/Throbber", [
-	"tinymce/dom/DomQuery",
+	"tinymce/ui/DomUtils",
 	"tinymce/ui/Control"
-], function($, Control) {
+], function(DomUtils, Control) {
 	"use strict";
 
 	/**
@@ -99292,23 +97647,18 @@ define("tinymce/ui/Throbber", [
 		 *
 		 * @method show
 		 * @param {Number} [time] Time to wait before showing.
-		 * @param {function} [callback] Optional callback to execute when the throbber is shown.
 		 * @return {tinymce.ui.Throbber} Current throbber instance.
 		 */
-		self.show = function(time, callback) {
+		self.show = function(time) {
 			self.hide();
 
 			state = true;
 
 			window.setTimeout(function() {
 				if (state) {
-					$(elm).append(
+					elm.appendChild(DomUtils.createFragment(
 						'<div class="' + classPrefix + 'throbber' + (inline ? ' ' + classPrefix + 'throbber-inline' : '') + '"></div>'
-					);
-
-					if (callback) {
-						callback();
-					}
+					));
 				}
 			}, time || 0);
 
@@ -99335,8 +97685,179 @@ define("tinymce/ui/Throbber", [
 	};
 });
 
-expose(["tinymce/dom/EventUtils","tinymce/dom/Sizzle","tinymce/Env","tinymce/util/Tools","tinymce/dom/DomQuery","tinymce/html/Styles","tinymce/dom/TreeWalker","tinymce/dom/Range","tinymce/html/Entities","tinymce/dom/DOMUtils","tinymce/dom/ScriptLoader","tinymce/AddOnManager","tinymce/dom/RangeUtils","tinymce/html/Node","tinymce/html/Schema","tinymce/html/SaxParser","tinymce/html/DomParser","tinymce/html/Writer","tinymce/html/Serializer","tinymce/dom/Serializer","tinymce/dom/TridentSelection","tinymce/util/VK","tinymce/dom/ControlSelection","tinymce/dom/BookmarkManager","tinymce/dom/Selection","tinymce/dom/ElementUtils","tinymce/Formatter","tinymce/UndoManager","tinymce/EnterKey","tinymce/ForceBlocks","tinymce/EditorCommands","tinymce/util/URI","tinymce/util/Class","tinymce/util/EventDispatcher","tinymce/data/Binding","tinymce/util/Observable","tinymce/data/ObservableObject","tinymce/ui/Selector","tinymce/ui/Collection","tinymce/ui/DomUtils","tinymce/ui/BoxUtils","tinymce/ui/ClassList","tinymce/ui/ReflowQueue","tinymce/ui/Control","tinymce/ui/Factory","tinymce/ui/KeyboardNavigation","tinymce/ui/Container","tinymce/ui/DragHelper","tinymce/ui/Scrollable","tinymce/ui/Panel","tinymce/ui/Movable","tinymce/ui/Resizable","tinymce/ui/FloatPanel","tinymce/ui/Window","tinymce/ui/MessageBox","tinymce/WindowManager","tinymce/util/Quirks","tinymce/EditorObservable","tinymce/Shortcuts","tinymce/util/Promise","tinymce/file/Conversions","tinymce/Editor","tinymce/util/I18n","tinymce/FocusManager","tinymce/EditorManager","tinymce/LegacyInput","tinymce/util/XHR","tinymce/util/JSON","tinymce/util/JSONRequest","tinymce/util/JSONP","tinymce/util/LocalStorage","tinymce/Compat","tinymce/ui/Layout","tinymce/ui/AbsoluteLayout","tinymce/ui/Tooltip","tinymce/ui/Widget","tinymce/ui/Button","tinymce/ui/ButtonGroup","tinymce/ui/Checkbox","tinymce/ui/ComboBox","tinymce/ui/ColorBox","tinymce/ui/PanelButton","tinymce/ui/ColorButton","tinymce/util/Color","tinymce/ui/ColorPicker","tinymce/ui/Path","tinymce/ui/ElementPath","tinymce/ui/FormItem","tinymce/ui/Form","tinymce/ui/FieldSet","tinymce/ui/FilePicker","tinymce/ui/FitLayout","tinymce/ui/FlexLayout","tinymce/ui/FlowLayout","tinymce/ui/FormatControls","tinymce/ui/GridLayout","tinymce/ui/Iframe","tinymce/ui/Label","tinymce/ui/Toolbar","tinymce/ui/MenuBar","tinymce/ui/MenuButton","tinymce/ui/MenuItem","tinymce/ui/Menu","tinymce/ui/ListBox","tinymce/ui/Radio","tinymce/ui/Rect","tinymce/ui/ResizeHandle","tinymce/ui/Slider","tinymce/ui/Spacer","tinymce/ui/SplitButton","tinymce/ui/StackLayout","tinymce/ui/TabPanel","tinymce/ui/TextBox","tinymce/ui/Throbber"]);
-})(this);;(function (global, factory) {
+expose(["tinymce/dom/EventUtils","tinymce/dom/Sizzle","tinymce/Env","tinymce/util/Tools","tinymce/dom/DomQuery","tinymce/html/Styles","tinymce/dom/TreeWalker","tinymce/dom/Range","tinymce/html/Entities","tinymce/dom/DOMUtils","tinymce/dom/ScriptLoader","tinymce/AddOnManager","tinymce/dom/RangeUtils","tinymce/html/Node","tinymce/html/Schema","tinymce/html/SaxParser","tinymce/html/DomParser","tinymce/html/Writer","tinymce/html/Serializer","tinymce/dom/Serializer","tinymce/dom/TridentSelection","tinymce/util/VK","tinymce/dom/ControlSelection","tinymce/dom/BookmarkManager","tinymce/dom/Selection","tinymce/dom/ElementUtils","tinymce/Formatter","tinymce/UndoManager","tinymce/EnterKey","tinymce/ForceBlocks","tinymce/EditorCommands","tinymce/util/URI","tinymce/util/Class","tinymce/util/EventDispatcher","tinymce/ui/Selector","tinymce/ui/Collection","tinymce/ui/DomUtils","tinymce/ui/Control","tinymce/ui/Factory","tinymce/ui/KeyboardNavigation","tinymce/ui/Container","tinymce/ui/DragHelper","tinymce/ui/Scrollable","tinymce/ui/Panel","tinymce/ui/Movable","tinymce/ui/Resizable","tinymce/ui/FloatPanel","tinymce/ui/Window","tinymce/ui/MessageBox","tinymce/WindowManager","tinymce/util/Quirks","tinymce/util/Observable","tinymce/EditorObservable","tinymce/Shortcuts","tinymce/Editor","tinymce/util/I18n","tinymce/FocusManager","tinymce/EditorManager","tinymce/LegacyInput","tinymce/util/XHR","tinymce/util/JSON","tinymce/util/JSONRequest","tinymce/util/JSONP","tinymce/util/LocalStorage","tinymce/Compat","tinymce/ui/Layout","tinymce/ui/AbsoluteLayout","tinymce/ui/Tooltip","tinymce/ui/Widget","tinymce/ui/Button","tinymce/ui/ButtonGroup","tinymce/ui/Checkbox","tinymce/ui/ComboBox","tinymce/ui/ColorBox","tinymce/ui/PanelButton","tinymce/ui/ColorButton","tinymce/util/Color","tinymce/ui/ColorPicker","tinymce/ui/Path","tinymce/ui/ElementPath","tinymce/ui/FormItem","tinymce/ui/Form","tinymce/ui/FieldSet","tinymce/ui/FilePicker","tinymce/ui/FitLayout","tinymce/ui/FlexLayout","tinymce/ui/FlowLayout","tinymce/ui/FormatControls","tinymce/ui/GridLayout","tinymce/ui/Iframe","tinymce/ui/Label","tinymce/ui/Toolbar","tinymce/ui/MenuBar","tinymce/ui/MenuButton","tinymce/ui/ListBox","tinymce/ui/MenuItem","tinymce/ui/Menu","tinymce/ui/Radio","tinymce/ui/ResizeHandle","tinymce/ui/Spacer","tinymce/ui/SplitButton","tinymce/ui/StackLayout","tinymce/ui/TabPanel","tinymce/ui/TextBox","tinymce/ui/Throbber"]);
+})(this);;/**
+ * Binds a TinyMCE widget to <textarea> elements.
+ */
+angular.module('ui.tinymce', [])
+  .value('uiTinymceConfig', {})
+  .directive('uiTinymce', ['$rootScope', '$compile', '$timeout', '$window', '$sce', 'uiTinymceConfig', function($rootScope, $compile, $timeout, $window, $sce, uiTinymceConfig) {
+    uiTinymceConfig = uiTinymceConfig || {};
+    var generatedIds = 0;
+    var ID_ATTR = 'ui-tinymce';
+    if (uiTinymceConfig.baseUrl) {
+      tinymce.baseURL = uiTinymceConfig.baseUrl;
+    }
+
+    return {
+      require: ['ngModel', '^?form'],
+      link: function(scope, element, attrs, ctrls) {
+        if (!$window.tinymce) {
+          return;
+        }
+
+        var ngModel = ctrls[0],
+          form = ctrls[1] || null;
+
+        var expression, options, tinyInstance,
+          updateView = function(editor) {
+            var content = editor.getContent({format: options.format}).trim();
+            content = $sce.trustAsHtml(content);
+
+            ngModel.$setViewValue(content);
+            if (!$rootScope.$$phase) {
+              scope.$apply();
+            }
+          };
+
+        // generate an ID
+        attrs.$set('id', ID_ATTR + '-' + generatedIds++);
+
+        expression = {};
+
+        angular.extend(expression, scope.$eval(attrs.uiTinymce));
+
+        options = {
+          // Update model when calling setContent
+          // (such as from the source editor popup)
+          setup: function(ed) {
+            ed.on('init', function() {
+              ngModel.$render();
+              ngModel.$setPristine();
+              if (form) {
+                form.$setPristine();
+              }
+            });
+
+            // Update model on button click
+            ed.on('ExecCommand', function() {
+              ed.save();
+              updateView(ed);
+            });
+
+            // Update model on change
+            ed.on('change', function(e) {
+              ed.save();
+              updateView(ed);
+            });
+
+            ed.on('blur', function() {
+              element[0].blur();
+            });
+
+            // Update model when an object has been resized (table, image)
+            ed.on('ObjectResized', function() {
+              ed.save();
+              updateView(ed);
+            });
+
+            ed.on('remove', function() {
+              element.remove();
+            });
+
+            if (expression.setup) {
+              expression.setup(ed, {
+                updateView: updateView
+              });
+            }
+          },
+          format: 'raw',
+          selector: '#' + attrs.id
+        };
+        // extend options with initial uiTinymceConfig and
+        // options from directive attribute value
+        angular.extend(options, uiTinymceConfig, expression);
+        // Wrapped in $timeout due to $tinymce:refresh implementation, requires
+        // element to be present in DOM before instantiating editor when
+        // re-rendering directive
+        $timeout(function() {
+          tinymce.init(options);
+        });
+
+        ngModel.$formatters.unshift(function(modelValue) {
+          return modelValue ? $sce.trustAsHtml(modelValue) : '';
+        });
+
+        ngModel.$parsers.unshift(function(viewValue) {
+          return viewValue ? $sce.getTrustedHtml(viewValue) : '';
+        });
+
+        ngModel.$render = function() {
+          ensureInstance();
+
+          var viewValue = ngModel.$viewValue ?
+            $sce.getTrustedHtml(ngModel.$viewValue) : '';
+
+          // instance.getDoc() check is a guard against null value
+          // when destruction & recreation of instances happen
+          if (tinyInstance &&
+            tinyInstance.getDoc()
+          ) {
+            tinyInstance.setContent(viewValue);
+            tinyInstance.fire('change');
+          }
+        };
+
+        attrs.$observe('disabled', function(disabled) {
+          if (disabled) {
+            ensureInstance();
+
+            if (tinyInstance) {
+              tinyInstance.getBody().setAttribute('contenteditable', false);
+            }
+          } else {
+            ensureInstance();
+
+            if (tinyInstance) {
+              tinyInstance.getBody().setAttribute('contenteditable', true);
+            }
+          }
+        });
+
+        // This block is because of TinyMCE not playing well with removal and
+        // recreation of instances, requiring instances to have different
+        // selectors in order to render new instances properly
+        scope.$on('$tinymce:refresh', function(e, id) {
+          var eid = attrs.id;
+          if (angular.isUndefined(id) || id === eid) {
+            var parentElement = element.parent();
+            var clonedElement = element.clone();
+            clonedElement.removeAttr('id');
+            clonedElement.removeAttr('style');
+            clonedElement.removeAttr('aria-hidden');
+            tinymce.execCommand('mceRemoveEditor', false, eid);
+            parentElement.append($compile(clonedElement)(scope));
+          }
+        });
+
+        scope.$on('$destroy', function() {
+          ensureInstance();
+
+          if (tinyInstance) {
+            tinyInstance.remove();
+            tinyInstance = null;
+          }
+        });
+
+        function ensureInstance() {
+          if (!tinyInstance) {
+            tinyInstance = tinymce.get(attrs.id);
+          }
+        }
+      }
+    };
+  }]);
+;(function (global, factory) {
     typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
     typeof define === 'function' && define.amd ? define(factory) :
     global.moment = factory()

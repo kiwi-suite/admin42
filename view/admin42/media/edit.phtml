@@ -50,7 +50,7 @@ $this->admin()->addJsonTemplate($jsonDataId, [
                     <div class="img-container" style="max-height: 700px; max-width: 1200px;">
                         <img
                             ng-cropper
-                            ng-if="selectedHandle"
+
                             src="<?= $this->url('admin/media/stream', ['id' => $this->media->getId(), 'dimension' => 'original'])?>">
                     </div>
 
@@ -87,7 +87,7 @@ $this->admin()->addJsonTemplate($jsonDataId, [
                                         </div>
                                         <div class="col-md-4 text-right">
                                             <button
-                                                ng-if="hasChanges(name) && checkImageSize(data)"
+                                                ng-if="hasChanges[name] && checkImageSize(data)"
                                                 class="btn btn-success btn-sm"
                                                 ng-click="saveCroppedImage(name, '<?= $this->url('admin/media/crop', ['id' => $this->media->getId(), 'dimension' => '{{ name }}'])?>')">
                                                 <span class="fa fa-save"></span>
