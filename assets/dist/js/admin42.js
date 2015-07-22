@@ -415,6 +415,29 @@ angular.module('smart-table')
         }
     }]);
 ;angular.module('admin42')
+    .filter('bytes', function() {
+        return function(bytes) {
+            if (isNaN(parseFloat(bytes)) || !isFinite(bytes) || bytes == 0) return '0';
+            var units = {1: 'KB', 2: 'MB', 3: 'GB', 4: 'TB'},
+                measure, floor, precision;
+            if (bytes > 1099511627775) {
+                measure = 4;
+            } else if (bytes > 1048575999 && bytes <= 1099511627775) {
+                measure = 3;
+            } else if (bytes > 1024000 && bytes <= 1048575999) {
+                measure = 2;
+            } else if (bytes <= 1024000) {
+                measure = 1;
+            }
+            floor = Math.floor(bytes / Math.pow(1024, measure)).toString().length;
+            if (floor > 3) {
+                precision = 0
+            } else {
+                precision = 3 - floor;
+            }
+            return (bytes / Math.pow(1024, measure)).toFixed(precision) + ' ' + units[measure];
+        }
+    });;angular.module('admin42')
     .filter('datetime', function(appConfig) {
         return function(input, emptyValue, format, timezone) {
             if (angular.isUndefined(emptyValue)) {
@@ -738,7 +761,7 @@ angular.module('admin42')
         };
     }]);
 ;angular.module('admin42')
-    .controller('MediaController', ['$scope', 'FileUploader', '$attrs', '$http', function ($scope, FileUploader, $attrs, $http) {
+    .controller('MediaController', ['$scope', 'FileUploader', '$attrs', '$http', 'toaster', function ($scope, FileUploader, $attrs, $http, toaster) {
         var currentTableState = {};
         var url = $attrs.url;
 
@@ -747,12 +770,37 @@ angular.module('admin42')
         $scope.isLoading = true;
         $scope.displayedPages = 1;
 
+        $scope.errorFiles = [];
+
         var uploader = $scope.uploader = new FileUploader({
-            url: $attrs.uploadUrl
+            url: $attrs.uploadUrl,
+            filters: [{
+                name: 'filesize',
+                fn: function(item) {
+                    console.log(item.size);
+
+                    if (item.size > $attrs.maxFileSize) {
+                        $scope.errorFiles.push(item);
+
+                        /*
+                        toaster.pop({
+                            type: 'error',
+                            title: 'Title text',
+                            body: 'Body text',
+                            showCloseButton: true
+                        });
+                        */
+                        return false;
+                    }
+
+                    return true;
+                }
+            }]
         });
 
         uploader.onCompleteAll = function() {
             requestFromServer(url, currentTableState);
+            $scope.errorFiles = [];
         };
 
         $scope.isImage = function(item) {
