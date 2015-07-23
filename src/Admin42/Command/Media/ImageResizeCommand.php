@@ -123,23 +123,34 @@ class ImageResizeCommand extends AbstractCommand
         $image = $this->imagine->open($this->media->getDirectory() . $this->media->getFilename());
         $imageSize = $image->getSize();
 
-        $width = (($this->dimension['width'] == 'auto') ? PHP_INT_MAX : $this->dimension['width']);
-        $height = (($this->dimension['height'] == 'auto') ? PHP_INT_MAX : $this->dimension['height']);
+        $imageRatio = $imageSize->getWidth() / $imageSize->getHeight();
 
-        $thumbnailMode = $image::THUMBNAIL_INSET;
-        if (($this->dimension['width'] == 'auto' || $imageSize->getWidth() >= $this->dimension['width']) &&
-            ($this->dimension['height'] == 'auto' || $imageSize->getHeight() >= $this->dimension['height'])
-        ) {
-            $thumbnailMode = $image::THUMBNAIL_OUTBOUND;
+        if ($this->dimension['width'] != "auto" && $this->dimension['height'] != "auto") {
+            $dimensionRatio = $this->dimension['width'] / $this->dimension['height'];
+
+            if ($imageRatio < $dimensionRatio) {
+                $boxWidth = $imageSize->getWidth();
+                $boxHeight = round($imageSize->getWidth()/ $dimensionRatio);
+            } elseif($imageRatio > $dimensionRatio) {
+                $boxHeight = $imageSize->getHeight();
+                $boxWidth = round($imageSize->getHeight() * $dimensionRatio);
+            } else {
+                $boxWidth = $imageSize->getWidth();
+                $boxHeight = $imageSize->getHeight();
+            }
+        } else {
+            $boxWidth = $imageSize->getWidth();
+            $boxHeight = $imageSize->getHeight();
         }
 
-        $image->thumbnail(new Box($width, $height), $thumbnailMode)
-            ->save($media->getDirectory() . $media->getFilename());
-
-        $finfo = finfo_open(FILEINFO_MIME_TYPE);
-        $media->setMimeType(finfo_file($finfo, $media->getDirectory() . $media->getFilename()));
-        $media->setSize(filesize($media->getDirectory() . $media->getFilename()));
-
-        return $media;
+        /** @var ImageCropCommand $imageCropCmd */
+        $imageCropCmd = $this->getCommand('Admin42\Media\ImageCrop');
+        return $imageCropCmd->setBoxWidth($boxWidth)
+            ->setBoxHeight($boxHeight)
+            ->setDimensionName($this->dimensionName)
+            ->setOffsetX(0)
+            ->setOffsetY(0)
+            ->setMedia($this->media)
+            ->run();
     }
 }
