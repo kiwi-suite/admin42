@@ -64,6 +64,7 @@ class UploadCommand extends AbstractCommand
             $mediaOptions = $this->getServiceManager()->get('Admin42\MediaOptions');
 
             foreach(array_keys($mediaOptions->getDimensions()) as $dimension) {
+                /* @var ImageResizeCommand $cmd */
                 $cmd = $this->getCommand('Admin42\Media\ImageResize');
                 $cmd->setMedia($media)
                     ->setDimensionName($dimension)

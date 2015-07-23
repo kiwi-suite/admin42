@@ -120,12 +120,20 @@ class ImageResizeCommand extends AbstractCommand
             return $media;
         }
 
+        $image = $this->imagine->open($this->media->getDirectory() . $this->media->getFilename());
+        $imageSize = $image->getSize();
+
         $width = (($this->dimension['width'] == 'auto') ? PHP_INT_MAX : $this->dimension['width']);
         $height = (($this->dimension['height'] == 'auto') ? PHP_INT_MAX : $this->dimension['height']);
 
-        $this->imagine
-            ->open($this->media->getDirectory() . $this->media->getFilename())
-            ->thumbnail(new Box($width, $height))
+        $thumbnailMode = $image::THUMBNAIL_INSET;
+        if (($this->dimension['width'] == 'auto' || $imageSize->getWidth() >= $this->dimension['width']) &&
+            ($this->dimension['height'] == 'auto' || $imageSize->getHeight() >= $this->dimension['height'])
+        ) {
+            $thumbnailMode = $image::THUMBNAIL_OUTBOUND;
+        }
+
+        $image->thumbnail(new Box($width, $height), $thumbnailMode)
             ->save($media->getDirectory() . $media->getFilename());
 
         $finfo = finfo_open(FILEINFO_MIME_TYPE);
