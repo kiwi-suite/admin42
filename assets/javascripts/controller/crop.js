@@ -44,7 +44,6 @@ angular.module('admin42')
 
             return true;
         };
-/*
         angular.forEach($scope.dimensions, function(value, key) {
             if (this.selectedHandle !== null) {
                 return;
@@ -56,7 +55,7 @@ angular.module('admin42')
 
             this.selectedHandle = key;
         }, $scope);
-*/
+
         $scope.saveCroppedImage = function(handle, url) {
             if (angular.isUndefined($scope.data[handle])) {
                 return false;

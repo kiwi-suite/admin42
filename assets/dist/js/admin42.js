@@ -566,7 +566,6 @@ angular.module('smart-table')
 
             return true;
         };
-/*
         angular.forEach($scope.dimensions, function(value, key) {
             if (this.selectedHandle !== null) {
                 return;
@@ -578,7 +577,7 @@ angular.module('smart-table')
 
             this.selectedHandle = key;
         }, $scope);
-*/
+
         $scope.saveCroppedImage = function(handle, url) {
             if (angular.isUndefined($scope.data[handle])) {
                 return false;
