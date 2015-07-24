@@ -28,7 +28,13 @@ return array(
         ),
     ),
 
+    'media_url' => '/media',
+
     'service_manager' => array(
+        'invokables' => [
+            'Admin42\Link\ExternLink' => 'Admin42\Link\Adapter\ExternLink',
+
+        ],
         'factories' => array(
             'Admin42\Authentication'    => 'Admin42\Authentication\Service\AuthenticationServiceFactory',
 
@@ -39,6 +45,9 @@ return array(
             'Imagine' => 'Admin42\Imagine\Service\ImagineFactory',
 
             'Admin42\MediaOptions' => 'Admin42\Media\Service\MediaOptionsFactory',
+
+            'Admin42\LinkProvider' => 'Admin42\Link\Service\LinkProviderFactory',
+            'Admin42\Link\MediaLink' => 'Admin42\Link\Adapter\Service\MediaLinkFactory',
         ),
     ),
 
@@ -52,12 +61,22 @@ return array(
         'factories' => array(
             'role'      => 'Admin42\FormElements\Service\RoleFactory',
             'dynamic'   => 'Admin42\FormElements\Service\DynamicFactory',
+            'link'      => 'Admin42\FormElements\Service\LinkFactory',
         ),
     ),
+
+    'link' => [
+        'adapter' => [
+            'extern' => 'Admin42\Link\ExternLink',
+            'media'  => 'Admin42\Link\MediaLink',
+        ],
+    ],
 
     'view_helpers' => [
         'factories' => [
             'media'            => 'Admin42\View\Helper\Service\MediaFactory',
+            'link'             => 'Admin42\View\Helper\Service\LinkFactory',
+            'mediaUrl'         => 'Admin42\View\Helper\Service\MediaUrlFactory',
         ],
     ],
 );

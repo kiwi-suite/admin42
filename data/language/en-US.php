@@ -52,6 +52,7 @@ return array(
     'title.user-add'                => 'Add user',
 
     'title.media'                   => 'Media management',
+    'title.link'                    => 'Link',
 
     'search.id'                     => 'Search for #ID',
     'search.email'                  => 'Search for Email',
@@ -76,4 +77,8 @@ return array(
     'media.info-dropzone'           => 'Drag your files into this area',
     'media.maxfilesize'             => 'maximal file size:',
     'media.error.filesize'          => 'At least one of your files exceeds the max. file size of ',
+
+    'label.link-type-selector'      => 'Link Type',
+    'link-type.extern'              => 'Externer Link',
+    'link-type.media'               => 'Media Link',
 );

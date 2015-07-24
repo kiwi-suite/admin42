@@ -172,6 +172,17 @@ return array(
                         ),
                         'may_terminate' => true,
                     ),
+                    'link' => array(
+                        'type' => 'Zend\Mvc\Router\Http\Literal',
+                        'options' => array(
+                            'route' => 'link/',
+                            'defaults' => array(
+                                'controller' => __NAMESPACE__ . '\Link',
+                                'action' => 'save'
+                            ),
+                        ),
+                        'may_terminate' => true,
+                    ),
                     'api' => array(
                         'type' => 'Zend\Mvc\Router\Http\Literal',
                         'options' => array(

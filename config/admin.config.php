@@ -59,7 +59,6 @@ return [
                 'formweek'                => 'Admin42\View\Helper\Form\FormWeek',
                 'formfileselect'          => 'Admin42\View\Helper\Form\FileSelect',
                 'formwysiwyg'             => 'Admin42\View\Helper\Form\FormWysiwyg',
-                'formyoutube'             => 'Admin42\View\Helper\Form\FormYouTube',
             ],
             'factories' => [
                 'admin'                 => 'Admin42\View\Helper\Service\AdminFactory',

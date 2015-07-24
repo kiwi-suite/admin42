@@ -50,7 +50,7 @@ $this->admin()->addJsonTemplate($jsonDataId, [
                     <div class="img-container" style="max-height: 700px; max-width: 1200px;">
                         <img
                             ng-cropper
-                            src="<?= $this->url('admin/media/stream', ['id' => $this->media->getId(), 'dimension' => 'original'])?>">
+                            src="<?= $this->mediaUrl($this->media->getId())?>">
                     </div>
 
                 </div>
