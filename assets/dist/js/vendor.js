@@ -11585,7 +11585,7 @@ return $.widget("ui.sortable", $.ui.mouse, {
 
 }));
 ;/**
- * @license AngularJS v1.3.17
+ * @license AngularJS v1.3.16
  * (c) 2010-2014 Google, Inc. http://angularjs.org
  * License: MIT
  */
@@ -11640,7 +11640,7 @@ function minErr(module, ErrorConstructor) {
       return match;
     });
 
-    message = message + '\nhttp://errors.angularjs.org/1.3.17/' +
+    message = message + '\nhttp://errors.angularjs.org/1.3.16/' +
       (module ? module + '/' : '') + code;
     for (i = 2; i < arguments.length; i++) {
       message = message + (i == 2 ? '?' : '&') + 'p' + (i - 2) + '=' +
@@ -13725,11 +13725,11 @@ function toDebugString(obj) {
  * - `codeName` – `{string}` – Code name of the release, such as "jiggling-armfat".
  */
 var version = {
-  full: '1.3.17',    // all of these placeholder strings will be replaced by grunt's
+  full: '1.3.16',    // all of these placeholder strings will be replaced by grunt's
   major: 1,    // package task
   minor: 3,
-  dot: 17,
-  codeName: 'tsktskskly-euouae'
+  dot: 16,
+  codeName: 'cookie-oatmealification'
 };
 
 
@@ -16540,7 +16540,7 @@ function Browser(window, document, $log, $sniffer) {
 
   function getHash(url) {
     var index = url.indexOf('#');
-    return index === -1 ? '' : url.substr(index);
+    return index === -1 ? '' : url.substr(index + 1);
   }
 
   /**
@@ -16667,7 +16667,7 @@ function Browser(window, document, $log, $sniffer) {
         // Do the assignment again so that those two variables are referentially identical.
         lastHistoryState = cachedState;
       } else {
-        if (!sameBase || reloadLocation) {
+        if (!sameBase) {
           reloadLocation = url;
         }
         if (replace) {
@@ -19540,7 +19540,7 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
 
       $compileNode.empty();
 
-      $templateRequest(templateUrl)
+      $templateRequest($sce.getTrustedResourceUrl(templateUrl))
         .then(function(content) {
           var compileNode, tempTemplateAttrs, $template, childBoundTranscludeFn;
 
@@ -22346,7 +22346,7 @@ function LocationHashbangUrl(appBase, hashPrefix) {
     var withoutBaseUrl = beginsWith(appBase, url) || beginsWith(appBaseNoFile, url);
     var withoutHashUrl;
 
-    if (!isUndefined(withoutBaseUrl) && withoutBaseUrl.charAt(0) === '#') {
+    if (withoutBaseUrl.charAt(0) === '#') {
 
       // The rest of the url starts with a hash so we have
       // got either a hashbang path or a plain hash fragment
@@ -22360,15 +22360,7 @@ function LocationHashbangUrl(appBase, hashPrefix) {
       // There was no hashbang path nor hash fragment:
       // If we are in HTML5 mode we use what is left as the path;
       // Otherwise we ignore what is left
-      if (this.$$html5) {
-        withoutHashUrl = withoutBaseUrl;
-      } else {
-        withoutHashUrl = '';
-        if (isUndefined(withoutBaseUrl)) {
-          appBase = url;
-          this.replace();
-        }
-      }
+      withoutHashUrl = this.$$html5 ? withoutBaseUrl : '';
     }
 
     parseAppUrl(withoutHashUrl, this);
@@ -27763,14 +27755,12 @@ var $compileMinErr = minErr('$compile');
  * @name $templateRequest
  *
  * @description
- * The `$templateRequest` service runs security checks then downloads the provided template using
- * `$http` and, upon success, stores the contents inside of `$templateCache`. If the HTTP request
- * fails or the response data of the HTTP request is empty, a `$compile` error will be thrown (the
- * exception can be thwarted by setting the 2nd parameter of the function to true). Note that the
- * contents of `$templateCache` are trusted, so the call to `$sce.getTrustedUrl(tpl)` is omitted
- * when `tpl` is of type string and `$templateCache` has the matching entry.
+ * The `$templateRequest` service downloads the provided template using `$http` and, upon success,
+ * stores the contents inside of `$templateCache`. If the HTTP request fails or the response data
+ * of the HTTP request is empty, a `$compile` error will be thrown (the exception can be thwarted
+ * by setting the 2nd parameter of the function to true).
  *
- * @param {string|TrustedResourceUrl} tpl The HTTP request template URL
+ * @param {string} tpl The HTTP request template URL
  * @param {boolean=} ignoreRequestError Whether or not to ignore the exception when the request fails or the template is empty
  *
  * @return {Promise} the HTTP Promise for the given.
@@ -27778,18 +27768,9 @@ var $compileMinErr = minErr('$compile');
  * @property {number} totalPendingRequests total amount of pending template requests being downloaded.
  */
 function $TemplateRequestProvider() {
-  this.$get = ['$templateCache', '$http', '$q', '$sce', function($templateCache, $http, $q, $sce) {
+  this.$get = ['$templateCache', '$http', '$q', function($templateCache, $http, $q) {
     function handleRequestFn(tpl, ignoreRequestError) {
       handleRequestFn.totalPendingRequests++;
-
-      // We consider the template cache holds only trusted templates, so
-      // there's no need to go through whitelisting again for keys that already
-      // are included in there. This also makes Angular accept any script
-      // directive, no matter its name. However, we still need to unwrap trusted
-      // types.
-      if (!isString(tpl) || !$templateCache.get(tpl)) {
-        tpl = $sce.getTrustedResourceUrl(tpl);
-      }
 
       var transformResponse = $http.defaults && $http.defaults.transformResponse;
 
@@ -34000,8 +33981,8 @@ var ngIfDirective = ['$animate', function($animate) {
  * @param {Object} angularEvent Synthetic event object.
  * @param {String} src URL of content to load.
  */
-var ngIncludeDirective = ['$templateRequest', '$anchorScroll', '$animate',
-                  function($templateRequest,   $anchorScroll,   $animate) {
+var ngIncludeDirective = ['$templateRequest', '$anchorScroll', '$animate', '$sce',
+                  function($templateRequest,   $anchorScroll,   $animate,   $sce) {
   return {
     restrict: 'ECA',
     priority: 400,
@@ -34037,7 +34018,7 @@ var ngIncludeDirective = ['$templateRequest', '$anchorScroll', '$animate',
           }
         };
 
-        scope.$watch(srcExp, function ngIncludeWatchAction(src) {
+        scope.$watch($sce.parseAsResourceUrl(srcExp), function ngIncludeWatchAction(src) {
           var afterAnimation = function() {
             if (isDefined(autoScrollExp) && (!autoScrollExp || scope.$eval(autoScrollExp))) {
               $anchorScroll();
@@ -47326,8 +47307,8 @@ angular.module("template/typeahead/typeahead-popup.html", []).run(["$templateCac
     "");
 }]);
 !angular.$$csp() && angular.element(document).find('head').prepend('<style type="text/css">.ng-animate.item:not(.left):not(.right){-webkit-transition:0s ease-in-out left;transition:0s ease-in-out left}</style>');;// https://github.com/Gillardo/bootstrap-ui-datetime-picker
-// Version: 1.1.5
-// Released: 2015-07-17 
+// Version: 1.1.0
+// Released: 2015-05-28 
 angular.module('ui.bootstrap.datetimepicker', ['ui.bootstrap.dateparser', 'ui.bootstrap.position'])
     .constant('uiDatetimePickerConfig', {
         dateFormat: 'yyyy-MM-dd HH:mm',
@@ -47374,7 +47355,14 @@ angular.module('ui.bootstrap.datetimepicker', ['ui.bootstrap.dateparser', 'ui.bo
                     // default picker view
                     scope.showPicker = scope.enableDate ? 'date' : 'time';
 
-                    // get text
+                    // default text
+                    scope.todayText = scope.todayText || 'Today';
+                    scope.nowText = scope.nowText || 'Now';
+                    scope.clearText = scope.clearText || 'Clear';
+                    scope.closeText = scope.closeText || 'Close';
+                    scope.dateText = scope.dateText || 'Date';
+                    scope.timeText = scope.timeText || 'Time';
+
                     scope.getText = function (key) {
                         return scope[key + 'Text'] || uiDatetimePickerConfig[key + 'Text'];
                     };
@@ -47386,12 +47374,12 @@ angular.module('ui.bootstrap.datetimepicker', ['ui.bootstrap.dateparser', 'ui.bo
 
                     // popup element used to display calendar
                     var popupEl = angular.element('' +
-                        '<div date-picker-wrap ng-show="showPicker == \'date\'">' +
-                        '<div datepicker></div>' +
-                        '</div>' +
-                        '<div time-picker-wrap ng-show="showPicker == \'time\'">' +
-                        '<div timepicker style="margin:0 auto"></div>' +
-                        '</div>');
+                    '<div date-picker-wrap ng-show="showPicker == \'date\'">' +
+                    '<div datepicker></div>' +
+                    '</div>' +
+                    '<div time-picker-wrap ng-show="showPicker == \'time\'">' +
+                    '<div timepicker style="margin:0 auto"></div>' +
+                    '</div>');
 
                     // get attributes from directive
                     popupEl.attr({
@@ -47421,7 +47409,7 @@ angular.module('ui.bootstrap.datetimepicker', ['ui.bootstrap.dateparser', 'ui.bo
 
                     // set datepickerMode to day by default as need to create watch
                     // this gets round issue#5 where by the highlight is not shown
-                    if (!angular.isDefined(attrs['datepickerMode'])) attrs['datepickerMode'] = 'day';
+                    if (!attrs['datepickerMode']) attrs['datepickerMode'] = 'day';
 
                     scope.watchData = {};
                     angular.forEach(['minDate', 'maxDate', 'datepickerMode'], function (key) {
@@ -47436,12 +47424,13 @@ angular.module('ui.bootstrap.datetimepicker', ['ui.bootstrap.dateparser', 'ui.bo
                             // Propagate changes from datepicker to outside
                             if (key === 'datepickerMode') {
                                 var setAttribute = getAttribute.assign;
-                                scope.$watch('watchData.' + key, function(value, oldvalue) {
-                                    if ( angular.isFunction(setAttribute) && value !== oldvalue ) {
+                                scope.$watch('watchData.' + key, function (value, oldvalue) {
+                                    if (value !== oldvalue) {
                                         setAttribute(scope.$parent, value);
                                     }
                                 });
-                            }                        }
+                            }
+                        }
                     });
 
                     if (attrs.dateDisabled) {
@@ -47510,16 +47499,15 @@ angular.module('ui.bootstrap.datetimepicker', ['ui.bootstrap.dateparser', 'ui.bo
                         ngModel.$setViewValue(scope.date);
                         ngModel.$render();
 
-                        if (dt === null) {
-                            scope.close();
-                        } else if (closeOnDateSelection) {
+                        if (closeOnDateSelection) {
                             // do not close when using timePicker
                             if (scope.showPicker != 'time') {
                                 // if time is enabled, swap to timePicker
                                 if (scope.enableTime) {
                                     scope.showPicker = 'time';
                                 } else {
-                                    scope.close();
+                                    scope.isOpen = false;
+                                    element[0].focus();
                                 }
                             }
                         }
@@ -47567,26 +47555,15 @@ angular.module('ui.bootstrap.datetimepicker', ['ui.bootstrap.dateparser', 'ui.bo
                     };
 
                     scope.$watch('isOpen', function (value) {
-                        scope.dropdownStyle = {
-                            display: value ? 'block' : 'none'
-                        };
-
                         if (value) {
                             scope.$broadcast('datepicker.focus');
 
-                            var position = appendToBody ? $position.offset(element) : $position.position(element);
+                            scope.position = appendToBody ? $position.offset(element) : $position.position(element);
+                            scope.position.top = scope.position.top + element.prop('offsetHeight');
 
-                            if (appendToBody) {
-                                scope.dropdownStyle.top = (position.top + element.prop('offsetHeight')) +'px';
-                            } else {
-                                scope.dropdownStyle.top = undefined;
-                            }
-
-                            scope.dropdownStyle.left = position.left + 'px';
-
-                            $document.bind('click', documentClickBind);
+                            $document.bind('mousedown', documentClickBind);
                         } else {
-                            $document.unbind('click', documentClickBind);
+                            $document.unbind('mousedown', documentClickBind);
                         }
                     });
 
@@ -47632,7 +47609,7 @@ angular.module('ui.bootstrap.datetimepicker', ['ui.bootstrap.dateparser', 'ui.bo
                     scope.$on('$destroy', function () {
                         $popup.remove();
                         element.unbind('keydown', keydown);
-                        $document.unbind('click', documentClickBind);
+                        $document.unbind('mousedown', documentClickBind);
                     });
                 }
             };
@@ -47645,7 +47622,7 @@ angular.module('ui.bootstrap.datetimepicker', ['ui.bootstrap.dateparser', 'ui.bo
             transclude: true,
             templateUrl: 'template/datetime-picker.html',
             link: function (scope, element, attrs) {
-                element.bind('click', function (event) {
+                element.bind('mousedown', function (event) {
                     event.preventDefault();
                     event.stopPropagation();
                 });
@@ -47660,19 +47637,18 @@ angular.module('ui.bootstrap.datetimepicker', ['ui.bootstrap.dateparser', 'ui.bo
             transclude: true,
             templateUrl: 'template/datetime-picker.html',
             link: function (scope, element, attrs) {
-                element.bind('click', function (event) {
+                element.bind('mousedown', function (event) {
                     event.preventDefault();
                     event.stopPropagation();
                 });
             }
         };
     });
-
 angular.module('ui.bootstrap.datetimepicker').run(['$templateCache', function($templateCache) {
   'use strict';
 
   $templateCache.put('template/datetime-picker.html',
-    "<ul class=\"dropdown-menu dropdown-menu-left datetime-picker-dropdown\" ng-style=dropdownStyle style=left:inherit ng-keydown=keydown($event)><li style=\"padding:0 5px 5px 5px\" ng-class=\"{'date-picker-menu': showPicker == 'date', 'time-picker-menu' : showPicker == 'time'}\"><div ng-transclude></div></li><li ng-if=showButtonBar style=padding:5px><span class=\"btn-group pull-left\" style=margin-right:10px><button ng-if=\"showPicker == 'date'\" type=button class=\"btn btn-sm btn-info\" ng-click=\"select('today')\" ng-disabled=isTodayDisabled()>{{ getText('today') }}</button> <button ng-if=\"showPicker == 'time'\" type=button class=\"btn btn-sm btn-info\" ng-click=\"select('now')\" ng-disabled=isTodayDisabled()>{{ getText('now') }}</button> <button type=button class=\"btn btn-sm btn-danger\" ng-click=select(null)>{{ getText('clear') }}</button></span> <span class=\"btn-group pull-right\"><button ng-if=\"showPicker == 'date' && enableTime\" type=button class=\"btn btn-sm btn-default\" ng-click=\"changePicker('time')\">{{ getText('time')}}</button> <button ng-if=\"showPicker == 'time' && enableDate\" type=button class=\"btn btn-sm btn-default\" ng-click=\"changePicker('date')\">{{ getText('date')}}</button> <button type=button class=\"btn btn-sm btn-success\" ng-click=close()>{{ getText('close') }}</button></span></li></ul>"
+    "<ul class=\"dropdown-menu dropdown-menu-left\" ng-style=\"{display: (isOpen && 'block') || 'none', top: position.top+'px', left: position.left+'px'}\" style=left:inherit ng-keydown=keydown($event)><li style=\"padding:0 5px 5px 5px\" class=datetime-picker><div ng-transclude></div></li><li ng-if=showButtonBar style=padding:5px><span class=\"btn-group pull-left\" style=margin-right:10px><button ng-if=\"showPicker == 'date'\" type=button class=\"btn btn-sm btn-info\" ng-click=\"select('today')\" ng-disabled=isTodayDisabled()>{{ getText('today') }}</button> <button ng-if=\"showPicker == 'time'\" type=button class=\"btn btn-sm btn-info\" ng-click=\"select('now')\" ng-disabled=isTodayDisabled()>{{ getText('now') }}</button> <button type=button class=\"btn btn-sm btn-danger\" ng-click=select(null)>{{ getText('clear') }}</button></span> <span class=\"btn-group pull-right\"><button ng-if=\"showPicker == 'date' && enableTime\" type=button class=\"btn btn-sm btn-default\" ng-click=\"changePicker('time')\">{{ getText('time')}}</button> <button ng-if=\"showPicker == 'time' && enableDate\" type=button class=\"btn btn-sm btn-default\" ng-click=\"changePicker('date')\">{{ getText('date')}}</button> <button type=button class=\"btn btn-sm btn-success\" ng-click=close()>{{ getText('close') }}</button></span></li></ul>"
   );
 
 }]);
@@ -47680,12 +47656,12 @@ angular.module('ui.bootstrap.datetimepicker').run(['$templateCache', function($t
   'use strict';
 
   $templateCache.put('template/datetime-picker.html',
-    "<ul class=\"dropdown-menu dropdown-menu-left datetime-picker-dropdown\" ng-style=dropdownStyle style=left:inherit ng-keydown=keydown($event)><li style=\"padding:0 5px 5px 5px\" ng-class=\"{'date-picker-menu': showPicker == 'date', 'time-picker-menu' : showPicker == 'time'}\"><div ng-transclude></div></li><li ng-if=showButtonBar style=padding:5px><span class=\"btn-group pull-left\" style=margin-right:10px><button ng-if=\"showPicker == 'date'\" type=button class=\"btn btn-sm btn-info\" ng-click=\"select('today')\" ng-disabled=isTodayDisabled()>{{ getText('today') }}</button> <button ng-if=\"showPicker == 'time'\" type=button class=\"btn btn-sm btn-info\" ng-click=\"select('now')\" ng-disabled=isTodayDisabled()>{{ getText('now') }}</button> <button type=button class=\"btn btn-sm btn-danger\" ng-click=select(null)>{{ getText('clear') }}</button></span> <span class=\"btn-group pull-right\"><button ng-if=\"showPicker == 'date' && enableTime\" type=button class=\"btn btn-sm btn-default\" ng-click=\"changePicker('time')\">{{ getText('time')}}</button> <button ng-if=\"showPicker == 'time' && enableDate\" type=button class=\"btn btn-sm btn-default\" ng-click=\"changePicker('date')\">{{ getText('date')}}</button> <button type=button class=\"btn btn-sm btn-success\" ng-click=close()>{{ getText('close') }}</button></span></li></ul>"
+    "<ul class=\"dropdown-menu dropdown-menu-left\" ng-style=\"{display: (isOpen && 'block') || 'none', top: position.top+'px', left: position.left+'px'}\" style=left:inherit ng-keydown=keydown($event)><li style=\"padding:0 5px 5px 5px\" class=datetime-picker><div ng-transclude></div></li><li ng-if=showButtonBar style=padding:5px><span class=\"btn-group pull-left\" style=margin-right:10px><button ng-if=\"showPicker == 'date'\" type=button class=\"btn btn-sm btn-info\" ng-click=\"select('today')\" ng-disabled=isTodayDisabled()>{{ getText('today') }}</button> <button ng-if=\"showPicker == 'time'\" type=button class=\"btn btn-sm btn-info\" ng-click=\"select('now')\" ng-disabled=isTodayDisabled()>{{ getText('now') }}</button> <button type=button class=\"btn btn-sm btn-danger\" ng-click=select(null)>{{ getText('clear') }}</button></span> <span class=\"btn-group pull-right\"><button ng-if=\"showPicker == 'date' && enableTime\" type=button class=\"btn btn-sm btn-default\" ng-click=\"changePicker('time')\">{{ getText('time')}}</button> <button ng-if=\"showPicker == 'time' && enableDate\" type=button class=\"btn btn-sm btn-default\" ng-click=\"changePicker('date')\">{{ getText('date')}}</button> <button type=button class=\"btn btn-sm btn-success\" ng-click=close()>{{ getText('close') }}</button></span></li></ul>"
   );
 
 }]);
 ;/**
- * @license AngularJS v1.3.17
+ * @license AngularJS v1.3.16
  * (c) 2010-2014 Google, Inc. http://angularjs.org
  * License: MIT
  */
@@ -49824,7 +49800,7 @@ angular.module('ngAnimate', ['ng'])
 
 })(window, window.angular);
 ;/**
- * @license AngularJS v1.3.17
+ * @license AngularJS v1.3.16
  * (c) 2010-2014 Google, Inc. http://angularjs.org
  * License: MIT
  */
@@ -50452,8 +50428,8 @@ angular.module('ngSanitize', []).provider('$sanitize', $SanitizeProvider);
  */
 angular.module('ngSanitize').filter('linky', ['$sanitize', function($sanitize) {
   var LINKY_URL_REGEXP =
-        /((ftp|https?):\/\/|(www\.)|(mailto:)?[A-Za-z0-9._%+-]+@)\S*[^\s.;,(){}<>"”’]/i,
-      MAILTO_REGEXP = /^mailto:/i;
+        /((ftp|https?):\/\/|(www\.)|(mailto:)?[A-Za-z0-9._%+-]+@)\S*[^\s.;,(){}<>"”’]/,
+      MAILTO_REGEXP = /^mailto:/;
 
   return function(text, target) {
     if (!text) return text;
@@ -55607,18 +55583,17 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
                 };
             }]
     );
-})(window, document);;(function (root, factory) {
-  'use strict';
+})(window, document);;(function(angular, factory) {
+    'use strict';
+    if (typeof define === 'function' && define.amd) {
+        define('ngStorage', ['angular'], function(angular) {
+            return factory(angular);
+        });
+    } else {
+        return factory(angular);
+    }
+}(typeof angular === 'undefined' ? null : angular, function(angular) {
 
-  if (typeof define === 'function' && define.amd) {
-    define(['angular'], factory);
-  } else if (typeof exports === 'object') {
-    module.exports = factory(require('angular'));
-  } else {
-    // Browser globals (root is window), we don't register it.
-    factory(root.angular);
-  }
-}(this , function (angular) {
     'use strict';
 
     /**
@@ -55626,7 +55601,7 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
      * @name ngStorage
      */
 
-    return angular.module('ngStorage', [])
+    angular.module('ngStorage', [])
 
     /**
      * @ngdoc object
@@ -55752,7 +55727,7 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
                 });
 
                 // #6: Use `$window.addEventListener` instead of `angular.element` to avoid the jQuery-specific `event.originalEvent`
-                $window.addEventListener && $window.addEventListener('storage', function(event) {
+                'localStorage' === storageType && $window.addEventListener && $window.addEventListener('storage', function(event) {
                     if ('ngStorage-' === event.key.slice(0, 10)) {
                         event.newValue ? $storage[event.key.slice(10)] = angular.fromJson(event.newValue) : delete $storage[event.key.slice(10)];
 
@@ -57100,13 +57075,13 @@ module
 
     return module;
 }));;/*!
- * Cropper v0.10.1
+ * Cropper v0.10.0
  * https://github.com/fengyuanchen/cropper
  *
- * Copyright (c) 2014-2015 Fengyuan Chen and contributors
+ * Copyright (c) 2014-2015 Fengyuan Chen and other contributors
  * Released under the MIT license
  *
- * Date: 2015-07-05T10:44:58.203Z
+ * Date: 2015-06-08T14:57:26.353Z
  */
 
 (function (factory) {
@@ -57146,9 +57121,9 @@ module
       CLASS_BG = 'cropper-bg',
 
       // Events
-      EVENT_MOUSE_DOWN = 'mousedown touchstart pointerdown MSPointerDown',
-      EVENT_MOUSE_MOVE = 'mousemove touchmove pointermove MSPointerMove',
-      EVENT_MOUSE_UP = 'mouseup touchend touchcancel pointerup pointercancel MSPointerUp MSPointerCancel',
+      EVENT_MOUSE_DOWN = 'mousedown touchstart',
+      EVENT_MOUSE_MOVE = 'mousemove touchmove',
+      EVENT_MOUSE_UP = 'mouseup mouseleave touchend touchleave touchcancel',
       EVENT_WHEEL = 'wheel mousewheel DOMMouseScroll',
       EVENT_DBLCLICK = 'dblclick',
       EVENT_RESIZE = 'resize' + CROPPER_NAMESPACE, // Bind to window with namespace
@@ -57282,34 +57257,11 @@ module
     this.rotated = false;
     this.cropped = false;
     this.disabled = false;
-    this.replaced = false;
-    this.isImg = false;
-    this.originalUrl = '';
     this.canvas = null;
     this.cropBox = null;
 
-    this.init();
+    this.load();
   }
-
-  prototype.init = function () {
-    var $this = this.$element,
-        url;
-
-    if ($this.is('img')) {
-      this.isImg = true;
-      this.originalUrl = url = $this.attr('src'); // e.g.: "img/picture.jpg"
-
-      if (!url) { // Blank image
-        return;
-      }
-
-      url = $this.prop('src'); // e.g.: "http://example.com/img/picture.jpg"
-    } else if ($this.is('canvas') && SUPPORT_CANVAS) {
-      url = $this[0].toDataURL();
-    }
-
-    this.load(url);
-  };
 
   prototype.load = function (url) {
     var options = this.options,
@@ -57318,6 +57270,18 @@ module
         bustCacheUrl,
         buildEvent,
         $clone;
+
+    if (!url) {
+      if ($this.is('img')) {
+        if (!$this.attr('src')) {
+          return;
+        }
+
+        url = $this.prop('src');
+      } else if ($this.is('canvas') && SUPPORT_CANVAS) {
+        url = $this[0].toDataURL();
+      }
+    }
 
     if (!url) {
       return;
@@ -57412,24 +57376,20 @@ module
       $cropBox.addClass(CLASS_HIDDEN);
     }
 
-    if (!options.guides) {
-      $cropBox.find('.cropper-dashed').addClass(CLASS_HIDDEN);
-    }
-
-    if (!options.center) {
-      $cropBox.find('.cropper-center').addClass(CLASS_HIDDEN);
-    }
-
-    if (options.cropBoxMovable) {
-      $face.addClass(CLASS_MOVE).data('drag', 'all');
+    if (options.background) {
+      $cropper.addClass(CLASS_BG);
     }
 
     if (!options.highlight) {
       $face.addClass(CLASS_INVISIBLE);
     }
 
-    if (options.background) {
-      $cropper.addClass(CLASS_BG);
+    if (!options.guides) {
+      $cropBox.find('.cropper-dashed').addClass(CLASS_HIDDEN);
+    }
+
+    if (options.cropBoxMovable) {
+      $face.addClass(CLASS_MOVE).data('drag', 'all');
     }
 
     if (!options.cropBoxResizable) {
@@ -58278,10 +58238,6 @@ module
       var $this = this.$element;
 
       if (this.ready) {
-        if (this.isImg) {
-          $this.attr('src', this.originalUrl);
-        }
-
         this.unbuild();
         $this.removeClass(CLASS_HIDDEN);
       } else if (this.$clone) {
@@ -58293,10 +58249,6 @@ module
 
     replace: function (url) {
       if (!this.disabled && url) {
-        if (this.isImg) {
-          this.$element.attr('src', url);
-        }
-
         this.options.data = null; // Remove previous data
         this.load(url);
       }
@@ -59108,7 +59060,6 @@ module
 
     modal: true, // Show the black modal
     guides: true, // Show the dashed lines for guiding
-    center: true, // Show the center indicator for guiding
     highlight: true, // Show the white modal to highlight the crop box
     background: true, // Show the grid background
 
@@ -59152,7 +59103,7 @@ module
     return source.replace(/\d+/g, function (i) {
       return words[i];
     });
-  })('<0 6="5-container"><0 6="5-canvas"></0><0 6="5-2-9"></0><0 6="5-crop-9"><1 6="5-view-9"></1><1 6="5-8 8-h"></1><1 6="5-8 8-v"></1><1 6="5-center"></1><1 6="5-face"></1><1 6="5-7 7-e" 3-2="e"></1><1 6="5-7 7-n" 3-2="n"></1><1 6="5-7 7-w" 3-2="w"></1><1 6="5-7 7-s" 3-2="s"></1><1 6="5-4 4-e" 3-2="e"></1><1 6="5-4 4-n" 3-2="n"></1><1 6="5-4 4-w" 3-2="w"></1><1 6="5-4 4-s" 3-2="s"></1><1 6="5-4 4-ne" 3-2="ne"></1><1 6="5-4 4-nw" 3-2="nw"></1><1 6="5-4 4-sw" 3-2="sw"></1><1 6="5-4 4-se" 3-2="se"></1></0></0>', 'div,span,drag,data,point,cropper,class,line,dashed,box');
+  })('<0 6="5-container"><0 6="5-canvas"></0><0 6="5-2-9"></0><0 6="5-crop-9"><1 6="5-view-9"></1><1 6="5-8 8-h"></1><1 6="5-8 8-v"></1><1 6="5-face"></1><1 6="5-7 7-e" 3-2="e"></1><1 6="5-7 7-n" 3-2="n"></1><1 6="5-7 7-w" 3-2="w"></1><1 6="5-7 7-s" 3-2="s"></1><1 6="5-4 4-e" 3-2="e"></1><1 6="5-4 4-n" 3-2="n"></1><1 6="5-4 4-w" 3-2="w"></1><1 6="5-4 4-s" 3-2="s"></1><1 6="5-4 4-ne" 3-2="ne"></1><1 6="5-4 4-nw" 3-2="nw"></1><1 6="5-4 4-sw" 3-2="sw"></1><1 6="5-4 4-se" 3-2="se"></1></0></0>', 'div,span,drag,data,point,cropper,class,line,dashed,box');
 
   /* Template source:
   <div class="cropper-container">
@@ -59162,7 +59113,6 @@ module
       <span class="cropper-view-box"></span>
       <span class="cropper-dashed dashed-h"></span>
       <span class="cropper-dashed dashed-v"></span>
-      <span class="cropper-center"></span>
       <span class="cropper-face"></span>
       <span class="cropper-line line-e" data-drag="e"></span>
       <span class="cropper-line line-n" data-drag="n"></span>
@@ -59194,10 +59144,6 @@ module
           fn;
 
       if (!data) {
-        if (/destroy/.test(options)) {
-          return;
-        }
-
         $this.data('cropper', (data = new Cropper(this, options)));
       }
 
@@ -97695,6 +97641,7 @@ angular.module('ui.tinymce', [])
     uiTinymceConfig = uiTinymceConfig || {};
     var generatedIds = 0;
     var ID_ATTR = 'ui-tinymce';
+
     if (uiTinymceConfig.baseUrl) {
       tinymce.baseURL = uiTinymceConfig.baseUrl;
     }
