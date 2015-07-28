@@ -19,6 +19,23 @@ class RegenerateCommand extends AbstractCommand
      * @var ResultSet
      */
     protected $result;
+
+    /**
+     * @var bool
+     */
+    protected $force = false;
+
+    /**
+     * @param bool $force
+     * @return $this
+     */
+    public function setForce($force)
+    {
+        $this->force = $force;
+
+        return $this;
+    }
+
     /**
      * @throws \Exception
      */
@@ -41,18 +58,21 @@ class RegenerateCommand extends AbstractCommand
                 continue;
             }
 
-            $dir = scandir($media->getDirectory());
-            foreach ($dir as $_entry) {
-                if ($_entry == ".." || $_entry == ".") {
-                    continue;
-                }
+            if ($this->force === true) {
+                $dir = scandir($media->getDirectory());
+                foreach ($dir as $_entry) {
+                    if ($_entry == ".." || $_entry == ".") {
+                        continue;
+                    }
 
-                if ($_entry == $media->getFilename()) {
-                    continue;
-                }
+                    if ($_entry == $media->getFilename()) {
+                        continue;
+                    }
 
-                unlink($media->getDirectory() . $_entry);
+                    unlink($media->getDirectory() . $_entry);
+                }
             }
+
 
             foreach(array_keys($mediaOptions->getDimensions()) as $dimension) {
                 $cmd = $this->getCommand('Admin42\Media\ImageResize');
@@ -69,6 +89,5 @@ class RegenerateCommand extends AbstractCommand
      */
     public function consoleSetup(Route $route)
     {
-        // TODO: Implement consoleSetup() method.
     }
 }
