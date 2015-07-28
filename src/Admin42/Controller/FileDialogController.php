@@ -20,12 +20,10 @@ class FileDialogController extends AbstractAdminController
     {
         $this->layout('admin/layout/dialog');
 
-        $media = [];
-        $sitemap = [];
+        $linkProvider = $this->getServiceLocator()->get('Admin42\LinkProvider');
 
         return [
-            'media' => $media,
-            'sitemap' => $sitemap,
+            'linkTypes' => $linkProvider->getAvailableAdapters(),
         ];
     }
 }

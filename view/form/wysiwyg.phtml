@@ -5,7 +5,8 @@ $name = uniqid('wysiwyg_');
      ng-base-url="<?= $this->basePath('/assets/admin/core/js/tinymce') ?>"
      ng-content-css="<?= $this->basePath('/assets/admin/core/css/admin42.min.css') ?>"
      ng-file-browser="<?= $this->url('admin/file-dialog') ?>"
-     ng-file-browser-titles='{"file":"Media & Sitemap Browser","image":"Media Browser","media":"Media Browser"}'
+     ng-file-browser-titles='{"file":"Link","image":"Link","media":"Link"}'
+     ng-link-save-url="<?= $this->url('admin/link') ?>"
      class="form-group<?= ($this->hasErrors) ? ' has-error has-feedback' : '' ?>">
 
     <label for="<?= $this->element->getName() ?>" class="col-sm-2 control-label">

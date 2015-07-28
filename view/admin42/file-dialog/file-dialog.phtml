@@ -1,89 +1,30 @@
-<div class="file-dialog" ng-controller="FileSelectorController" ng-type="<?= $this->params()->fromQuery('type') ?>">
-
+<div class="file-dialog" ng-controller="LinkDialogController">
+    <input type="hidden" id="linkSelection" value="{{ linkSelection }}">
     <div class="container-fluid">
-
-        <tabset type="pills">
-
-            <tab active="tabs.media.active" disable="tabs.media.disabled">
-
-                <tab-heading>
-                    <i class="fa fa-picture-o"></i> Media Files
-                </tab-heading>
-
-                <div class="well">
-
-                    <!-- here be code -->
-
-                    <?php
-                    $images = [
-                        'Opinion' => 'http://www.furiouscinema.com/wp-content/uploads/2010/11/opinion.jpg',
-                        'No' => 'http://img.pandawhale.com/121747-Tyrion-trial-no-gif-Imgur-game-kvRZ.gif',
-                        'Magic' => 'http://www.reactiongifs.com/r/mgc.gif',
-                        'Approved' => 'http://38.media.tumblr.com/cc86f2eae93f2d144aa54669d126322e/tumblr_mrvd8chmhk1s4xaulo1_500.gif',
-                    ];
-                    ?>
-
-                    <?php foreach($images as $title => $image): ?>
-                        <a href="#" class="selectable img-thumbnail <?= $this->params()->fromQuery('current') == $image ? 'text-success lead' : '' ?>">
-                            <img
-                                src="<?= $image ?>"
-                                alt="<?= $title ?>"/><br>
-                            <?= $title ?>
-                        </a>
-                    <?php endforeach ?>
-
-                    <div class="alert alert-success">
-                        <code>Type: <?= $this->params()->fromQuery('type') ?></code><br/>
-                        <code>Current: <?= $this->params()->fromQuery('current') ?></code>
-                    </div>
-
-                    <!--    -->
-
+        <form class="form-horizontal" role="form">
+            <div class="form-group">
+                <label class="col-sm-2 control-label">
+                    <?= $this->translate('label.link-type-selector', 'admin') ?>
+                </label>
+                <div class="col-sm-10">
+                    <select ng-model="linkType" class="form-control" ng-change="change()">
+                        <?php foreach($this->linkTypes as $type): ?>
+                            <option value="<?= $type ?>"><?= $this->translate('link-type.'.$type, 'admin')?></option>
+                        <?php endforeach; ?>
+                    </select>
                 </div>
-            </tab>
-
-            <tab active="tabs.sitemap.active" disable="tabs.sitemap.disabled">
-
-                <tab-heading>
-                    <i class="fa fa-sitemap"></i> Sitemap
-                </tab-heading>
-
-                <div class="well">
-
-                    <!-- here be code -->
-
-                    <?php
-                    $links = [
-                        'A Link in Sitemap' => 'http://www.furiouscinema.com/wp-content/uploads/2010/11/opinion.jpg',
-                        'Another Link in Sitemap' => 'http://img.pandawhale.com/121747-Tyrion-trial-no-gif-Imgur-game-kvRZ.gif',
-                        'Threes!' => 'http://www.reactiongifs.com/r/mgc.gif',
-                        'Quad' => 'http://38.media.tumblr.com/cc86f2eae93f2d144aa54669d126322e/tumblr_mrvd8chmhk1s4xaulo1_500.gif',
-                    ];
-                    ?>
-
-                    <ul>
-                        <?php foreach($links as $title => $link): ?>
-                        <li>
-                            <a class="selectable <?= $this->params()->fromQuery('current') == $link ? 'text-success lead' : '' ?>"
-                               href="<?= $link ?>"
-                               title="<?= $title ?>"
-                               onclick="return false;"><?= $title ?></a>
-                        </li>
-                        <?php endforeach ?>
-                    </ul>
-
-                    <div class="alert alert-success">
-                        <code>Type: <?= $this->params()->fromQuery('type') ?></code><br/>
-                        <code>Current: <?= $this->params()->fromQuery('current') ?></code>
-                    </div>
-
-                    <!--    -->
-
-                </div>
-            </tab>
-
-        </tabset>
-
+            </div>
+            <hr>
+            <div ng-repeat="item in includeArray">
+                <div ng-include="item"></div>
+            </div>
+        </form>
     </div>
 
 </div>
+
+<?php
+foreach($this->linkTypes as $type) {
+    echo $this->partial('link/' . $type);
+}
+?>

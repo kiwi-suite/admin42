@@ -48,7 +48,6 @@ module.exports = function(grunt) {
                     '<%= vendor_dir %>/ng-cropper/dist/ngCropper.js',
 
                     '<%= vendor_dir %>/tinymce-dist/tinymce.js',
-                    '<%= vendor_dir %>/angular-ui-tinymce/src/tinymce.js',
 
                     '<%= vendor_dir %>/moment/min/moment-with-locales.js',
                     '<%= vendor_dir %>/moment-timezone/builds/moment-timezone-with-data.js'

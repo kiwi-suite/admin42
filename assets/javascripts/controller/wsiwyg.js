@@ -1,5 +1,5 @@
 angular.module('admin42')
-    .controller('WysiwygController', function ($scope, $attrs, $rootScope) {
+    .controller('WysiwygController', function ($scope, $attrs, $http) {
         if ($attrs.ngBaseUrl) {
             tinymce.baseURL = $attrs.ngBaseUrl;
         }
@@ -8,13 +8,12 @@ angular.module('admin42')
             trusted: true,
             format: 'raw',
             file_browser_callback: fileBrowser,
-            plugins: 'paste advlist autolink lists charmap table code' +
+            plugins: 'paste autolink lists charmap table code link' +
                 //'media link42 image42 ' +
             '',
-            image_advtab: true,
             menubar: false,
             // == http://www.tinymce.com/wiki.php/Controls
-            toolbar: 'undo redo paste | styleselect | bold italic | alignleft aligncenter alignright alignjustify | ' +
+            toolbar: 'undo redo paste | styleselect | bold italic | link unlink | alignleft aligncenter alignright alignjustify | ' +
             'bullist numlist outdent indent | removeformat | table code | ' +
                 //"link42 image42 | " +
             '',
@@ -36,10 +35,6 @@ angular.module('admin42')
                 return;
             }
 
-            // == possible types:
-            // file: called from link plugin
-            // image: called from image plugin
-            // media: called from media plugin
             fileBrowserUrl += '?type=' + type;
 
             // add currently selected file to query params
@@ -54,19 +49,40 @@ angular.module('admin42')
                 width: 800,
                 height: 450,
                 resizable: "yes",
-                inline: "yes",  // This parameter only has an effect if you use the inlinepopups plugin!
-                close_previous: "yes",
                 buttons: [
                     // possibility to make selection that has to be confirmed via done button instead of immediately selecting and closing dialog (pull from iframe dialog into inline dialog)
-                    //{
-                    //    text: 'Done',
-                    //    onclick: function (e) {
-                    //        var frame = $(e.currentTarget).find("iframe").get(0);
-                    //        var content = frame.contentDocument;
-                    //        var selectedItem = $(content).find('a.selected');
-                    //        handleSelection(selectedItem);
-                    //    }
-                    //}
+                    {
+                        text: 'Done',
+                        onclick: function (e) {
+                            var frame = $(e.currentTarget).find("iframe").get(0);
+                            var content = frame.contentDocument;
+                            var selectedItem = $(content).find('input#linkSelection');
+                            var linkData = selectedItem.val();
+                            if (linkData.length == 0) {
+                                top.tinymce.activeEditor.windowManager.close();
+                            }
+
+                            linkData = angular.fromJson(linkData);
+
+                            if (angular.isUndefined(linkData.type)) {
+                                top.tinymce.activeEditor.windowManager.close();
+                            }
+
+                            $http({
+                                method: "POST",
+                                url: $attrs.ngLinkSaveUrl,
+                                data: linkData
+                            })
+                                .success(function (data){
+                                    win.document.getElementById(field_name).value = data.url;
+                                    top.tinymce.activeEditor.windowManager.close();
+                                })
+                                .error(function (){
+                                    top.tinymce.activeEditor.windowManager.close();
+                                });
+
+                        }
+                    },
                     {
                         text: 'Cancel',
                         onclick: function (e) {
@@ -78,85 +94,7 @@ angular.module('admin42')
                 // adding params just in case
                 field_name: field_name,
                 type: type,
-                win: win,
-                handleSelection: handleSelection
+                win: win
             });
-
-            // listen for selection in dialog (pull from iframe dialog into inline dialog)
-            $('#' + dialog._id).find('iframe').load(function () {
-                var dialog = $($(this).get(0).contentDocument);
-                $('a.selectable', dialog).click(function (e) {
-                    e.preventDefault();
-                    handleSelection($(this));
-                });
-            });
-
-            // add to dialog html if wanted other way around (push from iframe dialog to inline dialog):
-            //$(function () {
-            //    $('#assetResults img').live('click', function (event) {
-            //        var args = top.tinymce.activeEditor.windowManager.getParams();
-            //        win = (args.window);
-            //        input = (args.input);
-            //        win.document.getElementById(input).value = '/assets/clientAssets/' + $(this).data('filename');
-            //        top.tinymce.activeEditor.windowManager.close();
-            //    });
-            //});
-
-            function handleSelection($selectedItem) {
-
-                var data = {};
-
-                // both images and links
-                data.url = $selectedItem.find('img').attr('src') || $selectedItem.attr('href');
-                data.url = data.url.trim();
-                data.title = $selectedItem.find('img').attr('alt') || $selectedItem.attr('title');
-                data.title = data.title.trim();
-
-                var $urlInput = $('#' + field_name);
-                $urlInput.val(data.url);
-
-                switch (type) {
-                    case 'file':
-                        // called from link plugin
-                        data.text = data.text || $selectedItem.text();
-                        data.text = data.text.trim();
-                        data.class = 'site-link';
-
-                        // Text to display
-                        var $displayTextInput = $urlInput.parents('.mce-formitem').next().find('input');
-                        if ($displayTextInput.val() === '') {
-                            $displayTextInput.val(data.text);
-                        }
-
-                        // Title
-                        var $titleTextInput = $displayTextInput.parents('.mce-formitem').next().find('input');
-                        if ($titleTextInput.val() === '') {
-                            $titleTextInput.val(data.title);
-                        }
-
-                        break;
-                    case 'image':
-                        // called from image plugin
-
-                        // Image Description
-                        var $imageDescritpionInput = $urlInput.parents('.mce-formitem').next().find('input');
-                        if ($imageDescritpionInput.val() === '') {
-                            $imageDescritpionInput.val(data.title);
-                        }
-
-                        // TODO: clear dimensions?
-
-                        break;
-                    case 'media':
-                        // called from media plugin
-                        break;
-                }
-
-                console.log(type, data);
-
-                top.tinymce.activeEditor.windowManager.close();
-            }
-
-            return false;
         }
     });

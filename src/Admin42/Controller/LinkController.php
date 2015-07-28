@@ -47,6 +47,10 @@ class LinkController extends AbstractAdminController
                 $link->getType(),
                 $data['value']
             ),
+            'url' => $this->getServiceLocator()->get('Admin42\LinkProvider')->assemble(
+                $link->getType(),
+                $data['value']
+            ),
         ]);
     }
 }
