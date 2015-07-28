@@ -174,6 +174,10 @@ class Dynamic extends Fieldset
                 }
                 $elementOrFieldset = $this->addNewTargetElementInstance($value['dynamic_type'], $key);
 
+                if ($elementOrFieldset === false) {
+                    continue;
+                }
+
                 if ($key > $this->lastChildIndex) {
                     $this->lastChildIndex = $key;
                 }
@@ -196,6 +200,10 @@ class Dynamic extends Fieldset
     protected function addNewTargetElementInstance($name, $formName)
     {
         $this->shouldCreateChildrenOnPrepareElement = false;
+
+        if (!isset($this->targetElements[$name])) {
+            return false;
+        }
 
         $elementOrFieldset = clone ($this->targetElements[$name]);
         $elementOrFieldset->setName($formName);
