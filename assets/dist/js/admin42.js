@@ -1135,8 +1135,8 @@ angular.module('admin42')
             requestFromServer(url, tableState);
         };
 
-        $scope.getSrc = function(media) {
-            return MediaService.getMediaUrl(media.directory, media.filename, media.mimeType, 'admin_thumbnail');
+        $scope.getSrc = function(media, dimension) {
+            return MediaService.getMediaUrl(media.directory, media.filename, media.mimeType, dimension);
         };
 
         function requestFromServer(url, tableState) {
