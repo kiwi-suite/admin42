@@ -48,6 +48,11 @@ class EditCommand extends AbstractCommand
     private $userId;
 
     /**
+     * @var string
+     */
+    private $shortName;
+
+    /**
      * @param User $user
      * @return $this
      */
@@ -92,6 +97,17 @@ class EditCommand extends AbstractCommand
     }
 
     /**
+     * @param string $shortName
+     * @return $this
+     */
+    public function setShortName($shortName)
+    {
+        $this->shortName = $shortName;
+
+        return $this;
+    }
+
+    /**
      * @param string $email
      * @return $this
      */
@@ -122,6 +138,7 @@ class EditCommand extends AbstractCommand
         $this->setEmail(array_key_exists('email', $values) ? $values['email'] : null);
         $this->setDisplayName(array_key_exists('displayName', $values) ? $values['displayName'] : null);
         $this->setRole(array_key_exists('role', $values) ? $values['role'] : null);
+        $this->setShortName(array_key_exists('shortName', $values) ? $values['shortName'] : null);
     }
 
     /**
@@ -170,6 +187,17 @@ class EditCommand extends AbstractCommand
                 $this->addError("username", "Username can't be an email");
             }
         }
+
+        if (empty($this->shortName)) {
+            $this->shortName = strtoupper(substr($this->email, 0, 1));
+            if (!empty($this->displayName)) {
+                $parts = explode(" ", $this->displayName);
+                $this->shortName = strtoupper($parts[0]);
+                if (count($parts) > 1) {
+                    $this->shortName .= $parts[1];
+                }
+            }
+        }
     }
 
     /**
@@ -183,6 +211,7 @@ class EditCommand extends AbstractCommand
                 ->setEmail($this->email)
                 ->setDisplayName($this->displayName)
                 ->setRole($this->role)
+                ->setShortName($this->shortName)
                 ->setUpdated($dateTime);
 
 

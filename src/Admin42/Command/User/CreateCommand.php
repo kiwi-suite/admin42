@@ -58,6 +58,11 @@ class CreateCommand extends AbstractCommand
     private $role;
 
     /**
+     * @var string
+     */
+    private $shortName;
+
+    /**
      * @var bool
      */
     private $enablePasswordEmail = true;
@@ -193,6 +198,15 @@ class CreateCommand extends AbstractCommand
             }
         }
 
+        $this->shortName = strtoupper(substr($this->email, 0, 1));
+        if (!empty($this->displayName)) {
+            $parts = explode(" ", $this->displayName);
+            $this->shortName = strtoupper($parts[0]);
+            if (count($parts) > 1) {
+                $this->shortName .= $parts[1];
+            }
+        }
+
         $bCrypt = new Bcrypt();
         $this->cryptedPassword = $bCrypt->create($this->password);
     }
@@ -211,6 +225,7 @@ class CreateCommand extends AbstractCommand
                 ->setDisplayName($this->displayName)
                 ->setRole($this->role)
                 ->setStatus($this->status)
+                ->setShortName($this->shortName)
                 ->setUpdated($dateTime)
                 ->setCreated($dateTime);
 

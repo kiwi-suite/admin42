@@ -1,6 +1,22 @@
 <div class="app-aside hidden-xs bg-dark b-r">
     <div class="aside-wrap bg-dark">
         <div class="navi-wrap">
+            <div class="clearfix hidden-xs text-center hide show" id="aside-user">
+                <span class="w-auto-folded m-t-sm shortname-container">
+                    <?= $this->auth('Admin42\Authentication')->getIdentity()->getShortName() ?>
+                </span>
+                <span class="clear hidden-folded">
+                    <span class="block m-t-sm">
+                        <strong class="font-bold text-lt">
+                            <?= $this->admin()->getUserDisplayName($this->auth('Admin42\Authentication')->getIdentity()) ?>
+                        </strong>
+                    </span>
+                    <span class="text-muted text-xs block">
+                        <?= $this->auth('Admin42\Authentication')->getIdentity()->getRole() ?>
+                    </span>
+                </span>
+                <div class="line dk hidden-folded"></div>
+            </div>
             <nav ui-nav class="navi clearfix">
                 <?= $this->menu('partial/admin42/main-menu', 'admin42')->setMaxDepth(1) ?>
             </nav>

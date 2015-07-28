@@ -45,6 +45,11 @@ class ManageForm extends Form implements InputFilterProviderInterface
         $displayName = new Text('displayName');
         $displayName->setLabel('field.display-name');
         $this->add($displayName);
+
+        $shortName = new Text('shortName');
+        $shortName->setLabel('field.short-name');
+        $shortName->setAttribute("maxlength", 2);
+        $this->add($shortName);
     }
 
     /**

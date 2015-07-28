@@ -80,6 +80,7 @@ class UserController extends AbstractAdminController
                     'email' => $user->getEmail(),
                     'displayName' => $user->getDisplayName(),
                     'role' => $user->getRole(),
+                    'shortName' => $user->getShortName(),
                 ));
             }
         }
@@ -299,6 +300,7 @@ class UserController extends AbstractAdminController
             $manageForm->setData(array(
                 'username' => $authenticationService->getIdentity()->getUsername(),
                 'email' => $authenticationService->getIdentity()->getEmail(),
+                'shortName' => $authenticationService->getIdentity()->getShortName(),
                 'displayName' => $authenticationService->getIdentity()->getDisplayName()
             ));
         }

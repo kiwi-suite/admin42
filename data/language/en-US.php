@@ -45,6 +45,7 @@ return array(
     'field.size'                    => 'Size',
     'field.progress'                => 'Progress',
     'field.status'                  => 'Status',
+    'field.short-name'              => 'Short Name',
 
     'title.user-manage'             => 'Manage your profile settings',
     'title.users'                   => 'User management',

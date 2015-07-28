@@ -48,6 +48,11 @@ class ManageCommand extends AbstractCommand
     private $displayName;
 
     /**
+     * @var string
+     */
+    private $shortName;
+
+    /**
      * @param string $displayName
      * @return $this
      */
@@ -114,6 +119,17 @@ class ManageCommand extends AbstractCommand
     }
 
     /**
+     * @param string $shortName
+     * @return $this
+     */
+    public function setShortName($shortName)
+    {
+        $this->shortName = $shortName;
+
+        return $this;
+    }
+
+    /**
      * @param array $values
      */
     public function hydrate(array $values)
@@ -122,6 +138,7 @@ class ManageCommand extends AbstractCommand
         $this->setPassword((array_key_exists('password', $values)) ? $values['password'] : null);
         $this->setUsername((array_key_exists('username', $values)) ? $values['username'] : null);
         $this->setDisplayName((array_key_exists('displayName', $values)) ? $values['displayName'] : null);
+        $this->setShortName(array_key_exists('shortName', $values) ? $values['shortName'] : null);
     }
 
     /**
@@ -173,6 +190,17 @@ class ManageCommand extends AbstractCommand
             $bCrypt = new Bcrypt();
             $this->password = $bCrypt->create($this->password);
         }
+
+        if (empty($this->shortName)) {
+            $this->shortName = strtoupper(substr($this->email, 0, 1));
+            if (!empty($this->displayName)) {
+                $parts = explode(" ", $this->displayName);
+                $this->shortName = strtoupper($parts[0]);
+                if (count($parts) > 1) {
+                    $this->shortName .= $parts[1];
+                }
+            }
+        }
     }
 
 
@@ -182,6 +210,7 @@ class ManageCommand extends AbstractCommand
     protected function execute()
     {
         $this->user->setEmail($this->email)
+                    ->setShortName($this->shortName)
                     ->setUsername(!empty($this->username) ? $this->username : null)
                     ->setDisplayName(!empty($this->displayName) ? $this->displayName : null);
 

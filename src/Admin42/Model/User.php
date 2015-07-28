@@ -23,6 +23,8 @@ use Core42\Model\AbstractModel;
  * @method string getRole() getRole()
  * @method User setDisplayName() setDisplayName(string $displayName)
  * @method string getDisplayName() getDisplayName()
+ * @method User setShortName() setShortName(string $shortName)
+ * @method string getShortName() getShortName()
  * @method User setHash() setHash(string $hash)
  * @method string getHash() getHash()
  * @method User setStatus() setStatus(string $status)
@@ -49,6 +51,7 @@ class User extends AbstractModel
         'email',
         'role',
         'displayName',
+        'shortName',
         'hash',
         'status',
         'lastLogin',
