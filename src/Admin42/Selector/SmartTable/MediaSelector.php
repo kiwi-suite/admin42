@@ -63,6 +63,6 @@ class MediaSelector extends AbstractSmartTableSelector
      */
     protected function getDisplayColumns()
     {
-        return ['id', 'directoy', 'filename', 'mimeType', 'size', 'updated', 'created'];
+        return ['id', 'directory', 'filename', 'mimeType', 'size', 'updated', 'created'];
     }
 }

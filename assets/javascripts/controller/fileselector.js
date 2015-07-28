@@ -1,5 +1,5 @@
 angular.module('admin42')
-    .controller('FileSelectorController', ['$scope', '$attrs', 'jsonCache', '$modal', function ($scope, $attrs, jsonCache, $modal) {
+    .controller('FileSelectorController', ['$scope', '$attrs', 'jsonCache', '$modal', 'MediaService', function ($scope, $attrs, jsonCache, $modal, MediaService) {
         $scope.media = jsonCache.get($attrs.jsonDataId);
 
         $scope.tabs = {
@@ -22,6 +22,10 @@ angular.module('admin42')
                 return false;
             }
             return ($scope.media.mimeType.substr(0, 6) == "image/");
+        };
+
+        $scope.getSrc = function(media, dimension) {
+            return MediaService.getMediaUrl(media.directory, media.filename, media.mimeType, dimension);
         };
 
         $scope.selectMedia = function() {

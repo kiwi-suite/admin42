@@ -60,6 +60,7 @@ module.exports = function(grunt) {
                     'javascripts/directive/*.js',
                     'javascripts/filter/*.js',
                     'javascripts/controller/*.js',
+                    'javascripts/service/*.js',
                     'javascripts/tinymcePlugins/**/*.js'
                 ],
                 dest: '<%= dist %>/js/admin42.js'

@@ -9,6 +9,7 @@
 
 namespace Admin42\View\Helper;
 
+use Admin42\Media\MediaOptions;
 use Admin42\Model\User;
 use Admin42\TableGateway\UserTableGateway;
 use Zend\I18n\View\Helper\Translate;
@@ -38,17 +39,31 @@ class Admin extends AbstractHelper
     private $userTableGateway;
 
     /**
+     * @var MediaOptions
+     */
+    private $mediaOptions;
+
+    /**
      * @var array
      */
     private $userCache = [];
 
     /**
-     * @param array $config
+     * @var string
      */
-    public function __construct(array $config, UserTableGateway $userTableGateway)
+    private $mediaUrls;
+
+    /**
+     * @param array $config
+     * @param UserTableGateway $userTableGateway
+     * @param MediaOptions $mediaOptions
+     */
+    public function __construct(array $config, UserTableGateway $userTableGateway, MediaOptions $mediaOptions, $mediaUrls)
     {
         $this->config = $config;
         $this->userTableGateway = $userTableGateway;
+        $this->mediaOptions = $mediaOptions;
+        $this->mediaUrls = $mediaUrls;
     }
 
     /**
@@ -98,6 +113,12 @@ class Admin extends AbstractHelper
             'defaultDateTimeFormat' => 'LLL',
             'timezone' => date_default_timezone_get(),
         ];
+
+        $this->addJsonTemplate("mediaConfig", [
+            "baseUrl" => $this->mediaUrls,
+            "dimensions" => $this->mediaOptions->getDimensions(),
+        ]);
+
         return "var APP;"
             . "angular.element(document).ready(function(){"
             . "APP = angular.module('APP', ".json_encode($this->config['angular']['modules']).");"

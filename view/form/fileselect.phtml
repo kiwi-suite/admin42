@@ -20,7 +20,7 @@ $this->admin()->addJsonTemplate($jsonDataId, $media);
         <?php endif; ?>
     </label>
     <div ng-if="isImage()" class="col-sm-2">
-        <img class="img-responsive" ng-src="<?= $this->url('admin/media/stream', ['id' => '{{ media.id }}', 'dimension' => 'admin_thumbnail'])?>">
+        <img class="img-responsive" ng-src="{{getSrc(media, 'admin_thumbnail')}}">
     </div>
     <div ng-class="{'col-sm-8': isImage(), 'col-sm-10': !isImage()}">
         <div>
@@ -36,7 +36,7 @@ $this->admin()->addJsonTemplate($jsonDataId, $media);
                         <i class="fa fa-trash-o"></i>
                         <?= $this->translate('button.clear', 'admin') ?>
                     </a>
-                    <a href="<?= $this->url('admin/media/stream', ['id' => '{{ media.id }}'])?>" class="btn btn-default" target="_blank">
+                    <a ng-href="{{getSrc(media)}}" class="btn btn-default" target="_blank">
                         <i class="fa fa-download"></i>
                         <?= $this->translate('button.download', 'admin') ?>
                     </a>

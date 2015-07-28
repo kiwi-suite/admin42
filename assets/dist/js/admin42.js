@@ -792,7 +792,7 @@ angular.module('admin42')
         };
 }]);
 ;angular.module('admin42')
-    .controller('FileSelectorController', ['$scope', '$attrs', 'jsonCache', '$modal', function ($scope, $attrs, jsonCache, $modal) {
+    .controller('FileSelectorController', ['$scope', '$attrs', 'jsonCache', '$modal', 'MediaService', function ($scope, $attrs, jsonCache, $modal, MediaService) {
         $scope.media = jsonCache.get($attrs.jsonDataId);
 
         $scope.tabs = {
@@ -815,6 +815,10 @@ angular.module('admin42')
                 return false;
             }
             return ($scope.media.mimeType.substr(0, 6) == "image/");
+        };
+
+        $scope.getSrc = function(media, dimension) {
+            return MediaService.getMediaUrl(media.directory, media.filename, media.mimeType, dimension);
         };
 
         $scope.selectMedia = function() {
@@ -1075,7 +1079,7 @@ angular.module('admin42')
         $scope.cancel = function () {
         };
     }]);;angular.module('admin42')
-    .controller('MediaController', ['$scope', 'FileUploader', '$attrs', '$http', 'toaster', function ($scope, FileUploader, $attrs, $http, toaster) {
+    .controller('MediaController', ['$scope', 'FileUploader', '$attrs', '$http', 'toaster', 'MediaService', function ($scope, FileUploader, $attrs, $http, toaster, MediaService) {
         var currentTableState = {};
         var url = $attrs.url;
 
@@ -1129,6 +1133,10 @@ angular.module('admin42')
             currentTableState = tableState;
 
             requestFromServer(url, tableState);
+        };
+
+        $scope.getSrc = function(media) {
+            return MediaService.getMediaUrl(media.directory, media.filename, media.mimeType, 'admin_thumbnail');
         };
 
         function requestFromServer(url, tableState) {
@@ -1294,3 +1302,30 @@ angular.module('admin42')
             });
         }
     });
+;angular.module('admin42')
+    .service('MediaService', ['jsonCache', function(jsonCache) {
+        this.getMediaUrl = function(directory, filename, mimeType, dimension) {
+            var mediaConfig = jsonCache.get("mediaConfig");
+
+            directory = directory.replace("data/media", "");
+
+            if (mimeType.substr(0, 6) != "image/" || dimension == null) {
+                return mediaConfig.baseUrl + directory + filename;
+            }
+
+            if (angular.isUndefined(mediaConfig.dimensions[dimension])) {
+                return mediaConfig.baseUrl + directory + filename;
+            }
+
+            var currentDimension = mediaConfig.dimensions[dimension];
+
+            var extension = filename.split(".").pop();
+            var oldFilename = filename;
+            filename = filename.substr(0, filename.length - extension.length -1);
+
+            filename = filename + "-" + ((currentDimension.width == "auto") ? "" : currentDimension.width) + "x" + ((currentDimension.height == "auto") ? "" : currentDimension.height) + "." + extension;
+
+            return mediaConfig.baseUrl + directory + filename;
+        }
+    }]
+);

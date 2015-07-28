@@ -1,5 +1,5 @@
 angular.module('admin42')
-    .controller('MediaController', ['$scope', 'FileUploader', '$attrs', '$http', 'toaster', function ($scope, FileUploader, $attrs, $http, toaster) {
+    .controller('MediaController', ['$scope', 'FileUploader', '$attrs', '$http', 'toaster', 'MediaService', function ($scope, FileUploader, $attrs, $http, toaster, MediaService) {
         var currentTableState = {};
         var url = $attrs.url;
 
@@ -53,6 +53,10 @@ angular.module('admin42')
             currentTableState = tableState;
 
             requestFromServer(url, tableState);
+        };
+
+        $scope.getSrc = function(media) {
+            return MediaService.getMediaUrl(media.directory, media.filename, media.mimeType, 'admin_thumbnail');
         };
 
         function requestFromServer(url, tableState) {

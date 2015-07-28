@@ -117,7 +117,7 @@
                                     <?php else: ?>
                                     <a ng-click="selectMedia(row)">
                                     <?php endif; ?>
-                                        <img ng-if="isImage(row)" ng-src="<?= $this->url('admin/media/stream', ['id' => '{{ row.id }}', 'dimension' => 'admin_thumbnail'])?>">
+                                        <img ng-if="isImage(row)" ng-src="{{ getSrc(row) }}">
                                         <div ng-if="!isImage(row)" class="center text-center m-t-n w-full">
                                             <i class="fa fa-5x" ng-class="getDocumentClass(row)"></i>
                                         </div>

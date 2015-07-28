@@ -26,7 +26,8 @@ class AdminFactory implements FactoryInterface
     {
         $config = $serviceLocator->getServiceLocator()->get('Config');
         $userTableGateway = $serviceLocator->getServiceLocator()->get('TableGateway')->get('Admin42\User');
+        $mediaOptions = $serviceLocator->getServiceLocator()->get('Admin42\MediaOptions');
 
-        return new Admin($config['admin'], $userTableGateway);
+        return new Admin($config['admin'], $userTableGateway, $mediaOptions, $config['media_url']);
     }
 }
