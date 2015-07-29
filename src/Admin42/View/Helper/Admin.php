@@ -88,16 +88,36 @@ class Admin extends AbstractHelper
      * @return string
      * @throws \Exception
      */
-    public function getUserDisplayNameById($userId)
+    public function getUserShortNameNameById($userId)
     {
         if (array_key_exists($userId, $this->userCache)) {
-            return $this->userCache[$userId];
+            return $this->userCache[$userId]->getShortName();
         }
 
         $user = $this->userTableGateway->selectByPrimary($userId);
         if ($user !== null) {
-            $this->userCache[$userId] = $this->getUserDisplayName($user);
-            return $this->userCache[$userId];
+            $this->userCache[$userId] = $user;
+            return $this->userCache[$userId]->getShortName();
+        }
+
+        return '';
+    }
+
+    /**
+     * @param int $userId
+     * @return string
+     * @throws \Exception
+     */
+    public function getUserDisplayNameById($userId)
+    {
+        if (array_key_exists($userId, $this->userCache)) {
+            return $this->getUserDisplayName($this->userCache[$userId]);
+        }
+
+        $user = $this->userTableGateway->selectByPrimary($userId);
+        if ($user !== null) {
+            $this->userCache[$userId] = $user;
+            return $this->getUserDisplayName($this->userCache[$userId]);
         }
 
         return '';
