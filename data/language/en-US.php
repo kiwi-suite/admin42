@@ -24,6 +24,7 @@ return array(
     'label.profile'                 => 'Profile',
     'label.logout'                  => 'Logout',
     'label.settings'                => 'Settings',
+    'label.content'                 => 'Content',
     'label.users'                   => 'Users',
     'label.user-add'                => 'Add User',
     'label.user-edit'               => 'Edit User',

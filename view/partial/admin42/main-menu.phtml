@@ -16,11 +16,14 @@ foreach ($this->iterator as $page){
     if ($depth > $prevDepth) {
         if($prevDepth == $this->minDepth) {
             $html[] = '<ul class="nav">';
+        } elseif($depth == 1) {
+            //$html[] = '<ul>';
         } else {
             $html[] = '<ul class="nav nav-sub dk">';
         }
     } elseif($prevDepth > $depth) {
         for ($i = $prevDepth; $i > $depth; $i--) {
+            if ($i == 1) continue;
             $html[] = '</li></ul>';
         }
         $html[] = '</li>';
@@ -39,6 +42,9 @@ foreach ($this->iterator as $page){
     $href = $this->navigation->getHref($page);
 
     if($page->hasChildren() && $depth == 0 && empty($href)) {
+        $html[] = '<li class="line dk"></li>';
+        $html[] = '<li class="hidden-folded padder m-t m-b-sm text-muted text-xs">' .$label .'</li>';
+    } elseif($page->hasChildren() && $depth == 1 && empty($href)) {
         $html[] = '<li class="'.(($isActive) ? " active" : "").'">';
         $html[] = '<a>';
         $html[] = '<span class="pull-right text-muted">';
@@ -50,7 +56,7 @@ foreach ($this->iterator as $page){
         $html[] = '</a>';
     } else {
         $html[] = '<li'.(($isActive) ? ' class="active"' : "").'>';
-        $html[] = '<a href="'.$href.'">'. $icon .'<span class="'.(($depth == 0) ? "font-bold" : "").'">' . $label . '</span></a>';
+        $html[] = '<a href="'.$href.'">'. $icon .'<span class="'.(($depth == 1) ? "font-bold" : "").'">' . $label . '</span></a>';
     }
 
     $prevDepth = $depth;
