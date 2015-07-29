@@ -148,4 +148,39 @@ class MediaController extends AbstractAdminController
 
         return $jsonModel;
     }
+
+    public function deleteAction()
+    {
+        if ($this->getRequest()->isDelete()) {
+            $deleteCmd = $this->getCommand('Admin42\Media\Delete');
+
+            $deleteParams = array();
+            parse_str($this->getRequest()->getContent(), $deleteParams);
+
+            $deleteCmd->setMediaId((int) $deleteParams['id'])
+                ->run();
+
+            return new JsonModel(array(
+                'success' => true,
+            ));
+        } elseif ($this->getRequest()->isPost()) {
+            $deleteCmd = $this->getCommand('Admin42\Media\Delete');
+
+            $deleteCmd->setMediaId((int) $this->params()->fromPost('id'))
+                ->run();
+
+            $this->flashMessenger()->addSuccessMessage([
+                'title' => 'toaster.media.delete.title.success',
+                'message' => 'toaster.media.delete.message.success',
+            ]);
+
+            return new JsonModel([
+                'redirect' => $this->url()->fromRoute('admin/media')
+            ]);
+        }
+
+        return new JsonModel([
+            'redirect' => $this->url()->fromRoute('admin/media')
+        ]);
+    }
 }

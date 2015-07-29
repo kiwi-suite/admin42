@@ -69,9 +69,15 @@ return array(
     'toaster.user.detail.title.error'       => 'User not saved',
     'toaster.user.detail.message.error'     => 'There was an error in saving the user',
     'toaster.user.delete.title.success'     => 'User deleted',
-    'toaster.user.delete.message.success'   => 'User was deleted successfully',
+    'toaster.user.delete.message.success'   => 'User is successfully deleted',
     'toaster.user.manage.title.success'     => 'Profile saved',
-    'toaster.user.manage.message.success'   => 'Profile was saved successfully',
+    'toaster.user.manage.message.success'   => 'Profile is successfully saved',
+
+    'media.modal.delete.title'      => 'Delete Media',
+    'media.modal.delete.content'    => 'Really delete mediafile?',
+
+    'toaster.media.delete.title.success'    => 'Media deleted',
+    'toaster.media.delete.message.success'  => 'Media is successfully deleted',
 
     'start.upload'                  => 'Click here to start an upload',
     'title.upload'                  => 'Upload',

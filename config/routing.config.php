@@ -150,6 +150,15 @@ return array(
                                     ),
                                 ),
                             ),
+                            'delete' => array(
+                                'type' => 'Core42\Mvc\Router\Http\AngularSegment',
+                                'options' => array(
+                                    'route' => 'delete/',
+                                    'defaults' => array(
+                                        'action' => 'delete'
+                                    ),
+                                ),
+                            ),
                             'stream' => array(
                                 'type' => 'Core42\Mvc\Router\Http\AngularSegment',
                                 'options' => array(

@@ -18,14 +18,13 @@
                             <?= $this->translate('button.save', 'admin') ?>
                         </button>
 
-                        <button
-                            type="button"
-                            class="btn btn-danger dynamic-form-submit"
-                            data-action="<?= $this->url('admin/user/delete')?>"
-                            data-form-id="<?= $this->params()->fromRoute('id') ?>">
-                            <span class="fa fa-trash-o"></span>
-                            <?= $this->translate('button.delete', 'admin') ?>
-                        </button>
+                        <delete
+                            url="<?= $this->url('admin/media/delete') ?>"
+                            title="<?= $this->translate("media.modal.delete.title", "admin") ?>"
+                            content="<?= $this->translate("media.modal.delete.content", "admin") ?>"
+                            request-id="<?= $this->params()->fromRoute("id") ?>"
+                            >
+                        </delete>
                     </div>
                 </div>
             </div>
