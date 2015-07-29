@@ -43,7 +43,7 @@ foreach ($this->iterator as $page){
 
     if($page->hasChildren() && $depth == 0 && empty($href)) {
         $html[] = '<li class="line dk"></li>';
-        $html[] = '<li class="hidden-folded padder m-t m-b-sm text-muted text-xs">' .$label .'</li>';
+        $html[] = '<li class="hidden-folded padder m-t m-b-sm text-muted text-xs" style="cursor: default;">' .$label .'</li>';
     } elseif($page->hasChildren() && $depth == 1 && empty($href)) {
         $html[] = '<li class="'.(($isActive) ? " active" : "").'">';
         $html[] = '<a>';
