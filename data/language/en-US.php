@@ -92,4 +92,6 @@ return array(
     'label.link-type-selector'      => 'Link Type',
     'link-type.extern'              => 'Externer Link',
     'link-type.media'               => 'Media Link',
+
+    'media.category.default'        => 'Default',
 );

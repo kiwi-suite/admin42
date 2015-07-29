@@ -28,11 +28,13 @@ class MediaController extends AbstractAdminController
             return $this->getSelector('Admin42\SmartTable\Media')->getResult();
         }
 
-        $viewModel = new ViewModel([
-            'uploadForm' => $this->getForm('Admin42\Media\Upload')
-        ]);
+        $mediaOptions = $this->getServiceLocator()->get('Admin42\MediaOptions');
 
-        $viewModel->maxFileSize = MaxUploadFileSize::getSize();
+        $viewModel = new ViewModel([
+            'uploadForm' => $this->getForm('Admin42\Media\Upload'),
+            'maxFileSize' => MaxUploadFileSize::getSize(),
+            'mediaCategories' => $mediaOptions->getCategories(),
+        ]);
 
         if ($this->params('referrer') === "modal") {
             $viewModel->setTerminal(true);
@@ -135,6 +137,7 @@ class MediaController extends AbstractAdminController
                 $request->getPost()->toArray(),
                 $request->getFiles()->toArray()
             );
+
             $form->setData($post);
             if ($form->isValid()) {
                 $this->getFormCommand()

@@ -6,7 +6,7 @@
     </h1>
 </div>
 <?php endif; ?>
-<div class="<?= ($this->params()->fromRoute('referrer') == "index") ? "wrapper-md" : ""?>" ng-controller="MediaController" data-upload-url="<?= $this->url('admin/media/upload') ?>" data-url="<?= $this->url('admin/media')?>" data-max-file-size="<?= $this->maxFileSize ?>">
+<div class="<?= ($this->params()->fromRoute('referrer') == "index") ? "wrapper-md" : ""?>" ng-controller="MediaController" data-upload-url="<?= $this->url('admin/media/upload') ?>" data-url="<?= $this->url('admin/media')?>" data-max-file-size="<?= $this->maxFileSize ?>" data-category="<?= $this->params("category", "default")?>">
 
     <div class="panel panel-default">
         <div class="panel-heading" ng-click="isCollapsed = !isCollapsed">
@@ -25,6 +25,13 @@
 
             <div class="row">
                 <div class="col-sm-12 col-xs-12 col-md-3">
+                    <div class="m-b-md">
+                        <select class="form-control" ng-model="category" ng-change="uploadCategoryChange()">
+                            <?php foreach($this->mediaCategories as $key => $value): ?>
+                                <option value="<?= $key ?>"><?= $this->translate($value, 'admin')?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
                     <div class="m-b-md">
                         <div class="b-a b-2x b-dashed wrapper-lg bg-white text-center m-b" nv-file-drop uploader="uploader">
                             <?= $this->translate('media.info-dropzone', 'admin')?>
@@ -93,7 +100,14 @@
                 <th>
                     <input st-search="filename" placeholder="<?= $this->translate('search.name', 'admin') ?>" class="form-control input-sm" type="text"/>
                 </th>
-                <th colspan="3">
+                <th>
+                    <select id="categorySearchSelect" st-search="category" class="form-control" ng-model="category">
+                        <?php foreach($this->mediaCategories as $key => $value): ?>
+                            <option value="<?= $key ?>" <?= ($key == $this->params("category") ? "selected" : "")?>><?= $this->translate($value, 'admin')?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </th>
+                <th colspan="2">
                 </th>
                 <th class="text-right vertical-middle">
                     <i class="fa fa-fw" ng-class="{'fa-circle-o-notch' : isLoading, 'fa-spin' : isLoading, 'fa-search': !isLoading}"></i>

@@ -16,6 +16,11 @@ class MediaOptions extends AbstractOptions
     protected $images = [];
 
     /**
+     * @var array
+     */
+    protected $categories = [];
+
+    /**
      * @param $path
      */
     public function setPath($path)
@@ -67,5 +72,21 @@ class MediaOptions extends AbstractOptions
         }
 
         return $dimensions;
+    }
+
+    /**
+     * @param array $categories
+     */
+    public function setCategories($categories)
+    {
+        $this->categories = $categories;
+    }
+
+    /**
+     * @return array
+     */
+    public function getCategories()
+    {
+        return $this->categories;
     }
 }

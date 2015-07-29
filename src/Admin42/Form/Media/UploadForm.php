@@ -3,6 +3,7 @@ namespace Admin42\Form\Media;
 
 use Admin42\Filter\File\RenameUpload;
 use Zend\Form\Element\File;
+use Zend\Form\Element\Text;
 use Zend\Form\Form;
 use Zend\InputFilter\FileInput;
 use Zend\InputFilter\InputFilter;
@@ -14,6 +15,8 @@ class UploadForm extends Form
      */
     public function init()
     {
+        $category = new Text("category");
+        $this->add($category);
 
         $file = new File("file");
         $file->setAttribute("multiple", true);

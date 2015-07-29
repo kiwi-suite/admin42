@@ -10,6 +10,8 @@ use Core42\Model\AbstractModel;
  * @method string getDirectory() getDirectory()
  * @method Media setFilename() setFilename(string $filename)
  * @method string getFilename() getFilename()
+ * @method Media setCategory() setCategory(string $category)
+ * @method string getCategory() getCategory()
  * @method Media setTitle() setTitle(string $title)
  * @method string getTitle() getTitle()
  * @method Media setDescription() setDescription(string $description)
@@ -37,6 +39,7 @@ class Media extends AbstractModel
         'id',
         'directory',
         'filename',
+        'category',
         'title',
         'description',
         'keywords',

@@ -10,24 +10,16 @@ angular.module('admin42')
 
         $scope.errorFiles = [];
 
+        $scope.category = $attrs.category;
+
         var uploader = $scope.uploader = new FileUploader({
             url: $attrs.uploadUrl,
             filters: [{
                 name: 'filesize',
                 fn: function(item) {
-                    console.log(item.size);
-
                     if (item.size > $attrs.maxFileSize) {
                         $scope.errorFiles.push(item);
 
-                        /*
-                        toaster.pop({
-                            type: 'error',
-                            title: 'Title text',
-                            body: 'Body text',
-                            showCloseButton: true
-                        });
-                        */
                         return false;
                     }
 
@@ -35,6 +27,18 @@ angular.module('admin42')
                 }
             }]
         });
+
+        $scope.uploadCategoryChange = function() {
+            $('#categorySearchSelect').val($scope.category);
+            angular.element($('#categorySearchSelect')[0]).triggerHandler('input');
+        }
+
+        uploader.onBeforeUploadItem = function onBeforeUploadItem(item) {
+            item.formData = [{
+                category: $scope.category
+            }];
+        }
+
 
         uploader.onCompleteAll = function() {
             requestFromServer(url, currentTableState);

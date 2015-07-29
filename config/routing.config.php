@@ -111,11 +111,12 @@ return array(
                     'media' => array(
                         'type' => 'Zend\Mvc\Router\Http\Segment',
                         'options' => array(
-                            'route' => 'media/[:referrer/]',
+                            'route' => 'media/[:referrer/[:category/]]',
                             'defaults' => array(
                                 'controller' => __NAMESPACE__ . '\Media',
                                 'action' => 'index',
-                                'referrer' => 'index'
+                                'referrer' => 'index',
+                                'category' => 'default',
                             ),
                             'constraints' => [
                                 'referrer' => '(index|modal)'

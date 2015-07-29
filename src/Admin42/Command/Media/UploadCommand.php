@@ -20,6 +20,11 @@ class UploadCommand extends AbstractCommand
     private $uploadData;
 
     /**
+     * @var string
+     */
+    private $category;
+
+    /**
      * @param array $uploadData
      * @return $this
      */
@@ -31,12 +36,35 @@ class UploadCommand extends AbstractCommand
     }
 
     /**
+     * @param string $category
+     * @return $this
+     */
+    public function setCategory($category)
+    {
+        $this->category = $category;
+
+        return $this;
+    }
+
+    /**
      * @param array $values
      * @throws \Exception
      */
     public function hydrate(array $values)
     {
         $this->setUploadData($values['file']);
+        $this->setCategory($values['category']);
+    }
+
+    protected function preExecute()
+    {
+        $mediaOptions = $this->getServiceManager()->get('Admin42\MediaOptions');
+        $categories = $mediaOptions->getCategories();
+        $categories = array_keys($categories);
+
+        if (!in_array($this->category, $categories)) {
+            $this->category = "default";
+        }
     }
 
     /**
@@ -51,6 +79,7 @@ class UploadCommand extends AbstractCommand
         $media = new Media();
         $media->setFilename($this->uploadData['name'])
             ->setTitle($this->uploadData['name'])
+            ->setCategory($this->category)
             ->setMeta(json_encode([]))
             ->setDirectory(dirname($source) . DIRECTORY_SEPARATOR)
             ->setMimeType(finfo_file($finfo, $source))

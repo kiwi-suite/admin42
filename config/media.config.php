@@ -4,6 +4,10 @@ return [
     'media' => [
         'path' => 'data/media/',
 
+        'categories' => [
+            'default' => 'media.category.default'
+        ],
+
         'images' => [
             'adapter' => 'imagick',
             'dimensions' => [

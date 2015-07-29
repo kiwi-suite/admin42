@@ -47,7 +47,7 @@ class MediaSelector extends AbstractSmartTableSelector
      */
     protected function getSearchAbleColumns()
     {
-        return ['id', 'filename'];
+        return ['id', 'filename', 'category'];
     }
 
     /**
