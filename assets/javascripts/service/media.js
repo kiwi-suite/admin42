@@ -1,6 +1,9 @@
 angular.module('admin42')
     .service('MediaService', ['jsonCache', function(jsonCache) {
         this.getMediaUrl = function(directory, filename, mimeType, dimension) {
+            if (angular.isUndefined(directory) || angular.isUndefined(filename)) {
+                return "";
+            }
             var mediaConfig = jsonCache.get("mediaConfig");
 
             directory = directory.replace("data/media", "");
