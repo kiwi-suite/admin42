@@ -79,6 +79,9 @@ return array(
     'toaster.media.delete.title.success'    => 'Media deleted',
     'toaster.media.delete.message.success'  => 'Media is successfully deleted',
 
+    'item.modal.delete.title'       => 'Delete Item',
+    'item.modal.delete.content'     => 'Really delete this item?',
+
     'start.upload'                  => 'Click here to start an upload',
     'title.upload'                  => 'Upload',
     'media.info-dropzone'           => 'Drag your files into this area',

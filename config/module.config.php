@@ -48,6 +48,8 @@ return array(
 
             'Admin42\LinkProvider' => 'Admin42\Link\Service\LinkProviderFactory',
             'Admin42\Link\MediaLink' => 'Admin42\Link\Adapter\Service\MediaLinkFactory',
+
+            'Admin42\CrudOptionsPluginManager' => 'Admin42\Crud\Service\CrudOptionsPluginManagerFactory',
         ),
     ),
 
