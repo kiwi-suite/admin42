@@ -1,6 +1,6 @@
 <div class="wrapper-md bg-white b-b box-shadow">
     <h1 class="m-n font-thin h3">
-        <span class="fa fa-street-view"></span>
+        <span class="fa <?= $this->icon ?>"></span>
         <?php
         $label = $this->params()->fromRoute('isEditMode') == true ? 'Edit' : 'Add';
         ?>

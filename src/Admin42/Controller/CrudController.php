@@ -125,6 +125,7 @@ class CrudController extends AbstractAdminController
             'editRoute' => $currentRoute . '/edit',
             'addRoute' => $currentRoute . '/add',
             'deleteRoute' => $currentRoute . '/delete',
+            'icon' => $this->getCrudOptions()->getIcon(),
         ]);
 
         return $viewModel;
