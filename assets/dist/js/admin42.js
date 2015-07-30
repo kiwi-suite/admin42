@@ -571,7 +571,9 @@ angular.module('smart-table')
             y: 0,
             width: 0,
             height: 0,
-            rotate: 0
+            rotate: 0,
+            calcWidth: 0,
+            calcHeight: 0
         };
 
         $scope.isActive = function(handle) {
@@ -629,7 +631,40 @@ angular.module('smart-table')
             $http.post(url, $scope.data[handle]);
         };
 
+        function setCurrentInfo(currentInfo) {
+            var dimension = $scope.dimensions[$scope.selectedHandle];
+
+            if (dimension.width != "auto" && dimension.height != "auto") {
+                currentInfo.calcWidth = dimension.width;
+                currentInfo.calcHeight = dimension.height;
+            } else if(dimension.width == "auto" && dimension.height == "auto") {
+                currentInfo.calcWidth = currentInfo.width;
+                currentInfo.calcHeight = currentInfo.height;
+            } else if (dimension.width == "auto" && dimension.height != "auto") {
+                var ratio = currentInfo.height/dimension.height;
+
+                currentInfo.calcWidth = Math.round(currentInfo.width/ratio);
+                currentInfo.calcHeight = dimension.height;
+            } else {
+                var ratio = currentInfo.width/dimension.width;
+
+                currentInfo.calcWidth = dimension.width;
+                currentInfo.calcHeight = Math.round(currentInfo.height / ratio);
+            }
+            $scope.currentInfo = currentInfo;
+            $scope.$apply();
+        }
+
         $scope.selectDimension = function(handle) {
+            $scope.currentInfo = {
+                x: 0,
+                y: 0,
+                width: 0,
+                height: 0,
+                rotate: 0,
+                calcWidth: 0,
+                calcHeight: 0
+            };
             var dimension = $scope.dimensions[handle];
 
             Cropper.getJqueryCrop().cropper("destroy");
@@ -680,8 +715,7 @@ angular.module('smart-table')
                 var data = $cropper.cropper('getCropBoxData');
                 var imageData = $cropper.cropper('getImageData');
 
-                $scope.currentInfo = $cropper.cropper('getData', true);
-                $scope.$apply();
+                setCurrentInfo($cropper.cropper('getData', true));
 
                 if (dimension.width != 'auto' && data.width < dimension.width / (imageData.naturalWidth/imageData.width)) {
                     return false;
@@ -699,7 +733,7 @@ angular.module('smart-table')
                 var imageData = $cropper.cropper('getImageData');
                 var hasChanged = false;
 
-                $scope.currentInfo = $cropper.cropper('getData', true);
+                setCurrentInfo($cropper.cropper('getData', true));
 
                 if (dimension.width != 'auto') {
                     var width = dimension.width / (imageData.naturalWidth/imageData.width);
@@ -726,7 +760,7 @@ angular.module('smart-table')
                 }
             }).on('built.cropper', function (e) {
                 var $cropper = $(e.target);
-                $scope.currentInfo = $cropper.cropper('getData', true);
+                setCurrentInfo($cropper.cropper('getData', true));
             });
         };
 

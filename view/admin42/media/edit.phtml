@@ -64,6 +64,9 @@ $this->admin()->addJsonTemplate($jsonDataId, [
                                 <div class="col-sm-3 text-right">
                                     <b>{{ currentInfo.width }}px</b>
                                 </div>
+                                <div class="col-sm-3 text-right">
+                                    ({{ currentInfo.calcWidth }}px)
+                                </div>
                             </div>
                             <div class="row">
                                 <div class="col-sm-3">
@@ -71,6 +74,9 @@ $this->admin()->addJsonTemplate($jsonDataId, [
                                 </div>
                                 <div class="col-sm-3 text-right">
                                     <b>{{ currentInfo.height }}px</b>
+                                </div>
+                                <div class="col-sm-3 text-right">
+                                    ({{ currentInfo.calcHeight }}px)
                                 </div>
                             </div>
                         </div>
