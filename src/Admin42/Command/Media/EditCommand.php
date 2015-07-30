@@ -8,6 +8,7 @@ use Core42\Db\ResultSet\ResultSet;
 use Imagine\Image\Box;
 use Imagine\Image\ImagineInterface;
 use Imagine\Image\Point;
+use module\admin42\src\Admin42\Command\Tag\SaveCommand;
 use Zend\Json\Json;
 use ZF\Console\Route;
 
@@ -141,6 +142,13 @@ class EditCommand extends AbstractCommand
             ->setUpdated(new \DateTime());
 
         $this->getTableGateway('Admin42\Media')->update($this->media);
+
+        if (!empty($this->keywords)) {
+            /* @var SaveCommand $cmd */
+            $cmd = $this->getCommand('Admin42\Tag\Save');
+            $cmd->setTags($this->keywords)
+                ->run();
+        }
 
         if (!empty($this->uploadData)) {
             /* @var UploadCommand $cmd */
