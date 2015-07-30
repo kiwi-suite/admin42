@@ -8,31 +8,35 @@
     </h1>
 </div>
 <div class="wrapper-md">
-    <form class="form-horizontal" role="form" action="<?= $this->url(null, array(), array(), true) ?>" method="post">
-        <div class="panel b-a">
-            <div class="panel-body">
-                <?= $this->form($this->createEditForm)?>
-            </div>
-            <div class="panel-footer">
-                <div class="form-group">
-                    <div class="col-sm-offset-2 col-md-10">
-                        <button type="submit" class="btn btn-primary">
-                            <span class="fa fa-save"></span>
-                            <?= $this->translate('button.save', 'admin') ?>
-                        </button>
-                        <?php if ($this->params()->fromRoute('isEditMode') == true): ?>
-                            <delete
-                                url="<?= $this->url($this->deleteRoute) ?>"
-                                title="<?= $this->translate("item.modal.delete.title", "admin") ?>"
-                                content="<?= $this->translate("item.modal.delete.content", "admin") ?>"
-                                request-id="<?= $this->params()->fromRoute("id") ?>"
-                                method="post"
-                                >
-                            </delete>
-                        <?php endif; ?>
+    <div class="row">
+        <div class="col-md-6">
+            <form class="form-horizontal" role="form" action="<?= $this->url(null, array(), array(), true) ?>" method="post">
+                <div class="panel b-a">
+                    <div class="panel-body">
+                        <?= $this->form($this->createEditForm)?>
+                    </div>
+                    <div class="panel-footer">
+                        <div class="form-group">
+                            <div class="col-sm-offset-2 col-md-10">
+                                <button type="submit" class="btn btn-primary">
+                                    <span class="fa fa-save"></span>
+                                    <?= $this->translate('button.save', 'admin') ?>
+                                </button>
+                                <?php if ($this->params()->fromRoute('isEditMode') == true): ?>
+                                    <delete
+                                        url="<?= $this->url($this->deleteRoute) ?>"
+                                        title="<?= $this->translate("item.modal.delete.title", "admin") ?>"
+                                        content="<?= $this->translate("item.modal.delete.content", "admin") ?>"
+                                        request-id="<?= $this->params()->fromRoute("id") ?>"
+                                        method="post"
+                                        >
+                                    </delete>
+                                <?php endif; ?>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
+            </form>
         </div>
-    </form>
+    </div>
 </div>
