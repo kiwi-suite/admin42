@@ -31,6 +31,7 @@ return array(
     'label.media'                   => 'Media',
     'label.title'                   => 'Title',
     'label.description'             => 'Description',
+    'label.last-update'             => 'Last Update',
 
     'field.id'                      => '#ID',
     'field.username'                => 'Username',

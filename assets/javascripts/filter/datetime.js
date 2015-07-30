@@ -12,17 +12,17 @@ angular.module('admin42')
             }
             var dateTime;
             if (angular.isObject(input) && input.constructor.name == 'Date') {
-                dateTime = moment.tz(input, input.timezone);
+                dateTime = moment.tz(moment.utc(input), input.timezone);
             } else if (angular.isObject(input)) {
                 if (angular.isUndefined(input.date)) {
                     return emptyValue;
                 }
-                dateTime = moment.tz(input.date, input.timezone);
+                dateTime = moment.tz(moment.utc(input.date), input.timezone);
             } else if (angular.isString(input)) {
                 if (input.length == 0) {
                     return emptyValue;
                 }
-                dateTime = moment.tz(input, timezone);
+                dateTime = moment.tz(moment.utc(input), timezone);
             } else {
                 return emptyValue;
             }
