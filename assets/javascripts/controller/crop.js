@@ -10,6 +10,14 @@ angular.module('admin42')
 
         $scope.hasChanges = {};
 
+        $scope.currentInfo = {
+            x: 0,
+            y: 0,
+            width: 0,
+            height: 0,
+            rotate: 0
+        };
+
         $scope.isActive = function(handle) {
             if (handle == $scope.selectedHandle) {
                 return 'active';
@@ -19,7 +27,6 @@ angular.module('admin42')
         };
 
         $scope.checkChanges = function(handle) {
-            console.log('changes for ' + handle);
             if (angular.isUndefined($scope.data[handle])) {
                 return false;
             }
@@ -82,7 +89,7 @@ angular.module('admin42')
                 zoomable: false,
                 responsive: true,
                 rotatable: false,
-                guides: false
+                guides: true
             };
 
             if (!angular.isUndefined($scope.data[handle])) {
@@ -133,6 +140,8 @@ angular.module('admin42')
                 var imageData = $cropper.cropper('getImageData');
                 var hasChanged = false;
 
+                $scope.currentInfo = $cropper.cropper('getData', true);
+
                 if (dimension.width != 'auto') {
                     var width = dimension.width / (imageData.naturalWidth/imageData.width);
                     if (angular.isUndefined(data.width) || data.width < width) {
@@ -156,6 +165,9 @@ angular.module('admin42')
                 if (hasChanged) {
                     $(e.target).cropper('setCropBoxData', data);
                 }
+            }).on('built.cropper', function (e) {
+                var $cropper = $(e.target);
+                $scope.currentInfo = $cropper.cropper('getData', true);
             });
         };
 

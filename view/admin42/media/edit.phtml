@@ -55,6 +55,27 @@ $this->admin()->addJsonTemplate($jsonDataId, [
                 </div>
 
                 <div class="col-md-4">
+                    <div ng-show="currentInfo.width > 0 && currentInfo.height > 0" class="panel panel-info">
+                        <div class="panel-body">
+                            <div class="row">
+                                <div class="col-sm-3">
+                                    Width:
+                                </div>
+                                <div class="col-sm-3 text-right">
+                                    <b>{{ currentInfo.width }}px</b>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-3">
+                                    Height:
+                                </div>
+                                <div class="col-sm-3 text-right">
+                                    <b>{{ currentInfo.height }}px</b>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
                     <ul class="list-group">
                         <li class="list-group-item" ng-repeat="(name, data) in dimensions" ng-class="isActive(name)">
                             <div ng-if="!checkImageSize(data)" class="media">
