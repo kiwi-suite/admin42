@@ -197,9 +197,21 @@ return array(
                         'type' => 'Zend\Mvc\Router\Http\Literal',
                         'options' => array(
                             'route' => 'api/',
+                            'defaults' => array(
+                                'controller' => __NAMESPACE__ . '\Api\Api',
+                            )
                         ),
                         'may_terminate' => true,
                         'child_routes' => array(
+                            'tag-suggest' => array(
+                                'type' => 'Zend\Mvc\Router\Http\Literal',
+                                'options' => array(
+                                    'route' => 'tag-suggest',
+                                    'defaults' => array(
+                                        'action' => 'tagSuggest'
+                                    ),
+                                ),
+                            ),
                             'notification' => array(
                                 'type' => 'Zend\Mvc\Router\Http\Literal',
                                 'options' => array(

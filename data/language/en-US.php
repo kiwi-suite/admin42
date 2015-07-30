@@ -15,6 +15,7 @@ return array(
     'button.clear'                  => 'Clear',
     'button.select'                 => 'Select',
     'button.remove'                 => 'Remove',
+    'button.browse'                 => 'Browse',
     'button.upload'                 => 'Upload',
     'button.upload_all'             => 'Upload All',
     'button.cancel_all'             => 'Cancel All',
@@ -31,6 +32,7 @@ return array(
     'label.media'                   => 'Media',
     'label.title'                   => 'Title',
     'label.description'             => 'Description',
+    'label.keywords'                => 'Keywords',
     'label.last-update'             => 'Last Update',
 
     'field.id'                      => '#ID',

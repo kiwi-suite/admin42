@@ -43,6 +43,6 @@ class UploadForm extends Form
      */
     public function getTargetPath()
     {
-        return 'data/media/' . implode(DIRECTORY_SEPARATOR, str_split(substr(md5(uniqid()), 0, 6), 2)) . '/';
+        return 'data/media/' . implode('/', str_split(substr(md5(uniqid()), 0, 6), 2)) . '/';
     }
 }

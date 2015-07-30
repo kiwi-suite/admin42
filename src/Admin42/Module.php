@@ -78,9 +78,11 @@ class Module implements ConfigProviderInterface, BootstrapListenerInterface
 
                 $formElement = $viewHelperManager->get('formElement');
                 $formElement->addClass('Admin42\FormElements\FileSelect', 'formfileselect');
+                //$formElement->addClass('Admin42\FormElements\File', 'formfile');
                 $formElement->addClass('Admin42\FormElements\Wysiwyg', 'formwysiwyg');
                 $formElement->addClass('Admin42\FormElements\YouTube', 'formyoutube');
                 $formElement->addClass('Admin42\FormElements\Link', 'formlink');
+                $formElement->addClass('Admin42\FormElements\Tags', 'fromtags');
             },
             100
         );

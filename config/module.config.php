@@ -57,6 +57,8 @@ return array(
         'invokables' => [
             'fileSelect' => 'Admin42\FormElements\FileSelect',
             'datetime'   => 'Admin42\FormElements\DateTime',
+            //'file'       => 'Admin42\FormElements\File',
+            'tags'       => 'Admin42\FormElements\Tags',
             'wysiwyg'    => 'Admin42\FormElements\Wysiwyg',
             'youtube'    => 'Admin42\FormElements\YouTube',
         ],

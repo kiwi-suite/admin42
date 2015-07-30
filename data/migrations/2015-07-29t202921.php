@@ -10,7 +10,7 @@ class Migration20150729202921
 
     public function down(Zend\ServiceManager\ServiceManager $serviceManager)
     {
-        $sql = "ALTER TABLE `skrapid`.`admin42_media` DROP COLUMN `category`";
+        $sql = "ALTER TABLE `admin42_media` DROP COLUMN `category`";
         $serviceManager->get('Db\Master')->query($sql, \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
     }
 

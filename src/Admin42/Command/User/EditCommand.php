@@ -215,7 +215,7 @@ class EditCommand extends AbstractCommand
                 ->setUpdated($dateTime);
 
 
-        $this->getServiceManager()->get('TableGateway')->get('Admin42\User')->update($this->user);
+        $this->getTableGateway('Admin42\User')->update($this->user);
 
         return $this->user;
     }

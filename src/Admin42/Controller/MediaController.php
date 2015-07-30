@@ -9,6 +9,7 @@
 
 namespace Admin42\Controller;
 
+use Admin42\Command\Media\EditCommand;
 use Admin42\Mvc\Controller\AbstractAdminController;
 use Core42\Stdlib\MaxUploadFileSize;
 use Core42\View\Model\JsonModel;
@@ -57,9 +58,15 @@ class MediaController extends AbstractAdminController
             $editForm->setData($prg);
             if ($editForm->isValid()) {
 
-                $validatedValues = $editForm->getInputFilter()->getValues();
-                $media->setTitle($validatedValues['title'])
-                    ->setDescription((empty($validatedValues['description']) ? null : $validatedValues['description']));
+                /* @var EditCommand $cmd */
+                $cmd = $this->getCommand('Admin42\Media\Edit');
+                $cmd->setMediaId($this->params()->fromRoute("id"));
+
+                $formCommand = $this->getFormCommand();
+                $media = $formCommand->setForm($editForm)
+                    ->setCommand($cmd)
+                    ->setData($prg)
+                    ->run();
 
                 $this->getTableGateway('Admin42\Media')->update($media);
                 $this->flashMessenger()->addSuccessMessage([
@@ -90,6 +97,7 @@ class MediaController extends AbstractAdminController
             'media' => $media,
             'dimensions' => $mediaOptions->getDimensions(false),
             'imageSize' => $imageSize,
+            'maxFileSize' => MaxUploadFileSize::getSize()
         ];
     }
 
