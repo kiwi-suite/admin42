@@ -1,4 +1,17 @@
 <?php
+$jsonDataId = uniqid('form/tags/') . '.json';
+$values = [];
+if (strlen($this->element->getValue())) {
+    $tmp = explode(",", $this->element->getValue());
+    for ($i = 0; $i < count($tmp); $i++) {
+        $values[] = [
+            'id' => $i + 1,
+            'tag' => $tmp[$i],
+        ];
+    }
+}
+$this->admin()->addJsonTemplate($jsonDataId, $values);
+
 $id = uniqid("tags_");
 ?>
 <div class="form-group<?= ($this->hasErrors) ? ' has-error has-feedback' : ''?>">
@@ -8,7 +21,7 @@ $id = uniqid("tags_");
             <abbr title="required">*</abbr>
         <?php endif; ?>
     </label>
-    <div class="col-sm-10" ng-controller="TagsElementController" data-url="<?= $this->url('admin/api/tag-suggest') ?>">
+    <div class="col-sm-10" ng-controller="TagsElementController" data-url="<?= $this->url('admin/api/tag-suggest') ?>" json-data-id="<?= $jsonDataId ?>">
         <ui-select multiple tagging="addTagTransform" ng-model="tags.selectedTags" theme="bootstrap" ng-disabled="disabled" style="width: 800px;" title="Choose a tag" on-remove="updateHiddenField()" on-select="updateHiddenField()">
             <ui-select-match placeholder="Tags...">{{$item.tag}}</ui-select-match>
             <ui-select-choices refresh="refreshTags($select.search)" refresh-delay="100" repeat="value in tags.tags">

@@ -1,6 +1,5 @@
 angular.module('admin42')
-    .controller('TagsElementController', ['$scope', '$attrs', '$http', '$q', function ($scope, $attrs, $http, $q) {
-        var currentTableState = {};
+    .controller('TagsElementController', ['$scope', '$attrs', '$http', '$q', 'jsonCache', function ($scope, $attrs, $http, $q, jsonCache) {
         var url = $attrs.url;
 
         var canceler = null;
@@ -8,7 +7,7 @@ angular.module('admin42')
         $scope.tags = {
             tags: [],
             //selectedTags: [{"id": 1, "tag": "foobar"},{"id": 2, "tag": "test"}]
-            selectedTags: [],
+            selectedTags: jsonCache.get($attrs.jsonDataId),
             fieldValue: ''
         };
 
@@ -32,13 +31,10 @@ angular.module('admin42')
             $scope.tags.tags = [];
 
             var params = {tag: tag};
-            console.log('callback ' + tag);
 
             if (tag.length > 0) {
 
                 if (canceler != null) {
-                    console.log('cancel...');
-                    //console.log($scope.canceler);
                     canceler.resolve();
                 }
 

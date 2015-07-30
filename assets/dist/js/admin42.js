@@ -1209,70 +1209,6 @@ angular.module('admin42')
                 });
         }
 }]);
-;angular.module('admin42')
-    .controller('MediaEditController', ['$scope', 'FileUploader', '$attrs', '$http', function ($scope, FileUploader, $attrs, $http) {
-        var currentTableState = {};
-        var url = $attrs.url;
-
-        $scope.isCollapsed = true;
-        $scope.collection = [];
-        $scope.isLoading = true;
-        $scope.displayedPages = 1;
-
-        $scope.errorFiles = [];
-
-        var uploader = $scope.uploader = new FileUploader({
-            queueLimit: 1,
-            filters: [{
-                name: 'filesize',
-                fn: function(item) {
-                    console.log(item.size);
-
-                    if (item.size > $attrs.maxFileSize) {
-                        $scope.errorFiles.push(item);
-
-                        /*
-                        toaster.pop({
-                            type: 'error',
-                            title: 'Title text',
-                            body: 'Body text',
-                            showCloseButton: true
-                        });
-                        */
-                        return false;
-                    }
-
-                    return true;
-                }
-            }]
-        });
-
-        $scope.isImage = function(item) {
-            return (item.mimeType.substr(0, 6) == "image/");
-        };
-
-        $scope.getDocumentClass = function(item) {
-            return "fa-file";
-        };
-
-
-        function requestFromServer(url, tableState) {
-            $scope.collection = [];
-            $scope.isLoading = true;
-
-            $http.post(url, tableState).
-                success(function(data, status, headers, config) {
-                    $scope.isLoading = false;
-
-                    $scope.collection = data.data;
-
-                    $scope.displayedPages = data.meta.displayedPages;
-                    tableState.pagination.numberOfPages = data.meta.displayedPages;
-                }).
-                error(function(data, status, headers, config) {
-                });
-        }
-}]);
 ;angular.module('admin42').controller('ModalController', ['$scope', '$modalInstance', function ($scope, $modalInstance) {
     $scope.ok = function () {
         $modalInstance.close();
@@ -1320,8 +1256,7 @@ angular.module('admin42')
         }
     }]);
 ;angular.module('admin42')
-    .controller('TagsElementController', ['$scope', '$attrs', '$http', '$q', function ($scope, $attrs, $http, $q) {
-        var currentTableState = {};
+    .controller('TagsElementController', ['$scope', '$attrs', '$http', '$q', 'jsonCache', function ($scope, $attrs, $http, $q, jsonCache) {
         var url = $attrs.url;
 
         var canceler = null;
@@ -1329,7 +1264,7 @@ angular.module('admin42')
         $scope.tags = {
             tags: [],
             //selectedTags: [{"id": 1, "tag": "foobar"},{"id": 2, "tag": "test"}]
-            selectedTags: [],
+            selectedTags: jsonCache.get($attrs.jsonDataId),
             fieldValue: ''
         };
 
@@ -1353,13 +1288,10 @@ angular.module('admin42')
             $scope.tags.tags = [];
 
             var params = {tag: tag};
-            console.log('callback ' + tag);
 
             if (tag.length > 0) {
 
                 if (canceler != null) {
-                    console.log('cancel...');
-                    //console.log($scope.canceler);
                     canceler.resolve();
                 }
 
