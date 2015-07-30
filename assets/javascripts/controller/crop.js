@@ -124,6 +124,9 @@ angular.module('admin42')
                 var data = $cropper.cropper('getCropBoxData');
                 var imageData = $cropper.cropper('getImageData');
 
+                $scope.currentInfo = $cropper.cropper('getData', true);
+                $scope.$apply();
+
                 if (dimension.width != 'auto' && data.width < dimension.width / (imageData.naturalWidth/imageData.width)) {
                     return false;
                 }
