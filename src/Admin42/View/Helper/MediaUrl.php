@@ -9,85 +9,25 @@ use Zend\View\Helper\AbstractHelper;
 class MediaUrl extends AbstractHelper
 {
     /**
-     * @var MediaTableGateway;
-     */
-    protected $mediaTableGateway;
-
-    /**
-     * @var mediaOptions
-     */
-    protected $mediaOptions;
-
-    /**
-     * @var string
+     * @var \Admin42\Media\MediaUrl;
      */
     protected $mediaUrl;
 
     /**
-     * @var array
+     * @param \Admin42\Media\MediaUrl $mediaUrl
      */
-    protected $cached = [];
-
-    /**
-     * @param MediaTableGateway $mediaTableGateway
-     * @param MediaOptions $mediaOptions
-     */
-    public function __construct(MediaTableGateway $mediaTableGateway, MediaOptions $mediaOptions, $mediaUrl)
+    public function __construct(\Admin42\Media\MediaUrl $mediaUrl)
     {
-        $this->mediaTableGateway = $mediaTableGateway;
-
-        $this->mediaOptions = $mediaOptions;
-
         $this->mediaUrl = $mediaUrl;
-    }
-
-    public function __invoke($mediaId, $dimension = null)
-    {
-        $media = $this->loadMedia($mediaId);
-        if (empty($media)) {
-            return "";
-        }
-
-        if (substr($media->getMimeType(), 0, 6) != "image/" || $dimension === null) {
-            return $this->mediaUrl . str_replace("data/media", "", $media->getDirectory()) . $media->getFilename();
-        }
-
-        $dimensions = $this->mediaOptions->getDimensions();
-        if (!isset($dimensions[$dimension])) {
-            return "";
-        }
-
-        $dimension = $dimensions[$dimension];
-
-        $filenameParts = explode(".", $media->getFilename());
-
-        $extension = array_pop($filenameParts);
-        $filename = implode(".", $filenameParts);
-
-        $filename .= '-'
-            . (($dimension['width'] == 'auto') ? '000' : $dimension['width'])
-            . 'x'
-            . (($dimension['height'] == 'auto') ? '000' : $dimension['height'])
-            . '.' . $extension;
-
-        if (!file_exists($media->getDirectory() . $filename)) {
-            return "";
-        }
-
-        return $this->mediaUrl . str_replace("data/media", "", $media->getDirectory()) . $filename;
     }
 
     /**
      * @param $mediaId
-     * @return Media
-     * @throws \Exception
+     * @param null $dimension
+     * @return string
      */
-    public function loadMedia($mediaId)
+    public function __invoke($mediaId, $dimension = null)
     {
-        if (!isset($this->cached[$mediaId])) {
-            $this->cached[$mediaId] = $this->mediaTableGateway->selectByPrimary((int) $mediaId);
-        }
-
-        return $this->cached[$mediaId];
+        return $this->mediaUrl->getUrl($mediaId, $dimension);
     }
 }

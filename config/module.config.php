@@ -50,6 +50,7 @@ return array(
             'Admin42\Link\MediaLink' => 'Admin42\Link\Adapter\Service\MediaLinkFactory',
 
             'Admin42\CrudOptionsPluginManager' => 'Admin42\Crud\Service\CrudOptionsPluginManagerFactory',
+            'Admin42\MediaUrl'         => 'Admin42\Media\Service\MediaUrlFactory',
         ),
     ),
 
