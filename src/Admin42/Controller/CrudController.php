@@ -95,6 +95,7 @@ class CrudController extends AbstractAdminController
 
             $formCommand = $this->getFormCommand();
             $model = $formCommand->setForm($createEditForm)
+                ->setTableOriginalData(true)
                 ->setCommand($cmd)
                 ->setData($prg)
                 ->run();
@@ -120,7 +121,7 @@ class CrudController extends AbstractAdminController
                 $data = $model->toArray();
                 foreach ($data as $name => $value) {
                     if (!is_string($value)) continue;
-                    
+
                     $var = json_decode($value, true);
                     if (is_array($var)) {
                         $data[$name] = Json::decode($value, Json::TYPE_ARRAY);
