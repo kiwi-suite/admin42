@@ -16,6 +16,7 @@ use Core42\Command\ConsoleAwareTrait;
 use Core42\Model\ModelInterface;
 use Core42\View\Model\MailModel;
 use Zend\Crypt\Password\Bcrypt;
+use Zend\Json\Json;
 use Zend\Validator\EmailAddress;
 use ZF\Console\Route;
 
@@ -116,6 +117,12 @@ class EditCommand extends AbstractCommand
      */
     protected function execute()
     {
+        foreach ($this->data as $name => $value) {
+            if (is_array($value)) {
+                $this->data[$name] = Json::encode($value);
+            }
+        }
+
         $this->model->populate($this->data);
         if ($this->model->hasChanged()) {
 

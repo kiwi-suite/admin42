@@ -16,6 +16,7 @@ use Core42\Command\ConsoleAwareTrait;
 use Core42\Model\ModelInterface;
 use Core42\View\Model\MailModel;
 use Zend\Crypt\Password\Bcrypt;
+use Zend\Json\Json;
 use Zend\Validator\EmailAddress;
 use ZF\Console\Route;
 
@@ -85,6 +86,12 @@ class CreateCommand extends AbstractCommand
     protected function execute()
     {
         $model = $this->getTableGateway($this->tableGatewayName)->getModel();
+
+        foreach ($this->data as $name => $value) {
+            if (is_array($value)) {
+                $this->data[$name] = Json::encode($value);
+            }
+        }
 
         if (method_exists($model, "getProperties")) {
             $dateTime = new \DateTime();

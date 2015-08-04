@@ -13,6 +13,7 @@ use Admin42\Crud\AbstractOptions;
 use Admin42\Mvc\Controller\AbstractAdminController;
 use Core42\View\Model\JsonModel;
 use Zend\Http\Response;
+use Zend\Json\Json;
 use Zend\View\Model\ViewModel;
 
 class CrudController extends AbstractAdminController
@@ -116,7 +117,17 @@ class CrudController extends AbstractAdminController
                     ->getTableGateway($this->getCrudOptions()->getTableGatewayName())
                     ->selectByPrimary((int) $this->params()->fromRoute("id"));
 
-                $createEditForm->setData($model->toArray());
+                $data = $model->toArray();
+                foreach ($data as $name => $value) {
+                    if (!is_string($value)) continue;
+                    
+                    $var = json_decode($value, true);
+                    if (is_array($var)) {
+                        $data[$name] = Json::decode($value, Json::TYPE_ARRAY);
+                    }
+                }
+
+                $createEditForm->setData($data);
             }
         }
 
