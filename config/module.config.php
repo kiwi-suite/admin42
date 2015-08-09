@@ -67,6 +67,7 @@ return array(
             'role'      => 'Admin42\FormElements\Service\RoleFactory',
             'dynamic'   => 'Admin42\FormElements\Service\DynamicFactory',
             'link'      => 'Admin42\FormElements\Service\LinkFactory',
+            'country'   => 'Admin42\FormElements\Service\CountryFactory',
         ),
     ),
 
