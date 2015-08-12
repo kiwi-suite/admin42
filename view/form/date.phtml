@@ -1,0 +1,34 @@
+<div class="form-group<?= ($this->hasErrors) ? ' has-error has-feedback' : ''?>">
+    <label for="<?= $this->element->getName() ?>" class="col-sm-2 control-label">
+        <?= $this->element->getLabel() ?>
+    </label>
+    <div class="col-sm-10">
+        <div class="input-group w-md" ng-controller="AdminDatepickerController">
+            <input type="hidden" name="<?= $this->element->getName() ?>" value="{{ <?= $this->admin()->generateAngularModelName($this->element->getName()) ?> | datetime:'':'YYYY-MM-DD'}}">
+            <?= $this->formText($this->element->setAttributes(array(
+                'class'         => 'form-control',
+                'id'            => $this->element->getName(),
+                'data-ng-model' => $this->admin()->generateAngularModelName($this->element->getName()),
+                'data-ng-initial' => '',
+                'data-datepicker-popup' => 'yyyy-MM-dd',
+                'data-is-open' => 'opened',
+                'data-datepicker-options' => 'dateOptions',
+                'data-close-text' => 'Close',
+                'disabled' => 'disabled'
+            ))) ?>
+            <span class="input-group-btn">
+                <button type="button" class="btn btn-default" ng-click="open($event)">
+                    <i class="fa fa-calendar"></i>
+                </button>
+            </span>
+        </div>
+        <?php if ($this->hasErrors): ?>
+            <span class="glyphicon glyphicon-warning-sign form-control-feedback"></span>
+            <ul class="list-unstyled text-danger">
+                <?php foreach($this->element->getMessages() as $message): ?>
+                    <li><?= $message ?></li>
+                <?php endforeach; ?>
+            </ul>
+        <?php endif; ?>
+    </div>
+</div>
