@@ -64,5 +64,7 @@ return [
                 'admin'                 => 'Admin42\View\Helper\Service\AdminFactory',
             ],
         ],
+
+        'whitelabel' => false,
     ],
 ];
