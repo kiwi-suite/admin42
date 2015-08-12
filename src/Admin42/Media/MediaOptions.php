@@ -21,6 +21,11 @@ class MediaOptions extends AbstractOptions
     protected $categories = [];
 
     /**
+     * @var string
+     */
+    protected $uploadHost = "";
+
+    /**
      * @param $path
      */
     public function setPath($path)
@@ -89,4 +94,22 @@ class MediaOptions extends AbstractOptions
     {
         return $this->categories;
     }
+
+    /**
+     * @return string
+     */
+    public function getUploadHost()
+    {
+        return $this->uploadHost;
+    }
+
+    /**
+     * @param string $uploadHost
+     */
+    public function setUploadHost($uploadHost)
+    {
+        $this->uploadHost = $uploadHost;
+    }
+
+
 }

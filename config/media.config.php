@@ -2,6 +2,7 @@
 
 return [
     'media' => [
+        'upload_host' => '',
         'path' => 'data/media/',
 
         'categories' => [

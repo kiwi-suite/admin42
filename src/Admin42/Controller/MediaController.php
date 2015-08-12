@@ -35,6 +35,7 @@ class MediaController extends AbstractAdminController
             'uploadForm' => $this->getForm('Admin42\Media\Upload'),
             'maxFileSize' => MaxUploadFileSize::getSize(),
             'mediaCategories' => $mediaOptions->getCategories(),
+            'uploadHost' => $mediaOptions->getUploadHost(),
         ]);
 
         if ($this->params('referrer') === "modal") {
