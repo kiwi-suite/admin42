@@ -12,7 +12,7 @@ angular.module('admin42')
             },
             controller: ['$scope', 'jsonCache', function($scope, jsonCache) {
                 $scope.data = {};
-                $scope.elements = jsonCache.get($scope.adminDynamicFormElements);
+                $scope.elements = angular.copy(jsonCache.get($scope.adminDynamicFormElements));
                 $scope.prototypes = jsonCache.get($scope.adminDynamicPrototypes);
 
                 $scope.data.selectedPrototype = $scope.prototypes[0];
