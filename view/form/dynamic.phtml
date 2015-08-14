@@ -1,6 +1,30 @@
 <?php
 $baseFormName = uniqid('dynamic_form/base') . '.html';
+
+if ($this->element->getOption("compact") === true) {
+    $baseFormContent = <<<EOT
+<fieldset ng-repeat="element in elements track by \$index">
+    <input type="hidden" name="{$this->element->getName()}[{{ element.internIndex }}][dynamic_index]" value="{{ \$index }}">
+    <input type="hidden" name="{$this->element->getName()}[{{ element.internIndex }}][dynamic_deleted]" ng-model="element.deleted" value="{{ element.deleted }}">
+    <input type="hidden" name="{$this->element->getName()}[{{ element.internIndex }}][dynamic_type]" ng-model="element.type" value="{{ element.type }}">
+    <ng-include src="element.templateName"></ng-include>
+    <div class="line b-b line-lg pull-in"></div>
+</fieldset>
+<div class="form-group">
+    <div class="col-sm-offset-9 col-sm-2 text-right">
+        <select ng-if="prototypes.length > 1" class="form-control" ng-model="data.selectedPrototype" ng-options="prototype.label for prototype in prototypes"></select>
+    </div>
+    <div class="col-sm-1 text-right">
+        <button class="btn btn-default" ng-click="addTemplate()" type="button">
+            {$this->translate('button.add', 'admin')}
+        </button>
+    </div>
+</div>
+<div class="line line-dashed b-b line-lg pull-in"></div>
+EOT;
+} else {
 $baseFormContent = <<<EOT
+<fieldset>
     <legend>{$this->element->getLabel()}</legend>
     <div ui-sortable="sortableOptions" ng-model="elements">
         <div class="sortable-container" ng-repeat="element in elements track by \$index">
@@ -47,7 +71,7 @@ $baseFormContent = <<<EOT
 </div>
 <div class="line line-dashed b-b line-lg pull-in"></div>
 EOT;
-
+}
 ?>
 <?php $this->admin()->addHtmlTemplate($baseFormName, $baseFormContent) ?>
 
