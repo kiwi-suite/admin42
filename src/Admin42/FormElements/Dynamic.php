@@ -22,7 +22,12 @@ class Dynamic extends Fieldset
     /**
      * @var string
      */
-    protected $templatePlaceholder = '{{ element.internIndex }}';
+    protected $templatePlaceholder = '{{ $index }}';
+
+    /**
+     * @var string
+     */
+    public static $parentNestedIndexId;
 
     /**
      * @var string
@@ -55,6 +60,11 @@ class Dynamic extends Fieldset
     protected $shouldCreateChildrenOnPrepareElement = true;
 
     /**
+     * @var
+     */
+    protected $indexId;
+
+    /**
      * @return string
      */
     public function getType()
@@ -82,6 +92,16 @@ class Dynamic extends Fieldset
     }
 
     /**
+     * @return string
+     */
+    public function getNestedFormIndexId() {
+        if(!$this->indexId) {
+            $this->indexId = 'nestedFormIndex'.uniqid();
+        }
+        return $this->indexId;
+    }
+
+    /**
      * Prepare the collection by adding a dummy template element if the user want one
      *
      * @param  FormInterface $form
@@ -100,12 +120,20 @@ class Dynamic extends Fieldset
         parent::prepareElement($form);
 
         $name = $this->getName();
+
+        var_dump(str_replace('{{ $index }}', static::$parentNestedIndexId, $name));
+
+        //$name = str_replace('$index', static::$parentNestedIndexId, $name);
+        $name = str_replace('{{ $index }}', '{{'.static::$parentNestedIndexId.'}}', $name);
+        $this->setName($name);
+
         $templateElements = $this->getTemplateElements();
         foreach ($templateElements as $elementOrFieldset) {
             $elementOrFieldset->setName($name . '[' . $elementOrFieldset->getName() . ']');
 
             // Recursively prepare elements
             if ($elementOrFieldset instanceof ElementPrepareAwareInterface) {
+                static::$parentNestedIndexId = $this->getNestedFormIndexId();
                 $elementOrFieldset->prepareElement($form);
             }
         }
