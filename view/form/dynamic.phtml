@@ -51,9 +51,8 @@ $baseFormContent = <<<EOT
                     </div>
                 </div>
                 <div collapse="element.collapsed" class="panel-body">
-                    <!--pre>{$stripName}[{{ \$index }}] &lt;- unparsed</pre-->
-                    <!--pre>Parent {$this->element->getIndexId()}: {{ parentIndexes.{$this->element->getIndexId()} }}</pre-->
                     <pre>{$this->element->getName()}[{{ element.hash }}]</pre>
+                    <pre>Index: {{ \$index }}</pre>
                     <input type="hidden" name="{$this->element->getName()}[{{ element.hash }}][dynamic_index]" value="{{ \$index }}">
                     <input type="hidden" name="{$this->element->getName()}[{{ element.hash }}][dynamic_deleted]" ng-model="element.deleted" value="{{ element.deleted }}">
                     <input type="hidden" name="{$this->element->getName()}[{{ element.hash }}][dynamic_type]" ng-model="element.type" value="{{ element.type }}">
