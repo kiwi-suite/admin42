@@ -1,11 +1,13 @@
 angular.module('admin42')
-    .directive('adminDynamicForm', [function() {
+    .directive('adminDynamicForm', function($rootScope) {
         return {
             restrict: 'A',
             scope: {
                 templateName: '@',
                 adminDynamicFormElements: '@',
-                adminDynamicPrototypes: '@'
+                adminDynamicPrototypes: '@',
+                parentIndexes: '=',
+                indexId: '@'
             },
             templateUrl: function(elem,attrs){
                 return attrs.baseForm;
@@ -17,9 +19,18 @@ angular.module('admin42')
 
                 $scope.data.selectedPrototype = $scope.prototypes[0];
 
+                $scope.makeid = function(){
+                    var text = "";
+                    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+                    for( var i=0; i<5; i++ ){
+                        text += possible.charAt(Math.floor(Math.random() * possible.length));
+                    }
+                    return text;
+                };
+
                 $scope.addTemplate = function() {
                     var element = angular.copy($scope.data.selectedPrototype);
-                    element.internIndex = $scope.elements.length;
+                    element.hash = $scope.makeid();
                     $scope.elements.push(element);
                 };
 
@@ -41,4 +52,4 @@ angular.module('admin42')
 
             }]
         };
-    }]);
+    });

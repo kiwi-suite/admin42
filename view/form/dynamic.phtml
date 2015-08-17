@@ -4,9 +4,9 @@ $baseFormName = uniqid('dynamic_form/base') . '.html';
 if ($this->element->getOption("compact") === true) {
     $baseFormContent = <<<EOT
 <fieldset ng-repeat="element in elements track by \$index">
-    <input type="hidden" name="{$this->element->getName()}[{{ element.internIndex }}][dynamic_index]" value="{{ \$index }}">
-    <input type="hidden" name="{$this->element->getName()}[{{ element.internIndex }}][dynamic_deleted]" ng-model="element.deleted" value="{{ element.deleted }}">
-    <input type="hidden" name="{$this->element->getName()}[{{ element.internIndex }}][dynamic_type]" ng-model="element.type" value="{{ element.type }}">
+    <input type="hidden" name="{$this->element->getName()}[{{ element.hash }}][dynamic_index]" value="{{ \$index }}">
+    <input type="hidden" name="{$this->element->getName()}[{{ element.hash }}][dynamic_deleted]" ng-model="element.deleted" value="{{ element.deleted }}">
+    <input type="hidden" name="{$this->element->getName()}[{{ element.hash }}][dynamic_type]" ng-model="element.type" value="{{ element.type }}">
     <ng-include src="element.templateName"></ng-include>
     <div class="line b-b line-lg pull-in"></div>
 </fieldset>
@@ -28,7 +28,7 @@ $baseFormContent = <<<EOT
 <fieldset>
     <legend>{$this->element->getLabel()}</legend>
     <div ui-sortable="sortableOptions" ng-model="elements">
-        <div class="sortable-container" ng-repeat="element in elements track by \$index" ng-init="{$this->element->getNestedFormIndexId()}=\$index" >
+        <div class="sortable-container" ng-repeat="element in elements" ng-init="parentIndexes.{$this->element->getIndexId()} = element.hash">
             <div class="panel panel-default" ng-class="{'marked-deleted' : element.deleted}">
                 <div class="panel-heading">
                     <div class="pull-right">
@@ -51,12 +51,12 @@ $baseFormContent = <<<EOT
                     </div>
                 </div>
                 <div collapse="element.collapsed" class="panel-body">
-                    <pre>{$this->element->getName()}[{{ \$index }}]</pre>
-                    <pre>{$stripName}[{{ \$index }}]</pre>
-                    <pre>{$this->element->getNestedFormIndexId()}: {{ {$this->element->getNestedFormIndexId()} }}</pre>
-                    <input type="hidden" name="{$this->element->getName()}[{{ \$index }}][dynamic_index]" value="{{ \$index }}">
-                    <input type="hidden" name="{$this->element->getName()}[{{ \$index }}][dynamic_deleted]" ng-model="element.deleted" value="{{ element.deleted }}">
-                    <input type="hidden" name="{$this->element->getName()}[{{ \$index }}][dynamic_type]" ng-model="element.type" value="{{ element.type }}">
+                    <!--pre>{$stripName}[{{ \$index }}] &lt;- unparsed</pre-->
+                    <!--pre>Parent {$this->element->getIndexId()}: {{ parentIndexes.{$this->element->getIndexId()} }}</pre-->
+                    <pre>{$this->element->getName()}[{{ element.hash }}]</pre>
+                    <input type="hidden" name="{$this->element->getName()}[{{ element.hash }}][dynamic_index]" value="{{ \$index }}">
+                    <input type="hidden" name="{$this->element->getName()}[{{ element.hash }}][dynamic_deleted]" ng-model="element.deleted" value="{{ element.deleted }}">
+                    <input type="hidden" name="{$this->element->getName()}[{{ element.hash }}][dynamic_type]" ng-model="element.type" value="{{ element.type }}">
                     <ng-include src="element.templateName"></ng-include>
                 </div>
             </div>
@@ -95,7 +95,7 @@ $prototypesElements = [];
         'type' => $element['element']->getOption('dynamic_type'),
         'name' => $element['element']->getName(),
         'initial' => true,
-        'internIndex' => $element['element']->getOption('internIndex'),
+        'hash' => $element['element']->getOption('hash'),
     ];
     ?>
 
@@ -113,7 +113,7 @@ $prototypesElements = [];
         'type' => $element['element']->getOption('dynamic_type'),
         'name' => $element['element']->getName(),
         'initial' => false,
-        'internIndex' => 0,
+        'hash' => 0,
     ];
     ?>
 
@@ -128,4 +128,4 @@ $prototypeFormUniqueId = uniqid('dynamic_form/prototype') . '.json';
 $this->admin()->addJsonTemplate($prototypeFormUniqueId, $prototypesElements);
 
 ?>
-<div base-form="<?= $baseFormName ?>" admin-dynamic-form admin-dynamic-form-elements="<?= $prepareFormUniqueId ?>" admin-dynamic-prototypes="<?= $prototypeFormUniqueId ?>"></div>
+<div base-form="<?= $baseFormName ?>" admin-dynamic-form admin-dynamic-form-elements="<?= $prepareFormUniqueId ?>" parent-indexes="parentIndexes" admin-dynamic-prototypes="<?= $prototypeFormUniqueId ?>"></div>
