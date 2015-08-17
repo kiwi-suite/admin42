@@ -27,11 +27,6 @@ class Dynamic extends Fieldset
     /**
      * @var string
      */
-    public static $parentIndexId;
-
-    /**
-     * @var string
-     */
     protected $templatePlaceholderName = "";
 
     /**
@@ -60,9 +55,14 @@ class Dynamic extends Fieldset
     protected $shouldCreateChildrenOnPrepareElement = true;
 
     /**
+     * @var string
+     */
+    public static $parentHashId;
+
+    /**
      * @var
      */
-    protected $indexId;
+    protected $hashId;
 
     /**
      * @return string
@@ -94,11 +94,11 @@ class Dynamic extends Fieldset
     /**
      * @return string
      */
-    public function getIndexId() {
-        if(!$this->indexId) {
-            $this->indexId = 'pi'.uniqid();
+    public function getHashId() {
+        if(!$this->hashId) {
+            $this->hashId = 'ph'.uniqid();
         }
-        return $this->indexId;
+        return $this->hashId;
     }
 
     /**
@@ -121,7 +121,7 @@ class Dynamic extends Fieldset
 
         $name = $this->getName();
 
-        $name = str_replace('{{ element.hash }}', '{{ parentIndexes.'.static::$parentIndexId.' }}', $name);
+        $name = str_replace('element.hash', 'parentHashes.'.static::$parentHashId, $name);
         $this->setName($name);
 
         $templateElements = $this->getTemplateElements();
@@ -130,7 +130,7 @@ class Dynamic extends Fieldset
 
             // Recursively prepare elements
             if ($elementOrFieldset instanceof ElementPrepareAwareInterface) {
-                static::$parentIndexId = $this->getIndexId();
+                static::$parentHashId = $this->getHashId();
                 $elementOrFieldset->prepareElement($form);
             }
         }

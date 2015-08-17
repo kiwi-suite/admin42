@@ -28,7 +28,7 @@ $baseFormContent = <<<EOT
 <fieldset>
     <legend>{$this->element->getLabel()}</legend>
     <div ui-sortable="sortableOptions" ng-model="elements">
-        <div class="sortable-container" ng-repeat="element in elements" ng-init="parentIndexes.{$this->element->getIndexId()} = element.hash">
+        <div class="sortable-container" ng-repeat="element in elements" ng-init="parentHashes.{$this->element->getHashId()} = element.hash">
             <div class="panel panel-default" ng-class="{'marked-deleted' : element.deleted}">
                 <div class="panel-heading">
                     <div class="pull-right">
@@ -127,4 +127,4 @@ $prototypeFormUniqueId = uniqid('dynamic_form/prototype') . '.json';
 $this->admin()->addJsonTemplate($prototypeFormUniqueId, $prototypesElements);
 
 ?>
-<div base-form="<?= $baseFormName ?>" admin-dynamic-form admin-dynamic-form-elements="<?= $prepareFormUniqueId ?>" parent-indexes="parentIndexes" admin-dynamic-prototypes="<?= $prototypeFormUniqueId ?>"></div>
+<div base-form="<?= $baseFormName ?>" admin-dynamic-form admin-dynamic-form-elements="<?= $prepareFormUniqueId ?>" parent-hashes="parentHashes" admin-dynamic-prototypes="<?= $prototypeFormUniqueId ?>"></div>

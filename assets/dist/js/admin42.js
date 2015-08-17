@@ -134,14 +134,14 @@ angular.module('admin42')
                 };
     }]);
 ;angular.module('admin42')
-    .directive('adminDynamicForm', function($rootScope) {
+    .directive('adminDynamicForm', function() {
         return {
             restrict: 'A',
             scope: {
                 templateName: '@',
                 adminDynamicFormElements: '@',
                 adminDynamicPrototypes: '@',
-                parentIndexes: '='
+                parentHashes: '='
             },
             templateUrl: function(elem,attrs){
                 return attrs.baseForm;
