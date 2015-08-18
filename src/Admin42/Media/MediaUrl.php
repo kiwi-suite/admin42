@@ -68,7 +68,7 @@ class MediaUrl extends AbstractHelper
             . 'x'
             . (($dimension['height'] == 'auto') ? '000' : $dimension['height'])
             . '.' . $extension;
-        
+
 
         return $this->mediaUrl . str_replace("data/media", "", $media->getDirectory()) . $filename;
     }

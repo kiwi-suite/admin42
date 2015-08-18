@@ -4,7 +4,7 @@
     "require": {
         "php": ">=5.5",
         "ext-fileinfo": "*",
-        "zendframework/zendframework": "=2.5.0",
+        "zendframework/zendframework": "=2.5.2",
         "fruit42/core42": "dev-feature/core2.0",
         "imagine/imagine": "dev-master"
     },
