@@ -4,9 +4,8 @@
     "require": {
         "php": ">=5.5",
         "ext-fileinfo": "*",
-        "zendframework/zendframework": "=2.5.2",
-        "fruit42/core42": "dev-feature/core2.0",
-        "imagine/imagine": "dev-master"
+        "fruit42/core42": "2.0.*",
+        "imagine/imagine": "0.6.2"
     },
     "autoload": {
         "psr-0": {
