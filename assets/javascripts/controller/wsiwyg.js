@@ -20,6 +20,7 @@ angular.module('admin42')
             skin: 'lightgray',
             theme: 'modern',
             elementpath: false,
+            convert_urls: false,
             resize: true
         };
 
