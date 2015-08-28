@@ -92,13 +92,13 @@ class Link extends AbstractHelper
             return;
         }
 
-        if (!$this->cache->hasItem($linkId)) {
+        if (!$this->cache->hasItem('link_'. $linkId)) {
             $this->cache->setItem(
-                $linkId,
+                'link_'. $linkId,
                 $this->linkTableGateway->selectByPrimary($linkId)
             );
         }
 
-        return $this->cache->getItem($linkId);
+        return $this->cache->getItem('link_'. $linkId);
     }
 }

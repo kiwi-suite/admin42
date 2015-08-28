@@ -10,6 +10,7 @@
 namespace Admin42\View\Helper;
 
 use Admin42\TableGateway\MediaTableGateway;
+use Zend\Cache\Storage\StorageInterface;
 use Zend\View\Helper\AbstractHelper;
 
 class Media extends AbstractHelper
@@ -20,16 +21,18 @@ class Media extends AbstractHelper
     protected $mediaTableGateway;
 
     /**
-     * @var array
+     * @var StorageInterface
      */
-    protected $cachedMedia = [];
+    protected $cache;
 
     /**
      * @param MediaTableGateway $mediaTableGateway
      */
-    public function __construct(MediaTableGateway $mediaTableGateway)
+    public function __construct(MediaTableGateway $mediaTableGateway, StorageInterface $cache)
     {
         $this->mediaTableGateway = $mediaTableGateway;
+
+        $this->cache = $cache;
     }
 
     /**
@@ -52,10 +55,16 @@ class Media extends AbstractHelper
      */
     public function getMedia($mediaId)
     {
-        if (!isset($this->cachedMedia[$mediaId])) {
-            $this->cachedMedia[$mediaId] = $this->mediaTableGateway->selectByPrimary((int) $mediaId);
+        if (empty($mediaId)) {
+            return ;
+        }
+        if (!$this->cache->hasItem('media_'. $mediaId)) {
+            $this->cache->setItem(
+                'media_'. $mediaId,
+                $this->mediaTableGateway->selectByPrimary((int) $mediaId)
+            );
         }
 
-        return $this->cachedMedia[$mediaId];
+        return $this->cache->getItem('media_'. $mediaId);
     }
 }
