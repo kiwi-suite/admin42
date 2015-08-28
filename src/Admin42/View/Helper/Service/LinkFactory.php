@@ -26,7 +26,8 @@ class LinkFactory implements FactoryInterface
     {
         $linkTableGateway = $serviceLocator->getServiceLocator()->get('TableGateway')->get('Admin42\Link');
         $linkProvider = $serviceLocator->getServiceLocator()->get('Admin42\LinkProvider');
+        $cache = $serviceLocator->getServiceLocator()->get('Cache\Link');
 
-        return new Link($linkTableGateway, $linkProvider);
+        return new Link($linkTableGateway, $linkProvider, $cache);
     }
 }
