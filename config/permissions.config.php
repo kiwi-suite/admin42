@@ -32,7 +32,8 @@ return array(
                                 'route/admin/login',
                                 'route/admin/lost-password',
                                 'route/admin/recover-password',
-                                'route/home'
+                                'route/home',
+                                'route/admin/api/job',
                             ),
                         ),
                     ),
