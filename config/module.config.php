@@ -53,6 +53,7 @@ return array(
             'Admin42\MediaUrl'         => 'Admin42\Media\Service\MediaUrlFactory',
 
             'Admin42\Crud\EventManager' => 'Admin42\Crud\Service\EventManagerFactory',
+            'Admin42\Media\EventManager' => 'Admin42\Media\Service\EventManagerFactory',
         ),
     ),
 
