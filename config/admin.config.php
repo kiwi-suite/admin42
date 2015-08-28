@@ -3,6 +3,7 @@ namespace Admin42;
 
 return [
     'admin' => [
+        'job_auth' => '',
         'angular' => [
             'modules' => ['admin42']
         ],

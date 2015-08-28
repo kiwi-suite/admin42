@@ -1,6 +1,7 @@
 <?php
 namespace Admin42\Command\Media;
 
+use Admin42\Media\MediaEvent;
 use Admin42\Model\Media;
 use Core42\Command\AbstractCommand;
 use Imagine\Image\Box;
@@ -210,6 +211,11 @@ class ImageCropCommand extends AbstractCommand
             $this->media->setUpdated(new \DateTime());
         }
         $this->getTableGateway('Admin42\Media')->update($this->media);
+
+        $this
+            ->getServiceManager()
+            ->get('Admin42\Media\EventManager')
+            ->trigger(MediaEvent::EVENT_CROP, $media);
 
         return $media;
     }

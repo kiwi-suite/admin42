@@ -18,7 +18,10 @@ class LinkProviderFactory implements FactoryInterface
     {
         $config = $serviceLocator->get('config')['link'];
 
-        $linkProvider = new LinkProvider();
+        $linkProvider = new LinkProvider(
+            $serviceLocator->get('TableGateway')->get('Admin42\Link'),
+            $serviceLocator->get('Cache\Link')
+        );
 
         foreach ($config['adapter'] as $name => $service) {
             $linkProvider->addAdapter($name, $serviceLocator->get($service));

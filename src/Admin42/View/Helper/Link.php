@@ -11,6 +11,7 @@ namespace Admin42\View\Helper;
 
 use Admin42\Link\LinkProvider;
 use Admin42\TableGateway\LinkTableGateway;
+use Zend\Cache\Storage\StorageInterface;
 use Zend\Json\Json;
 use Zend\View\Helper\AbstractHelper;
 
@@ -27,19 +28,24 @@ class Link extends AbstractHelper
     protected $linkProvider;
 
     /**
-     * @var array
+     * @var StorageInterface
      */
-    protected $cachedLinks = [];
+    protected $cache;
 
     /**
      * @param LinkTableGateway $linkTableGateway
      * @param LinkProvider $linkProvider
      */
-    public function __construct(LinkTableGateway $linkTableGateway, LinkProvider $linkProvider)
-    {
+    public function __construct(
+        LinkTableGateway $linkTableGateway,
+        LinkProvider $linkProvider,
+        StorageInterface $cache
+    ) {
         $this->linkTableGateway = $linkTableGateway;
 
         $this->linkProvider = $linkProvider;
+
+        $this->cache = $cache;
     }
 
     /**
@@ -57,7 +63,7 @@ class Link extends AbstractHelper
             return "";
         }
 
-        return $this->linkProvider->assemble($link->getType(), Json::decode($link->getValue(), Json::TYPE_ARRAY));
+        return $this->linkProvider->assembleById($linkId);
     }
 
     /**
@@ -81,10 +87,18 @@ class Link extends AbstractHelper
      */
     public function getLink($linkId)
     {
-        if (!isset($this->cachedLinks[$linkId])) {
-            $this->cachedLinks[$linkId] = $this->linkTableGateway->selectByPrimary((int) $linkId);
+        $linkId = (int) $linkId;
+        if (empty($linkId)) {
+            return;
         }
 
-        return $this->cachedLinks[$linkId];
+        if (!$this->cache->hasItem($linkId)) {
+            $this->cache->setItem(
+                $linkId,
+                $this->linkTableGateway->selectByPrimary($linkId)
+            );
+        }
+
+        return $this->cache->getItem($linkId);
     }
 }

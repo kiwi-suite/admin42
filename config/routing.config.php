@@ -212,6 +212,16 @@ return array(
                                     ),
                                 ),
                             ),
+                            'job' => array(
+                                'type' => 'Zend\Mvc\Router\Http\Segment',
+                                'options' => array(
+                                    'route' => 'job/',
+                                    'defaults' => array(
+                                        'action' => 'run',
+                                        'controller' => __NAMESPACE__ . '\Api\Job',
+                                    ),
+                                ),
+                            ),
                             'notification' => array(
                                 'type' => 'Zend\Mvc\Router\Http\Literal',
                                 'options' => array(
