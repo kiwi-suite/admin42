@@ -86,11 +86,11 @@ class LinkProvider
             return "";
         }
 
-        if (!$this->cache->hasItem($id)) {
+        if (!$this->cache->hasItem('link_'. $id)) {
             $link = $this->linkTableGateway->selectByPrimary((int) $id);
-            $this->cache->setItem($id, $link);
+            $this->cache->setItem('link_'. $id, $link);
         }
-        $link = $this->cache->getItem($id);
+        $link = $this->cache->getItem('link_'. $id);
         if (empty($link)) {
             return "";
         }

@@ -90,13 +90,13 @@ class MediaUrl extends AbstractHelper
         if (empty($mediaId)) {
             return ;
         }
-        if (!$this->cache->hasItem($mediaId)) {
+        if (!$this->cache->hasItem('media_'. $mediaId)) {
             $this->cache->setItem(
-                $mediaId,
+                'media_'. $mediaId,
                 $this->mediaTableGateway->selectByPrimary((int) $mediaId)
             );
         }
 
-        return $this->cache->getItem($mediaId);
+        return $this->cache->getItem('media_'. $mediaId);
     }
 }

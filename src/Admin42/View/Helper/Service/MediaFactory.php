@@ -25,7 +25,8 @@ class MediaFactory implements FactoryInterface
     public function createService(ServiceLocatorInterface $serviceLocator)
     {
         $mediaTableGateway = $serviceLocator->getServiceLocator()->get('TableGateway')->get('Admin42\Media');
+        $cache = $serviceLocator->getServiceLocator()->get('Cache\Media');
 
-        return new Media($mediaTableGateway);
+        return new Media($mediaTableGateway, $cache);
     }
 }
