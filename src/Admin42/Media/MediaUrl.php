@@ -77,7 +77,7 @@ class MediaUrl extends AbstractHelper
             . '.' . $extension;
 
 
-        return $this->mediaUrl . str_replace("data/media", "", $media->getDirectory()) . $filename;
+        return $this->mediaUrl . str_replace("data/media", "", $media->getDirectory()) . rawurlencode($filename);
     }
 
     /**
