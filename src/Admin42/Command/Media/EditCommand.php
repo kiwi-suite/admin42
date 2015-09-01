@@ -170,6 +170,8 @@ class EditCommand extends AbstractCommand
             */
         }
 
+        $this->getServiceManager()->get('Cache\Media')->removeItem('media_'. $this->media->getId());
+
         return $this->media;
     }
 }
