@@ -19,7 +19,8 @@ class MediaUrlFactory implements FactoryInterface
         return new MediaUrl(
             $serviceLocator->get('TableGateway')->get('Admin42\Media'),
             $serviceLocator->get('Admin42\MediaOptions'),
-            $serviceLocator->get('config')['media_url']
+            $serviceLocator->get('config')['media_url'],
+            $serviceLocator->get('Cache\Media')
         );
     }
 }

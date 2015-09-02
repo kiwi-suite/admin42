@@ -9,13 +9,8 @@
 
 namespace Admin42\FormElements;
 
-class DateTime extends \Zend\Form\Element\DateTime
+class Date extends \Zend\Form\Element\Date
 {
-    /**
-     * @var string
-     */
-    protected $format = 'Y-m-d H:iP';
-
     /**
      * @return array
      */

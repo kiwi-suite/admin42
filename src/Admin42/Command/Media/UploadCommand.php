@@ -9,6 +9,7 @@
 
 namespace Admin42\Command\Media;
 
+use Admin42\Media\MediaEvent;
 use Admin42\Model\Media;
 use Core42\Command\AbstractCommand;
 
@@ -88,6 +89,10 @@ class UploadCommand extends AbstractCommand
             ->setCreated($dateTime);
 
         $this->getTableGateway('Admin42\Media')->insert($media);
+        $this
+            ->getServiceManager()
+            ->get('Admin42\Media\EventManager')
+            ->trigger(MediaEvent::EVENT_ADD, $media);
 
         if (substr($media->getMimeType(), 0, 6) == "image/") {
             $mediaOptions = $this->getServiceManager()->get('Admin42\MediaOptions');

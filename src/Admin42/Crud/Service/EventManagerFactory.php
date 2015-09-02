@@ -7,26 +7,27 @@
  *
  */
 
-namespace Admin42\View\Helper\Service;
+namespace Admin42\Crud\Service;
 
-use Admin42\View\Helper\Media;
+use Admin42\Crud\CrudEvent;
+use Zend\EventManager\EventManager;
 use Zend\ServiceManager\FactoryInterface;
 use Zend\ServiceManager\ServiceLocatorInterface;
 
-class MediaFactory implements FactoryInterface
+class EventManagerFactory implements FactoryInterface
 {
 
     /**
      * Create service
      *
      * @param ServiceLocatorInterface $serviceLocator
-     * @return Admin
+     * @return mixed
      */
     public function createService(ServiceLocatorInterface $serviceLocator)
     {
-        $mediaTableGateway = $serviceLocator->getServiceLocator()->get('TableGateway')->get('Admin42\Media');
-        $cache = $serviceLocator->getServiceLocator()->get('Cache\Media');
+        $eventManager = new EventManager();
+        $eventManager->setEventClass(new CrudEvent());
 
-        return new Media($mediaTableGateway, $cache);
+        return $eventManager;
     }
 }

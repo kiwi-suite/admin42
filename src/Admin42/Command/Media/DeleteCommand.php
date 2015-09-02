@@ -9,6 +9,7 @@
 
 namespace Admin42\Command\Media;
 
+use Admin42\Media\MediaEvent;
 use Admin42\Model\Media;
 use Core42\Command\AbstractCommand;
 
@@ -80,5 +81,12 @@ class DeleteCommand extends AbstractCommand
         @rmdir($this->media->getDirectory());
 
         $this->getTableGateway('Admin42\Media')->delete($this->media);
+
+        $this
+            ->getServiceManager()
+            ->get('Admin42\Media\EventManager')
+            ->trigger(MediaEvent::EVENT_DELETE, $this->media);
+
+        $this->getServiceManager()->get('Cache\Media')->removeItem('media_'. $this->media->getId());
     }
 }

@@ -1,5 +1,4 @@
 <?php
-$jsonDataId = uniqid('form/select/') . '.json';
 $values = [];
 foreach ($this->element->getValueOptions() as $id => $value) {
     $values[] = [
@@ -7,6 +6,7 @@ foreach ($this->element->getValueOptions() as $id => $value) {
         'label' => $value
     ];
 }
+$jsonDataId = 'form/select/' . md5(json_encode($values)) . '.json';
 $this->admin()->addJsonTemplate($jsonDataId, $values)
 ?>
 <div

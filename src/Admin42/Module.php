@@ -34,6 +34,7 @@ class Module implements ConfigProviderInterface, BootstrapListenerInterface
             include __DIR__ . '/../../config/translation.config.php',
             include __DIR__ . '/../../config/admin.config.php',
             include __DIR__ . '/../../config/media.config.php',
+            include __DIR__ . '/../../config/caches.config.php',
             include __DIR__ . '/../../config/routing.config.php'
         );
     }

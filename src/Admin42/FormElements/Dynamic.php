@@ -22,7 +22,7 @@ class Dynamic extends Fieldset
     /**
      * @var string
      */
-    protected $templatePlaceholder = '{{ element.internIndex }}';
+    protected $templatePlaceholder = '{{ element.hash }}';
 
     /**
      * @var string
@@ -55,6 +55,16 @@ class Dynamic extends Fieldset
     protected $shouldCreateChildrenOnPrepareElement = true;
 
     /**
+     * @var string
+     */
+    public static $parentHashId;
+
+    /**
+     * @var
+     */
+    protected $hashId;
+
+    /**
      * @return string
      */
     public function getType()
@@ -82,6 +92,16 @@ class Dynamic extends Fieldset
     }
 
     /**
+     * @return string
+     */
+    public function getHashId() {
+        if(!$this->hashId) {
+            $this->hashId = 'ph'.uniqid();
+        }
+        return $this->hashId;
+    }
+
+    /**
      * Prepare the collection by adding a dummy template element if the user want one
      *
      * @param  FormInterface $form
@@ -100,12 +120,17 @@ class Dynamic extends Fieldset
         parent::prepareElement($form);
 
         $name = $this->getName();
+
+        $name = str_replace('element.hash', 'parentHashes.'.static::$parentHashId, $name);
+        $this->setName($name);
+
         $templateElements = $this->getTemplateElements();
         foreach ($templateElements as $elementOrFieldset) {
             $elementOrFieldset->setName($name . '[' . $elementOrFieldset->getName() . ']');
 
             // Recursively prepare elements
             if ($elementOrFieldset instanceof ElementPrepareAwareInterface) {
+                static::$parentHashId = $this->getHashId();
                 $elementOrFieldset->prepareElement($form);
             }
         }
@@ -207,7 +232,7 @@ class Dynamic extends Fieldset
 
         $elementOrFieldset = clone ($this->targetElements[$name]);
         $elementOrFieldset->setName($formName);
-        $elementOrFieldset->setOption("internIndex", $formName);
+        $elementOrFieldset->setOption("hash", $formName);
 
         $this->add($elementOrFieldset);
 

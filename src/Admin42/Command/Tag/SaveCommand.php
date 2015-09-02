@@ -39,6 +39,7 @@ class SaveCommand extends AbstractCommand
             if ($result->count() == 0) {
                 $newTag = new Tag();
                 $newTag->setTag($tag);
+                $newTag->setCreated(new \DateTime());
                 $tagsTableGateway->insert($newTag);
             }
         }

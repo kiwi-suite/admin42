@@ -2,6 +2,9 @@
 namespace Admin42\Link;
 
 use Admin42\Link\Adapter\AdapterInterface;
+use Admin42\TableGateway\LinkTableGateway;
+use Zend\Cache\Storage\StorageInterface;
+use Zend\Json\Json;
 
 class LinkProvider
 {
@@ -9,6 +12,23 @@ class LinkProvider
      * @var AdapterInterface[]
      */
     protected $adapter = [];
+
+    /**
+     * @var LinkTableGateway
+     */
+    protected $linkTableGateway;
+
+    /**
+     * @var StorageInterface
+     */
+    protected $cache;
+
+    public function __construct(LinkTableGateway $linkTableGateway, StorageInterface $cache)
+    {
+        $this->linkTableGateway = $linkTableGateway;
+
+        $this->cache = $cache;
+    }
 
     /**
      * @param string $name
@@ -53,5 +73,28 @@ class LinkProvider
     public function getDisplayName($name, $value)
     {
         return $this->adapter[$name]->getDisplayName($value);
+    }
+
+    /**
+     * @param int $id
+     * @return string
+     * @throws \Exception
+     */
+    public function assembleById($id)
+    {
+        if (empty($id)) {
+            return "";
+        }
+
+        if (!$this->cache->hasItem('link_'. $id)) {
+            $link = $this->linkTableGateway->selectByPrimary((int) $id);
+            $this->cache->setItem('link_'. $id, $link);
+        }
+        $link = $this->cache->getItem('link_'. $id);
+        if (empty($link)) {
+            return "";
+        }
+
+        return $this->assemble($link->getType(), Json::decode($link->getValue(), Json::TYPE_ARRAY));
     }
 }

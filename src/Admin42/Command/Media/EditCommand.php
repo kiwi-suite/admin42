@@ -1,6 +1,7 @@
 <?php
 namespace Admin42\Command\Media;
 
+use Admin42\Media\MediaEvent;
 use Admin42\Model\Media;
 use Core42\Command\AbstractCommand;
 use Core42\Command\ConsoleAwareTrait;
@@ -141,6 +142,11 @@ class EditCommand extends AbstractCommand
             ->setKeywords($this->keywords)
             ->setUpdated(new \DateTime());
 
+        $this
+            ->getServiceManager()
+            ->get('Admin42\Media\EventManager')
+            ->trigger(MediaEvent::EVENT_EDIT_PRE, $this->media);
+
         $this->getTableGateway('Admin42\Media')->update($this->media);
 
         if (!empty($this->keywords)) {
@@ -149,6 +155,10 @@ class EditCommand extends AbstractCommand
             $cmd->setTags($this->keywords)
                 ->run();
         }
+        $this
+            ->getServiceManager()
+            ->get('Admin42\Media\EventManager')
+            ->trigger(MediaEvent::EVENT_EDIT_POST, $this->media);
 
         if (!empty($this->uploadData)) {
             /* @var UploadCommand $cmd */
@@ -159,6 +169,8 @@ class EditCommand extends AbstractCommand
                 ->run();
             */
         }
+
+        $this->getServiceManager()->get('Cache\Media')->removeItem('media_'. $this->media->getId());
 
         return $this->media;
     }

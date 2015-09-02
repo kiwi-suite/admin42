@@ -134,13 +134,14 @@ angular.module('admin42')
                 };
     }]);
 ;angular.module('admin42')
-    .directive('adminDynamicForm', [function() {
+    .directive('adminDynamicForm', function() {
         return {
             restrict: 'A',
             scope: {
                 templateName: '@',
                 adminDynamicFormElements: '@',
-                adminDynamicPrototypes: '@'
+                adminDynamicPrototypes: '@',
+                parentHashes: '='
             },
             templateUrl: function(elem,attrs){
                 return attrs.baseForm;
@@ -152,9 +153,18 @@ angular.module('admin42')
 
                 $scope.data.selectedPrototype = $scope.prototypes[0];
 
+                $scope.makeid = function(){
+                    var text = "";
+                    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+                    for( var i=0; i<8; i++ ){
+                        text += possible.charAt(Math.floor(Math.random() * possible.length));
+                    }
+                    return text;
+                };
+
                 $scope.addTemplate = function() {
                     var element = angular.copy($scope.data.selectedPrototype);
-                    element.internIndex = $scope.elements.length;
+                    element.hash = $scope.makeid();
                     $scope.elements.push(element);
                 };
 
@@ -176,7 +186,7 @@ angular.module('admin42')
 
             }]
         };
-    }]);
+    });
 ;angular.module('admin42').directive('dynamicModel', ['$compile', function ($compile) {
     return {
         'link': function(scope, element, attrs) {
@@ -1333,6 +1343,7 @@ angular.module('admin42')
             skin: 'lightgray',
             theme: 'modern',
             elementpath: false,
+            convert_urls: false,
             resize: true
         };
 

@@ -10,6 +10,7 @@
 namespace Admin42\Command\Crud;
 
 use Admin42\Command\Mail\SendCommand;
+use Admin42\Crud\CrudEvent;
 use Admin42\Model\User;
 use Core42\Command\AbstractCommand;
 use Core42\Command\ConsoleAwareTrait;
@@ -135,7 +136,17 @@ class EditCommand extends AbstractCommand
                 }
             }
 
+            $this
+                ->getServiceManager()
+                ->get('Admin42\Crud\EventManager')
+                ->trigger(CrudEvent::EVENT_EDIT_PRE, $this->model);
+
             $this->getTableGateway($this->tableGatewayName)->update($this->model);
+
+            $this
+                ->getServiceManager()
+                ->get('Admin42\Crud\EventManager')
+                ->trigger(CrudEvent::EVENT_EDIT_POST, $this->model);
 
         }
 
