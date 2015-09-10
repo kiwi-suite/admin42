@@ -29,7 +29,6 @@ $id = uniqid("tags_");
             </ui-select-choices>
         </ui-select>
         <input type="hidden" name="<?= $this->element->getName() ?>" value="{{tags.fieldValue}}">
-        <!-- p>Selected: {{tags.selectedTags | json}}</p -->
 
         <?php if ($this->hasErrors): ?>
             <span class="glyphicon glyphicon-warning-sign form-control-feedback"></span>

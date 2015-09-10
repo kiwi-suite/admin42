@@ -26,6 +26,8 @@ angular.module('admin42')
             $scope.tags.fieldValue = fieldValue.substring(0, fieldValue.length - 1);
         };
 
+        $scope.updateHiddenField();
+
         $scope.refreshTags = function(tag) {
 
             $scope.tags.tags = [];
