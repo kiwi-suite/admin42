@@ -101,7 +101,7 @@
                     <input st-search="filename" placeholder="<?= $this->translate('search.name', 'admin') ?>" class="form-control input-sm" type="text"/>
                 </th>
                 <th>
-                    <select id="categorySearchSelect" st-search="category" class="form-control" ng-model="category">
+                    <select id="categorySearchSelect" st-input-event="change" st-search42="category" class="form-control" ng-model="category">
                         <?php foreach($this->mediaCategories as $key => $value): ?>
                             <option value="<?= $key ?>" <?= ($key == $this->params("category") ? "selected" : "")?>><?= $this->translate($value, 'admin')?></option>
                         <?php endforeach; ?>
