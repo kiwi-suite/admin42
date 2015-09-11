@@ -11,6 +11,7 @@
             'id'            => $this->element->getName(),
             'data-ng-model' => $this->admin()->generateAngularModelName($this->element->getName()),
             'data-ng-initial' => '',
+            'rows' => 6
         ))) ?>
         <?php if ($this->hasErrors): ?>
             <span class="glyphicon glyphicon-warning-sign form-control-feedback"></span>

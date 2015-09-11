@@ -1,22 +1,17 @@
-/**
- * modified stSearch directive for smart-tables
- * remove as soon as fixes are available from original vendor
- * fixes: multiple preset search input values
- */
-
 angular.module('smart-table')
-    .directive('stSearch42', ['stConfig', '$timeout', function (stConfig, $timeout) {
+    .directive('stSearch42', ['stConfig', '$timeout','$parse', function (stConfig, $timeout, $parse) {
         return {
             require: '^stTable',
             link: function (scope, element, attr, ctrl) {
                 var tableCtrl = ctrl;
                 var promise = null;
                 var throttle = attr.stDelay || stConfig.search.delay;
+                var event = attr.stInputEvent || stConfig.search.inputEvent;
 
                 attr.$observe('stSearch42', function (newValue, oldValue) {
                     var input = element[0].value;
                     if (newValue !== oldValue && input) {
-                        //ctrl.tableState().search = {}; // TODO: @lcs: this prevents multiple preset values from working
+                        //ctrl.tableState().search = {};
                         tableCtrl.search(input, newValue);
                     }
                 });
@@ -26,13 +21,13 @@ angular.module('smart-table')
                     return ctrl.tableState().search;
                 }, function (newValue, oldValue) {
                     var predicateExpression = attr.stSearch42 || '$';
-                    if (newValue.predicateObject && newValue.predicateObject[predicateExpression] !== element[0].value) {
-                        element[0].value = newValue.predicateObject[predicateExpression] || '';
+                    if (newValue.predicateObject && $parse(predicateExpression)(newValue.predicateObject) !== element[0].value) {
+                        element[0].value = $parse(predicateExpression)(newValue.predicateObject) || '';
                     }
                 }, true);
 
                 // view -> table state
-                element.bind('input', function (evt) {
+                element.bind(event, function (evt) {
                     evt = evt.originalEvent || evt;
                     if (promise !== null) {
                         $timeout.cancel(promise);

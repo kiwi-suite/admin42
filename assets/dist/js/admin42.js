@@ -342,25 +342,20 @@ angular.module('admin42')
             }]
         };
     });
-;/**
- * modified stSearch directive for smart-tables
- * remove as soon as fixes are available from original vendor
- * fixes: multiple preset search input values
- */
-
-angular.module('smart-table')
-    .directive('stSearch42', ['stConfig', '$timeout', function (stConfig, $timeout) {
+;angular.module('smart-table')
+    .directive('stSearch42', ['stConfig', '$timeout','$parse', function (stConfig, $timeout, $parse) {
         return {
             require: '^stTable',
             link: function (scope, element, attr, ctrl) {
                 var tableCtrl = ctrl;
                 var promise = null;
                 var throttle = attr.stDelay || stConfig.search.delay;
+                var event = attr.stInputEvent || stConfig.search.inputEvent;
 
                 attr.$observe('stSearch42', function (newValue, oldValue) {
                     var input = element[0].value;
                     if (newValue !== oldValue && input) {
-                        //ctrl.tableState().search = {}; // TODO: @lcs: this prevents multiple preset values from working
+                        //ctrl.tableState().search = {};
                         tableCtrl.search(input, newValue);
                     }
                 });
@@ -370,13 +365,13 @@ angular.module('smart-table')
                     return ctrl.tableState().search;
                 }, function (newValue, oldValue) {
                     var predicateExpression = attr.stSearch42 || '$';
-                    if (newValue.predicateObject && newValue.predicateObject[predicateExpression] !== element[0].value) {
-                        element[0].value = newValue.predicateObject[predicateExpression] || '';
+                    if (newValue.predicateObject && $parse(predicateExpression)(newValue.predicateObject) !== element[0].value) {
+                        element[0].value = $parse(predicateExpression)(newValue.predicateObject) || '';
                     }
                 }, true);
 
                 // view -> table state
-                element.bind('input', function (evt) {
+                element.bind(event, function (evt) {
                     evt = evt.originalEvent || evt;
                     if (promise !== null) {
                         $timeout.cancel(promise);
@@ -804,8 +799,23 @@ angular.module('admin42')
         return this.crop;
     };
 }]);
-;angular.module('admin42').controller('DataGridController',['$scope', '$http', '$attrs', function($scope, $http, $attrs){
+;angular.module('admin42').controller('DataGridController',['$scope', '$http', '$attrs', '$sessionStorage', '$templateCache', function($scope, $http, $attrs, $sessionStorage, $templateCache){
+    $templateCache.put('template/smart-table/pagination.html',
+        '<nav ng-if="numPages && pages.length >= 2"><ul class="pagination">' +
+        '<li ng-if="currentPage > 1"><a ng-click="selectPage(1)"><i class="fa fa-angle-double-left"></i></a></li>' +
+        '<li ng-if="currentPage > 1"><a ng-click="selectPage(currentPage - 1)"><i class="fa fa-angle-left"></i></a></li>' +
+        '<li ng-repeat="page in pages" ng-class="{active: page==currentPage}"><a ng-click="selectPage(page)">{{page}}</a></li>' +
+        '<li ng-if="currentPage < numPages"><a ng-click="selectPage(currentPage + 1)"><i class="fa fa-angle-right"></i></a></li>' +
+        '<li ng-if="currentPage < numPages"><a ng-click="selectPage(numPages)"><i class="fa fa-angle-double-right"></i></a></li>' +
+        '</ul></nav>');
+
     var url = $attrs.url;
+    var isInitialCall = true;
+    var persistNamespace = null;
+
+    if (angular.isDefined($attrs.persist) && $attrs.persist.length > 0) {
+        persistNamespace = $attrs.persist;
+    }
 
     $scope.collection = [];
     $scope.isLoading = true;
@@ -815,6 +825,18 @@ angular.module('admin42')
         $scope.collection = [];
         $scope.isLoading = true;
 
+        if (isInitialCall === true && persistNamespace !== null) {
+            if (angular.isDefined($sessionStorage.smartTable) && angular.isDefined($sessionStorage.smartTable[persistNamespace])) {
+                angular.extend(tableState, angular.fromJson($sessionStorage.smartTable[persistNamespace]));
+            }
+        } else if (persistNamespace !== null) {
+            if (angular.isUndefined($sessionStorage.smartTable)) {
+                $sessionStorage.smartTable = {};
+            }
+            $sessionStorage.smartTable[persistNamespace] = angular.toJson(tableState);
+        }
+
+        isInitialCall = false;
         $http.post(url, tableState).
             success(function(data, status, headers, config) {
                 $scope.isLoading = false;
@@ -1293,6 +1315,8 @@ angular.module('admin42')
             $scope.tags.fieldValue = fieldValue.substring(0, fieldValue.length - 1);
         };
 
+        $scope.updateHiddenField();
+
         $scope.refreshTags = function(tag) {
 
             $scope.tags.tags = [];
@@ -1330,6 +1354,7 @@ angular.module('admin42')
         $scope.tinymceOptionsFull = {
             trusted: true,
             format: 'raw',
+            height : 400,
             file_browser_callback: fileBrowser,
             plugins: 'paste autolink lists charmap table code link' +
                 //'media link42 image42 ' +

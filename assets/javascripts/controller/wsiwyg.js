@@ -7,6 +7,7 @@ angular.module('admin42')
         $scope.tinymceOptionsFull = {
             trusted: true,
             format: 'raw',
+            height : 400,
             file_browser_callback: fileBrowser,
             plugins: 'paste autolink lists charmap table code link' +
                 //'media link42 image42 ' +
