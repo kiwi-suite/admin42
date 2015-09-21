@@ -5,8 +5,6 @@ angular.module('admin42')
             link: function (scope, element, attr, ctrl) {
                 var nameSpace = attr.stPersist;
 
-                console.log('persist');
-                
                 //save the table state every time it changes
                 scope.$watch(function () {
                     return ctrl.tableState();
