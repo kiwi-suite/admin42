@@ -79,13 +79,15 @@ body, .bg_body {
     &.table-row-links {
         cursor: pointer;
     }
-    > tbody > tr {
-        &:nth-of-type(odd) {
-            &:hover {
-                // css4
-                &:not(.success):not(.info):not(.warning):not(.danger) {
-                    > td {
-                        background-color: @table-bg-hover;
+    &.table-hover {
+        > tbody > tr {
+            &:nth-of-type(odd) {
+                &:hover {
+                    // css4
+                    &:not(.success):not(.info):not(.warning):not(.danger) {
+                        > td {
+                            background-color: @table-bg-hover;
+                        }
                     }
                 }
             }
