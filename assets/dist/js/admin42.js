@@ -342,6 +342,37 @@ angular.module('admin42')
             }]
         };
     });
+;angular.module('admin42')
+    .directive('stPersist', function () {
+        return {
+            require: '^stTable',
+            link: function (scope, element, attr, ctrl) {
+                var nameSpace = attr.stPersist;
+
+                console.log('persist');
+                
+                //save the table state every time it changes
+                scope.$watch(function () {
+                    return ctrl.tableState();
+                }, function (newValue, oldValue) {
+                    if (newValue !== oldValue) {
+                        localStorage.setItem(nameSpace, JSON.stringify(newValue));
+                    }
+                }, true);
+
+                //fetch the table state when the directive is loaded
+                if (localStorage.getItem(nameSpace)) {
+                    var savedState = JSON.parse(localStorage.getItem(nameSpace));
+                    var tableState = ctrl.tableState();
+
+                    angular.extend(tableState, savedState);
+                    ctrl.pipe();
+
+                }
+
+            }
+        };
+    });
 ;angular.module('smart-table')
     .directive('stSearch42', ['stConfig', '$timeout','$parse', function (stConfig, $timeout, $parse) {
         return {
