@@ -2,12 +2,14 @@
 $values = [];
 foreach ($this->element->getValueOptions() as $id => $value) {
     $values[] = [
-        'id' => $id,
+        'id'    => $id,
         'label' => $value
     ];
 }
 $jsonDataId = 'form/select/'.md5(json_encode($values)).'.json';
-$this->admin()->addJsonTemplate($jsonDataId, $values)
+$this->admin()->addJsonTemplate($jsonDataId, $values);
+$disabled = $this->element->getAttribute('disabled');
+$readonly = $this->element->getAttribute('readonly');
 ?>
 <div
     class="form-group<?= ($this->hasErrors) ? ' has-error has-feedback' : '' ?>"
@@ -32,7 +34,9 @@ $this->admin()->addJsonTemplate($jsonDataId, $values)
         <ui-select ng-model="option.selected" reset-search-input="false"
                    on-select="<?= $this->admin()->generateAngularModelName(
                        $this->element->getName()
-                   ) ?> = option.selected.id">
+                   ) ?> = option.selected.id"
+            <?= !empty($disabled) || !empty($readonly) ? 'ng-disabled="true"' : '' ?>
+            >
             <ui-select-match placeholder="<?= $this->translate($this->element->getLabel(), 'admin') ?>">
                 {{$select.selected.label}}
             </ui-select-match>
