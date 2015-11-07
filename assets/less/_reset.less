@@ -488,16 +488,17 @@ blockquote{
   > tbody {
     > tr{
       &:nth-child(odd){
-        > td,
-        > th{
+          // @lcs td,th nested rule breaks row color classes (.success,.info.danger...)
+//        > td,
+//        > th{
           background-color: @table-striped-color;
-        }
+//        }
       }
     }
   }
   > thead {
+    background-color: @table-striped-color;
     > th{
-      background-color: @table-striped-color;
       border-right: 1px solid @table-border-color;
       &:last-child{
         border-right: none
