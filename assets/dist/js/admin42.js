@@ -342,6 +342,35 @@ angular.module('admin42')
             }]
         };
     });
+;angular.module('admin42')
+    .directive('stPersist', function () {
+        return {
+            require: '^stTable',
+            link: function (scope, element, attr, ctrl) {
+                var nameSpace = attr.stPersist;
+
+                //save the table state every time it changes
+                scope.$watch(function () {
+                    return ctrl.tableState();
+                }, function (newValue, oldValue) {
+                    if (newValue !== oldValue) {
+                        localStorage.setItem(nameSpace, JSON.stringify(newValue));
+                    }
+                }, true);
+
+                //fetch the table state when the directive is loaded
+                if (localStorage.getItem(nameSpace)) {
+                    var savedState = JSON.parse(localStorage.getItem(nameSpace));
+                    var tableState = ctrl.tableState();
+
+                    angular.extend(tableState, savedState);
+                    ctrl.pipe();
+
+                }
+
+            }
+        };
+    });
 ;angular.module('smart-table')
     .directive('stSearch42', ['stConfig', '$timeout','$parse', function (stConfig, $timeout, $parse) {
         return {
@@ -1276,15 +1305,19 @@ angular.module('admin42')
     }]);
 ;angular.module('admin42')
     .controller('SelectController', ['$scope', '$attrs', 'jsonCache', function($scope, $attrs, jsonCache){
-        $scope.items = jsonCache.get($attrs.jsonDataId);
-        $scope.item = {};
-
-        if ($attrs.initValue.length > 0) {
-            angular.forEach($scope.items, function(value){
-                if (value.id == $attrs.initValue) {
-                    $scope.item.selected = value;
+        $scope.options = jsonCache.get($attrs.jsonDataId);
+        $scope.option = {};
+        
+        $scope.select = function(id){
+            angular.forEach($scope.options, function(option){
+                if (option.id == id) {
+                    $scope.option.selected = option;
                 }
             });
+        };
+        
+        if ($attrs.initValue && $attrs.initValue.length > 0) {
+            $scope.select($attrs.initValue);
         }
     }]);
 ;angular.module('admin42')

@@ -11585,7 +11585,7 @@ return $.widget("ui.sortable", $.ui.mouse, {
 
 }));
 ;/**
- * @license AngularJS v1.3.18
+ * @license AngularJS v1.3.20
  * (c) 2010-2014 Google, Inc. http://angularjs.org
  * License: MIT
  */
@@ -11640,7 +11640,7 @@ function minErr(module, ErrorConstructor) {
       return match;
     });
 
-    message = message + '\nhttp://errors.angularjs.org/1.3.18/' +
+    message = message + '\nhttp://errors.angularjs.org/1.3.20/' +
       (module ? module + '/' : '') + code;
     for (i = 2; i < arguments.length; i++) {
       message = message + (i == 2 ? '?' : '&') + 'p' + (i - 2) + '=' +
@@ -13725,11 +13725,11 @@ function toDebugString(obj) {
  * - `codeName` – `{string}` – Code name of the release, such as "jiggling-armfat".
  */
 var version = {
-  full: '1.3.18',    // all of these placeholder strings will be replaced by grunt's
+  full: '1.3.20',    // all of these placeholder strings will be replaced by grunt's
   major: 1,    // package task
   minor: 3,
-  dot: 18,
-  codeName: 'collective-penmanship'
+  dot: 20,
+  codeName: 'shallow-translucence'
 };
 
 
@@ -18104,14 +18104,6 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
     return bindings;
   }
 
-  function assertValidDirectiveName(name) {
-    var letter = name.charAt(0);
-    if (!letter || letter !== lowercase(letter)) {
-      throw $compileMinErr('baddir', "Directive name '{0}' is invalid. The first character must be a lowercase letter", name);
-    }
-    return name;
-  }
-
   /**
    * @ngdoc method
    * @name $compileProvider#directive
@@ -18130,7 +18122,6 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
    this.directive = function registerDirective(name, directiveFactory) {
     assertNotHasOwnProperty(name, 'directive');
     if (isString(name)) {
-      assertValidDirectiveName(name);
       assertArg(directiveFactory, 'directiveFactory');
       if (!hasDirectives.hasOwnProperty(name)) {
         hasDirectives[name] = [];
@@ -21326,8 +21317,8 @@ function $HttpProvider() {
        * Resolves the raw $http promise.
        */
       function resolvePromise(response, status, headers, statusText) {
-        // normalize internal statuses to 0
-        status = Math.max(status, 0);
+        //status: HTTP response status code, 0, -1 (aborted by timeout / promise)
+        status = status >= -1 ? status : 0;
 
         (isSuccess(status) ? deferred.resolve : deferred.reject)({
           data: response,
@@ -22250,12 +22241,12 @@ function serverBase(url) {
  *
  * @constructor
  * @param {string} appBase application base URL
+ * @param {string} appBaseNoFile application base URL stripped of any filename
  * @param {string} basePrefix url path prefix
  */
-function LocationHtml5Url(appBase, basePrefix) {
+function LocationHtml5Url(appBase, appBaseNoFile, basePrefix) {
   this.$$html5 = true;
   basePrefix = basePrefix || '';
-  var appBaseNoFile = stripFile(appBase);
   parseAbsoluteUrl(appBase, this);
 
 
@@ -22329,10 +22320,10 @@ function LocationHtml5Url(appBase, basePrefix) {
  *
  * @constructor
  * @param {string} appBase application base URL
+ * @param {string} appBaseNoFile application base URL stripped of any filename
  * @param {string} hashPrefix hashbang prefix
  */
-function LocationHashbangUrl(appBase, hashPrefix) {
-  var appBaseNoFile = stripFile(appBase);
+function LocationHashbangUrl(appBase, appBaseNoFile, hashPrefix) {
 
   parseAbsoluteUrl(appBase, this);
 
@@ -22441,13 +22432,12 @@ function LocationHashbangUrl(appBase, hashPrefix) {
  *
  * @constructor
  * @param {string} appBase application base URL
+ * @param {string} appBaseNoFile application base URL stripped of any filename
  * @param {string} hashPrefix hashbang prefix
  */
-function LocationHashbangInHtml5Url(appBase, hashPrefix) {
+function LocationHashbangInHtml5Url(appBase, appBaseNoFile, hashPrefix) {
   this.$$html5 = true;
   LocationHashbangUrl.apply(this, arguments);
-
-  var appBaseNoFile = stripFile(appBase);
 
   this.$$parseLinkUrl = function(url, relHref) {
     if (relHref && relHref[0] === '#') {
@@ -22984,7 +22974,9 @@ function $LocationProvider() {
       appBase = stripHash(initialUrl);
       LocationMode = LocationHashbangUrl;
     }
-    $location = new LocationMode(appBase, '#' + hashPrefix);
+    var appBaseNoFile = stripFile(appBase);
+
+    $location = new LocationMode(appBase, appBaseNoFile, '#' + hashPrefix);
     $location.$$parseLinkUrl(initialUrl, initialUrl);
 
     $location.$$state = $browser.state();
@@ -23064,6 +23056,13 @@ function $LocationProvider() {
 
     // update $location when $browser url changes
     $browser.onUrlChange(function(newUrl, newState) {
+
+      if (isUndefined(beginsWith(appBaseNoFile, newUrl))) {
+        // If we are navigating outside of the app then force a reload
+        $window.location.href = newUrl;
+        return;
+      }
+
       $rootScope.$evalAsync(function() {
         var oldUrl = $location.absUrl();
         var oldState = $location.$$state;
@@ -23346,6 +23345,25 @@ function ensureSafeMemberName(name, fullExpression) {
       || name === "__proto__") {
     throw $parseMinErr('isecfld',
         'Attempting to access a disallowed field in Angular expressions! '
+        + 'Expression: {0}', fullExpression);
+  }
+  return name;
+}
+
+function getStringValue(name, fullExpression) {
+  // From the JavaScript docs:
+  // Property names must be strings. This means that non-string objects cannot be used
+  // as keys in an object. Any non-string object, including a number, is typecasted
+  // into a string via the toString method.
+  //
+  // So, to ensure that we are checking the same `name` that JavaScript would use,
+  // we cast it to a string, if possible.
+  // Doing `name + ''` can cause a repl error if the result to `toString` is not a string,
+  // this is, this will handle objects that misbehave.
+  name = name + '';
+  if (!isString(name)) {
+    throw $parseMinErr('iseccst',
+        'Cannot convert object to primitive value! '
         + 'Expression: {0}', fullExpression);
   }
   return name;
@@ -23992,7 +24010,7 @@ Parser.prototype = {
 
     return extend(function $parseObjectIndex(self, locals) {
       var o = obj(self, locals),
-          i = indexFn(self, locals),
+          i = getStringValue(indexFn(self, locals), expression),
           v;
 
       ensureSafeMemberName(i, expression);
@@ -24001,7 +24019,7 @@ Parser.prototype = {
       return v;
     }, {
       assign: function(self, value, locals) {
-        var key = ensureSafeMemberName(indexFn(self, locals), expression);
+        var key = ensureSafeMemberName(getStringValue(indexFn(self, locals), expression), expression);
         // prevent overwriting of Function.constructor which would break ensureSafeObject check
         var o = ensureSafeObject(obj(self, locals), expression);
         if (!o) obj.assign(self, o = {}, locals);
@@ -37950,8 +37968,9 @@ var patternDirective = function() {
         ctrl.$validate();
       });
 
-      ctrl.$validators.pattern = function(value) {
-        return ctrl.$isEmpty(value) || isUndefined(regexp) || regexp.test(value);
+      ctrl.$validators.pattern = function(modelValue, viewValue) {
+        // HTML5 pattern constraint validates the input value, so we validate the viewValue
+        return ctrl.$isEmpty(viewValue) || isUndefined(regexp) || regexp.test(viewValue);
       };
     }
   };
@@ -49300,11 +49319,16 @@ angular.module("template/typeahead/typeahead-popup.html", []).run(["$templateCac
     "");
 }]);
 !angular.$$csp() && angular.element(document).find('head').prepend('<style type="text/css">.ng-animate.item:not(.left):not(.right){-webkit-transition:0s ease-in-out left;transition:0s ease-in-out left}</style>');;// https://github.com/Gillardo/bootstrap-ui-datetime-picker
-// Version: 1.1.7
-// Released: 2015-08-22 
+// Version: 1.2.6
+// Released: 2015-10-21 
 angular.module('ui.bootstrap.datetimepicker', ['ui.bootstrap.dateparser', 'ui.bootstrap.position'])
     .constant('uiDatetimePickerConfig', {
         dateFormat: 'yyyy-MM-dd HH:mm',
+        html5Types: {
+            date: 'yyyy-MM-dd',
+            'datetime-local': 'yyyy-MM-ddTHH:mm:ss.sss',
+            'month': 'yyyy-MM'
+        },
         enableDate: true,
         enableTime: true,
         todayText: 'Today',
@@ -49317,8 +49341,8 @@ angular.module('ui.bootstrap.datetimepicker', ['ui.bootstrap.dateparser', 'ui.bo
         appendToBody: false,
         showButtonBar: true
     })
-    .directive('datetimePicker', ['$compile', '$parse', '$document', '$timeout', '$position', 'dateFilter', 'dateParser', 'uiDatetimePickerConfig',
-        function ($compile, $parse, $document, $timeout, $position, dateFilter, dateParser, uiDatetimePickerConfig) {
+    .directive('datetimePicker', ['$compile', '$parse', '$document', '$timeout', '$position', 'dateFilter', 'dateParser', 'uiDatetimePickerConfig', '$rootScope',
+        function ($compile, $parse, $document, $timeout, $position, dateFilter, dateParser, uiDatetimePickerConfig, $rootScope) {
             return {
                 restrict: 'A',
                 require: 'ngModel',
@@ -49335,7 +49359,7 @@ angular.module('ui.bootstrap.datetimepicker', ['ui.bootstrap.dateparser', 'ui.bo
                     dateDisabled: '&'
                 },
                 link: function (scope, element, attrs, ngModel) {
-                    var dateFormat = uiDatetimePickerConfig.dateFormat, currentDate,
+                    var dateFormat = uiDatetimePickerConfig.dateFormat,
                         closeOnDateSelection = angular.isDefined(attrs.closeOnDateSelection) ? scope.$parent.$eval(attrs.closeOnDateSelection) : uiDatetimePickerConfig.closeOnDateSelection,
                         appendToBody = angular.isDefined(attrs.datepickerAppendToBody) ? scope.$parent.$eval(attrs.datepickerAppendToBody) : uiDatetimePickerConfig.appendToBody;
 
@@ -49353,17 +49377,32 @@ angular.module('ui.bootstrap.datetimepicker', ['ui.bootstrap.dateparser', 'ui.bo
                         return scope[key + 'Text'] || uiDatetimePickerConfig[key + 'Text'];
                     };
 
-                    attrs.$observe('datetimePicker', function (value) {
-                        dateFormat = value || uiDatetimePickerConfig.dateFormat;
-                        ngModel.$render();
-                    });
+                    var isHtml5DateInput = false;
+                    if (uiDatetimePickerConfig.html5Types[attrs.type]) {
+                        dateFormat = uiDatetimePickerConfig.html5Types[attrs.type];
+                        isHtml5DateInput = true;
+                    } else {
+                        dateFormat = attrs.datepickerPopup || uiDatetimePickerConfig.dateFormat;
+                        attrs.$observe('datetimePicker', function(value) {
+                            var newDateFormat = value || uiDatetimePickerConfig.dateFormat;
+
+                            if (newDateFormat !== dateFormat) {
+                                dateFormat = newDateFormat;
+                                ngModel.$modelValue = null;
+
+                                if (!dateFormat) {
+                                    throw new Error('datetimePicker must have a date format specified.');
+                                }
+                            }
+                        });
+                    }
 
                     // popup element used to display calendar
                     var popupEl = angular.element('' +
-                        '<div date-picker-wrap ng-show="showPicker == \'date\'">' +
+                        '<div date-picker-wrap>' +
                         '<div datepicker></div>' +
                         '</div>' +
-                        '<div time-picker-wrap ng-show="showPicker == \'time\'">' +
+                        '<div time-picker-wrap>' +
                         '<div timepicker style="margin:0 auto"></div>' +
                         '</div>');
 
@@ -49379,30 +49418,50 @@ angular.module('ui.bootstrap.datetimepicker', ['ui.bootstrap.dateparser', 'ui.bo
 
                     // datepicker element
                     var datepickerEl = angular.element(popupEl.children()[0]);
+
+                    if (isHtml5DateInput) {
+                        if (attrs.type === 'month') {
+                            datepickerEl.attr('datepicker-mode', '"month"');
+                            datepickerEl.attr('min-mode', 'month');
+                        }
+                    }
+
                     if (attrs.datepickerOptions) {
-                        angular.forEach(scope.$parent.$eval(attrs.datepickerOptions), function (value, option) {
+                        var options = scope.$parent.$eval(attrs.datepickerOptions);
+
+                        if (options && options.initDate) {
+                            scope.initDate = options.initDate;
+                            datepickerEl.attr('init-date', 'initDate');
+                            delete options.initDate;
+                        }
+
+                        angular.forEach(options, function (value, option) {
                             datepickerEl.attr(cameltoDash(option), value);
                         });
                     }
 
                     // timepicker element
                     var timepickerEl = angular.element(popupEl.children()[1]);
+
                     if (attrs.timepickerOptions) {
-                        angular.forEach(scope.$parent.$eval(attrs.timepickerOptions), function (value, option) {
+                        var options = scope.$parent.$eval(attrs.timepickerOptions);
+
+                        angular.forEach(options, function (value, option) {
                             timepickerEl.attr(cameltoDash(option), value);
                         });
                     }
 
                     // set datepickerMode to day by default as need to create watch
-                    // this gets round issue#5 where by the highlight is not shown
-                    if (!angular.isDefined(attrs['datepickerMode'])) attrs['datepickerMode'] = 'day';
+                    // else disabled cannot pass in mode
+                    if (!angular.isDefined(attrs['datepickerMode'])) {
+                        attrs['datepickerMode'] = 'day';
+                    }
 
                     scope.watchData = {};
-                    angular.forEach(['minDate', 'maxDate', 'datepickerMode'], function (key) {
+                    angular.forEach(['minMode', 'maxMode', 'minDate', 'maxDate', 'datepickerMode', 'initDate', 'shortcutPropagation'], function(key) {
                         if (attrs[key]) {
                             var getAttribute = $parse(attrs[key]);
-
-                            scope.$parent.$watch(getAttribute, function (value) {
+                            scope.$parent.$watch(getAttribute, function(value) {
                                 scope.watchData[key] = value;
                             });
                             datepickerEl.attr(cameltoDash(key), 'watchData.' + key);
@@ -49411,66 +49470,106 @@ angular.module('ui.bootstrap.datetimepicker', ['ui.bootstrap.dateparser', 'ui.bo
                             if (key === 'datepickerMode') {
                                 var setAttribute = getAttribute.assign;
                                 scope.$watch('watchData.' + key, function(value, oldvalue) {
-                                    if (angular.isFunction(setAttribute) && value !== oldvalue ) {
+                                    if (angular.isFunction(setAttribute) && value !== oldvalue) {
                                         setAttribute(scope.$parent, value);
                                     }
                                 });
-                            }                        }
+                            }
+                        }
                     });
 
                     if (attrs.dateDisabled) {
                         datepickerEl.attr('date-disabled', 'dateDisabled({ date: date, mode: mode })');
                     }
 
-                    function isDateDisabled(dt) {
-                        return attrs.dateDisabled && angular.isDefined(dt) && scope.dateDisabled({ date: dt, mode: scope.watchData['datepickerMode']});
-                    }
+                    // do not check showWeeks attr, as should be used via datePickerOptions
 
                     function parseDate(viewValue) {
+                        if (angular.isNumber(viewValue)) {
+                            // presumably timestamp to date object
+                            viewValue = new Date(viewValue);
+                        }
+
                         if (!viewValue) {
-                            ngModel.$setValidity('date', true);
                             return null;
                         } else if (angular.isDate(viewValue) && !isNaN(viewValue)) {
-                            ngModel.$setValidity('date', true);
                             return viewValue;
                         } else if (angular.isString(viewValue)) {
-                            var date = dateParser.parse(viewValue, dateFormat) || new Date(viewValue);
-
+                            var date = dateParser.parse(viewValue, dateFormat, scope.date);
                             if (isNaN(date)) {
-                                ngModel.$setValidity('date', false);
-                                return undefined;
+                                return null;
                             } else {
-                                ngModel.$setValidity('date', true);
                                 return date;
                             }
                         } else {
-                            ngModel.$setValidity('date', false);
-                            return undefined;
+                            return null;
                         }
                     }
-                    ngModel.$parsers.unshift(parseDate);
+
+                    function validator(modelValue, viewValue) {
+                        var value = modelValue || viewValue;
+
+                        if (!(attrs.ngRequired || attrs.required) && !value) {
+                            return true;
+                        }
+
+                        if (angular.isNumber(value)) {
+                            value = new Date(value);
+                        }
+                        if (!value) {
+                            return true;
+                        } else if (angular.isDate(value) && !isNaN(value)) {
+                            return true;
+                        } else if (angular.isDate(new Date(value)) && !isNaN(new Date(value).valueOf())) {
+                            return true;
+                        } else if (angular.isString(value)) {
+                            var date = dateParser.parse(value, dateFormat);
+                            return !isNaN(date);
+                        } else {
+                            return false;
+                        }
+                    }
+
+                    if (!isHtml5DateInput) {
+                        // Internal API to maintain the correct ng-invalid-[key] class
+                        ngModel.$$parserName = 'datetime';
+                        ngModel.$validators.datetime = validator;
+                        ngModel.$parsers.unshift(parseDate);
+                        ngModel.$formatters.push(function(value) {
+                            scope.date = value;
+                            return ngModel.$isEmpty(value) ? value : dateFilter(value, dateFormat);
+                        });
+                    } else {
+                        ngModel.$formatters.push(function(value) {
+                            scope.date = value;
+                            return value;
+                        });
+                    }
 
                     // Inner change
                     scope.dateSelection = function (dt) {
-                        // check which picker is being shown, if its date, all is fine and this is the date
-                        // we will use, if its the timePicker but enableDate = true, we need to merge
-                        // the values, else timePicker will reset the date
-                        if (scope.enableDate && scope.enableTime && scope.showPicker === 'time') {
-                            if (currentDate && currentDate !== null && (scope.date !== null || dt || dt != null)) {
-                                // dt will not be undefined if the now or today button is pressed
-                                if (dt && dt != null) {
-                                    currentDate.setHours(dt.getHours());
-                                    currentDate.setMinutes(dt.getMinutes());
-                                    currentDate.setSeconds(dt.getSeconds());
-                                    currentDate.setMilliseconds(dt.getMilliseconds());
-                                    dt = new Date(currentDate);
-                                } else {
-                                    currentDate.setHours(scope.date.getHours());
-                                    currentDate.setMinutes(scope.date.getMinutes());
-                                    currentDate.setSeconds(scope.date.getSeconds());
-                                    currentDate.setMilliseconds(scope.date.getMilliseconds());
+
+                        // check if timePicker is being shown and merge dates, so that the date
+                        // part is never changed, only the time
+                        if (scope.enableTime && scope.showPicker === 'time') {
+
+                            // only proceed if dt is a date
+                            if (dt || dt != null) {
+                                // check if our scope.date is null, and if so, set to todays date
+                                if (!angular.isDefined(scope.date) || scope.date == null) {
+                                    scope.date = new Date();
                                 }
 
+                                // dt will not be undefined if the now or today button is pressed
+                                if (dt && dt != null) {
+                                    // get the existing date and update the time
+                                    var date = new Date(scope.date);
+                                    date.setHours(dt.getHours());
+                                    date.setMinutes(dt.getMinutes());
+                                    date.setSeconds(dt.getSeconds());
+                                    date.setMilliseconds(dt.getMilliseconds());
+                                    dt = date;
+                                }
                             }
                         }
 
@@ -49478,20 +49577,20 @@ angular.module('ui.bootstrap.datetimepicker', ['ui.bootstrap.dateparser', 'ui.bo
                             scope.date = dt;
                         }
 
-                        // store currentDate
-                        currentDate = scope.date;
+                        var date = scope.date ? dateFilter(scope.date, dateFormat) : null;
 
-                        ngModel.$setViewValue(scope.date);
-                        ngModel.$render();
+                        element.val(date);
+                        ngModel.$setViewValue(date);
 
-                        if (dt === null) {
-                            scope.close();
-                        } else if (closeOnDateSelection) {
-                            // do not close when using timePicker
-                            if (scope.showPicker != 'time') {
+                        if (closeOnDateSelection) {
+                            // do not close when using timePicker as make impossible to choose a time
+                            if (scope.showPicker != 'time' && date != null) {
                                 // if time is enabled, swap to timePicker
                                 if (scope.enableTime) {
-                                    scope.showPicker = 'time';
+                                    // need to delay this, else timePicker never shown
+                                    $timeout(function() {
+                                        scope.showPicker = 'time';
+                                    }, 0);
                                 } else {
                                     scope.close();
                                 }
@@ -49500,47 +49599,45 @@ angular.module('ui.bootstrap.datetimepicker', ['ui.bootstrap.dateparser', 'ui.bo
 
                     };
 
-                    element.bind('input change keyup', function () {
-                        scope.$apply(function () {
-                            scope.date = ngModel.$modelValue;
-                        });
+                    // Detect changes in the view from the text box
+                    ngModel.$viewChangeListeners.push(function() {
+                        scope.date = dateParser.parse(ngModel.$viewValue, dateFormat, scope.date);
                     });
 
-                    // Outer change
-                    ngModel.$render = function () {
-                        var date = ngModel.$viewValue ? parseDate(ngModel.$viewValue) : null;
-                        var display = date ? dateFilter(date, dateFormat) : '';
-                        element.val(display);
-                        scope.date = date;
-                    };
-
                     var documentClickBind = function (event) {
-                        if (scope.isOpen && event.target !== element[0]) {
+                        if (scope.isOpen && !(element[0].contains(event.target) || $popup[0].contains(event.target))) {
                             scope.$apply(function () {
-                                scope.isOpen = false;
+                                scope.close();
                             });
                         }
                     };
 
-                    var keydown = function (evt, noApply) {
-                        scope.keydown(evt);
-                    };
-                    element.bind('keydown', keydown);
-
-                    scope.keydown = function (evt) {
-                        if (evt.which === 27) {
+                    var inputKeydownBind = function(evt) {
+                        if (evt.which === 27 && scope.isOpen) {
                             evt.preventDefault();
-
-                            if (scope.isOpen) {
-                                evt.stopPropagation();
-                            }
-                            scope.close();
+                            evt.stopPropagation();
+                            scope.$apply(function() {
+                                scope.close();
+                            });
+                            element[0].focus();
                         } else if (evt.which === 40 && !scope.isOpen) {
-                            scope.isOpen = true;
+                            evt.preventDefault();
+                            evt.stopPropagation();
+                            scope.$apply(function() {
+                                scope.isOpen = true;
+                            });
+                        }
+                    };
+                    element.bind('keydown', inputKeydownBind);
+
+                    scope.keydown = function(evt) {
+                        if (evt.which === 27) {
+                            scope.close();
+                            element[0].focus();
                         }
                     };
 
-                    var isOpenWatch = scope.$watch('isOpen', function (value) {
+                    scope.$watch('isOpen', function (value) {
                         scope.dropdownStyle = {
                             display: value ? 'block' : 'none'
                         };
@@ -49565,16 +49662,28 @@ angular.module('ui.bootstrap.datetimepicker', ['ui.bootstrap.dateparser', 'ui.bo
                         }
                     });
 
-                    scope.isTodayDisabled = function() {
-                        return isDateDisabled(new Date());
+                    scope.isDisabled = function(date) {
+                        var isToday = (date == 'today');
+
+                        if (date === 'today' || date === 'now')
+                            date = new Date();
+
+                        if (attrs.dateDisabled) {
+                            return scope.dateDisabled({date: date, mode: scope.watchData['datepickerMode']});
+                        } else {
+                            return false;
+                        }
                     };
 
-                    scope.select = function (date) {
+                    scope.select = function (opt) {
 
-                        if (date === 'today' || date == 'now') {
+                        var date = null;
+                        var isNow = opt === 'now';
+
+                        if (opt === 'today' || opt == 'now') {
                             var now = new Date();
-                            if (angular.isDate(ngModel.$modelValue)) {
-                                date = new Date(ngModel.$modelValue);
+                            if (angular.isDate(scope.date)) {
+                                date = new Date(scope.date);
                                 date.setFullYear(now.getFullYear(), now.getMonth(), now.getDate());
                                 date.setHours(now.getHours(), now.getMinutes(), now.getSeconds(), now.getMilliseconds());
                             } else {
@@ -49583,10 +49692,18 @@ angular.module('ui.bootstrap.datetimepicker', ['ui.bootstrap.dateparser', 'ui.bo
                         }
 
                         scope.dateSelection(date);
+
+                        if (opt == 'clear')
+                            scope.close();
                     };
 
                     scope.close = function () {
                         scope.isOpen = false;
+
+                        // if enableDate and enableTime are true, reopen the picker in date mode first
+                        if (scope.enableDate && scope.enableTime)
+                            scope.showPicker = 'date';
+
                         element[0].focus();
                     };
 
@@ -49609,14 +49726,15 @@ angular.module('ui.bootstrap.datetimepicker', ['ui.bootstrap.dateparser', 'ui.bo
 
                     scope.$on('$destroy', function () {
                         if (scope.isOpen === true) {
-                            scope.$apply(function() {
-                                scope.isOpen = false;
-                            });
+                            if (!$rootScope.$$phase) {
+                                scope.$apply(function() {
+                                    scope.close();
+                                });
+                            }
                         }
 
-                        isOpenWatch();
                         $popup.remove();
-                        element.unbind('keydown', keydown);
+                        element.unbind('keydown', inputKeydownBind);
                         $document.unbind('click', documentClickBind);
                     });
                 }
@@ -49628,13 +49746,7 @@ angular.module('ui.bootstrap.datetimepicker', ['ui.bootstrap.dateparser', 'ui.bo
             restrict: 'EA',
             replace: true,
             transclude: true,
-            templateUrl: 'template/datetime-picker.html',
-            link: function (scope, element, attrs) {
-                element.bind('click', function (event) {
-                    event.preventDefault();
-                    event.stopPropagation();
-                });
-            }
+            templateUrl: 'template/date-picker.html'
         };
     })
 
@@ -49643,34 +49755,38 @@ angular.module('ui.bootstrap.datetimepicker', ['ui.bootstrap.dateparser', 'ui.bo
             restrict: 'EA',
             replace: true,
             transclude: true,
-            templateUrl: 'template/datetime-picker.html',
-            link: function (scope, element, attrs) {
-                element.bind('click', function (event) {
-                    event.preventDefault();
-                    event.stopPropagation();
-                });
-            }
+            templateUrl: 'template/time-picker.html'
         };
     });
 
 angular.module('ui.bootstrap.datetimepicker').run(['$templateCache', function($templateCache) {
   'use strict';
 
-  $templateCache.put('template/datetime-picker.html',
-    "<ul class=\"dropdown-menu dropdown-menu-left datetime-picker-dropdown\" ng-style=dropdownStyle style=left:inherit ng-keydown=keydown($event)><li style=\"padding:0 5px 5px 5px\" ng-class=\"{'date-picker-menu': showPicker == 'date', 'time-picker-menu' : showPicker == 'time'}\"><div ng-transclude></div></li><li ng-if=showButtonBar style=padding:5px><span class=\"btn-group pull-left\" style=margin-right:10px><button ng-if=\"showPicker == 'date'\" type=button class=\"btn btn-sm btn-info\" ng-click=\"select('today')\" ng-disabled=isTodayDisabled()>{{ getText('today') }}</button> <button ng-if=\"showPicker == 'time'\" type=button class=\"btn btn-sm btn-info\" ng-click=\"select('now')\" ng-disabled=isTodayDisabled()>{{ getText('now') }}</button> <button type=button class=\"btn btn-sm btn-danger\" ng-click=select(null)>{{ getText('clear') }}</button></span> <span class=\"btn-group pull-right\"><button ng-if=\"showPicker == 'date' && enableTime\" type=button class=\"btn btn-sm btn-default\" ng-click=\"changePicker($event, 'time')\">{{ getText('time')}}</button> <button ng-if=\"showPicker == 'time' && enableDate\" type=button class=\"btn btn-sm btn-default\" ng-click=\"changePicker($event, 'date')\">{{ getText('date')}}</button> <button type=button class=\"btn btn-sm btn-success\" ng-click=close()>{{ getText('close') }}</button></span></li></ul>"
+  $templateCache.put('template/date-picker.html',
+    "<ul ng-if=\"isOpen && showPicker == 'date'\" class=\"dropdown-menu dropdown-menu-left datetime-picker-dropdown\" ng-style=dropdownStyle style=left:inherit ng-keydown=keydown($event) ng-click=$event.stopPropagation()><li style=\"padding:0 5px 5px 5px\" class=date-picker-menu><div ng-transclude></div></li><li ng-if=showButtonBar style=padding:5px><span class=\"btn-group pull-left\" style=margin-right:10px><button type=button class=\"btn btn-sm btn-info\" ng-click=\"select('today')\" ng-disabled=\"isDisabled('today')\">{{ getText('today') }}</button> <button type=button class=\"btn btn-sm btn-danger\" ng-click=\"select('clear')\">{{ getText('clear') }}</button></span> <span class=\"btn-group pull-right\"><button ng-if=enableTime type=button class=\"btn btn-sm btn-default\" ng-click=\"changePicker($event, 'time')\">{{ getText('time')}}</button> <button type=button class=\"btn btn-sm btn-success\" ng-click=close()>{{ getText('close') }}</button></span></li></ul>"
+  );
+
+
+  $templateCache.put('template/time-picker.html',
+    "<ul ng-if=\"isOpen && showPicker == 'time'\" class=\"dropdown-menu dropdown-menu-left datetime-picker-dropdown\" ng-style=dropdownStyle style=left:inherit ng-keydown=keydown($event) ng-click=$event.stopPropagation()><li style=\"padding:0 5px 5px 5px\" class=time-picker-menu><div ng-transclude></div></li><li ng-if=showButtonBar style=padding:5px><span class=\"btn-group pull-left\" style=margin-right:10px><button type=button class=\"btn btn-sm btn-info\" ng-click=\"select('now')\" ng-disabled=\"isDisabled('now')\">{{ getText('now') }}</button> <button type=button class=\"btn btn-sm btn-danger\" ng-click=\"select('clear')\">{{ getText('clear') }}</button></span> <span class=\"btn-group pull-right\"><button ng-if=enableDate type=button class=\"btn btn-sm btn-default\" ng-click=\"changePicker($event, 'date')\">{{ getText('date')}}</button> <button type=button class=\"btn btn-sm btn-success\" ng-click=close()>{{ getText('close') }}</button></span></li></ul>"
   );
 
 }]);
 ;angular.module('ui.bootstrap.datetimepicker').run(['$templateCache', function($templateCache) {
   'use strict';
 
-  $templateCache.put('template/datetime-picker.html',
-    "<ul class=\"dropdown-menu dropdown-menu-left datetime-picker-dropdown\" ng-style=dropdownStyle style=left:inherit ng-keydown=keydown($event)><li style=\"padding:0 5px 5px 5px\" ng-class=\"{'date-picker-menu': showPicker == 'date', 'time-picker-menu' : showPicker == 'time'}\"><div ng-transclude></div></li><li ng-if=showButtonBar style=padding:5px><span class=\"btn-group pull-left\" style=margin-right:10px><button ng-if=\"showPicker == 'date'\" type=button class=\"btn btn-sm btn-info\" ng-click=\"select('today')\" ng-disabled=isTodayDisabled()>{{ getText('today') }}</button> <button ng-if=\"showPicker == 'time'\" type=button class=\"btn btn-sm btn-info\" ng-click=\"select('now')\" ng-disabled=isTodayDisabled()>{{ getText('now') }}</button> <button type=button class=\"btn btn-sm btn-danger\" ng-click=select(null)>{{ getText('clear') }}</button></span> <span class=\"btn-group pull-right\"><button ng-if=\"showPicker == 'date' && enableTime\" type=button class=\"btn btn-sm btn-default\" ng-click=\"changePicker($event, 'time')\">{{ getText('time')}}</button> <button ng-if=\"showPicker == 'time' && enableDate\" type=button class=\"btn btn-sm btn-default\" ng-click=\"changePicker($event, 'date')\">{{ getText('date')}}</button> <button type=button class=\"btn btn-sm btn-success\" ng-click=close()>{{ getText('close') }}</button></span></li></ul>"
+  $templateCache.put('template/date-picker.html',
+    "<ul ng-if=\"isOpen && showPicker == 'date'\" class=\"dropdown-menu dropdown-menu-left datetime-picker-dropdown\" ng-style=dropdownStyle style=left:inherit ng-keydown=keydown($event) ng-click=$event.stopPropagation()><li style=\"padding:0 5px 5px 5px\" class=date-picker-menu><div ng-transclude></div></li><li ng-if=showButtonBar style=padding:5px><span class=\"btn-group pull-left\" style=margin-right:10px><button type=button class=\"btn btn-sm btn-info\" ng-click=\"select('today')\" ng-disabled=\"isDisabled('today')\">{{ getText('today') }}</button> <button type=button class=\"btn btn-sm btn-danger\" ng-click=\"select('clear')\">{{ getText('clear') }}</button></span> <span class=\"btn-group pull-right\"><button ng-if=enableTime type=button class=\"btn btn-sm btn-default\" ng-click=\"changePicker($event, 'time')\">{{ getText('time')}}</button> <button type=button class=\"btn btn-sm btn-success\" ng-click=close()>{{ getText('close') }}</button></span></li></ul>"
+  );
+
+
+  $templateCache.put('template/time-picker.html',
+    "<ul ng-if=\"isOpen && showPicker == 'time'\" class=\"dropdown-menu dropdown-menu-left datetime-picker-dropdown\" ng-style=dropdownStyle style=left:inherit ng-keydown=keydown($event) ng-click=$event.stopPropagation()><li style=\"padding:0 5px 5px 5px\" class=time-picker-menu><div ng-transclude></div></li><li ng-if=showButtonBar style=padding:5px><span class=\"btn-group pull-left\" style=margin-right:10px><button type=button class=\"btn btn-sm btn-info\" ng-click=\"select('now')\" ng-disabled=\"isDisabled('now')\">{{ getText('now') }}</button> <button type=button class=\"btn btn-sm btn-danger\" ng-click=\"select('clear')\">{{ getText('clear') }}</button></span> <span class=\"btn-group pull-right\"><button ng-if=enableDate type=button class=\"btn btn-sm btn-default\" ng-click=\"changePicker($event, 'date')\">{{ getText('date')}}</button> <button type=button class=\"btn btn-sm btn-success\" ng-click=close()>{{ getText('close') }}</button></span></li></ul>"
   );
 
 }]);
 ;/**
- * @license AngularJS v1.3.18
+ * @license AngularJS v1.3.20
  * (c) 2010-2014 Google, Inc. http://angularjs.org
  * License: MIT
  */
@@ -51812,7 +51928,7 @@ angular.module('ngAnimate', ['ng'])
 
 })(window, window.angular);
 ;/**
- * @license AngularJS v1.3.18
+ * @license AngularJS v1.3.20
  * (c) 2010-2014 Google, Inc. http://angularjs.org
  * License: MIT
  */
@@ -52491,7 +52607,7 @@ angular.module('ngSanitize').filter('linky', ['$sanitize', function($sanitize) {
 
 })(window, window.angular);
 ;/** 
-* @version 2.1.3
+* @version 2.1.4
 * @license MIT
 */
 (function (ng, undefined){
@@ -52523,7 +52639,8 @@ ng.module('smart-table')
     sort: {
       ascentClass: 'st-sort-ascent',
       descentClass: 'st-sort-descent',
-      skipNatural: false
+      skipNatural: false,
+      delay:300
     },
     pipe: {
       delay: 100 //ms
@@ -52814,7 +52931,7 @@ ng.module('smart-table')
   }]);
 
 ng.module('smart-table')
-  .directive('stSort', ['stConfig', '$parse', function (stConfig, $parse) {
+  .directive('stSort', ['stConfig', '$parse', '$timeout', function (stConfig, $parse, $timeout) {
     return {
       restrict: 'A',
       require: '^stTable',
@@ -52828,6 +52945,8 @@ ng.module('smart-table')
         var stateClasses = [classAscent, classDescent];
         var sortDefault;
         var skipNatural = attr.stSkipNatural !== undefined ? attr.stSkipNatural : stConfig.sort.skipNatural;
+        var promise = null;
+        var throttle = attr.stDelay || stConfig.sort.delay;
 
         if (attr.stSortDefault) {
           sortDefault = scope.$eval(attr.stSortDefault) !== undefined ? scope.$eval(attr.stSortDefault) : attr.stSortDefault;
@@ -52836,21 +52955,26 @@ ng.module('smart-table')
         //view --> table state
         function sort () {
           index++;
+          var func;
           predicate = ng.isFunction(getter(scope)) ? getter(scope) : attr.stSort;
           if (index % 3 === 0 && !!skipNatural !== true) {
             //manual reset
             index = 0;
             ctrl.tableState().sort = {};
             ctrl.tableState().pagination.start = 0;
-            ctrl.pipe();
+            func = ctrl.pipe.bind(ctrl);
           } else {
-            ctrl.sortBy(predicate, index % 2 === 0);
+            func = ctrl.sortBy.bind(ctrl, predicate, index % 2 === 0);
           }
+          if (promise !== null) {
+            $timeout.cancel(promise);
+          }
+          promise = $timeout(func, throttle);
         }
 
         element.bind('click', function sortClick () {
           if (predicate) {
-            scope.$apply(sort);
+            sort();
           }
         });
 
@@ -53015,7 +53139,6 @@ angular.module('ui.alias', []).config(['$compileProvider', 'uiAliasConfig', func
       };
     }
     $compileProvider.directive(alias, function(){
-      return config;
     });
   });
 }]);
@@ -57749,7 +57872,7 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
 
     /*
      * AngularJS Toaster
-     * Version: 0.4.15
+     * Version: 0.4.16
      *
      * Copyright 2013-2015 Jiri Kavulak.
      * All Rights Reserved.
@@ -57788,7 +57911,7 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
                 success: 'toast-success',
                 warning: 'toast-warning'
             },
-            'body-output-type': '', // Options: '', 'trustedHtml', 'template', 'templateWithData'
+            'body-output-type': '', // Options: '', 'trustedHtml', 'template', 'templateWithData', 'directive'
             'body-template': 'toasterBodyTmpl.html',
             'icon-class': 'toast-info',
             'position-class': 'toast-top-right', // Options (see CSS):
@@ -57800,10 +57923,10 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
             'prevent-duplicates': false,
             'mouseover-timer-stop': true // stop timeout on mouseover and restart timer on mouseout
         }
-    ).service(
+        ).service(
         'toaster', [
             '$rootScope', 'toasterConfig', function ($rootScope, toasterConfig) {
-                this.pop = function (type, title, body, timeout, bodyOutputType, clickHandler, toasterId, showCloseButton, toastId, onHideCallback) {
+                this.pop = function (type, title, body, timeout, bodyOutputType, clickHandler, toasterId, showCloseButton, toastId, onHideCallback, directiveData) {
                     if (angular.isObject(type)) {
                         var params = type; // Enable named parameters as pop argument
                         this.toast = {
@@ -57815,7 +57938,8 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
                             clickHandler: params.clickHandler,
                             showCloseButton: params.showCloseButton,
                             uid: params.toastId,
-                            onHideCallback: params.onHideCallback
+                            onHideCallback: params.onHideCallback,
+                            directiveData: params.directiveData
                         };
                         toastId = params.toastId;
                         toasterId = params.toasterId;
@@ -57829,7 +57953,8 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
                             clickHandler: clickHandler,
                             showCloseButton: showCloseButton,
                             uid: toastId,
-                            onHideCallback: onHideCallback
+                            onHideCallback: onHideCallback,
+                            directiveData: directiveData
                         };
                     }
                     $rootScope.$emit('toaster-newToast', toasterId, toastId);
@@ -57841,29 +57966,32 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
 
                 // Create one method per icon class, to allow to call toaster.info() and similar
                 for (var type in toasterConfig['icon-classes']) {
-                    this[type] = (function (toasterType) {
-                        return function (title, body, timeout, bodyOutputType, clickHandler, toasterId, showCloseButton, toastId,onHideCallback) {
-                            if (angular.isString(title)) {
-                                this.pop(
-                                    toasterType,
-                                    title,
-                                    body,
-                                    timeout,
-                                    bodyOutputType,
-                                    clickHandler,
-                                    toasterId,
-                                    showCloseButton,
-                                    toastId,
-                                    onHideCallback
+                    this[type] = createTypeMethod(type);
+                }
+
+                function createTypeMethod(toasterType) {
+                    return function (title, body, timeout, bodyOutputType, clickHandler, toasterId, showCloseButton, toastId, onHideCallback, directiveData) {
+                        if (angular.isString(title)) {
+                            this.pop(
+                                toasterType,
+                                title,
+                                body,
+                                timeout,
+                                bodyOutputType,
+                                clickHandler,
+                                toasterId,
+                                showCloseButton,
+                                toastId,
+                                onHideCallback,
+                                directiveData
                                 );
-                            } else { // 'title' is actually an object with options
-                                this.pop(angular.extend(title, { type: toasterType }));
-                            }
-                        };
-                    })(type);
+                        } else { // 'title' is actually an object with options
+                            this.pop(angular.extend(title, { type: toasterType }));
+                        }
+                    };
                 }
             }]
-    ).factory(
+        ).factory(
         'toasterEventRegistry', [
             '$rootScope', function ($rootScope) {
                 var deregisterNewToast = null, deregisterClearToasts = null, newToastEventSubscribers = [], clearToastsEventSubscribers = [], toasterFactory;
@@ -57877,7 +58005,7 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
                                         newToastEventSubscribers[i](event, toasterId, toastId);
                                     }
                                 }
-                            );
+                                );
                         }
 
                         if (!deregisterClearToasts) {
@@ -57887,7 +58015,7 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
                                         clearToastsEventSubscribers[i](event, toasterId, toastId);
                                     }
                                 }
-                            );
+                                );
                         }
                     },
 
@@ -57928,7 +58056,36 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
                     unsubscribeToClearToastsEvent: toasterFactory.unsubscribeToClearToastsEvent
                 };
             }]
-    ).directive(
+        )
+        .directive('directiveTemplate', ['$compile', '$injector', function($compile, $injector) {
+            return {
+                restrict: 'A',
+                scope: {
+                    directiveName: '@directiveName',
+                    directiveData: '@directiveData'
+                },
+                replace: true,   
+                link: function (scope, elm, attrs) {
+                    scope.$watch('directiveName', function (directiveName) {
+                        if (angular.isUndefined(directiveName) || directiveName.length <= 0)
+                            throw new Error('A valid directive name must be provided via the toast body argument when using bodyOutputType: directive');
+                        
+                        var directiveExists = $injector.has(attrs.$normalize(directiveName) + 'Directive');
+                        
+                        if (!directiveExists)
+                            throw new Error(directiveName + ' could not be found.');
+                        
+                        if (scope.directiveData)
+                            scope.directiveData = angular.fromJson(scope.directiveData);
+                        
+                        var template = $compile('<div ' + directiveName + '></div>')(scope);
+
+                        elm.append(template);
+                    });
+                }
+            }
+        }])
+        .directive(
         'toasterContainer', [
             '$parse', '$rootScope', '$interval', '$sce', 'toasterConfig', 'toaster', 'toasterEventRegistry',
             function ($parse, $rootScope, $interval, $sce, toasterConfig, toaster, toasterEventRegistry) {
@@ -57958,14 +58115,14 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
                                 toasterEventRegistry.unsubscribeToNewToastEvent(scope._onNewToast);
                                 toasterEventRegistry.unsubscribeToClearToastsEvent(scope._onClearToasts);
                             }
-                        );
+                            );
 
                         function setTimeout(toast, time) {
                             toast.timeoutPromise = $interval(
                                 function () {
                                     scope.removeToast(toast.id);
                                 }, time, 1
-                            );
+                                );
                         }
 
                         scope.configureTimer = function (toast) {
@@ -58044,6 +58201,9 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
                                     toast.bodyTemplate = templateWithData.template;
                                     toast.data = templateWithData.data;
                                     break;
+                                case 'directive':
+                                    toast.html = toast.body;
+                                    break;
                             }
 
                             scope.configureTimer(toast);
@@ -58061,7 +58221,7 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
                         }
 
                         scope.removeToast = function (id) {
-                            var i, len, toast;
+                            var i, len;
                             for (i = 0, len = scope.toasters.length; i < len; i++) {
                                 if (scope.toasters[i].id === id) {
                                     removeToast(i);
@@ -58077,7 +58237,7 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
                                     $interval.cancel(toast.timeoutPromise);
                                 }
                                 scope.toasters.splice(toastIndex, 1);
-                                
+
                                 if (angular.isFunction(toast.onHideCallback)) {
                                     toast.onHideCallback();
                                 }
@@ -58099,7 +58259,7 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
                         scope.toasters = [];
 
                         function isUndefinedOrNull(val) {
-                            return angular.isUndefined(val) || val === null
+                            return angular.isUndefined(val) || val === null;
                         }
 
                         scope._onNewToast = function (event, toasterId, toastId) {
@@ -58164,10 +58324,23 @@ $templateCache.put("selectize/select.tpl.html","<div class=\"ui-select-container
                                 }
                             };
                         }],
-                    template: '<div id="toast-container" ng-class="[config.position, config.animation]">' + '<div ng-repeat="toaster in toasters" class="toast" ng-class="toaster.type" ng-click="click(toaster)" ng-mouseover="stopTimer(toaster)" ng-mouseout="restartTimer(toaster)">' + '<button type="button" class="toast-close-button" ng-show="toaster.showCloseButton" ng-click="click(toaster, true)">&times;</button>' + '<div ng-class="config.title">{{toaster.title}}</div>' + '<div ng-class="config.message" ng-switch on="toaster.bodyOutputType">' + '<div ng-switch-when="trustedHtml" ng-bind-html="toaster.html"></div>' + '<div ng-switch-when="template"><div ng-include="toaster.bodyTemplate"></div></div>' + '<div ng-switch-when="templateWithData"><div ng-include="toaster.bodyTemplate"></div></div>' + '<div ng-switch-default >{{toaster.body}}</div>' + '</div>' + '</div>' + '</div>'
+                    template: 
+                        '<div id="toast-container" ng-class="[config.position, config.animation]">' + 
+                            '<div ng-repeat="toaster in toasters" class="toast" ng-class="toaster.type" ng-click="click(toaster)" ng-mouseover="stopTimer(toaster)" ng-mouseout="restartTimer(toaster)">' + 
+                                '<button type="button" class="toast-close-button" ng-show="toaster.showCloseButton" ng-click="click(toaster, true)">&times;</button>' + 
+                                '<div ng-class="config.title">{{toaster.title}}</div>' + 
+                                '<div ng-class="config.message" ng-switch on="toaster.bodyOutputType">' + 
+                                    '<div ng-switch-when="trustedHtml" ng-bind-html="toaster.html"></div>' + 
+                                    '<div ng-switch-when="template"><div ng-include="toaster.bodyTemplate"></div></div>' + 
+                                    '<div ng-switch-when="templateWithData"><div ng-include="toaster.bodyTemplate"></div></div>' +
+                                    '<div ng-switch-when="directive"><div directive-template directive-name="{{toaster.html}}" directive-data="{{toaster.directiveData}}"></div></div>' + 
+                                    '<div ng-switch-default >{{toaster.body}}</div>' + 
+                                '</div>' + 
+                            '</div>' + 
+                        '</div>'
                 };
             }]
-    );
+        );
 })(window, document);;(function (root, factory) {
   'use strict';
 
@@ -61831,7 +62004,210 @@ module
   };
 
 });
-;// 4.2.5 (2015-08-31)
+;(function() {
+'use strict';
+
+angular.module('ngCropper', ['ng'])
+.directive('ngCropper', ['$q', function($q) {
+  return {
+    restrict: 'A',
+    scope: {options: '=ngOptions'},
+    link: function(scope, element, atts) {
+      var shown = false;
+
+      scope.$on(atts.ngShow, function() {
+        if (shown) return;
+        shown = true;
+
+        preprocess(scope.options, element[0])
+          .then(function(options) {
+            element.cropper(options);
+          })
+      });
+
+      scope.$on(atts.ngHide, function() {
+        if (!shown) return;
+        shown = false;
+        element.cropper('destroy');
+      });
+
+      scope.$watch('options.disabled', function(disabled) {
+        if (!shown) return;
+        if (disabled) element.cropper('disable');
+        if (!disabled) element.cropper('enable');
+      });
+    }
+  };
+
+  function preprocess(options, img) {
+    options = options || {};
+
+    var defer = $q.defer();
+    var toResolve = [passInitial(options)];
+
+    if (options.maximize) toResolve.push(maximizeSelection(options, img));
+
+    $q.all(toResolve).then(function(values) {
+      var lastUpdatedOptions = values[values.length-1];
+      defer.resolve(lastUpdatedOptions);
+    });
+
+    return defer.promise;
+  }
+
+  /**
+   * The only promise to resolve when no more processing promiseses passed.
+   */
+  function passInitial(options) {
+    var defer = $q.defer();
+    defer.resolve(options);
+    return defer.promise;
+  }
+
+  /**
+   * Change options to make selection maximum for the image.
+   * fengyuanchen/cropper calculates valid selection's height & width
+   * with respect to `aspectRatio`.
+   */
+  function maximizeSelection(options, img) {
+    var defer = $q.defer();
+
+    getRealSize(img).then(function(size) {
+      options.data = size;
+      defer.resolve(options);
+    });
+
+    return defer.promise;
+  }
+
+  /**
+   * Returns real image size (without changes by css, attributes).
+   */
+  function getRealSize(img) {
+    var defer = $q.defer();
+    var size = {height: null, width: null};
+    var image = new Image();
+
+    image.onload = function() {
+      defer.resolve({width: image.width, height: image.height});
+    }
+
+    image.src = img.src;
+    return defer.promise;
+  }
+}])
+.service('Cropper', ['$q', function($q) {
+
+  this.encode = function(blob) {
+    var defer = $q.defer();
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      defer.resolve(e.target.result);
+    };
+    reader.readAsDataURL(blob);
+    return defer.promise;
+  };
+
+  this.decode = function(dataUrl) {
+    var meta = dataUrl.split(';')[0];
+    var type = meta.split(':')[1];
+    var binary = atob(dataUrl.split(',')[1]);
+    var array = new Uint8Array(binary.length);
+    for (var i = 0; i < binary.length; i++) {
+        array[i] = binary.charCodeAt(i);
+    }
+    return new Blob([array], {type: type});
+  };
+
+  this.crop = function(file, data) {
+    var defer = $q.defer();
+    var _decode = this.decode;
+
+    this.encode(file).then(_createImage).then(function(image) {
+      var canvas = createCanvas(data);
+      var context = canvas.getContext('2d');
+
+      context.drawImage(image, data.x, data.y, data.width, data.height, 0, 0, data.width, data.height);
+
+      var encoded = canvas.toDataURL(file.type);
+      var blob = _decode(encoded);
+
+      defer.resolve(blob);
+      removeElement(canvas);
+    });
+
+    return defer.promise;
+  };
+
+  this.scale = function(file, data) {
+    var defer = $q.defer();
+    var _decode = this.decode;
+
+    this.encode(file).then(_createImage).then(function(image) {
+      var heightOrig = image.height;
+      var widthOrig = image.width;
+      var ratio, height, width;
+
+      if (angular.isNumber(data)) {
+        ratio = data;
+        height = heightOrig * ratio;
+        width = widthOrig * ratio;
+      }
+
+      if (angular.isObject(data)) {
+        ratio = widthOrig / heightOrig;
+        height = data.height;
+        width = data.width;
+
+        if (height && !width)
+          width = height * ratio;
+        else if (width && !height)
+          height = width / ratio;
+      }
+
+      var canvas = createCanvas(data);
+      var context = canvas.getContext('2d');
+
+      canvas.height = height;
+      canvas.width = width;
+
+      context.drawImage(image, 0, 0, widthOrig, heightOrig, 0, 0, width, height);
+
+      var encoded = canvas.toDataURL(file.type);
+      var blob = _decode(encoded);
+
+      defer.resolve(blob);
+      removeElement(canvas);
+    });
+
+    return defer.promise;
+  };
+
+
+  function _createImage(source) {
+    var defer = $q.defer();
+    var image = new Image();
+    image.onload = function(e) { defer.resolve(e.target); };
+    image.src = source;
+    return defer.promise;
+  }
+
+  function createCanvas(data) {
+    var canvas = document.createElement('canvas');
+    canvas.width = data.width;
+    canvas.height = data.height;
+    canvas.style.display = 'none';
+    document.body.appendChild(canvas);
+    return canvas;
+  }
+
+  function removeElement(el) {
+    el.parentElement.removeChild(el);
+  }
+
+}]);
+
+})();;// 4.2.7 (2015-10-27)
 
 /**
  * Compiled inline version. (Library mode)
@@ -65322,6 +65698,7 @@ define("tinymce/dom/DomQuery", [
 	var doc = document, push = Array.prototype.push, slice = Array.prototype.slice;
 	var rquickExpr = /^(?:[^#<]*(<[\w\W]+>)[^>]*$|#([\w\-]*)$)/;
 	var Event = EventUtils.Event, undef;
+	var skipUniques = Tools.makeMap('children,contents,next,prev');
 
 	function isDefined(obj) {
 		return typeof obj !== 'undefined';
@@ -66650,7 +67027,9 @@ define("tinymce/dom/DomQuery", [
 
 			// If traversing on multiple elements we might get the same elements twice
 			if (this.length > 1) {
-				result = DomQuery.unique(result);
+				if (!skipUniques[name]) {
+					result = DomQuery.unique(result);
+				}
 
 				if (name.indexOf('parents') === 0) {
 					result = result.reverse();
@@ -68222,7 +68601,7 @@ define("tinymce/html/Entities", [
 
 	var Entities = {
 		/**
-		 * Encodes the specified string using raw entities. This means only the required XML base entities will be endoded.
+		 * Encodes the specified string using raw entities. This means only the required XML base entities will be encoded.
 		 *
 		 * @method encodeRaw
 		 * @param {String} text Text to encode.
@@ -68650,6 +69029,39 @@ define("tinymce/dom/DOMUtils", [
 		}
 
 		return attrHooks;
+	}
+
+	function updateInternalStyleAttr(domUtils, $elm) {
+		var value = $elm.attr('style');
+
+		value = domUtils.serializeStyle(domUtils.parseStyle(value), $elm[0].nodeName);
+
+		if (!value) {
+			value = null;
+		}
+
+		$elm.attr('data-mce-style', value);
+	}
+
+	function nodeIndex(node, normalized) {
+		var idx = 0, lastNodeType, nodeType;
+
+		if (node) {
+			for (lastNodeType = node.nodeType, node = node.previousSibling; node; node = node.previousSibling) {
+				nodeType = node.nodeType;
+
+				// Normalize text nodes
+				if (normalized && nodeType == 3) {
+					if (nodeType == lastNodeType || !node.nodeValue.length) {
+						continue;
+					}
+				}
+				idx++;
+				lastNodeType = nodeType;
+			}
+		}
+
+		return idx;
 	}
 
 	/**
@@ -69192,7 +69604,7 @@ define("tinymce/dom/DOMUtils", [
 		 * or the CSS style name like background-color.
 		 *
 		 * @method setStyle
-		 * @param {String/Element/Array} n HTML element/Element ID or Array of elements/ids to set CSS style value on.
+		 * @param {String/Element/Array} n HTML element/Array of elements to set CSS style value on.
 		 * @param {String} na Name of the style value to set.
 		 * @param {String} v Value to set on the style.
 		 * @example
@@ -69206,7 +69618,7 @@ define("tinymce/dom/DOMUtils", [
 			elm = this.$$(elm).css(name, value);
 
 			if (this.settings.update_styles) {
-				elm.attr('data-mce-style', null);
+				updateInternalStyleAttr(this, elm);
 			}
 		},
 
@@ -69255,7 +69667,7 @@ define("tinymce/dom/DOMUtils", [
 			elm = this.$$(elm).css(styles);
 
 			if (this.settings.update_styles) {
-				elm.attr('data-mce-style', null);
+				updateInternalStyleAttr(this, elm);
 			}
 		},
 
@@ -70068,26 +70480,7 @@ define("tinymce/dom/DOMUtils", [
 		 * @param {boolean} normalized Optional true/false state if the index is what it would be after a normalization.
 		 * @return {Number} Index of the specified node.
 		 */
-		nodeIndex: function(node, normalized) {
-			var idx = 0, lastNodeType, nodeType;
-
-			if (node) {
-				for (lastNodeType = node.nodeType, node = node.previousSibling; node; node = node.previousSibling) {
-					nodeType = node.nodeType;
-
-					// Normalize text nodes
-					if (normalized && nodeType == 3) {
-						if (nodeType == lastNodeType || !node.nodeValue.length) {
-							continue;
-						}
-					}
-					idx++;
-					lastNodeType = nodeType;
-				}
-			}
-
-			return idx;
-		},
+		nodeIndex: nodeIndex,
 
 		/**
 		 * Splits an element into two new elements and places the specified split
@@ -70396,6 +70789,7 @@ define("tinymce/dom/DOMUtils", [
 	 * tinymce.DOM.addClass('someid', 'someclass');
 	 */
 	DOMUtils.DOM = new DOMUtils(document);
+	DOMUtils.nodeIndex = nodeIndex;
 
 	return DOMUtils;
 });
@@ -71199,6 +71593,10 @@ define("tinymce/dom/RangeUtils", [
 				var container, offset, walker, body = dom.getRoot(), node, nonEmptyElementsMap;
 				var directionLeft, isAfterNode;
 
+				function isTableCell(node) {
+					return node && /^(TD|TH|CAPTION)$/.test(node.nodeName);
+				}
+
 				function hasBrBeforeAfter(node, left) {
 					var walker = new TreeWalker(node, dom.getParent(node.parentNode, dom.isBlock) || body);
 
@@ -71312,7 +71710,7 @@ define("tinymce/dom/RangeUtils", [
 								}
 
 								// Found a BR/IMG element that we can place the caret before
-								if (nonEmptyElementsMap[node.nodeName.toLowerCase()]) {
+								if (nonEmptyElementsMap[node.nodeName.toLowerCase()] && !isTableCell(node)) {
 									offset = dom.nodeIndex(node);
 									container = node.parentNode;
 
@@ -74744,27 +75142,29 @@ define("tinymce/html/Serializer", [
 						sortedAttrs.map = {};
 
 						elementRule = schema.getElementRule(node.name);
-						for (i = 0, l = elementRule.attributesOrder.length; i < l; i++) {
-							attrName = elementRule.attributesOrder[i];
+						if (elementRule) {
+							for (i = 0, l = elementRule.attributesOrder.length; i < l; i++) {
+								attrName = elementRule.attributesOrder[i];
 
-							if (attrName in attrs.map) {
-								attrValue = attrs.map[attrName];
-								sortedAttrs.map[attrName] = attrValue;
-								sortedAttrs.push({name: attrName, value: attrValue});
+								if (attrName in attrs.map) {
+									attrValue = attrs.map[attrName];
+									sortedAttrs.map[attrName] = attrValue;
+									sortedAttrs.push({name: attrName, value: attrValue});
+								}
 							}
-						}
 
-						for (i = 0, l = attrs.length; i < l; i++) {
-							attrName = attrs[i].name;
+							for (i = 0, l = attrs.length; i < l; i++) {
+								attrName = attrs[i].name;
 
-							if (!(attrName in sortedAttrs.map)) {
-								attrValue = attrs.map[attrName];
-								sortedAttrs.map[attrName] = attrValue;
-								sortedAttrs.push({name: attrName, value: attrValue});
+								if (!(attrName in sortedAttrs.map)) {
+									attrValue = attrs.map[attrName];
+									sortedAttrs.map[attrName] = attrValue;
+									sortedAttrs.push({name: attrName, value: attrValue});
+								}
 							}
-						}
 
-						attrs = sortedAttrs;
+							attrs = sortedAttrs;
+						}
 					}
 
 					writer.start(node.name, attrs, isEmpty);
@@ -74825,6 +75225,33 @@ define("tinymce/dom/Serializer", [
 ], function(DOMUtils, DomParser, Entities, Serializer, Node, Schema, Env, Tools) {
 	var each = Tools.each, trim = Tools.trim;
 	var DOM = DOMUtils.DOM;
+
+	/**
+	 * IE 11 has a fantastic bug where it will produce two trailing BR elements to iframe bodies when
+	 * the iframe is hidden by display: none on a parent container. The DOM is actually out of sync
+	 * with innerHTML in this case. It's like IE adds shadow DOM BR elements that appears on innerHTML
+	 * but not as the lastChild of the body. So this fix simply removes the last two
+	 * BR elements at the end of the document.
+	 *
+	 * Example of what happens: <body>text</body> becomes <body>text<br><br></body>
+	 */
+	function trimTrailingBr(rootNode) {
+		var brNode1, brNode2;
+
+		function isBr(node) {
+			return node && node.name === 'br';
+		}
+
+		brNode1 = rootNode.lastChild;
+		if (isBr(brNode1)) {
+			brNode2 = brNode1.prev;
+
+			if (isBr(brNode2)) {
+				brNode1.remove();
+				brNode2.remove();
+			}
+		}
+	}
 
 	/**
 	 * Constructs a new DOM serializer class.
@@ -75083,7 +75510,7 @@ define("tinymce/dom/Serializer", [
 			 * @param {Object} args Arguments option that gets passed to event handlers.
 			 */
 			serialize: function(node, args) {
-				var self = this, impl, doc, oldDoc, htmlSerializer, content;
+				var self = this, impl, doc, oldDoc, htmlSerializer, content, rootNode;
 
 				// Explorer won't clone contents of script and style and the
 				// selected index of select elements are cleared on a clone operation.
@@ -75133,13 +75560,13 @@ define("tinymce/dom/Serializer", [
 					self.onPreProcess(args);
 				}
 
-				// Setup serializer
-				htmlSerializer = new Serializer(settings, schema);
+				// Parse HTML
+				rootNode = htmlParser.parse(trim(args.getInner ? node.innerHTML : dom.getOuterHTML(node)), args);
+				trimTrailingBr(rootNode);
 
-				// Parse and serialize HTML
-				args.content = htmlSerializer.serialize(
-					htmlParser.parse(trim(args.getInner ? node.innerHTML : dom.getOuterHTML(node)), args)
-				);
+				// Serialize HTML
+				htmlSerializer = new Serializer(settings, schema);
+				args.content = htmlSerializer.serialize(rootNode);
 
 				// Replace all BOM characters for now until we can find a better solution
 				if (!args.cleanup) {
@@ -75852,6 +76279,10 @@ define("tinymce/dom/ControlSelection", [
 				return false;
 			}
 
+			if (elm == editor.getBody()) {
+				return false;
+			}
+
 			return editor.dom.is(elm, selector);
 		}
 
@@ -76328,7 +76759,7 @@ define("tinymce/dom/ControlSelection", [
 				}
 			});
 
-			editor.on('hide', hideResizeRect);
+			editor.on('hide blur', hideResizeRect);
 
 			// Hide rect on focusout since it would float on top of windows otherwise
 			//editor.on('focusout', hideResizeRect);
@@ -80293,9 +80724,13 @@ define("tinymce/Formatter", [
 
 					removeCaretContainer();
 
-					// Remove caret container on keydown and it's a backspace, enter or left/right arrow keys
-					// Backspace key needs to check if the range is collapsed due to bug #6780
-					if ((keyCode == 8 && selection.isCollapsed()) || keyCode == 37 || keyCode == 39) {
+					// Remove caret container if it's empty
+					if (keyCode == 8 && selection.isCollapsed() && selection.getStart().innerHTML == INVISIBLE_CHAR) {
+						removeCaretContainer(getParentCaretContainer(selection.getStart()));
+					}
+
+					// Remove caret container on keydown and it's left/right arrow keys
+					if (keyCode == 37 || keyCode == 39) {
 						removeCaretContainer(getParentCaretContainer(selection.getStart()));
 					}
 
@@ -80473,7 +80908,7 @@ define("tinymce/UndoManager", [
 			}
 		});
 
-		editor.on('ObjectResizeStart', function() {
+		editor.on('ObjectResizeStart Cut', function() {
 			self.beforeChange();
 		});
 
@@ -80482,6 +80917,12 @@ define("tinymce/UndoManager", [
 
 		editor.on('KeyUp', function(e) {
 			var keyCode = e.keyCode;
+
+			// If key is prevented then don't add undo level
+			// This would happen on keyboard shortcuts for example
+			if (e.isDefaultPrevented()) {
+				return;
+			}
 
 			if ((keyCode >= 33 && keyCode <= 36) || (keyCode >= 37 && keyCode <= 40) || keyCode == 45 || keyCode == 13 || e.ctrlKey) {
 				addNonTypingUndoLevel();
@@ -80512,6 +80953,12 @@ define("tinymce/UndoManager", [
 
 		editor.on('KeyDown', function(e) {
 			var keyCode = e.keyCode;
+
+			// If key is prevented then don't add undo level
+			// This would happen on keyboard shortcuts for example
+			if (e.isDefaultPrevented()) {
+				return;
+			}
 
 			// Is caracter positon keys left,right,up,down,home,end,pgdown,pgup,enter
 			if ((keyCode >= 33 && keyCode <= 36) || (keyCode >= 37 && keyCode <= 40) || keyCode == 45) {
@@ -80797,6 +81244,10 @@ define("tinymce/EnterKey", [
 					dom.getContentEditable(node) !== "true";
 			}
 
+			function isTableCell(node) {
+				return node && /^(TD|TH|CAPTION)$/.test(node.nodeName);
+			}
+
 			// Renders empty block on IE
 			function renderBlockOnIE(block) {
 				var oldRng;
@@ -80947,6 +81398,11 @@ define("tinymce/EnterKey", [
 				}
 			}
 
+			function emptyBlock(elm) {
+				// BR is needed in empty blocks on non IE browsers
+				elm.innerHTML = !isIE ? '<br data-mce-bogus="1">' : '';
+			}
+
 			// Creates a new block element by cloning the current one or creating a new one if the name is specified
 			// This function will also copy any text formatting from the parent block and add it to the new one
 			function createNewBlock(name) {
@@ -81058,9 +81514,14 @@ define("tinymce/EnterKey", [
 
 				// Not in a block element or in a table cell or caption
 				parentBlock = dom.getParent(container, dom.isBlock);
-				rootBlockName = editor.getBody().nodeName.toLowerCase();
 				if (!parentBlock || !canSplitBlock(parentBlock)) {
 					parentBlock = parentBlock || editableRoot;
+
+					if (parentBlock == editor.getBody() || isTableCell(parentBlock)) {
+						rootBlockName = parentBlock.nodeName.toLowerCase();
+					} else {
+						rootBlockName = parentBlock.parentNode.nodeName.toLowerCase();
+					}
 
 					if (!parentBlock.hasChildNodes()) {
 						newBlock = dom.create(blockName);
@@ -81130,6 +81591,10 @@ define("tinymce/EnterKey", [
 					}
 
 					return containerBlock;
+				}
+
+				if (containerBlock == editor.getBody()) {
+					return;
 				}
 
 				// Check if we are in an nested list
@@ -81381,6 +81846,10 @@ define("tinymce/EnterKey", [
 				dom.insertAfter(fragment, parentBlock);
 				trimInlineElementsOnLeftSideOfBlock(newBlock);
 				addBrToBlockIfNeeded(parentBlock);
+
+				if (dom.isEmpty(parentBlock)) {
+					emptyBlock(parentBlock);
+				}
 
 				// New block might become empty if it's <p><b>a |</b></p>
 				if (dom.isEmpty(newBlock)) {
@@ -82091,7 +82560,9 @@ define("tinymce/EditorCommands", [
 
 				// Setup parser and serializer
 				parser = editor.parser;
-				serializer = new Serializer({}, editor.schema);
+				serializer = new Serializer({
+					validate: settings.validate
+				}, editor.schema);
 				bookmarkHtml = '<span id="mce_marker" data-mce-type="bookmark">&#xFEFF;&#x200B;</span>';
 
 				// Run beforeSetContent handlers on the HTML to be inserted
@@ -89407,6 +89878,59 @@ define("tinymce/WindowManager", [
 	};
 });
 
+// Included from: js/tinymce/classes/dom/NodePath.js
+
+/**
+ * NodePath.js
+ *
+ * Released under LGPL License.
+ * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
+ *
+ * License: http://www.tinymce.com/license
+ * Contributing: http://www.tinymce.com/contributing
+ */
+
+/**
+ * Handles paths of nodes within an element.
+ *
+ * @private
+ * @class tinymce.dom.NodePath
+ */
+define("tinymce/dom/NodePath", [
+	"tinymce/dom/DOMUtils"
+], function(DOMUtils) {
+	function create(rootNode, targetNode, normalized) {
+		var path = [];
+
+		for (; targetNode && targetNode != rootNode; targetNode = targetNode.parentNode) {
+			path.push(DOMUtils.nodeIndex(targetNode, normalized));
+		}
+
+		return path;
+	}
+
+	function resolve(rootNode, path) {
+		var i, node, children;
+
+		for (node = rootNode, i = path.length - 1; i >= 0; i--) {
+			children = node.childNodes;
+
+			if (path[i] > children.length - 1) {
+				return null;
+			}
+
+			node = children[path[i]];
+		}
+
+		return node;
+	}
+
+	return {
+		create: create,
+		resolve: resolve
+	};
+});
+
 // Included from: js/tinymce/classes/util/Quirks.js
 
 /**
@@ -89431,11 +89955,12 @@ define("tinymce/util/Quirks", [
 	"tinymce/util/VK",
 	"tinymce/dom/RangeUtils",
 	"tinymce/dom/TreeWalker",
+	"tinymce/dom/NodePath",
 	"tinymce/html/Node",
 	"tinymce/html/Entities",
 	"tinymce/Env",
 	"tinymce/util/Tools"
-], function(VK, RangeUtils, TreeWalker, Node, Entities, Env, Tools) {
+], function(VK, RangeUtils, TreeWalker, NodePath, Node, Entities, Env, Tools) {
 	return function(editor) {
 		var each = Tools.each, $ = editor.$;
 		var BACKSPACE = VK.BACKSPACE, DELETE = VK.DELETE, dom = editor.dom, selection = editor.selection,
@@ -89814,6 +90339,111 @@ define("tinymce/util/Quirks", [
 				}
 			}
 
+			/**
+			 * This retains the formatting if the last character is to be deleted.
+			 *
+			 * Backspace on this: <p><b><i>a|</i></b></p> would become <p>|</p> in WebKit.
+			 * With this patch: <p><b><i>|<br></i></b></p>
+			 */
+			function handleLastBlockCharacterDelete(isForward, rng) {
+				var path, blockElm, newBlockElm, clonedBlockElm, sibling,
+					container, offset, br, currentFormatNodes;
+
+				function cloneTextBlockWithFormats(blockElm, node) {
+					currentFormatNodes = $(node).parents().filter(function(idx, node) {
+						return !!editor.schema.getTextInlineElements()[node.nodeName];
+					});
+
+					newBlockElm = blockElm.cloneNode(false);
+
+					currentFormatNodes = Tools.map(currentFormatNodes, function(formatNode) {
+						formatNode = formatNode.cloneNode(false);
+
+						if (newBlockElm.hasChildNodes()) {
+							formatNode.appendChild(newBlockElm.firstChild);
+							newBlockElm.appendChild(formatNode);
+						} else {
+							newBlockElm.appendChild(formatNode);
+						}
+
+						newBlockElm.appendChild(formatNode);
+
+						return formatNode;
+					});
+
+					if (currentFormatNodes.length) {
+						br = dom.create('br');
+						currentFormatNodes[0].appendChild(br);
+						dom.replace(newBlockElm, blockElm);
+
+						rng.setStartBefore(br);
+						rng.setEndBefore(br);
+						editor.selection.setRng(rng);
+
+						return br;
+					}
+
+					return null;
+				}
+
+				function isTextBlock(node) {
+					return node && editor.schema.getTextBlockElements()[node.tagName];
+				}
+
+				if (!rng.collapsed) {
+					return;
+				}
+
+				container = rng.startContainer;
+				offset = rng.startOffset;
+				blockElm = dom.getParent(container, dom.isBlock);
+				if (!isTextBlock(blockElm)) {
+					return;
+				}
+
+				if (container.nodeType == 1) {
+					container = container.childNodes[offset];
+					if (container && container.tagName != 'BR') {
+						return;
+					}
+
+					if (isForward) {
+						sibling = blockElm.nextSibling;
+					} else {
+						sibling = blockElm.previousSibling;
+					}
+
+					if (dom.isEmpty(blockElm) && isTextBlock(sibling) && dom.isEmpty(sibling)) {
+						if (cloneTextBlockWithFormats(blockElm, container)) {
+							dom.remove(sibling);
+							return true;
+						}
+					}
+				} else if (container.nodeType == 3) {
+					path = NodePath.create(blockElm, container);
+					clonedBlockElm = blockElm.cloneNode(true);
+					container = NodePath.resolve(clonedBlockElm, path);
+
+					if (isForward) {
+						if (offset >= container.data.length) {
+							return;
+						}
+
+						container.deleteData(offset, 1);
+					} else {
+						if (offset <= 0) {
+							return;
+						}
+
+						container.deleteData(offset - 1, 1);
+					}
+
+					if (dom.isEmpty(clonedBlockElm)) {
+						return cloneTextBlockWithFormats(blockElm, container);
+					}
+				}
+			}
+
 			function customDelete(isForward) {
 				var mutationObserver, rng, caretElement;
 
@@ -89898,6 +90528,16 @@ define("tinymce/util/Quirks", [
 				if (!isDefaultPrevented(e) && (isForward || e.keyCode == BACKSPACE)) {
 					var rng = editor.selection.getRng(), container = rng.startContainer, offset = rng.startOffset;
 
+					// Shift+Delete is cut
+					if (isForward && e.shiftKey) {
+						return;
+					}
+
+					if (handleLastBlockCharacterDelete(isForward, rng)) {
+						e.preventDefault();
+						return;
+					}
+
 					// Ignore non meta delete in the where there is text before/after the caret
 					if (!isMetaOrCtrl && rng.collapsed && container.nodeType == 3) {
 						if (isForward ? offset < container.data.length : offset > 0) {
@@ -89917,7 +90557,7 @@ define("tinymce/util/Quirks", [
 
 			// Handle case where text is deleted by typing over
 			editor.on('keypress', function(e) {
-				if (!isDefaultPrevented(e) && !selection.isCollapsed() && e.charCode && !VK.metaKeyPressed(e)) {
+				if (!isDefaultPrevented(e) && !selection.isCollapsed() && e.charCode > 31 && !VK.metaKeyPressed(e)) {
 					var rng, currentFormatNodes, fragmentNode, blockParent, caretNode, charText;
 
 					rng = editor.selection.getRng();
@@ -90751,8 +91391,15 @@ define("tinymce/util/Quirks", [
 			if (!editor.inline) {
 				editor.contentStyles.push('body {min-height: 150px}');
 				editor.on('click', function(e) {
+					var rng;
+
 					if (e.target.nodeName == 'HTML') {
-						var rng;
+						// Edge seems to only need focus if we set the range
+						// the caret will become invisible and moved out of the iframe!!
+						if (Env.ie > 11) {
+							editor.getBody().focus();
+							return;
+						}
 
 						// Need to store away non collapsed ranges since the focus call will mess that up see #7382
 						rng = editor.selection.getRng();
@@ -90785,25 +91432,6 @@ define("tinymce/util/Quirks", [
 		 */
 		function disableAutoUrlDetect() {
 			setEditorCommandState("AutoUrlDetect", false);
-		}
-
-		/**
-		 * IE 11 has a fantastic bug where it will produce two trailing BR elements to iframe bodies when
-		 * the iframe is hidden by display: none on a parent container. The DOM is actually out of sync
-		 * with innerHTML in this case. It's like IE adds shadow DOM BR elements that appears on innerHTML
-		 * but not as the lastChild of the body. However is we add a BR element to the body then remove it
-		 * it doesn't seem to add these BR elements makes sence right?!
-		 *
-		 * Example of what happens: <body>text</body> becomes <body>text<br><br></body>
-		 */
-		function doubleTrailingBrElements() {
-			if (!editor.inline) {
-				editor.on('focus blur beforegetcontent', function() {
-					var br = editor.dom.create('br');
-					editor.getBody().appendChild(br);
-					br.parentNode.removeChild(br);
-				}, true);
-			}
 		}
 
 		/**
@@ -90979,7 +91607,6 @@ define("tinymce/util/Quirks", [
 
 		if (Env.ie >= 11) {
 			bodyHeight();
-			doubleTrailingBrElements();
 			disableBackspaceIntoATable();
 		}
 
@@ -92132,6 +92759,16 @@ define("tinymce/EditorUpload", [
 	return function(editor) {
 		var blobCache = new BlobCache(), uploader, imageScanner;
 
+		function aliveGuard(callback) {
+			return function(result) {
+				if (editor.selection) {
+					return callback(result);
+				}
+
+				return [];
+			};
+		}
+
 		// Replaces strings without regexps to avoid FF regexp to big issue
 		function replaceString(content, search, replace) {
 			var index = 0;
@@ -92171,14 +92808,14 @@ define("tinymce/EditorUpload", [
 				});
 			}
 
-			return scanForImages().then(function(imageInfos) {
+			return scanForImages().then(aliveGuard(function(imageInfos) {
 				var blobInfos;
 
 				blobInfos = Arr.map(imageInfos, function(imageInfo) {
 					return imageInfo.blobInfo;
 				});
 
-				return uploader.upload(blobInfos).then(function(result) {
+				return uploader.upload(blobInfos).then(aliveGuard(function(result) {
 					result = Arr.map(result, function(uploadInfo, index) {
 						var image = imageInfos[index].image;
 
@@ -92200,8 +92837,14 @@ define("tinymce/EditorUpload", [
 					}
 
 					return result;
-				});
-			});
+				}));
+			}));
+		}
+
+		function uploadImagesAuto(callback) {
+			if (editor.settings.automatic_uploads !== false) {
+				return uploadImages(callback);
+			}
 		}
 
 		function scanForImages() {
@@ -92209,14 +92852,14 @@ define("tinymce/EditorUpload", [
 				imageScanner = new ImageScanner(blobCache);
 			}
 
-			return imageScanner.findAll(editor.getBody()).then(function(result) {
+			return imageScanner.findAll(editor.getBody()).then(aliveGuard(function(result) {
 				Arr.each(result, function(resultItem) {
 					replaceUrlInUndoStack(resultItem.image.src, resultItem.blobInfo.blobUri());
 					resultItem.image.src = resultItem.blobInfo.blobUri();
 				});
 
 				return result;
-			});
+			}));
 		}
 
 		function destroy() {
@@ -92238,11 +92881,17 @@ define("tinymce/EditorUpload", [
 					return 'src="data:' + blobInfo.blob().type + ';base64,' + blobInfo.base64() + '"';
 				}
 
-				return match[0];
+				return match;
 			});
 		}
 
-		editor.on('setContent paste', scanForImages);
+		editor.on('setContent', function() {
+			if (editor.settings.automatic_uploads !== false) {
+				uploadImagesAuto();
+			} else {
+				scanForImages();
+			}
+		});
 
 		editor.on('RawSaveContent', function(e) {
 			e.content = replaceBlobWithBase64(e.content);
@@ -92259,6 +92908,7 @@ define("tinymce/EditorUpload", [
 		return {
 			blobCache: blobCache,
 			uploadImages: uploadImages,
+			uploadImagesAuto: uploadImagesAuto,
 			scanForImages: scanForImages,
 			destroy: destroy
 		};
@@ -92929,7 +93579,10 @@ define("tinymce/Editor", [
 
 			// Domain relaxing is required since the user has messed around with document.domain
 			if (document.domain != location.hostname) {
-				url = domainRelaxUrl;
+				// Edge seems to be able to handle domain relaxing
+				if (Env.ie && Env.ie < 12) {
+					url = domainRelaxUrl;
+				}
 			}
 
 			// Create iframe
@@ -93123,11 +93776,14 @@ define("tinymce/Editor", [
 
 			// Keep scripts from executing
 			self.parser.addNodeFilter('script', function(nodes) {
-				var i = nodes.length, node;
+				var i = nodes.length, node, type;
 
 				while (i--) {
 					node = nodes[i];
-					node.attr('type', 'mce-' + (node.attr('type') || 'no/type'));
+					type = node.attr('type') || 'no/type';
+					if (type.indexOf('mce-') !== 0) {
+						node.attr('type', 'mce-' + type);
+					}
 				}
 			});
 
@@ -93930,7 +94586,7 @@ define("tinymce/Editor", [
 		 * tinymce.activeEditor.setContent('[b]some[/b] html', {format: 'bbcode'});
 		 */
 		setContent: function(content, args) {
-			var self = this, body = self.getBody(), forcedRootBlockName;
+			var self = this, body = self.getBody(), forcedRootBlockName, padd;
 
 			// Setup args object
 			args = args || {};
@@ -93948,14 +94604,24 @@ define("tinymce/Editor", [
 			// Padd empty content in Gecko and Safari. Commands will otherwise fail on the content
 			// It will also be impossible to place the caret in the editor unless there is a BR element present
 			if (content.length === 0 || /^\s+$/.test(content)) {
+				padd = ie && ie < 11 ? '' : '<br data-mce-bogus="1">';
+
+				// Todo: There is a lot more root elements that need special padding
+				// so separate this and add all of them at some point.
+				if (body.nodeName == 'TABLE') {
+					content = '<tr><td>' + padd + '</td></tr>';
+				} else if (/^(UL|OL)$/.test(body.nodeName)) {
+					content = '<li>' + padd + '</li>';
+				}
+
 				forcedRootBlockName = self.settings.forced_root_block;
 
 				// Check if forcedRootBlock is configured and that the block is a valid child of the body
 				if (forcedRootBlockName && self.schema.isValidChild(body.nodeName.toLowerCase(), forcedRootBlockName.toLowerCase())) {
 					// Padd with bogus BR elements on modern browsers and IE 7 and 8 since they don't render empty P tags properly
-					content = ie && ie < 11 ? '' : '<br data-mce-bogus="1">';
+					content = padd;
 					content = self.dom.createHTML(forcedRootBlockName, self.settings.forced_root_block_attrs, content);
-				} else if (!ie) {
+				} else if (!ie && !content) {
 					// We need to add a BR when forced_root_block is disabled on non IE browsers to place the caret
 					content = '<br data-mce-bogus="1">';
 				}
@@ -93966,7 +94632,9 @@ define("tinymce/Editor", [
 			} else {
 				// Parse and serialize the html
 				if (args.format !== 'raw') {
-					content = new Serializer({}, self.schema).serialize(
+					content = new Serializer({
+						validate: self.validate
+					}, self.schema).serialize(
 						self.parser.parse(content, {isRootContent: true})
 					);
 				}
@@ -94898,7 +95566,7 @@ define("tinymce/EditorManager", [
 		 * @property minorVersion
 		 * @type String
 		 */
-		minorVersion: '2.5',
+		minorVersion: '2.7',
 
 		/**
 		 * Release date of TinyMCE build.
@@ -94906,7 +95574,7 @@ define("tinymce/EditorManager", [
 		 * @property releaseDate
 		 * @type String
 		 */
-		releaseDate: '2015-08-31',
+		releaseDate: '2015-10-27',
 
 		/**
 		 * Collection of editor instances.
@@ -95629,6 +96297,12 @@ define("tinymce/util/XHR", [
 
 				if (settings.content_type) {
 					xhr.setRequestHeader('Content-Type', settings.content_type);
+				}
+
+				if (settings.requestheaders) {
+					Tools.each(settings.requestheaders, function(header) {
+						xhr.setRequestHeader(header.key, header.value);
+					});
 				}
 
 				xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
@@ -99304,6 +99978,23 @@ define("tinymce/ui/FormatControls", [
 
 		formatMenu = createFormatMenu();
 
+		function initOnPostRender() {
+			var self = this;
+
+			// TODO: Fix this
+			if (editor.formatter) {
+				editor.formatter.formatChanged(name, function(state) {
+					self.active(state);
+				});
+			} else {
+				editor.on('init', function() {
+					editor.formatter.formatChanged(name, function(state) {
+						self.active(state);
+					});
+				});
+			}
+		}
+
 		// Simple format controls <control/format>:<UI text>
 		each({
 			bold: 'Bold',
@@ -99316,20 +100007,7 @@ define("tinymce/ui/FormatControls", [
 			editor.addButton(name, {
 				tooltip: text,
 				onPostRender: function() {
-					var self = this;
-
-					// TODO: Fix this
-					if (editor.formatter) {
-						editor.formatter.formatChanged(name, function(state) {
-							self.active(state);
-						});
-					} else {
-						editor.on('init', function() {
-							editor.formatter.formatChanged(name, function(state) {
-								self.active(state);
-							});
-						});
-					}
+					initOnPostRender();
 				},
 				onclick: function() {
 					toggleFormat(name);
@@ -99373,20 +100051,7 @@ define("tinymce/ui/FormatControls", [
 				tooltip: item[0],
 				cmd: item[1],
 				onPostRender: function() {
-					var self = this;
-
-					// TODO: Fix this
-					if (editor.formatter) {
-						editor.formatter.formatChanged(name, function(state) {
-							self.active(state);
-						});
-					} else {
-						editor.on('init', function() {
-							editor.formatter.formatChanged(name, function(state) {
-								self.active(state);
-							});
-						});
-					}
+					initOnPostRender();
 				}
 			});
 		});
