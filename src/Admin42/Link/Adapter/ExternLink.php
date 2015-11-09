@@ -20,6 +20,10 @@ class ExternLink implements AdapterInterface
         $value["url"] = str_replace("https://", "", $value["url"]);
         $value["url"] = str_replace("mailto:", "", $value["url"]);
 
+        if (empty($value['type'])) {
+            $value['type'] = "http://";
+        }
+
         return $value['type'] . $value['url'];
     }
 }
