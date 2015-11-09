@@ -16,6 +16,10 @@ class ExternLink implements AdapterInterface
 
     protected function getLinkData($value)
     {
+        if (empty($value['url'])) {
+            return '';
+        }
+        
         $value["url"] = str_replace("http://", "", $value["url"]);
         $value["url"] = str_replace("https://", "", $value["url"]);
         $value["url"] = str_replace("mailto:", "", $value["url"]);
