@@ -169,11 +169,11 @@ class Dynamic extends Fieldset
             return ($value1['dynamic_index'] < $value2['dynamic_index']) ? -1 : 1;
         });
         $newData = [];
-        foreach ($data as $info) {
+        foreach ($data as $key => $info) {
             if (!array_key_exists('dynamic_deleted', $info) || $info['dynamic_deleted'] == 'true') {
                 continue;
             }
-            $newData[] = $info;
+            $newData[$key] = $info;
         }
 
         $data = $newData;
@@ -203,7 +203,7 @@ class Dynamic extends Fieldset
                     continue;
                 }
 
-                if ($key > $this->lastChildIndex) {
+                if (is_int($key) && $key > $this->lastChildIndex) {
                     $this->lastChildIndex = $key;
                 }
             }
