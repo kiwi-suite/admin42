@@ -138,7 +138,7 @@
                                     </div>
                                     <div class="row m-t-xs">
                                         <div class="text-ellipsis col-sm-<?= ($this->params()->fromRoute('referrer') == "index" ? 12 : 8)?>">
-                                            {{ row.filename }}
+                                            <i ng-if="row.meta != '[]'" class="fa fa-crop"></i> {{ row.filename }}
                                         </div>
                                         <?php if ($this->params()->fromRoute('referrer') != "index"): ?>
                                         <div class="col-sm-4 text-right">
