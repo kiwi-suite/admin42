@@ -2,39 +2,52 @@
 $values = [];
 foreach ($this->element->getValueOptions() as $id => $value) {
     $values[] = [
-        'id' => $id,
+        'id'    => $id,
         'label' => $value
     ];
 }
-$jsonDataId = 'form/select/' . md5(json_encode($values)) . '.json';
-$this->admin()->addJsonTemplate($jsonDataId, $values)
+$jsonDataId = 'form/select/'.md5(json_encode($values)).'.json';
+$this->admin()->addJsonTemplate($jsonDataId, $values);
+$disabled = $this->element->getAttribute('disabled');
+$readonly = $this->element->getAttribute('readonly');
 ?>
 <div
-    class="form-group<?= ($this->hasErrors) ? ' has-error has-feedback' : ''?>"
-    ng-init="<?= $this->admin()->generateAngularModelName($this->element->getName())?> = '<?= $this->element->getValue()?>'">
+    class="form-group<?= ($this->hasErrors) ? ' has-error has-feedback' : '' ?>"
+    ng-init="<?= $this->admin()->generateAngularModelName($this->element->getName()) ?> = '<?= $this->element->getValue(
+    ) ?>'">
     <label class="col-sm-2 control-label">
         <?= $this->translate($this->element->getLabel(), 'admin') ?>
         {{ item | json}}
-        <?php if($this->element->hasAttribute('required')): ?>
+        <?php if ($this->element->hasAttribute('required')): ?>
             <abbr title="required">*</abbr>
         <?php endif; ?>
     </label>
+
     <div class="col-sm-10"
          ng-controller="SelectController"
-         init-value="<?= $this->element->getValue()?>"
-         json-data-id="<?= $jsonDataId ?>">
-        <input type="hidden" ng-model="<?= $this->admin()->generateAngularModelName($this->element->getName())?>" name="<?= $this->element->getName() ?>" value="{{ item.selected.id }}">
+         init-value="<?= $this->element->getValue() ?>"
+         json-data-id="<?= $jsonDataId ?>"
+        >
+        <input type="hidden" ng-model="<?= $this->admin()->generateAngularModelName($this->element->getName()) ?>"
+               name="<?= $this->element->getName() ?>" value="{{ option.selected.id }}">
 
-        <ui-select ng-model="item.selected" reset-search-input="false" on-select="<?= $this->admin()->generateAngularModelName($this->element->getName())?> = item.selected.id">
-            <ui-select-match placeholder="<?= $this->translate($this->element->getLabel(), 'admin') ?>">{{$select.selected.label}}</ui-select-match>
-            <ui-select-choices repeat="item in items | filter: $select.search">
-                <div ng-bind-html="item.label | highlight: $select.search"></div>
+        <ui-select ng-model="option.selected" reset-search-input="false"
+                   on-select="<?= $this->admin()->generateAngularModelName(
+                       $this->element->getName()
+                   ) ?> = option.selected.id"
+            <?= !empty($disabled) || !empty($readonly) ? 'ng-disabled="true"' : '' ?>
+            >
+            <ui-select-match placeholder="<?= $this->translate($this->element->getLabel(), 'admin') ?>">
+                {{$select.selected.label}}
+            </ui-select-match>
+            <ui-select-choices repeat="option in options | filter: $select.search">
+                <div ng-bind-html="option.label | highlight: $select.search"></div>
             </ui-select-choices>
         </ui-select>
         <?php if ($this->hasErrors): ?>
             <span class="glyphicon glyphicon-warning-sign form-control-feedback"></span>
             <ul class="list-unstyled text-danger">
-                <?php foreach($this->element->getMessages() as $message): ?>
+                <?php foreach ($this->element->getMessages() as $message): ?>
                     <li><?= $message ?></li>
                 <?php endforeach; ?>
             </ul>

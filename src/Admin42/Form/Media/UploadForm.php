@@ -43,6 +43,10 @@ class UploadForm extends Form
      */
     public function getTargetPath()
     {
-        return 'data/media/' . implode('/', str_split(substr(md5(uniqid()), 0, 6), 2)) . '/';
+        do {
+            $path = implode('/', str_split(substr(md5(uniqid()), 0, 6), 2));
+        } while (strpos($path, "ad") !== false);
+
+        return 'data/media/' . $path . '/';
     }
 }

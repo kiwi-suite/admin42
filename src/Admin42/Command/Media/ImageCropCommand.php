@@ -191,7 +191,13 @@ class ImageCropCommand extends AbstractCommand
             ->open($this->media->getDirectory() . $this->media->getFilename())
             ->crop(new Point($this->offsetX, $this->offsetY), new Box($this->boxWidth, $this->boxHeight))
             ->thumbnail(new Box($width, $height))
-            ->save($media->getDirectory() . $media->getFilename());
+            ->save(
+                $media->getDirectory() . $media->getFilename(),
+                [
+                    'jpeg_quality' => 75,
+                    'png_compression_level' => 7
+                ]
+            );
 
         $finfo = finfo_open(FILEINFO_MIME_TYPE);
         $media->setMimeType(finfo_file($finfo, $media->getDirectory() . $media->getFilename()));
