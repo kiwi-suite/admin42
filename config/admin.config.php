@@ -66,6 +66,8 @@ return [
             ],
         ],
 
+        'display-timezone' => 'Europe/Vienna',
+
         'whitelabel' => false,
     ],
 ];

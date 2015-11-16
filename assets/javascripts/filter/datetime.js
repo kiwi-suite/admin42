@@ -8,16 +8,19 @@ angular.module('admin42')
                 format = appConfig.defaultDateTimeFormat;
             }
             if (angular.isUndefined(timezone)) {
-                timezone = appConfig.timezone;
+                timezone = appConfig.displayTimezone;
             }
+
             var dateTime;
             if (angular.isObject(input) && input.constructor.name == 'Date') {
                 dateTime = moment.tz(moment.utc(input), input.timezone);
+                dateTime = moment.tz(dateTime, timezone);
             } else if (angular.isObject(input)) {
                 if (angular.isUndefined(input.date)) {
                     return emptyValue;
                 }
                 dateTime = moment.tz(moment.utc(input.date), input.timezone);
+                dateTime = moment.tz(dateTime, timezone);
             } else if (angular.isString(input)) {
                 if (input.length == 0) {
                     return emptyValue;
