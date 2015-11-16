@@ -15,7 +15,8 @@ angular.module('admin42', [
 angular.module('admin42').config(['$httpProvider', function($httpProvider) {
     $httpProvider.defaults.headers.common["X-Requested-With"] = 'XMLHttpRequest';
 }]);
-;angular.module('admin42')
+;
+angular.module('admin42')
     .directive('delete', [function() {
         return {
             restrict: 'E',
@@ -133,7 +134,8 @@ angular.module('admin42')
                     $modalInstance.dismiss('cancel');
                 };
     }]);
-;angular.module('admin42')
+;
+angular.module('admin42')
     .directive('adminDynamicForm', function() {
         return {
             restrict: 'A',
@@ -187,7 +189,8 @@ angular.module('admin42')
             }]
         };
     });
-;angular.module('admin42').directive('dynamicModel', ['$compile', function ($compile) {
+;
+angular.module('admin42').directive('dynamicModel', ['$compile', function ($compile) {
     return {
         'link': function(scope, element, attrs) {
             scope.$watch(attrs.dynamicModel, function(dynamicModel) {
@@ -205,7 +208,8 @@ angular.module('admin42')
             });
         }
     };
-}]);;angular.module('admin42')
+}]);;
+angular.module('admin42')
     .directive('uiFullscreen', ['$document', function($document) {
         return {
             restrict: 'AC',
@@ -230,7 +234,8 @@ angular.module('admin42')
             }
         };
     }]);
-;angular.module('admin42')
+;
+angular.module('admin42')
     .factory('jsonCache', ['$cacheFactory', function($cacheFactory) {
         return $cacheFactory('json-cache');
     }])
@@ -247,7 +252,8 @@ angular.module('admin42')
             }
         };
     }]);
-;angular.module('admin42')
+;
+angular.module('admin42')
     .directive('uiNav', [function() {
         return {
             restrict: 'AC',
@@ -316,7 +322,8 @@ angular.module('admin42')
             }
         };
     }]);
-;angular.module('admin42')
+;
+angular.module('admin42')
     .directive('ngInitial', function() {
         return{
             restrict: 'A',
@@ -342,7 +349,8 @@ angular.module('admin42')
             }]
         };
     });
-;angular.module('admin42')
+;
+angular.module('admin42')
     .directive('stPersist', function () {
         return {
             require: '^stTable',
@@ -371,7 +379,8 @@ angular.module('admin42')
             }
         };
     });
-;angular.module('smart-table')
+;
+angular.module('smart-table')
     .directive('stSearch42', ['stConfig', '$timeout','$parse', function (stConfig, $timeout, $parse) {
         return {
             require: '^stTable',
@@ -414,7 +423,8 @@ angular.module('admin42')
             }
         };
     }]);
-;angular.module('admin42')
+;
+angular.module('admin42')
   .directive('uiToggleClass', ['$timeout', '$document', function($timeout, $document) {
     return {
       restrict: 'AC',
@@ -448,7 +458,8 @@ angular.module('admin42')
         });
       }
     };
-  }]);;angular.module('admin42')
+  }]);;
+angular.module('admin42')
     .directive('tinyWysiwyg', ['$timeout', '$window', function ($timeout, $window) {
         var editorCounter = 0;
         var idPrefix = 'tiny-wysiwyg';
@@ -482,7 +493,8 @@ angular.module('admin42')
             }
         }
     }]);
-;angular.module('admin42')
+;
+angular.module('admin42')
     .directive('youtube', [function () {
         return {
             restrict: 'E',
@@ -508,7 +520,8 @@ angular.module('admin42')
         }
     }]
 );
-;angular.module('admin42')
+;
+angular.module('admin42')
     .filter('bytes', function() {
         return function(bytes) {
             if (isNaN(parseFloat(bytes)) || !isFinite(bytes) || bytes == 0) return '0';
@@ -531,7 +544,8 @@ angular.module('admin42')
             }
             return (bytes / Math.pow(1024, measure)).toFixed(precision) + ' ' + units[measure];
         }
-    });;angular.module('admin42')
+    });;
+angular.module('admin42')
     .filter('datetime', function(appConfig) {
         return function(input, emptyValue, format, timezone) {
             if (angular.isUndefined(emptyValue)) {
@@ -541,16 +555,19 @@ angular.module('admin42')
                 format = appConfig.defaultDateTimeFormat;
             }
             if (angular.isUndefined(timezone)) {
-                timezone = appConfig.timezone;
+                timezone = appConfig.displayTimezone;
             }
+
             var dateTime;
             if (angular.isObject(input) && input.constructor.name == 'Date') {
                 dateTime = moment.tz(moment.utc(input), input.timezone);
+                dateTime = moment.tz(dateTime, timezone);
             } else if (angular.isObject(input)) {
                 if (angular.isUndefined(input.date)) {
                     return emptyValue;
                 }
                 dateTime = moment.tz(moment.utc(input.date), input.timezone);
+                dateTime = moment.tz(dateTime, timezone);
             } else if (angular.isString(input)) {
                 if (input.length == 0) {
                     return emptyValue;
@@ -564,7 +581,8 @@ angular.module('admin42')
             return dateTime.format(format);
         };
     });
-;angular.module('admin42').controller('AppController',['$scope', 'toaster', '$timeout', '$localStorage', function($scope, toaster, $timeout, $localStorage){
+;
+angular.module('admin42').controller('AppController',['$scope', 'toaster', '$timeout', '$localStorage', function($scope, toaster, $timeout, $localStorage){
     $scope.app = {
         $storage: $localStorage.$default({
             asideFolded: false
@@ -588,7 +606,8 @@ angular.module('admin42')
     }
 
 }]);
-;angular.module('admin42')
+;
+angular.module('admin42')
     .controller('CropController', ['$scope', '$http', '$timeout', 'Cropper', 'jsonCache', '$attrs', '$interval', function ($scope, $http, $timeout, Cropper, jsonCache, $attrs, $interval) {
         $scope.data = [];
 
@@ -828,7 +847,8 @@ angular.module('admin42')
         return this.crop;
     };
 }]);
-;angular.module('admin42').controller('DataGridController',['$scope', '$http', '$attrs', '$sessionStorage', '$templateCache', function($scope, $http, $attrs, $sessionStorage, $templateCache){
+;
+angular.module('admin42').controller('DataGridController',['$scope', '$http', '$attrs', '$sessionStorage', '$templateCache', function($scope, $http, $attrs, $sessionStorage, $templateCache){
     $templateCache.put('template/smart-table/pagination.html',
         '<nav ng-if="numPages && pages.length >= 2"><ul class="pagination">' +
         '<li ng-if="currentPage > 1"><a ng-click="selectPage(1)"><i class="fa fa-angle-double-left"></i></a></li>' +
@@ -879,7 +899,8 @@ angular.module('admin42')
             });
     };
 }]);
-;angular.module('admin42')
+;
+angular.module('admin42')
     .controller('AdminDatepickerController',['$scope', '$attrs', function($scope, $attrs){
         $scope.opened = false;
 
@@ -890,6 +911,8 @@ angular.module('admin42')
             $scope.opened = true;
         };
 
+        eval("$scope." + $attrs.modelName + "=moment($attrs.value).toDate()");
+
         $scope.dateOptions = {
             formatYear: 'yy',
             startingDay: 1,
@@ -897,11 +920,11 @@ angular.module('admin42')
             enableTime: true,
             class: 'datepicker',
             showWeeks: false,
-            timeText: 'Time',
-            startingDay: 1
+            timeText: 'Time'
         };
 }]);
-;angular.module('admin42')
+;
+angular.module('admin42')
     .controller('FileSelectorController', ['$scope', '$attrs', 'jsonCache', '$modal', 'MediaService', function ($scope, $attrs, jsonCache, $modal, MediaService) {
         $scope.media = jsonCache.get($attrs.jsonDataId);
 
@@ -973,7 +996,8 @@ angular.module('admin42')
             $modalInstance.dismiss('cancel');
         };
     }]);
-;angular.module('admin42')
+;
+angular.module('admin42')
     .controller('LinkController',['$scope', '$attrs', '$modal', 'jsonCache', function($scope, $attrs, $modal, jsonCache){
         $scope.linkId = jsonCache.get($attrs.jsonDataId)['linkId'];
         $scope.linkType = jsonCache.get($attrs.jsonDataId)['linkType'];
@@ -1130,7 +1154,8 @@ angular.module('admin42')
             });
         };
     }]
-);;angular.module('admin42')
+);;
+angular.module('admin42')
     .controller('LinkDialogController', ['$scope', '$http', function ($scope, $http) {
         $scope.includeArray = [];
         $scope.linkSelection = {
@@ -1188,7 +1213,8 @@ angular.module('admin42')
 
         $scope.cancel = function () {
         };
-    }]);;angular.module('admin42')
+    }]);;
+angular.module('admin42')
     .controller('MediaController', ['$scope', 'FileUploader', '$attrs', '$http', 'toaster', 'MediaService', function ($scope, FileUploader, $attrs, $http, toaster, MediaService) {
         var currentTableState = {};
         var url = $attrs.url;
@@ -1270,7 +1296,8 @@ angular.module('admin42')
                 });
         }
 }]);
-;angular.module('admin42').controller('ModalController', ['$scope', '$modalInstance', function ($scope, $modalInstance) {
+;
+angular.module('admin42').controller('ModalController', ['$scope', '$modalInstance', function ($scope, $modalInstance) {
     $scope.ok = function () {
         $modalInstance.close();
     };
@@ -1279,7 +1306,8 @@ angular.module('admin42')
         $modalInstance.dismiss('cancel');
     };
 }]);
-;angular.module('admin42').controller('NotificationController', ['$scope', '$interval', '$http', '$attrs', function($scope, $interval, $http, $attrs){
+;
+angular.module('admin42').controller('NotificationController', ['$scope', '$interval', '$http', '$attrs', function($scope, $interval, $http, $attrs){
         var notificationUrl = $attrs.notificationUrl;
         var updateNotifications = function() {
             $http.get(notificationUrl).
@@ -1303,7 +1331,8 @@ angular.module('admin42')
                 error(function() {});
         };
     }]);
-;angular.module('admin42')
+;
+angular.module('admin42')
     .controller('SelectController', ['$scope', '$attrs', 'jsonCache', function($scope, $attrs, jsonCache){
         $scope.options = jsonCache.get($attrs.jsonDataId);
         $scope.option = {};
@@ -1320,7 +1349,8 @@ angular.module('admin42')
             $scope.select($attrs.initValue);
         }
     }]);
-;angular.module('admin42')
+;
+angular.module('admin42')
     .controller('TagsElementController', ['$scope', '$attrs', '$http', '$q', 'jsonCache', function ($scope, $attrs, $http, $q, jsonCache) {
         var url = $attrs.url;
 
@@ -1378,7 +1408,8 @@ angular.module('admin42')
             }
         };
 }]);
-;angular.module('admin42')
+;
+angular.module('admin42')
     .controller('WysiwygController', function ($scope, $attrs, $http) {
         if ($attrs.ngBaseUrl) {
             tinymce.baseURL = $attrs.ngBaseUrl;
@@ -1480,7 +1511,8 @@ angular.module('admin42')
             });
         }
     });
-;angular.module('admin42')
+;
+angular.module('admin42')
     .service('MediaService', ['jsonCache', function(jsonCache) {
         this.getMediaUrl = function(directory, filename, mimeType, dimension) {
             if (angular.isUndefined(directory) || angular.isUndefined(filename)) {
