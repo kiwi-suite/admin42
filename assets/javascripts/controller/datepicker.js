@@ -9,6 +9,11 @@ angular.module('admin42')
             $scope.opened = true;
         };
 
+        if ($attrs.value.length > 0) {
+            eval("$scope." + $attrs.modelName + "=moment($attrs.value).toDate()");
+        }
+
+
         $scope.dateOptions = {
             formatYear: 'yy',
             startingDay: 1,
@@ -16,7 +21,6 @@ angular.module('admin42')
             enableTime: true,
             class: 'datepicker',
             showWeeks: false,
-            timeText: 'Time',
-            startingDay: 1
+            timeText: 'Time'
         };
 }]);

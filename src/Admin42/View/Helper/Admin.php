@@ -83,6 +83,11 @@ class Admin extends AbstractHelper
         return $displayName;
     }
 
+    public function getDisplayTimezone()
+    {
+        return $this->config['display-timezone'];
+    }
+
     /**
      * @param int $userId
      * @return string
@@ -132,6 +137,7 @@ class Admin extends AbstractHelper
             'locale' => \Locale::getDefault(),
             'defaultDateTimeFormat' => 'LLL',
             'timezone' => date_default_timezone_get(),
+            'displayTimezone' => $this->getDisplayTimezone()
         ];
 
         $this->addJsonTemplate("mediaConfig", [

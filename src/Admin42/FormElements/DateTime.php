@@ -14,7 +14,7 @@ class DateTime extends \Zend\Form\Element\DateTime
     /**
      * @var string
      */
-    protected $format = 'Y-m-d H:iP';
+    protected $format = 'Y-m-d H:i';
 
     /**
      * @return array

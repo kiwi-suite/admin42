@@ -17,7 +17,7 @@ module.exports = function(grunt) {
 
         concat: {
             options: {
-                separator: ';'
+                separator: ';\n'
             },
             vendor: {
                 src: [
@@ -43,7 +43,7 @@ module.exports = function(grunt) {
                     '<%= vendor_dir %>/screenfull/dist/screenfull.js',
                     '<%= vendor_dir %>/angularjs-toaster/toaster.js',
                     '<%= vendor_dir %>/ngstorage/ngStorage.js',
-                    '<%= vendor_dir %>/angular-file-upload/angular-file-upload.js',
+                    '<%= vendor_dir %>/angular-file-upload/dist/angular-file-upload.min.js',
                     '<%= vendor_dir %>/cropper/dist/cropper.js',
                     '<%= vendor_dir %>/ng-cropper/dist/ngCropper.js',
 
