@@ -2,20 +2,29 @@
     <label for="<?= $this->element->getName() ?>" class="col-sm-2 control-label">
         <?= $this->element->getLabel() ?>
     </label>
+    <?php
+    $value = $this->element->getValue();
+    if (empty($value)) {
+        $value = "";
+    } elseif (is_string($value)) {
+        $value = new \DateTime($value);
+        $value = $value->format("Y-m-d");
+    }
+    ?>
     <div class="col-sm-10">
-        <div class="input-group w-md" ng-controller="AdminDatepickerController">
+        <div class="input-group w-md" ng-controller="AdminDatepickerController" data-value="<?= $value ?>" data-model-name="<?= $this->admin()->generateAngularModelName($this->element->getName()) ?>">
             <input type="hidden" name="<?= $this->element->getName() ?>" value="{{ <?= $this->admin()->generateAngularModelName($this->element->getName()) ?> | datetime:'':'YYYY-MM-DD'}}">
-            <?= $this->formText($this->element->setAttributes(array(
-                'class'         => 'form-control',
-                'id'            => $this->element->getName(),
-                'data-ng-model' => $this->admin()->generateAngularModelName($this->element->getName()),
-                'data-ng-initial' => '',
-                'data-datepicker-popup' => 'yyyy-MM-dd',
-                'data-is-open' => 'opened',
-                'data-datepicker-options' => 'dateOptions',
-                'data-close-text' => 'Close',
-                'disabled' => 'disabled'
-            ))) ?>
+            <input
+                type="text"
+                class="form-control"
+                id="<?= $this->element->getName() ?>"
+                data-ng-model="<?= $this->admin()->generateAngularModelName($this->element->getName()) ?>"
+                data-datetime-picker="yyyy-MM-dd"
+                data-is-open="opened"
+                data-datepicker-options="dateOptions"
+                data-enable-time="false"
+                disabled
+                >
             <span class="input-group-btn">
                 <button type="button" class="btn btn-default" ng-click="open($event)">
                     <i class="fa fa-calendar"></i>
