@@ -62,6 +62,29 @@ class CrudController extends AbstractAdminController
         return $viewModel;
     }
 
+    /**
+     * @return array
+     * @throws \Exception
+     */
+    protected function getEditData()
+    {
+        $model = $this
+            ->getTableGateway($this->getCrudOptions()->getTableGatewayName())
+            ->selectByPrimary((int) $this->params()->fromRoute("id"));
+
+        $data = $model->toArray();
+        foreach ($data as $name => $value) {
+            if (!is_string($value)) continue;
+
+            $var = json_decode($value, true);
+            if (is_array($var)) {
+                $data[$name] = Json::decode($value, Json::TYPE_ARRAY);
+            }
+        }
+
+        return $data;
+    }
+
     public function detailAction()
     {
         $isEditMode = $this->params()->fromRoute("isEditMode");
@@ -114,21 +137,7 @@ class CrudController extends AbstractAdminController
             }
         } else {
             if ($isEditMode === true) {
-                $model = $this
-                    ->getTableGateway($this->getCrudOptions()->getTableGatewayName())
-                    ->selectByPrimary((int) $this->params()->fromRoute("id"));
-
-                $data = $model->toArray();
-                foreach ($data as $name => $value) {
-                    if (!is_string($value)) continue;
-
-                    $var = json_decode($value, true);
-                    if (is_array($var)) {
-                        $data[$name] = Json::decode($value, Json::TYPE_ARRAY);
-                    }
-                }
-
-                $createEditForm->setData($data);
+                $createEditForm->setData($this->getEditData());
             }
         }
 
@@ -140,6 +149,7 @@ class CrudController extends AbstractAdminController
             'icon' => $this->getCrudOptions()->getIcon(),
         ]);
 
+        $viewModel->setTemplate("admin42/crud/detail");
         return $viewModel;
     }
 
