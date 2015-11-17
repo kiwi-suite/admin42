@@ -4,7 +4,9 @@
     </label>
     <?php
     $value = $this->element->getValue();
-    if (is_string($value)) {
+    if (empty($value)) {
+        $value = "";
+    } elseif (is_string($value)) {
         $value = new \DateTime($value);
         $value->setTimezone(new \DateTimeZone($this->admin()->getDisplayTimezone()));
         $value = $value->format("Y-m-d H:i");

@@ -9,7 +9,10 @@ angular.module('admin42')
             $scope.opened = true;
         };
 
-        eval("$scope." + $attrs.modelName + "=moment($attrs.value).toDate()");
+        if ($attrs.value.length > 0) {
+            eval("$scope." + $attrs.modelName + "=moment($attrs.value).toDate()");
+        }
+
 
         $scope.dateOptions = {
             formatYear: 'yy',
