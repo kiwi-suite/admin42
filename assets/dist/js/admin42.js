@@ -161,7 +161,7 @@ angular.module('admin42')
                     for( var i=0; i<8; i++ ){
                         text += possible.charAt(Math.floor(Math.random() * possible.length));
                     }
-                    return text;
+                    return "ph" + text;
                 };
 
                 $scope.addTemplate = function() {

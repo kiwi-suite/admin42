@@ -213,6 +213,10 @@ class Admin extends AbstractHelper
                 $newName .= '[' . $_part . ']';
                 continue;
             }
+
+            if (is_numeric(substr($_part, 0, 1))) {
+                $_part = "ph" . $_part;
+            }
             $newName .= '.' . $_part;
         }
 
