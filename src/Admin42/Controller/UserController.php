@@ -12,6 +12,7 @@ namespace Admin42\Controller;
 use Admin42\Authentication\AuthenticationService;
 use Admin42\Model\User;
 use Admin42\Mvc\Controller\AbstractAdminController;
+use Core42\Permission\Rbac\Role\RoleInterface;
 use Core42\View\Model\JsonModel;
 use Zend\Http\PhpEnvironment\Response;
 
@@ -163,7 +164,25 @@ class UserController extends AbstractAdminController
                 if ($this->params()->fromQuery('redirectTo', null) !== null) {
                     return $this->redirect()->toUrl($this->params()->fromQuery('redirectTo'));
                 } else {
-                    return $this->redirect()->toRoute('admin/user/manage');
+                    $identityRoles = $this
+                        ->getServiceLocator()
+                        ->get('Core42\Permission')
+                        ->getService('admin42')
+                        ->getIdentityRoles();
+
+                    if (empty($identityRoles)) {
+                        return $this->redirect()->toRoute('admin/user/manage');
+                    }
+
+                    /** @var RoleInterface $role */
+                    $role = current($identityRoles);
+                    $roleOptions = $role->getOptions();
+
+                    if (empty($roleOptions['redirect_after_login'])) {
+                        return $this->redirect()->toRoute('admin/user/manage');
+                    }
+
+                    return $this->redirect()->toRoute($roleOptions['redirect_after_login']);
                 }
             }
         }
