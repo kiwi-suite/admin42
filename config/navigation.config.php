@@ -18,6 +18,7 @@ return array(
                                 'route' => 'admin/media',
                                 'icon' => 'fa fa-picture-o fa-fw',
                                 'order' => 5000,
+                                'permission' => 'route/admin/media'
                             ),
                         ),
                     ]
@@ -36,6 +37,7 @@ return array(
                                 'route' => 'admin/user',
                                 'icon' => 'fa fa-users fa-fw',
                                 'order' => 10000,
+                                'permission' => 'route/admin/user'
                             ),
                         ),
                     ]
