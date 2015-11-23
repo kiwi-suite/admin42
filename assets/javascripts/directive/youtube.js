@@ -6,6 +6,9 @@ angular.module('admin42')
             transclude: false,
             controller: ['$scope', '$sce', '$attrs',  function($scope, $sce, $attrs) {
                 $scope.youtubeCode = $attrs.youtubeCode;
+                if ($scope.youtubeCode.length > 0) {
+                    $scope.youtubeLink = "https://www.youtube.com/?v=" + $scope.youtubeCode;
+                }
                 $scope.changeValue = function() {
                     var regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
                     var match = $scope.youtubeLink.match(regExp);
