@@ -131,6 +131,19 @@ abstract class AbstractSmartTableSelector extends AbstractDatabaseSelector
                 continue;
             }
 
+            if (is_array($value)) {
+                foreach ($value as $_innerCol => $_innerVal) {
+                    if (!in_array($column . '.' . $_innerCol, $searchAbleColumns)) {
+                        continue;
+                    }
+                    $where = new Where();
+                    $where->like($column . '.' . $_innerCol, "%" . $_innerVal . "%");
+                    $searchWhere[] = $where;
+                }
+
+                continue;
+            }
+
             if (!in_array($column, $searchAbleColumns)) {
                 continue;
             }
