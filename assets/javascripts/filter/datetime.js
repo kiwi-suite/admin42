@@ -12,7 +12,7 @@ angular.module('admin42')
             }
 
             var dateTime;
-            if (angular.isObject(input) && input.constructor.name == 'Date') {
+            if (angular.isObject(input) && Object.prototype.toString.call(input) == '[object Date]') {
                 dateTime = moment.tz(moment.utc(input), input.timezone);
                 dateTime = moment.tz(dateTime, timezone);
             } else if (angular.isObject(input)) {
