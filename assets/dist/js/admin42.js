@@ -915,7 +915,15 @@ angular.module('admin42')
         };
 
         if ($attrs.value.length > 0) {
-            eval("$scope." + $attrs.modelName + "=moment($attrs.value).toDate()");
+            var segs = $attrs.modelName.split('.');
+            var data = $scope;
+            while (segs.length > 0) {
+                var pathStep = segs.shift();
+                if (typeof data[pathStep] === 'undefined') {
+                    data[pathStep] = segs.length === 0 ? moment($attrs.value).toDate() : {};
+                }
+                data = data[pathStep];
+            }
         }
 
 
