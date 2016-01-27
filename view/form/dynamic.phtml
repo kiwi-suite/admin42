@@ -118,6 +118,10 @@ $prototypesElements = [];
 <?php endforeach; ?>
 
 <?php
+usort($prototypesElements, function ($a, $b) {
+   return strcasecmp($a['label'], $b['label']);
+});
+
 $prepareFormUniqueId = uniqid('dynamic_form/prepare') . '.json';
 $this->admin()->addJsonTemplate($prepareFormUniqueId, $preparedFormElements);
 
