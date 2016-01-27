@@ -940,16 +940,21 @@ angular.module('admin42')
         };
 
         if ($attrs.value.length > 0) {
+            eval("$scope." + $attrs.modelName + "=moment($attrs.value).toDate()");
+        }
+
+        /*if ($attrs.value.length > 0) {
             var segs = $attrs.modelName.split('.');
             var data = $scope;
             while (segs.length > 0) {
                 var pathStep = segs.shift();
                 if (typeof data[pathStep] === 'undefined') {
                     data[pathStep] = segs.length === 0 ? moment($attrs.value).toDate() : {};
+                    console.log(data[pathStep]);
                 }
                 data = data[pathStep];
             }
-        }
+        }*/
 
 
         $scope.dateOptions = {
@@ -1254,9 +1259,20 @@ angular.module('admin42')
         };
     }]);;
 angular.module('admin42')
-    .controller('MediaController', ['$scope', 'FileUploader', '$attrs', '$http', 'toaster', 'MediaService', function ($scope, FileUploader, $attrs, $http, toaster, MediaService) {
+    .controller('MediaController', ['$scope', 'FileUploader', '$attrs', '$http', '$sessionStorage', '$templateCache', 'toaster', 'MediaService', function ($scope, FileUploader, $attrs, $http, $sessionStorage, $templateCache, toaster, MediaService) {
+        $templateCache.put('template/smart-table/pagination.html',
+            '<nav ng-if="numPages && pages.length >= 2"><ul class="pagination">' +
+            '<li ng-if="currentPage > 1"><a ng-click="selectPage(1)"><i class="fa fa-angle-double-left"></i></a></li>' +
+            '<li ng-if="currentPage > 1"><a ng-click="selectPage(currentPage - 1)"><i class="fa fa-angle-left"></i></a></li>' +
+            '<li ng-repeat="page in pages" ng-class="{active: page==currentPage}"><a ng-click="selectPage(page)">{{page}}</a></li>' +
+            '<li ng-if="currentPage < numPages"><a ng-click="selectPage(currentPage + 1)"><i class="fa fa-angle-right"></i></a></li>' +
+            '<li ng-if="currentPage < numPages"><a ng-click="selectPage(numPages)"><i class="fa fa-angle-double-right"></i></a></li>' +
+            '</ul></nav>');
+
         var currentTableState = {};
         var url = $attrs.url;
+        var persistNamespace = null;
+        var isInitialCall = true;
 
         $scope.isCollapsed = true;
         $scope.collection = [];
@@ -1266,6 +1282,12 @@ angular.module('admin42')
         $scope.errorFiles = [];
 
         $scope.category = $attrs.category;
+
+
+
+        if (angular.isDefined($attrs.persist) && $attrs.persist.length > 0) {
+            persistNamespace = $attrs.persist;
+        }
 
         var uploader = $scope.uploader = new FileUploader({
             url: $attrs.uploadUrl,
@@ -1311,6 +1333,17 @@ angular.module('admin42')
         $scope.callServer = function (tableState) {
             currentTableState = tableState;
 
+            if (isInitialCall === true && persistNamespace !== null) {
+                if (angular.isDefined($sessionStorage.smartTable) && angular.isDefined($sessionStorage.smartTable[persistNamespace])) {
+                    angular.extend(tableState, angular.fromJson($sessionStorage.smartTable[persistNamespace]));
+                }
+            } else if (persistNamespace !== null) {
+                if (angular.isUndefined($sessionStorage.smartTable)) {
+                    $sessionStorage.smartTable = {};
+                }
+                $sessionStorage.smartTable[persistNamespace] = angular.toJson(tableState);
+            }
+
             requestFromServer(url, tableState);
         };
 
@@ -1322,6 +1355,7 @@ angular.module('admin42')
             $scope.collection = [];
             $scope.isLoading = true;
 
+            isInitialCall = false;
             $http.post(url, tableState).
                 success(function(data, status, headers, config) {
                     $scope.isLoading = false;

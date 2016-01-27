@@ -6,7 +6,7 @@
     </h1>
 </div>
 <?php endif; ?>
-<div class="<?= ($this->params()->fromRoute('referrer') == "index") ? "wrapper-md" : ""?>" ng-controller="MediaController" data-upload-url="<?= $this->uploadHost . $this->url('admin/media/upload') ?>" data-url="<?= $this->url('admin/media')?>" data-max-file-size="<?= $this->maxFileSize ?>" data-category="<?= $this->params("category", "default")?>">
+<div class="<?= ($this->params()->fromRoute('referrer') == "index") ? "wrapper-md" : ""?>" ng-controller="MediaController" data-upload-url="<?= $this->uploadHost . $this->url('admin/media/upload') ?>" data-url="<?= $this->url('admin/media')?>" data-max-file-size="<?= $this->maxFileSize ?>" data-category="<?= $this->params("category", "default")?>" persist="admin42_media">
 
     <div class="panel panel-default">
         <div class="panel-heading" ng-click="isCollapsed = !isCollapsed">
