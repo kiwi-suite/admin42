@@ -58,8 +58,12 @@ class Admin extends AbstractHelper
      * @param UserTableGateway $userTableGateway
      * @param MediaOptions $mediaOptions
      */
-    public function __construct(array $config, UserTableGateway $userTableGateway, MediaOptions $mediaOptions, $mediaUrls)
-    {
+    public function __construct(
+        array $config,
+        UserTableGateway $userTableGateway,
+        MediaOptions $mediaOptions,
+        $mediaUrls
+    ) {
         $this->config = $config;
         $this->userTableGateway = $userTableGateway;
         $this->mediaOptions = $mediaOptions;

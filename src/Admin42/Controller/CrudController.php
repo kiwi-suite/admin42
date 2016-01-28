@@ -74,7 +74,9 @@ class CrudController extends AbstractAdminController
 
         $data = $model->toArray();
         foreach ($data as $name => $value) {
-            if (!is_string($value)) continue;
+            if (!is_string($value)) {
+                continue;
+            }
 
             $var = json_decode($value, true);
             if (is_array($var)) {
