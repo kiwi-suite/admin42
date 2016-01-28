@@ -23,6 +23,11 @@ class LinkProvider
      */
     protected $cache;
 
+    /**
+     * LinkProvider constructor.
+     * @param LinkTableGateway $linkTableGateway
+     * @param StorageInterface $cache
+     */
     public function __construct(LinkTableGateway $linkTableGateway, StorageInterface $cache)
     {
         $this->linkTableGateway = $linkTableGateway;

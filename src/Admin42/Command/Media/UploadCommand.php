@@ -57,6 +57,9 @@ class UploadCommand extends AbstractCommand
         $this->setCategory($values['category']);
     }
 
+    /**
+     *
+     */
     protected function preExecute()
     {
         $mediaOptions = $this->getServiceManager()->get('Admin42\MediaOptions');

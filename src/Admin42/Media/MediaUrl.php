@@ -47,6 +47,11 @@ class MediaUrl extends AbstractHelper
         $this->cache = $cache;
     }
 
+    /**
+     * @param $mediaId
+     * @param null $dimension
+     * @return string
+     */
     public function getUrl($mediaId, $dimension = null)
     {
         $media = $this->loadMedia($mediaId);

@@ -87,6 +87,9 @@ class Admin extends AbstractHelper
         return $displayName;
     }
 
+    /**
+     * @return string
+     */
     public function getDisplayTimezone()
     {
         return $this->config['display-timezone'];

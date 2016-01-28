@@ -19,6 +19,10 @@ class ImportCommand extends AbstractCommand
      */
     protected $filename;
 
+    /**
+     * @param $filename
+     * @return $this
+     */
     public function setFilename($filename)
     {
         $this->filename = $filename;

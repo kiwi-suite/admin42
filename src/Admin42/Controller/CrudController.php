@@ -42,6 +42,9 @@ class CrudController extends AbstractAdminController
             ->get($this->params("crud"));
     }
 
+    /**
+     * @return mixed|ViewModel
+     */
     public function indexAction()
     {
         $selector = $this->getSelector($this->getCrudOptions()->getSelectorName());
@@ -87,6 +90,10 @@ class CrudController extends AbstractAdminController
         return $data;
     }
 
+    /**
+     * @return array|Response|ViewModel
+     * @throws \Exception
+     */
     public function detailAction()
     {
         $isEditMode = $this->params()->fromRoute("isEditMode");
@@ -155,6 +162,10 @@ class CrudController extends AbstractAdminController
         return $viewModel;
     }
 
+    /**
+     * @return JsonModel
+     * @throws \Exception
+     */
     public function deleteAction()
     {
         $cmdName = $this->getCrudOptions()->getDeleteCommandName();
