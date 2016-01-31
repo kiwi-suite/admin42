@@ -134,14 +134,14 @@ class CrudController extends AbstractAdminController
             if (!$formCommand->hasErrors()) {
                 $this->flashMessenger()->addSuccessMessage([
                     'title' => 'toaster.item.edit.title.success',
-                    'message' => 'toaster.item.edit.content.success',
+                    'message' => 'toaster.item.edit.message.success',
                 ]);
 
                 return $this->redirect()->toRoute($currentRoute . '/edit', array('id' => $model->getId()));
             } else {
                 $this->flashMessenger()->addErrorMessage([
-                    'title' => 'toaster.item.edit.title.failed',
-                    'message' => 'toaster.item.edit.content.failed',
+                    'title' => 'toaster.item.edit.title.error',
+                    'message' => 'toaster.item.edit.message.error',
                 ]);
             }
         } else {
