@@ -3,19 +3,21 @@ angular.module('admin42')
         return {
             require: '^uibTabset',
             link: function (scope, element, attr, ctrl) {
-                var nameSpace = attr.uibTabsetPersist;
+                var nameSpace = 'uibTabsetPersist';
+                var id = attr.uibTabsetPersist;
 
-                if (localStorage.getItem(nameSpace)) {
-                    var activeTab = localStorage.getItem(nameSpace);
-                    ctrl.select(ctrl.tabs[activeTab])
+                var currentItem = JSON.parse(localStorage.getItem(nameSpace));
+
+                if (currentItem && currentItem.id == id) {
+                    ctrl.select(ctrl.tabs[currentItem.index])
                 }
 
-                ctrl.select = function(selectedTab){
-                    ctrl.tabs.forEach(function(tab, index){
+                ctrl.select = function (selectedTab) {
+                    ctrl.tabs.forEach(function (tab, index) {
                         tab.active = false;
-                        if(tab == selectedTab) {
+                        if (tab == selectedTab) {
                             tab.active = true;
-                            localStorage.setItem(nameSpace, index);
+                            localStorage.setItem(nameSpace, JSON.stringify({id: id, index: index}));
                         }
                     });
                 };
