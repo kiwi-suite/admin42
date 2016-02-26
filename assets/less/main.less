@@ -47,6 +47,18 @@ body, .bg_body {
 
 /* misc */
 
+.row-no-pad {
+    > div[class*="col-"] {
+        padding: 0;
+    }
+    //> div[class*="col-"]:not(:first-child) {
+    //    padding-left: 0;
+    //}
+    //> div[class*="col-"]:not(:last-child) {
+    //    padding-right: 0;
+    //}
+}
+
 .vertical-top {
     vertical-align: top !important;
 }
@@ -298,35 +310,69 @@ body, .bg_body {
 /* shortname */
 
 .shortname-container {
-    width: 50px;
-    height: 50px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
-    font-size: 26px;
+    font-size: 20px;
     color: #fff;
-    line-height: 50px;
+    line-height: 40px;
     text-align: center;
     background-color: #16aad8;
     //    padding: 10px;
     padding: 0;
     display: inline-block;
+    font-weight: bold;
+    text-shadow: none;
 }
 
 .shortname-container-xs {
-    width: 20px;
-    height: 20px;
+    width: 22px;
+    height: 22px;
     border-radius: 50%;
     font-size: 12px;
     color: #fff;
-    line-height: 20px;
+    line-height: 22px;
     text-align: center;
     background-color: #16aad8;
     padding: 0;
     display: inline-block;
+    font-weight: bold;
+    text-shadow: none;
+}
+
+.app-header, .app-aside {
+    text-shadow: 1px 1px 2px darken(@brand-black, 10%);
+    .shortname-container, .shortname-container-xs {
+        box-shadow: 1px 1px 2px darken(@brand-black, 10%);
+    }
+}
+
+.app-aside {
+    .identity {
+        position: relative;
+        a {
+            padding-left: 65px;
+            height: 60px;
+        }
+        .shortname-container {
+            position: absolute;
+            left: 0px;
+        }
+        .role {
+            line-height: 1em;
+        }
+    }
 }
 
 .app-aside-folded {
-    .shortname-container {
-        .shortname-container-xs;
+    .identity {
+        a {
+            height: 40px;
+        }
+        .shortname-container {
+            .shortname-container-xs;
+            margin-left: 18px;
+        }
     }
 }
 
