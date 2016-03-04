@@ -75,10 +75,7 @@ class Module implements ConfigProviderInterface, BootstrapListenerInterface
 
                 $headScript->appendFile($basePath('/assets/admin/core/js/vendor.min.js'));
                 $headScript->appendFile($basePath('/assets/admin/core/js/admin42.min.js'));
-
-                if (!$config['admin']['whitelabel']) {
-                    $headLink->appendStylesheet($basePath('/assets/admin/core/css/admin42.min.css'));
-                }
+                $headLink->appendStylesheet($basePath('/assets/admin/core/css/admin42.min.css'));
 
                 $formElement = $viewHelperManager->get('formElement');
                 $formElement->addClass('Admin42\FormElements\FileSelect', 'formfileselect');

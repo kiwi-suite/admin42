@@ -7,8 +7,8 @@
             <i class="glyphicon glyphicon-align-justify"></i>
         </button>
         <a href="<?= $this->url('admin') ?>" class="navbar-brand text-lt">
-            <img src="<?= $this->basePath('assets/admin/core/images/iconkiwi42.png'); ?>" alt=".">
-            <span class="hidden-folded m-l-xs">kiw<span class="text-r42">i</span></span>
+            <img src="<?= $this->basePath($this->admin()->getWhitelabelOption('logo-icon')); ?>" alt=".">
+            <span class="hidden-folded m-l-xs"><?= $this->admin()->getWhitelabelOption('topbar-title') ?></span>
         </a>
     </div>
 
