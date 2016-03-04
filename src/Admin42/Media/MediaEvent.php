@@ -10,7 +10,4 @@ class MediaEvent extends Event
     const EVENT_ADD = 'event_add';
     const EVENT_DELETE = 'event_delete';
     const EVENT_CROP = 'event_crop';
-
-
-
 }

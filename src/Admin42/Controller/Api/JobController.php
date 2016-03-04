@@ -14,6 +14,10 @@ use Core42\View\Model\JsonModel;
 
 class JobController extends AbstractAdminController
 {
+    /**
+     * @return JsonModel
+     * @throws \Exception
+     */
     public function runAction()
     {
         if (!$this->getRequest()->isPost()) {
@@ -37,12 +41,13 @@ class JobController extends AbstractAdminController
             unset($params['cmd']);
             try {
                 $cmd->hydrate($params);
-            } catch (\Exception $e) {}
+            } catch (\Exception $e) {
+
+            }
 
         }
 
         $cmd->run();
-
 
         return new JsonModel();
     }

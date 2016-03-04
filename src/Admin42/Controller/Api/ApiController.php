@@ -16,13 +16,19 @@ use Zend\Db\Sql\Predicate\Like;
 
 class ApiController extends AbstractAdminController
 {
+    /**
+     * @return JsonModel
+     */
     public function tagSuggestAction()
     {
         $searchTag = $this->request->getQuery('tag', '');
 
         $tags = [];
         if (!empty($searchTag)) {
-            $tagResult = $this->getTableGateway('Admin42\Tag')->select([new Like('tag', $searchTag . '%'), new IsNull('namespace')]);
+            $tagResult = $this->getTableGateway('Admin42\Tag')->select([
+                new Like('tag', $searchTag . '%'),
+                new IsNull('namespace')
+            ]);
             foreach ($tagResult as $tag) {
                 $tags[] = [
                     'id' => $tag->getId(),

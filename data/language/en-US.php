@@ -68,6 +68,15 @@ return array(
     'text.login-description'        => 'Enter username/email and password to continue.',
     'text.lostpw-description'       => 'To reset your password, enter the email address you use to sign in.',
 
+    'toaster.item.edit.title.success'     => 'Item saved',
+    'toaster.item.edit.message.success'   => 'Item was saved successfully',
+    'toaster.item.edit.title.error'       => 'Item not saved',
+    'toaster.item.edit.message.error'     => 'There was an error in saving the resource',
+    'toaster.item.delete.title.success'   => 'Item deleted',
+    'toaster.item.delete.message.success' => 'Item is successfully deleted',
+    'toaster.item.delete.title.error'     => 'Item not deleted',
+    'toaster.item.delete.message.error'   => 'There was an error in deleting the resource',
+
     'toaster.user.detail.title.success'     => 'User saved',
     'toaster.user.detail.message.success'   => 'User was saved successfully',
     'toaster.user.detail.title.error'       => 'User not saved',

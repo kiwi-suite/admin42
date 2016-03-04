@@ -94,8 +94,9 @@ class Dynamic extends Fieldset
     /**
      * @return string
      */
-    public function getHashId() {
-        if(!$this->hashId) {
+    public function getHashId()
+    {
+        if (!$this->hashId) {
             $this->hashId = 'ph'.uniqid();
         }
         return $this->hashId;

@@ -106,6 +106,9 @@ class EditCommand extends AbstractCommand
         return $this;
     }
 
+    /**
+     * @param array $values
+     */
     public function hydrate(array $values)
     {
         $this->setTitle($values['title']);

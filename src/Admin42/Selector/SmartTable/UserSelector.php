@@ -42,6 +42,9 @@ class UserSelector extends AbstractSmartTableSelector
         ];
     }
 
+    /**
+     * @return PredicateSet|Where
+     */
     protected function getWhere()
     {
         $where = parent::getWhere();

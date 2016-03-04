@@ -42,6 +42,9 @@ class CrudController extends AbstractAdminController
             ->get($this->params("crud"));
     }
 
+    /**
+     * @return mixed|ViewModel
+     */
     public function indexAction()
     {
         $selector = $this->getSelector($this->getCrudOptions()->getSelectorName());
@@ -74,7 +77,9 @@ class CrudController extends AbstractAdminController
 
         $data = $model->toArray();
         foreach ($data as $name => $value) {
-            if (!is_string($value)) continue;
+            if (!is_string($value)) {
+                continue;
+            }
 
             $var = json_decode($value, true);
             if (is_array($var)) {
@@ -85,6 +90,10 @@ class CrudController extends AbstractAdminController
         return $data;
     }
 
+    /**
+     * @return array|Response|ViewModel
+     * @throws \Exception
+     */
     public function detailAction()
     {
         $isEditMode = $this->params()->fromRoute("isEditMode");
@@ -125,14 +134,14 @@ class CrudController extends AbstractAdminController
             if (!$formCommand->hasErrors()) {
                 $this->flashMessenger()->addSuccessMessage([
                     'title' => 'toaster.item.edit.title.success',
-                    'message' => 'toaster.item.edit.content.success',
+                    'message' => 'toaster.item.edit.message.success',
                 ]);
 
                 return $this->redirect()->toRoute($currentRoute . '/edit', array('id' => $model->getId()));
             } else {
                 $this->flashMessenger()->addErrorMessage([
-                    'title' => 'toaster.item.edit.title.failed',
-                    'message' => 'toaster.item.edit.content.failed',
+                    'title' => 'toaster.item.edit.title.error',
+                    'message' => 'toaster.item.edit.message.error',
                 ]);
             }
         } else {
@@ -153,6 +162,10 @@ class CrudController extends AbstractAdminController
         return $viewModel;
     }
 
+    /**
+     * @return JsonModel
+     * @throws \Exception
+     */
     public function deleteAction()
     {
         $cmdName = $this->getCrudOptions()->getDeleteCommandName();
