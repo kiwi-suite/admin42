@@ -65,11 +65,11 @@ class MediaOptions extends AbstractOptions
     {
         $dimensions = [];
 
-        foreach($this->images['dimensions'] as $name => $_dimensions) {
+        foreach ($this->images['dimensions'] as $name => $_dimensions) {
             if ($includeSystem === false
                 && array_key_exists('system', $_dimensions)
-                && $_dimensions['system'] === true)
-            {
+                && $_dimensions['system'] === true
+            ) {
                 continue;
             }
 
@@ -110,6 +110,4 @@ class MediaOptions extends AbstractOptions
     {
         $this->uploadHost = $uploadHost;
     }
-
-
 }

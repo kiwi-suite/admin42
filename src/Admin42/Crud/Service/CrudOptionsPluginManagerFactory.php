@@ -26,6 +26,9 @@ class CrudOptionsPluginManagerFactory implements FactoryInterface
         $config = $serviceLocator->get('config');
         $config = (array_key_exists('crud_options', $config)) ? $config['crud_options'] : [];
 
-        return new CrudOptionsPluginManager(new Config($config));
+        $manager = new CrudOptionsPluginManager(new Config($config));
+        $manager->setServiceLocator($serviceLocator);
+
+        return $manager;
     }
 }

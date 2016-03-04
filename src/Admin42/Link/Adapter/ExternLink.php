@@ -3,17 +3,28 @@ namespace Admin42\Link\Adapter;
 
 class ExternLink implements AdapterInterface
 {
+    /**
+     * @param mixed $value
+     * @return string
+     */
     public function assemble($value)
     {
         return $this->getLinkData($value);
     }
 
+    /**
+     * @param mixed $value
+     * @return string
+     */
     public function getDisplayName($value)
     {
         return $this->getLinkData($value);
     }
 
-
+    /**
+     * @param $value
+     * @return string
+     */
     protected function getLinkData($value)
     {
         if (empty($value['url'])) {

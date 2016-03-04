@@ -1,24 +1,38 @@
-<div class="app-aside hidden-xs bg-dark b-r">
-    <div class="aside-wrap bg-dark">
+<div class="app-aside hidden-xs bg-dark dk">
+    <div class="aside-wrap">
         <div class="navi-wrap">
-            <div class="clearfix hidden-xs text-center hide show" id="aside-user">
-                <span class="w-auto-folded m-t-sm shortname-container">
-                    <?= $this->auth('Admin42\Authentication')->getIdentity()->getShortName() ?>
-                </span>
-                <span class="clear hidden-folded">
-                    <span class="block m-t-sm">
-                        <strong class="font-bold text-lt">
-                            <?= $this->admin()->getUserDisplayName($this->auth('Admin42\Authentication')->getIdentity()) ?>
-                        </strong>
-                    </span>
-                    <span class="text-muted text-xs block">
-                        <?= $this->auth('Admin42\Authentication')->getIdentity()->getRole() ?>
-                    </span>
-                </span>
-            </div>
+
+            <ul class="nav">
+                <li class="m-t-sm text-muted text-sm identity">
+                    <a href="<?= $this->url('admin/user/manage') ?>">
+                        <span class="m-l m-r-xs shortname-container">
+                            <?= $this->auth('Admin42\Authentication')->getIdentity()->getShortName() ?>
+                        </span>
+                        <div class="hidden-folded">
+                            <div class="m-t-xs font-bold text-lt">
+                                <?= $this->admin()->getUserDisplayName(
+                                    $this->auth('Admin42\Authentication')->getIdentity()
+                                ) ?>
+                            </div>
+                            <div class="text-muted text-xs role">
+                                <?= $this->auth('Admin42\Authentication')->getIdentity()->getRole() ?>
+                            </div>
+                        </div>
+                    </a>
+                </li>
+            </ul>
+
             <nav ui-nav class="navi clearfix">
                 <?= $this->menu('partial/admin42/main-menu', 'admin42')->setMaxDepth(1) ?>
             </nav>
+
+            <ul class="nav m-b-lg hidden-folded">
+                <li class="line dk"></li>
+                <li class="m-t-sm m-b-sm text-muted text-xs" style="cursor: default;">
+                    <a href="http://www.raum42.at" target="_blank" title="raum42 OG">kiwi&nbsp;&copy;&nbsp;raum42 OG</a>
+                </li>
+            </ul>
+
         </div>
     </div>
     <div class="clearfix"></div>

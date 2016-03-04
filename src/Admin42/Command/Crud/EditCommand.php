@@ -102,6 +102,9 @@ class EditCommand extends AbstractCommand
         throw new \Exception("Method {$method} not found");
     }
 
+    /**
+     * @throws \Exception
+     */
     protected function preExecute()
     {
         $this->model = $this->getTableGateway($this->tableGatewayName)->selectByPrimary((int) $this->id);

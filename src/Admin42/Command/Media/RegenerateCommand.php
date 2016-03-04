@@ -74,7 +74,7 @@ class RegenerateCommand extends AbstractCommand
             }
 
 
-            foreach(array_keys($mediaOptions->getDimensions()) as $dimension) {
+            foreach (array_keys($mediaOptions->getDimensions()) as $dimension) {
                 $cmd = $this->getCommand('Admin42\Media\ImageResize');
                 $cmd->setMedia($media)
                     ->setDimensionName($dimension)

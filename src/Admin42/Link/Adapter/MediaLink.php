@@ -27,6 +27,10 @@ class MediaLink implements AdapterInterface
         $this->mediaUrl = $mediaUrl;
     }
 
+    /**
+     * @param mixed $value
+     * @return string
+     */
     public function assemble($value)
     {
         $media = $this->getLinkData($value);
@@ -37,6 +41,10 @@ class MediaLink implements AdapterInterface
         return $this->mediaUrl . str_replace("data/media", "", $media->getDirectory()) . $media->getFilename();
     }
 
+    /**
+     * @param mixed $value
+     * @return string
+     */
     public function getDisplayName($value)
     {
         $media = $this->getLinkData($value);

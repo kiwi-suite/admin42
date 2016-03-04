@@ -25,6 +25,4 @@ class Link extends AbstractModel
         'type',
         'value',
     );
-
-
 }

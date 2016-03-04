@@ -131,7 +131,7 @@ class ImageResizeCommand extends AbstractCommand
             if ($imageRatio < $dimensionRatio) {
                 $boxWidth = $imageSize->getWidth();
                 $boxHeight = round($imageSize->getWidth()/ $dimensionRatio);
-            } elseif($imageRatio > $dimensionRatio) {
+            } elseif ($imageRatio > $dimensionRatio) {
                 $boxHeight = $imageSize->getHeight();
                 $boxWidth = round($imageSize->getHeight() * $dimensionRatio);
             } else {

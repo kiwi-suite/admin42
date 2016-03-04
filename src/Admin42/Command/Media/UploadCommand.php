@@ -57,6 +57,9 @@ class UploadCommand extends AbstractCommand
         $this->setCategory($values['category']);
     }
 
+    /**
+     *
+     */
     protected function preExecute()
     {
         $mediaOptions = $this->getServiceManager()->get('Admin42\MediaOptions');
@@ -97,7 +100,7 @@ class UploadCommand extends AbstractCommand
         if (substr($media->getMimeType(), 0, 6) == "image/") {
             $mediaOptions = $this->getServiceManager()->get('Admin42\MediaOptions');
 
-            foreach(array_keys($mediaOptions->getDimensions()) as $dimension) {
+            foreach (array_keys($mediaOptions->getDimensions()) as $dimension) {
                 /* @var ImageResizeCommand $cmd */
                 $cmd = $this->getCommand('Admin42\Media\ImageResize');
                 $cmd->setMedia($media)

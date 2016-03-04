@@ -45,6 +45,10 @@ class MediaController extends AbstractAdminController
         return $viewModel;
     }
 
+    /**
+     * @return array|\Zend\Http\Response
+     * @throws \Exception
+     */
     public function editAction()
     {
         $editForm = $this->getForm('Admin42\Media\Edit');
@@ -102,6 +106,9 @@ class MediaController extends AbstractAdminController
         ];
     }
 
+    /**
+     * @return JsonModel
+     */
     public function cropAction()
     {
         $data = Json::decode($this->getRequest()->getContent(), Json::TYPE_ARRAY);
@@ -161,6 +168,9 @@ class MediaController extends AbstractAdminController
         return $jsonModel;
     }
 
+    /**
+     * @return JsonModel
+     */
     public function deleteAction()
     {
         if ($this->getRequest()->isDelete()) {

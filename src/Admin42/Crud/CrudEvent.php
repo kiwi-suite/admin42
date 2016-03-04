@@ -9,6 +9,4 @@ class CrudEvent extends Event
     const EVENT_EDIT_POST = 'event_edit_post';
     const EVENT_ADD = 'event_add';
     const EVENT_DELETE = 'event_delete';
-
-
 }
