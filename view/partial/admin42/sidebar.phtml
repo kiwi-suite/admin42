@@ -23,15 +23,24 @@
             </ul>
 
             <nav ui-nav class="navi clearfix">
-                <?= $this->menu('partial/admin42/main-menu', 'admin42')->setMaxDepth(1) ?>
-            </nav>
 
-            <ul class="nav m-b-lg hidden-folded">
-                <li class="line dk"></li>
-                <li class="m-t-sm m-b-sm text-muted text-xs" style="cursor: default;">
-                    <a href="http://www.raum42.at" target="_blank" title="raum42 OG">kiwi&nbsp;&copy;&nbsp;raum42 OG</a>
-                </li>
-            </ul>
+                <?= $this->menu('partial/admin42/main-menu', 'admin42')->setMaxDepth(1) ?>
+
+                <ul class="nav m-b-lg">
+                    <li class="line bg-dark"></li>
+                    <li class="m-b-sm text-muted" style="cursor: default;">
+                        <a href="https://www.raum42.at" target="_blank" title="raum42 OG">
+                            <i class="icon fa fa-fw">
+                                <img class="icon icon-kiwi" src="<?= $this->basePath('assets/admin/core/images/logo-icon.png') ?>">
+                            </i>
+                            <span class="hidden-folded text-xs">
+                                kiw<span class="text-r42">i</span>42
+                                &nbsp;&copy;&nbsp;raum42 OG<br>
+                            </span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
 
         </div>
     </div>
