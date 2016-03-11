@@ -49,9 +49,12 @@
                         <td class="vertical-middle"><small>{{row.created | datetime}}</small></td>
                         <td class="vertical-middle"><small>{{row.lastLogin | datetime}}</small></td>
                         <td class="vertical-middle text-right">
+                            <?php if($this->permission('admin42')->isGranted('route/admin/user/edit')): ?>
                             <a class="btn btn-info btn-xs" ng-href="<?= $this->url("admin/user/edit", array('id' => "{{ row.id }}"))?>">
                                 <span class="fa fa-pencil" aria-hidden="true"></span>
                             </a>
+                            <?php endif; ?>
+                            <?php if($this->permission('admin42')->isGranted('route/admin/user/delete')): ?>
                             <delete
                                 url="<?= $this->url('admin/user/delete') ?>"
                                 title="<?= $this->translate("user.modal.delete.title", "admin") ?>"
@@ -60,6 +63,7 @@
                                 request-id="{{row.id}}"
                                 >
                             </delete>
+                            <?php endif; ?>
                         </td>
                     </tr>
                 </tbody>
@@ -78,10 +82,12 @@
             </table>
         </div>
         <div class="panel-footer">
+            <?php if($this->permission('admin42')->isGranted('route/admin/user/add')): ?>
             <a class="btn btn-default" href="<?= $this->url('admin/user/add') ?>">
                 <span class="fa fa-plus-circle"></span>
                 <?= $this->translate('button.user-add', 'admin') ?>
             </a>
+            <?php endif; ?>
         </div>
     </div>
 </div>
