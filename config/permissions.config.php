@@ -27,7 +27,9 @@ return [
                                 'user'
                             ],
                             'permissions' => [
-                                'route/admin*'
+                                'route/admin*',
+
+                                'dynamic/manage*',
                             ],
                             'options' => [
                                 'redirect_after_login' => 'admin/user/manage',
