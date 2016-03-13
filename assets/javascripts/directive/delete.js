@@ -27,7 +27,15 @@ angular.module('admin42')
                     }
                 }
 
+                $scope.icon = "fa fa-trash-o";
+                if (!angular.isUndefined($attrs.icon)) {
+                    $scope.icon = $attrs.icon;
+                }
+
+                $scope.deleteLoading = false;
+
                 $scope.delete = function() {
+                    $scope.deleteLoading = true;
                     var modalInstance = $modal.open({
                         animation: true,
                         templateUrl: 'element/delete-modal.html',
@@ -55,6 +63,9 @@ angular.module('admin42')
                             },
                             requestMethod: function(){
                                 return $scope.method;
+                            },
+                            requestIcon: function(){
+                                return $scope.icon;
                             }
                         }
                     });
@@ -69,8 +80,10 @@ angular.module('admin42')
                         if (angular.isDefined($scope.callback)) {
                             $scope.callback();
                         }
-                    }, function () {
 
+                        $scope.deleteLoading = false;
+                    }, function () {
+                        $scope.deleteLoading = false;
                     });
                 }
             }]
@@ -87,11 +100,15 @@ angular.module('admin42')
             'requestTitle',
             'requestContent',
             'requestMethod',
-            function ($scope, $modalInstance, $http, requestUrl, requestParams, requestTitle, requestContent, requestMethod) {
+            'requestIcon',
+            function ($scope, $modalInstance, $http, requestUrl, requestParams, requestTitle, requestContent, requestMethod, requestIcon) {
                 $scope.title = requestTitle;
                 $scope.content = requestContent;
+                $scope.icon = requestIcon;
+                $scope.deleteLoading = false;
 
                 $scope.ok = function () {
+                    $scope.deleteLoading = true;
                     $http({
                         method: requestMethod.toUpperCase(),
                         url: requestUrl,
