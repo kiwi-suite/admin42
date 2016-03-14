@@ -24,6 +24,7 @@
 @import "_nav.dock.less";
 
 @import "_arrow.less";
+@import "_buttons.less";
 @import "_widgets.less";
 
 @import "_components.less";
@@ -35,15 +36,8 @@
 @import "_utilities.less";
 
 @import "_wysiwyg.less";
+@import "_magnific.less";
 
-
-/*
-    kiwi42
-*/
-
-body, .bg_body {
-    //background: url(../images/bg_body.png);
-}
 
 /* misc */
 
@@ -56,12 +50,6 @@ body, .bg_body {
     > div[class*="col-"] {
         padding: 0;
     }
-    //> div[class*="col-"]:not(:first-child) {
-    //    padding-left: 0;
-    //}
-    //> div[class*="col-"]:not(:last-child) {
-    //    padding-right: 0;
-    //}
 }
 
 .vertical-top {
@@ -70,15 +58,6 @@ body, .bg_body {
 
 .vertical-middle {
     vertical-align: middle !important;
-}
-
-.bg_linen {
-    //background: url(../images/linen_header.jpg);
-    color: @white;
-}
-
-.bg_sub_header {
-    //background: url(../images/bg_sub_header.jpg);
 }
 
 .bottomline {
@@ -98,13 +77,6 @@ body, .bg_body {
 }
 
 /* tables */
-
-.table {
-    thead {
-        //background: @brand-dark;
-        //color: @brand-light;
-    }
-}
 
 .table-striped {
     &.table-row-links {
@@ -138,9 +110,6 @@ body, .bg_body {
 /*### LOGIN ###*/
 
 .login-container {
-    //width: 580px;
-    //margin-top: 55px;
-
     .form-group {
         &.no-margin, &:last-child {
             margin-bottom: 0;
@@ -152,36 +121,13 @@ body, .bg_body {
     }
 
     .panel {
-        //background: url('../images/linen_login.jpg') top center no-repeat;
-        //width: 450px;
-        //margin-left: 50px;
         margin-bottom: 0;
-        //padding: 10px 24px 24px 24px;
-        //border: 1px solid #333;
-        //-webkit-border-bottom-right-radius: 5px;
-        //-webkit-border-bottom-left-radius: 5px;
-        //-moz-border-radius-bottomright: 5px;
-        //-moz-border-radius-bottomleft: 5px;
-        //border-bottom-right-radius: 5px;
-        //border-bottom-left-radius: 5px;
-        //box-shadow: inset 0 0 1px #ccc;
-        //-o-box-shadow: inset 0 0 1px #ccc;
-        //-webkit-box-shadow: inset 0 0 1px #ccc;
-        //-moz-box-shadow: inset 0 0 1px #ccc;
     }
 
     #login-subheader {
-        //width: 450px;
         margin-left: 50px;
         text-align: center;
         padding: 5px 24px 5px 24px;
-        //color: @white;
-        //text-shadow: #000 0 0 2px;
-        //border-top: 1px solid @brand-primary;
-        //border-bottom: 1px solid @brand-primary;
-
-        &:extend(.bg_sub_header);
-
         h4 {
             font-size: 15px;
             margin: 0 10px;
@@ -189,17 +135,6 @@ body, .bg_body {
     }
 
     #login-header {
-        //padding: 10px 24px 0px 24px;
-        //width: 450px;
-        //margin-left: 50px;
-        //-webkit-border-top-left-radius: 5px;
-        //-webkit-border-top-right-radius: 5px;
-        //-moz-border-radius-topleft: 5px;
-        //-moz-border-radius-topright: 5px;
-        //border-top-left-radius: 5px;
-        //border-top-right-radius: 5px;
-        //background: @white url("../images/bg_gradient.jpg") left bottom repeat-x;
-        //text-align: right;
         text-align: center;
 
         img {
@@ -214,44 +149,6 @@ body, .bg_body {
             &:extend(.text-white);
         }
     }
-
-    /*
-    .btn {
-        margin: 0 auto;
-        font-weight: bold;
-        padding: 4px 12px;
-        color: #444;
-        text-shadow: 0px 1px 1px @white;
-        border-color: #f9f9f9;
-        background: #f9f9f9;
-        background: -moz-linear-gradient(top, #f9f9f9 0%, #e2e2e2 100%);
-        background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #f9f9f9), color-stop(100%, #e2e2e2));
-        background: -o-linear-gradient(top, #f9f9f9 0%, #e2e2e2 100%);
-        background: -ms-linear-gradient(top, #f9f9f9 0%, #e2e2e2 100%);
-        background: linear-gradient(top, #f9f9f9 0%, #e2e2e2 100%);
-        box-shadow: inset 0 1px 0 0 @white;
-        -moz-box-shadow: inset 0 1px 0 0 @white;
-        -webkit-box-shadow: inset 0 1px 0 0 @white;
-        -o-box-shadow: inset 0 1px 0 0 @white;
-
-        &:hover, &:focus {
-            box-shadow: 0 0 5px 2px rgba(71, 135, 177, 0.9), inset 0 1px 0 0 @white;
-            -moz-box-shadow: 0 0 5px 2px rgba(71, 135, 177, 0.9), inset 0 1px 0 0 @white;
-            -webkit-box-shadow: 0 0 5px 2px rgba(71, 135, 177, 0.9), inset 0 1px 0 0 @white;
-            -o-box-shadow: 0 0 5px 2px rgba(71, 135, 177, 0.9), inset 0 1px 0 0 @white;
-            color: #000;
-        }
-
-        &:active {
-            color: #333;
-            background: -moz-linear-gradient(top, #dcdcdc 0%, #f9f9f9 100%);
-            background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #dcdcdc), color-stop(100%, #f9f9f9));
-            background: -o-linear-gradient(top, #dcdcdc 0%, #f9f9f9 100%);
-            background: -ms-linear-gradient(top, #dcdcdc 0%, #f9f9f9 100%);
-            background: linear-gradient(top, #dcdcdc 0%, #f9f9f9 100%);
-        }
-    }
-    */
 
     .panel-footer {
         &:extend(.text-white);
@@ -387,4 +284,8 @@ body, .bg_body {
 .modal-scroll-body {
     max-height: calc(75vh) !important;
     overflow-y: auto;
+}
+
+.bg-for-transparent {
+    background: url("../images/bg-for-transparent.png") repeat;
 }
