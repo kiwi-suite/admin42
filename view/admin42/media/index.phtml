@@ -79,7 +79,7 @@
             </div>
         </div>
         <div class="panel-footer text-right" collapse="isCollapsed">
-            <button type="button" class="btn btn-addon btn-success" ng-click="uploader.uploadAll()" ng-hide="!uploader.getNotUploadedItems().length">
+            <button type="button" class="btn btn-addon btn-primary" ng-click="uploader.uploadAll()" ng-hide="!uploader.getNotUploadedItems().length">
                 <i class="fa fa-arrow-circle-o-up"></i> <?= $this->translate('button.upload_all', 'admin')?>
             </button>
             <button type="button" class="btn btn-addon btn-warning" ng-click="uploader.cancelAll()" ng-hide="!uploader.isUploading">
