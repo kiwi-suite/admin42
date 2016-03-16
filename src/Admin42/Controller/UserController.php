@@ -29,6 +29,32 @@ class UserController extends AbstractAdminController
     }
 
     /**
+     * @return \Zend\Http\Response
+     */
+    public function homeAction()
+    {
+        $identityRoles = $this
+            ->getServiceLocator()
+            ->get('Core42\Permission')
+            ->getService('admin42')
+            ->getIdentityRoles();
+
+        if (empty($identityRoles)) {
+            return $this->redirect()->toRoute('admin/user/manage');
+        }
+
+        /** @var RoleInterface $role */
+        $role = current($identityRoles);
+        $roleOptions = $role->getOptions();
+
+        if (empty($roleOptions['redirect_after_login'])) {
+            return $this->redirect()->toRoute('admin/user/manage');
+        }
+
+        return $this->redirect()->toRoute($roleOptions['redirect_after_login']);
+    }
+
+    /**
      * @return array
      * @throws \Exception
      */
@@ -146,7 +172,25 @@ class UserController extends AbstractAdminController
         /** @var AuthenticationService $authenticationService */
         $authenticationService = $this->getServiceLocator()->get('Admin42\Authentication');
         if ($authenticationService->hasIdentity()) {
-            return $this->redirect()->toRoute('admin/user/manage');
+            $identityRoles = $this
+                ->getServiceLocator()
+                ->get('Core42\Permission')
+                ->getService('admin42')
+                ->getIdentityRoles();
+
+            if (empty($identityRoles)) {
+                return $this->redirect()->toRoute('admin/user/manage');
+            }
+
+            /** @var RoleInterface $role */
+            $role = current($identityRoles);
+            $roleOptions = $role->getOptions();
+
+            if (empty($roleOptions['redirect_after_login'])) {
+                return $this->redirect()->toRoute('admin/user/manage');
+            }
+
+            return $this->redirect()->toRoute($roleOptions['redirect_after_login']);
         }
 
         $this->layout('admin/layout/layout-min');

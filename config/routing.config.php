@@ -15,6 +15,16 @@ return array(
                 ),
                 'may_terminate' => true,
                 'child_routes' => array(
+                    'home' => array(
+                        'type' => 'Zend\Mvc\Router\Http\Literal',
+                        'options' => array(
+                            'route' => 'home/',
+                            'defaults' => array(
+                                'controller' => __NAMESPACE__ . '\User',
+                                'action' => 'home',
+                            ),
+                        ),
+                    ),
                     'login' => array(
                         'type' => 'Zend\Mvc\Router\Http\Literal',
                         'options' => array(
