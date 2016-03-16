@@ -45,7 +45,15 @@ angular.module('admin42')
                     }
                 }
 
+                $scope.icon = "fa fa-trash-o";
+                if (!angular.isUndefined($attrs.icon)) {
+                    $scope.icon = $attrs.icon;
+                }
+
+                $scope.deleteLoading = false;
+
                 $scope.delete = function() {
+                    $scope.deleteLoading = true;
                     var modalInstance = $modal.open({
                         animation: true,
                         templateUrl: 'element/delete-modal.html',
@@ -73,6 +81,9 @@ angular.module('admin42')
                             },
                             requestMethod: function(){
                                 return $scope.method;
+                            },
+                            requestIcon: function(){
+                                return $scope.icon;
                             }
                         }
                     });
@@ -87,8 +98,10 @@ angular.module('admin42')
                         if (angular.isDefined($scope.callback)) {
                             $scope.callback();
                         }
-                    }, function () {
 
+                        $scope.deleteLoading = false;
+                    }, function () {
+                        $scope.deleteLoading = false;
                     });
                 }
             }]
@@ -105,11 +118,15 @@ angular.module('admin42')
             'requestTitle',
             'requestContent',
             'requestMethod',
-            function ($scope, $modalInstance, $http, requestUrl, requestParams, requestTitle, requestContent, requestMethod) {
+            'requestIcon',
+            function ($scope, $modalInstance, $http, requestUrl, requestParams, requestTitle, requestContent, requestMethod, requestIcon) {
                 $scope.title = requestTitle;
                 $scope.content = requestContent;
+                $scope.icon = requestIcon;
+                $scope.deleteLoading = false;
 
                 $scope.ok = function () {
+                    $scope.deleteLoading = true;
                     $http({
                         method: requestMethod.toUpperCase(),
                         url: requestUrl,
@@ -249,6 +266,24 @@ angular.module('admin42')
                         json = angular.fromJson(element[0].text);
                     jsonCache.put(jsonHandler, json);
                 }
+            }
+        };
+    }]);
+;
+angular.module('admin42')
+    .directive('lightbox', [function() {
+        return {
+            restrict: 'A',
+            link: function(scope, elem, attrs) {
+                $(elem).magnificPopup({
+                    type: 'image',
+                    closeOnContentClick: true,
+                    mainClass: 'mfp-img-mobile',
+                    image: {
+                        verticalFit: true
+                    }
+
+                });
             }
         };
     }]);
@@ -419,6 +454,42 @@ angular.module('smart-table')
                         tableCtrl.search(evt.target.value, attr.stSearch42 || '');
                         promise = null;
                     }, throttle);
+                });
+            }
+        };
+    }]);
+;
+angular.module('admin42')
+    .directive('submit', [function() {
+        return {
+            restrict: 'E',
+            replace: true,
+            scope: {},
+            templateUrl: 'element/submit.html',
+            link: function(scope, elem, attrs, ctrl) {
+                scope.icon = "fa fa-save";
+                if (!angular.isUndefined(attrs.icon)) {
+                    scope.icon = attrs.icon;
+                }
+
+                scope.submitText = "Save";
+                if (!angular.isUndefined(attrs.submitText)) {
+                    scope.submitText = attrs.submitText;
+                }
+
+                scope.submitLoading = false;
+
+                elem.bind('click', function(event) {
+                    if (scope.submitLoading == true) {
+                        event.preventDefault();
+
+                        return;
+                    }
+                    scope.$apply(
+                        function(){
+                            scope.submitLoading = true;
+                        }
+                    );
                 });
             }
         };

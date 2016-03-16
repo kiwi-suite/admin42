@@ -6,13 +6,13 @@
         <button class="pull-right visible-xs" ui-toggle-class="off-screen" data-target=".app-aside" ui-scroll-to="app">
             <i class="glyphicon glyphicon-align-justify"></i>
         </button>
-        <a href="<?= $this->url('admin') ?>" class="navbar-brand text-lt">
-            <img src="<?= $this->basePath('assets/admin/core/images/iconkiwi42.png'); ?>" alt=".">
-            <span class="hidden-folded m-l-xs">kiw<span class="text-r42">i</span></span>
+        <a href="<?= $this->url('admin/home') ?>" class="navbar-brand">
+            <img src="<?= $this->basePath($this->admin()->getWhitelabelOption('logo-icon')); ?>" alt=".">
+            <span class="hidden-folded m-l-xs"><?= $this->admin()->getWhitelabelOption('topbar-title') ?></span>
         </a>
     </div>
 
-    <div class="collapse pos-rlt navbar-collapse bg-dark bg_sub_header">
+    <div class="collapse pos-rlt navbar-collapse bg-dark">
         <div class="nav navbar-nav hidden-xs">
             <a href class="btn no-shadow navbar-btn" ng-click="app.$storage.asideFolded = !app.$storage.asideFolded">
                 <i class="fa {{app.$storage.asideFolded ? 'fa-indent' : 'fa-dedent'}} fa-fw"></i>

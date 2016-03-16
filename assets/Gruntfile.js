@@ -49,6 +49,9 @@ module.exports = function(grunt) {
 
                     '<%= vendor_dir %>/tinymce-dist/tinymce.js',
 
+                    '<%= vendor_dir %>/magnific-popup/src/js/core.js',
+                    '<%= vendor_dir %>/magnific-popup/src/js/image.js',
+
                     '<%= vendor_dir %>/moment/min/moment-with-locales.js',
                     '<%= vendor_dir %>/moment-timezone/builds/moment-timezone-with-data.js'
                 ],
@@ -93,7 +96,8 @@ module.exports = function(grunt) {
                         '<%= vendor_dir %>/angularjs-toaster/toaster.css',
                         '<%= vendor_dir %>/cropper/dist/cropper.css',
                         'less/main.less',
-                        '<%= vendor_dir %>/angular-ui-select/dist/select.css'
+                        '<%= vendor_dir %>/angular-ui-select/dist/select.css',
+                        '<%= vendor_dir %>/magnific-popup/dist/magnific-popup.css'
                     ]
                 }
             }

@@ -282,4 +282,17 @@ class Admin extends AbstractHelper
 
         return implode(PHP_EOL, $templates);
     }
+
+    /**
+     * @param string $option
+     * @return string
+     */
+    public function getWhitelabelOption($option)
+    {
+        if (empty($this->config['whitelabel'][$option])) {
+            return "";
+        }
+
+        return $this->config['whitelabel'][$option];
+    }
 }

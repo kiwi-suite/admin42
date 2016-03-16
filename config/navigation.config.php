@@ -7,9 +7,8 @@ return array(
                 'content' => [
                     'options' => array(
                         'label' => 'label.content',
-                        'options' => [
-                            'order' => 1000,
-                        ]
+                        'order' => 1000,
+                        'permission' => 'navigation/section/content',
                     ),
                     'pages' => [
                         'media' => array(
@@ -26,9 +25,8 @@ return array(
                 'setting' => [
                     'options' => array(
                         'label' => 'label.settings',
-                        'options' => [
-                            'order' => 10000,
-                        ]
+                        'order' => 10000,
+                        'permission' => 'navigation/section/settings',
                     ),
                     'pages' => [
                         'user' => array(

@@ -44,5 +44,10 @@ class CreateEditForm extends Form
         $role->setLabel("Role");
         $role->setAttribute("required", "required");
         $this->add($role);
+
+        $shortName = new Text('shortName');
+        $shortName->setLabel('field.short-name');
+        $shortName->setAttribute("maxlength", 2);
+        $this->add($shortName);
     }
 }

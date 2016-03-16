@@ -68,6 +68,11 @@ return [
 
         'display-timezone' => 'Europe/Vienna',
 
-        'whitelabel' => false,
+        'whitelabel' => [
+            'topbar-title'  => 'kiw<span class="text-r42">i</span>42',
+            'logo-icon'     => 'assets/admin/core/images/logo-icon.png',
+            'logo-lg'       => 'assets/admin/core/images/logo-lg.png',
+            'logo-xs'       => 'assets/admin/core/images/logo-xs.png',
+        ],
     ],
 ];

@@ -1,6 +1,6 @@
 <div class="login-container container w-xxl w-auto-xs">
     <div id="login-header">
-        <img src="<?= $this->basePath('assets/admin/core/images/raum42_logo.png'); ?>" id="logo" border="0" alt="raum42 kiwi">
+        <img class="img-responsive" src="<?= $this->basePath($this->admin()->getWhitelabelOption('logo-lg')); ?>" id="logo" border="0" alt="kiwi42">
     </div>
     <!--<div id="login-subheader" class="subheader bold color-1"><h4>Login</h4></div>-->
     <div class="panel">
@@ -53,18 +53,16 @@
 
                 <div class="form-group no-margin">
                     <div class="col-sm-12 text-center">
-                        <button type="submit" class="btn btn-primary">
+                        <button type="submit" class="btn btn-block btn-primary">
                             <span class="fa fa-sign-in"></span>
                             <?= $this->translate('button.login', 'admin') ?>
                         </button>
                     </div>
                 </div>
                 <div class="form-group">
-                    <div class="col-sm-12 text-center">
+                    <div class="col-sm-12 m-t-sm">
                         <a href="<?= $this->url('admin/lost-password')?>">
-                            <small>
-                                <?= $this->translate('button.lost-password', 'admin')?>
-                            </small>
+                            <?= $this->translate('button.lost-password', 'admin')?>
                         </a>
                     </div>
                 </div>
@@ -72,11 +70,13 @@
             </form>
         </div>
     </div>
-    <div class="box-bottom">
-    </div>
+    <div class="box-bottom"></div>
 </div>
 <div class="bottomline">
-    <small>
-        kiwi&nbsp;&copy;&nbsp;<a href="http://www.raum42.at" target="_blank" title="raum42 OG">raum42 OG</a>
-    </small>
+    <a href="http://www.raum42.at" target="_blank" title="raum42 OG">
+        <small class="text-muted">
+            <img src="<?= $this->basePath('assets/admin/core/images/logo-xs.png') ?>"><br>
+            kiw<span class="text-r42">i</span>42&nbsp;&copy;&nbsp;raum42 OG
+        </small>
+    </a>
 </div>
