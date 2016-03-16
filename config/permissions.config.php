@@ -16,6 +16,7 @@ return [
                         'user' => [
                             'permissions' => [
                                 'route/admin/user/manage',
+                                'route/admin/home',
                                 'route/admin/logout'
                             ],
                             'options' => [
@@ -28,8 +29,9 @@ return [
                             ],
                             'permissions' => [
                                 'route/admin*',
-
+                                'navigation/section*',
                                 'dynamic/manage*',
+
                             ],
                             'options' => [
                                 'redirect_after_login' => 'admin/user/manage',
