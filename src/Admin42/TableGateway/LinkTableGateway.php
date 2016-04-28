@@ -14,10 +14,27 @@ class LinkTableGateway extends AbstractTableGateway
     /**
      * @var array
      */
-    protected $databaseTypeMap = array();
+    protected $primaryKey = ['id'];
+
+    /**
+     * @var array
+     */
+    protected $databaseTypeMap = [
+        'id' => 'Integer',
+        'hash' => 'String',
+        'type' => 'String',
+        'value' => 'String',
+    ];
+
+    /**
+     * @var boolean
+     */
+    protected $useMetaDataFeature = false;
 
     /**
      * @var string
      */
     protected $modelPrototype = 'Admin42\\Model\\Link';
+
+
 }

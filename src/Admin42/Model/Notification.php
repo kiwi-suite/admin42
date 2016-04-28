@@ -1,11 +1,4 @@
 <?php
-/**
- * admin42 (www.raum42.at)
- *
- * @link http://www.raum42.at
- * @copyright Copyright (c) 2010-2014 raum42 OG (http://www.raum42.at)
- *
- */
 namespace Admin42\Model;
 
 use Core42\Model\AbstractModel;
@@ -30,12 +23,12 @@ class Notification extends AbstractModel
     /**
      * @var array
      */
-    protected $properties = [
+    public $properties = [
         'id',
         'userId',
         'text',
         'route',
         'routeParams',
-        'created'
+        'created',
     ];
 }

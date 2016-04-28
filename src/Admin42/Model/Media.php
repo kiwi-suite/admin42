@@ -35,7 +35,7 @@ class Media extends AbstractModel
     /**
      * @var array
      */
-    protected $properties = array(
+    public $properties = [
         'id',
         'directory',
         'filename',
@@ -48,5 +48,5 @@ class Media extends AbstractModel
         'meta',
         'updated',
         'created',
-    );
+    ];
 }

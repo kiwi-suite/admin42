@@ -14,10 +14,27 @@ class TagTableGateway extends AbstractTableGateway
     /**
      * @var array
      */
-    protected $databaseTypeMap = array();
+    protected $primaryKey = ['id'];
+
+    /**
+     * @var array
+     */
+    protected $databaseTypeMap = [
+        'id' => 'Integer',
+        'tag' => 'String',
+        'namespace' => 'String',
+        'created' => 'DateTime',
+    ];
+
+    /**
+     * @var boolean
+     */
+    protected $useMetaDataFeature = false;
 
     /**
      * @var string
      */
     protected $modelPrototype = 'Admin42\\Model\\Tag';
+
+
 }

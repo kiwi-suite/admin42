@@ -19,10 +19,10 @@ class Link extends AbstractModel
     /**
      * @var array
      */
-    protected $properties = array(
+    public $properties = [
         'id',
         'hash',
         'type',
         'value',
-    );
+    ];
 }

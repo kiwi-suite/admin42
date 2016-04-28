@@ -1,11 +1,4 @@
 <?php
-/**
- * admin42 (www.raum42.at)
- *
- * @link http://www.raum42.at
- * @copyright Copyright (c) 2010-2014 raum42 OG (http://www.raum42.at)
- *
- */
 namespace Admin42\Model;
 
 use Core42\Model\AbstractModel;
@@ -40,11 +33,10 @@ class User extends AbstractModel
 {
     const STATUS_ACTIVE = "active";
     const STATUS_INACTIVE = "inactive";
-
     /**
      * @var array
      */
-    protected $properties = [
+    public $properties = [
         'id',
         'username',
         'password',
@@ -56,6 +48,6 @@ class User extends AbstractModel
         'status',
         'lastLogin',
         'updated',
-        'created'
+        'created',
     ];
 }

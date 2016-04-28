@@ -14,10 +14,35 @@ class MediaTableGateway extends AbstractTableGateway
     /**
      * @var array
      */
-    protected $databaseTypeMap = array();
+    protected $primaryKey = ['id'];
+
+    /**
+     * @var array
+     */
+    protected $databaseTypeMap = [
+        'id' => 'Integer',
+        'directory' => 'String',
+        'filename' => 'String',
+        'category' => 'String',
+        'title' => 'String',
+        'description' => 'String',
+        'keywords' => 'String',
+        'mimeType' => 'String',
+        'size' => 'Integer',
+        'meta' => 'String',
+        'updated' => 'DateTime',
+        'created' => 'DateTime',
+    ];
+
+    /**
+     * @var boolean
+     */
+    protected $useMetaDataFeature = false;
 
     /**
      * @var string
      */
     protected $modelPrototype = 'Admin42\\Model\\Media';
+
+
 }
