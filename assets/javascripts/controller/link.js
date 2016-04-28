@@ -1,12 +1,12 @@
 angular.module('admin42')
-    .controller('LinkController',['$scope', '$attrs', '$modal', 'jsonCache', function($scope, $attrs, $modal, jsonCache){
+    .controller('LinkController',['$scope', '$attrs', '$uibModal', 'jsonCache', function($scope, $attrs, $uibModal, jsonCache){
         $scope.linkId = jsonCache.get($attrs.jsonDataId)['linkId'];
         $scope.linkType = jsonCache.get($attrs.jsonDataId)['linkType'];
         $scope.linkValue = jsonCache.get($attrs.jsonDataId)['linkValue'];
         $scope.linkDisplayName = jsonCache.get($attrs.jsonDataId)['linkDisplayName'];
 
         $scope.selectLink = function() {
-            var modalInstance = $modal.open({
+            var modalInstance = $uibModal.open({
                 animation: true,
                 templateUrl: 'linkModalSelectorContent.html',
                 controller: 'LinkModalSelectorController',
@@ -45,7 +45,7 @@ angular.module('admin42')
 );
 
 angular.module('admin42')
-    .controller('LinkModalSelectorController', ['$scope', '$modalInstance', '$http', 'linkSaveUrl', 'linkType', 'linkValue', 'linkId', function ($scope, $modalInstance, $http, linkSaveUrl, linkType, linkValue, linkId) {
+    .controller('LinkModalSelectorController', ['$scope', '$uibModalInstance', '$http', 'linkSaveUrl', 'linkType', 'linkValue', 'linkId', function ($scope, $uibModalInstance, $http, linkSaveUrl, linkType, linkValue, linkId) {
         $scope.includeArray = [];
 
         $scope.link = {
@@ -74,7 +74,7 @@ angular.module('admin42')
 
         $scope.ok = function () {
             if (linkValue == null || $scope.linkType.length == 0) {
-                $modalInstance.close({
+                $uibModalInstance.close({
                     linkId: null,
                     linkDisplayName: null,
                     linkValue: null,
@@ -94,7 +94,7 @@ angular.module('admin42')
                 }
             })
                 .success(function (data){
-                    $modalInstance.close({
+                    $uibModalInstance.close({
                         linkId: data.linkId,
                         linkDisplayName: data.linkDisplayName,
                         linkValue: linkValue,
@@ -102,13 +102,13 @@ angular.module('admin42')
                     });
                 })
                 .error(function (){
-                    $modalInstance.dismiss('cancel');
+                    $uibModalInstance.dismiss('cancel');
                 });
 
         };
 
         $scope.cancel = function () {
-            $modalInstance.dismiss('cancel');
+            $uibModalInstance.dismiss('cancel');
         };
     }]);
 

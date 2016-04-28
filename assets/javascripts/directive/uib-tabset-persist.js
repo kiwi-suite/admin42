@@ -9,17 +9,18 @@ angular.module('admin42')
                 var currentItem = JSON.parse(localStorage.getItem(nameSpace));
 
                 if (currentItem && currentItem.id == id) {
-                    ctrl.select(ctrl.tabs[currentItem.index])
+                    //ctrl.select(ctrl.tabs[currentItem.index])
                 }
 
                 ctrl.select = function (selectedTab) {
-                    ctrl.tabs.forEach(function (tab, index) {
+                    console.log(ctrl);
+                    /*ctrl.tabs.forEach(function (tab, index) {
                         tab.active = false;
                         if (tab == selectedTab) {
                             tab.active = true;
                             localStorage.setItem(nameSpace, JSON.stringify({id: id, index: index}));
                         }
-                    });
+                    });*/
                 };
             }
         };

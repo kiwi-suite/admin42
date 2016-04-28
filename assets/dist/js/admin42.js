@@ -24,7 +24,7 @@ angular.module('admin42')
             scope: {
                 callback: "="
             },
-            controller: ['$scope', '$attrs', '$modal', '$window', '$parse', function($scope, $attrs, $modal, $window, $parse) {
+            controller: ['$scope', '$attrs', '$uibModal', '$window', '$parse', function($scope, $attrs, $uibModal, $window, $parse) {
                 if (angular.isUndefined($attrs.size)) {
                     $scope.size = "lg";
                 } else {
@@ -54,7 +54,7 @@ angular.module('admin42')
 
                 $scope.delete = function() {
                     $scope.deleteLoading = true;
-                    var modalInstance = $modal.open({
+                    var modalInstance = $uibModal.open({
                         animation: true,
                         templateUrl: 'element/delete-modal.html',
                         controller: 'DeleteModalController',
@@ -111,7 +111,7 @@ angular.module('admin42')
 angular.module('admin42')
     .controller('DeleteModalController', [
             '$scope',
-            '$modalInstance',
+            '$uibModalInstance',
             '$http',
             'requestUrl',
             'requestParams',
@@ -119,7 +119,7 @@ angular.module('admin42')
             'requestContent',
             'requestMethod',
             'requestIcon',
-            function ($scope, $modalInstance, $http, requestUrl, requestParams, requestTitle, requestContent, requestMethod, requestIcon) {
+            function ($scope, $uibModalInstance, $http, requestUrl, requestParams, requestTitle, requestContent, requestMethod, requestIcon) {
                 $scope.title = requestTitle;
                 $scope.content = requestContent;
                 $scope.icon = requestIcon;
@@ -140,15 +140,15 @@ angular.module('admin42')
                         }
                     })
                         .success(function (data){
-                            $modalInstance.close(data);
+                            $uibModalInstance.close(data);
                         })
                         .error(function (){
-                            $modalInstance.dismiss('cancel');
+                            $uibModalInstance.dismiss('cancel');
                         });
                 };
 
                 $scope.cancel = function () {
-                    $modalInstance.dismiss('cancel');
+                    $uibModalInstance.dismiss('cancel');
                 };
     }]);
 ;
@@ -226,32 +226,6 @@ angular.module('admin42').directive('dynamicModel', ['$compile', function ($comp
         }
     };
 }]);;
-angular.module('admin42')
-    .directive('uiFullscreen', ['$document', function($document) {
-        return {
-            restrict: 'AC',
-            template: '<i class="fa fa-expand fa-fw text"></i><i class="fa fa-compress fa-fw text-active"></i>',
-            link: function (scope, el, attr) {
-                el.addClass('hide');
-                if (screenfull.enabled && !navigator.userAgent.match(/Trident.*rv:11\./)) {
-                    el.removeClass('hide');
-                }
-                el.on('click', function () {
-                    var target;
-                    attr.target && ( target = $(attr.target)[0] );
-                    screenfull.toggle(target);
-                });
-                $document.on(screenfull.raw.fullscreenchange, function () {
-                    if (screenfull.isFullscreen) {
-                        el.addClass('active');
-                    } else {
-                        el.removeClass('active');
-                    }
-                });
-            }
-        };
-    }]);
-;
 angular.module('admin42')
     .factory('jsonCache', ['$cacheFactory', function($cacheFactory) {
         return $cacheFactory('json-cache');
@@ -541,17 +515,18 @@ angular.module('admin42')
                 var currentItem = JSON.parse(localStorage.getItem(nameSpace));
 
                 if (currentItem && currentItem.id == id) {
-                    ctrl.select(ctrl.tabs[currentItem.index])
+                    //ctrl.select(ctrl.tabs[currentItem.index])
                 }
 
                 ctrl.select = function (selectedTab) {
-                    ctrl.tabs.forEach(function (tab, index) {
+                    console.log(ctrl);
+                    /*ctrl.tabs.forEach(function (tab, index) {
                         tab.active = false;
                         if (tab == selectedTab) {
                             tab.active = true;
                             localStorage.setItem(nameSpace, JSON.stringify({id: id, index: index}));
                         }
-                    });
+                    });*/
                 };
             }
         };
@@ -827,9 +802,15 @@ angular.module('admin42')
 
             var options = {
                 crop: function(dataNew) {
-                    $scope.data[$scope.selectedHandle] = dataNew;
+                    console.log(dataNew);
+                    $scope.data[$scope.selectedHandle] = {
+                        'x': dataNew.x,
+                        'y': dataNew.y,
+                        'width': dataNew.width,
+                        'height': dataNew.height
+                    };
                 },
-
+                viewMode: 1,
                 strict: true,
                 zoomable: false,
                 responsive: true,
@@ -858,12 +839,12 @@ angular.module('admin42')
                 options.aspectRatio = dimension.width / dimension.height;
             }
 
-            Cropper.getJqueryCrop().off('dragmove.cropper');
-            Cropper.getJqueryCrop().off('dragstart.cropper');
+            Cropper.getJqueryCrop().off('cropmove.cropper');
+            Cropper.getJqueryCrop().off('cropstart.cropper');
 
             Cropper.getJqueryCrop().cropper(options);
 
-            Cropper.getJqueryCrop().on('dragmove.cropper', function (e) {
+            Cropper.getJqueryCrop().on('cropmove.cropper', function (e) {
                 var $cropper = $(e.target);
 
                 var data = $cropper.cropper('getCropBoxData');
@@ -880,7 +861,7 @@ angular.module('admin42')
                 }
 
                 return true;
-            }).on('dragstart.cropper', function (e) {
+            }).on('cropstart.cropper', function (e) {
                 var $cropper = $(e.target);
 
                 var data = $cropper.cropper('getCropBoxData');
@@ -1042,7 +1023,7 @@ angular.module('admin42')
 }]);
 ;
 angular.module('admin42')
-    .controller('FileSelectorController', ['$scope', '$attrs', 'jsonCache', '$modal', 'MediaService', function ($scope, $attrs, jsonCache, $modal, MediaService) {
+    .controller('FileSelectorController', ['$scope', '$attrs', 'jsonCache', '$uibModal', 'MediaService', function ($scope, $attrs, jsonCache, $uibModal, MediaService) {
         $scope.media = jsonCache.get($attrs.jsonDataId);
 
         $scope.tabs = {
@@ -1072,7 +1053,7 @@ angular.module('admin42')
         };
 
         $scope.selectMedia = function() {
-            var modalInstance = $modal.open({
+            var modalInstance = $uibModal.open({
                 animation: true,
                 templateUrl: $attrs.modalTemplate,
                 controller: 'MediaModalSelectorController',
@@ -1090,7 +1071,7 @@ angular.module('admin42')
 }]);
 
 angular.module('admin42')
-    .controller('MediaModalSelectorController', ['$scope', '$modalInstance', function ($scope, $modalInstance) {
+    .controller('MediaModalSelectorController', ['$scope', '$uibModalInstance', function ($scope, $uibModalInstance) {
         var selectedMedia = null;
 
 
@@ -1106,23 +1087,23 @@ angular.module('admin42')
         };
 
         $scope.ok = function () {
-            $modalInstance.close(selectedMedia);
+            $uibModalInstance.close(selectedMedia);
         };
 
         $scope.cancel = function () {
-            $modalInstance.dismiss('cancel');
+            $uibModalInstance.dismiss('cancel');
         };
     }]);
 ;
 angular.module('admin42')
-    .controller('LinkController',['$scope', '$attrs', '$modal', 'jsonCache', function($scope, $attrs, $modal, jsonCache){
+    .controller('LinkController',['$scope', '$attrs', '$uibModal', 'jsonCache', function($scope, $attrs, $uibModal, jsonCache){
         $scope.linkId = jsonCache.get($attrs.jsonDataId)['linkId'];
         $scope.linkType = jsonCache.get($attrs.jsonDataId)['linkType'];
         $scope.linkValue = jsonCache.get($attrs.jsonDataId)['linkValue'];
         $scope.linkDisplayName = jsonCache.get($attrs.jsonDataId)['linkDisplayName'];
 
         $scope.selectLink = function() {
-            var modalInstance = $modal.open({
+            var modalInstance = $uibModal.open({
                 animation: true,
                 templateUrl: 'linkModalSelectorContent.html',
                 controller: 'LinkModalSelectorController',
@@ -1161,7 +1142,7 @@ angular.module('admin42')
 );
 
 angular.module('admin42')
-    .controller('LinkModalSelectorController', ['$scope', '$modalInstance', '$http', 'linkSaveUrl', 'linkType', 'linkValue', 'linkId', function ($scope, $modalInstance, $http, linkSaveUrl, linkType, linkValue, linkId) {
+    .controller('LinkModalSelectorController', ['$scope', '$uibModalInstance', '$http', 'linkSaveUrl', 'linkType', 'linkValue', 'linkId', function ($scope, $uibModalInstance, $http, linkSaveUrl, linkType, linkValue, linkId) {
         $scope.includeArray = [];
 
         $scope.link = {
@@ -1190,7 +1171,7 @@ angular.module('admin42')
 
         $scope.ok = function () {
             if (linkValue == null || $scope.linkType.length == 0) {
-                $modalInstance.close({
+                $uibModalInstance.close({
                     linkId: null,
                     linkDisplayName: null,
                     linkValue: null,
@@ -1210,7 +1191,7 @@ angular.module('admin42')
                 }
             })
                 .success(function (data){
-                    $modalInstance.close({
+                    $uibModalInstance.close({
                         linkId: data.linkId,
                         linkDisplayName: data.linkDisplayName,
                         linkValue: linkValue,
@@ -1218,13 +1199,13 @@ angular.module('admin42')
                     });
                 })
                 .error(function (){
-                    $modalInstance.dismiss('cancel');
+                    $uibModalInstance.dismiss('cancel');
                 });
 
         };
 
         $scope.cancel = function () {
-            $modalInstance.dismiss('cancel');
+            $uibModalInstance.dismiss('cancel');
         };
     }]);
 
@@ -1271,7 +1252,8 @@ angular.module('admin42')
             });
         };
     }]
-);;
+);
+;
 angular.module('admin42')
     .controller('LinkDialogController', ['$scope', '$http', function ($scope, $http) {
         $scope.includeArray = [];
@@ -1443,13 +1425,13 @@ angular.module('admin42')
         }
 }]);
 ;
-angular.module('admin42').controller('ModalController', ['$scope', '$modalInstance', function ($scope, $modalInstance) {
+angular.module('admin42').controller('ModalController', ['$scope', '$uibModalInstance', function ($scope, $uibModalInstance) {
     $scope.ok = function () {
-        $modalInstance.close();
+        $uibModalInstance.close();
     };
 
     $scope.cancel = function () {
-        $modalInstance.dismiss('cancel');
+        $uibModalInstance.dismiss('cancel');
     };
 }]);
 ;

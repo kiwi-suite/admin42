@@ -14,7 +14,7 @@
             <h5 ng-if="isCollapsed"><?= $this->translate('start.upload', 'admin') ?></h5>
         </div>
 
-        <div class="panel-body" collapse="isCollapsed">
+        <div class="panel-body" uib-collapse="isCollapsed">
 
             <div class="alert alert-danger" ng-show="errorFiles.length != 0">
                 <strong><?= $this->translate('media.error.filesize', 'admin') ?> {{ '<?= $this->maxFileSize ?>' | bytes }}</strong>
@@ -78,7 +78,7 @@
                 </div>
             </div>
         </div>
-        <div class="panel-footer text-right" collapse="isCollapsed">
+        <div class="panel-footer text-right" uib-collapse="isCollapsed">
             <button type="button" class="btn btn-addon btn-primary" ng-click="uploader.uploadAll()" ng-hide="!uploader.getNotUploadedItems().length">
                 <i class="fa fa-arrow-circle-o-up"></i> <?= $this->translate('button.upload_all', 'admin')?>
             </button>

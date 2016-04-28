@@ -1,9 +1,9 @@
-angular.module('admin42').controller('ModalController', ['$scope', '$modalInstance', function ($scope, $modalInstance) {
+angular.module('admin42').controller('ModalController', ['$scope', '$uibModalInstance', function ($scope, $uibModalInstance) {
     $scope.ok = function () {
-        $modalInstance.close();
+        $uibModalInstance.close();
     };
 
     $scope.cancel = function () {
-        $modalInstance.dismiss('cancel');
+        $uibModalInstance.dismiss('cancel');
     };
 }]);

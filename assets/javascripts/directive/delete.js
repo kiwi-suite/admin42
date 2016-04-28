@@ -6,7 +6,7 @@ angular.module('admin42')
             scope: {
                 callback: "="
             },
-            controller: ['$scope', '$attrs', '$modal', '$window', '$parse', function($scope, $attrs, $modal, $window, $parse) {
+            controller: ['$scope', '$attrs', '$uibModal', '$window', '$parse', function($scope, $attrs, $uibModal, $window, $parse) {
                 if (angular.isUndefined($attrs.size)) {
                     $scope.size = "lg";
                 } else {
@@ -36,7 +36,7 @@ angular.module('admin42')
 
                 $scope.delete = function() {
                     $scope.deleteLoading = true;
-                    var modalInstance = $modal.open({
+                    var modalInstance = $uibModal.open({
                         animation: true,
                         templateUrl: 'element/delete-modal.html',
                         controller: 'DeleteModalController',
@@ -93,7 +93,7 @@ angular.module('admin42')
 angular.module('admin42')
     .controller('DeleteModalController', [
             '$scope',
-            '$modalInstance',
+            '$uibModalInstance',
             '$http',
             'requestUrl',
             'requestParams',
@@ -101,7 +101,7 @@ angular.module('admin42')
             'requestContent',
             'requestMethod',
             'requestIcon',
-            function ($scope, $modalInstance, $http, requestUrl, requestParams, requestTitle, requestContent, requestMethod, requestIcon) {
+            function ($scope, $uibModalInstance, $http, requestUrl, requestParams, requestTitle, requestContent, requestMethod, requestIcon) {
                 $scope.title = requestTitle;
                 $scope.content = requestContent;
                 $scope.icon = requestIcon;
@@ -122,14 +122,14 @@ angular.module('admin42')
                         }
                     })
                         .success(function (data){
-                            $modalInstance.close(data);
+                            $uibModalInstance.close(data);
                         })
                         .error(function (){
-                            $modalInstance.dismiss('cancel');
+                            $uibModalInstance.dismiss('cancel');
                         });
                 };
 
                 $scope.cancel = function () {
-                    $modalInstance.dismiss('cancel');
+                    $uibModalInstance.dismiss('cancel');
                 };
     }]);

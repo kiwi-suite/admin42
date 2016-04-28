@@ -117,9 +117,15 @@ angular.module('admin42')
 
             var options = {
                 crop: function(dataNew) {
-                    $scope.data[$scope.selectedHandle] = dataNew;
+                    console.log(dataNew);
+                    $scope.data[$scope.selectedHandle] = {
+                        'x': dataNew.x,
+                        'y': dataNew.y,
+                        'width': dataNew.width,
+                        'height': dataNew.height
+                    };
                 },
-
+                viewMode: 1,
                 strict: true,
                 zoomable: false,
                 responsive: true,
@@ -148,12 +154,12 @@ angular.module('admin42')
                 options.aspectRatio = dimension.width / dimension.height;
             }
 
-            Cropper.getJqueryCrop().off('dragmove.cropper');
-            Cropper.getJqueryCrop().off('dragstart.cropper');
+            Cropper.getJqueryCrop().off('cropmove.cropper');
+            Cropper.getJqueryCrop().off('cropstart.cropper');
 
             Cropper.getJqueryCrop().cropper(options);
 
-            Cropper.getJqueryCrop().on('dragmove.cropper', function (e) {
+            Cropper.getJqueryCrop().on('cropmove.cropper', function (e) {
                 var $cropper = $(e.target);
 
                 var data = $cropper.cropper('getCropBoxData');
@@ -170,7 +176,7 @@ angular.module('admin42')
                 }
 
                 return true;
-            }).on('dragstart.cropper', function (e) {
+            }).on('cropstart.cropper', function (e) {
                 var $cropper = $(e.target);
 
                 var data = $cropper.cropper('getCropBoxData');

@@ -100,6 +100,7 @@ return array(
     'media.info-dropzone'           => 'Drag your files into this area',
     'media.maxfilesize'             => 'maximal file size:',
     'media.error.filesize'          => 'At least one of your files exceeds the max. file size of ',
+    'media.warning.image-too-small' => 'Image too small',
 
     'label.link-type-selector'      => 'Link Type',
     'link-type.extern'              => 'Externer Link',
