@@ -23,6 +23,8 @@ module.exports = function(grunt) {
                 src: [
                     '<%= vendor_dir %>/jquery/dist/jquery.js',
 
+                    '<%= vendor_dir %>/lodash/dist/lodash.js',
+
                     '<%= vendor_dir %>/jquery-ui/ui/core.js',
                     '<%= vendor_dir %>/jquery-ui/ui/widget.js',
                     '<%= vendor_dir %>/jquery-ui/ui/mouse.js',
@@ -48,16 +50,22 @@ module.exports = function(grunt) {
                     '<%= vendor_dir %>/angular-ui-utils/index.js',
 
                     '<%= vendor_dir %>/angular-ui-sortable/sortable.js',
+
                     '<%= vendor_dir %>/angular-ui-select/dist/select.js',
-                    '<%= vendor_dir %>/angular-ui-map/ui-map.js',
-                    '<%= vendor_dir %>/screenfull/dist/screenfull.js',
+
                     '<%= vendor_dir %>/angularjs-toaster/toaster.js',
+
                     '<%= vendor_dir %>/ngstorage/ngStorage.js',
+
                     '<%= vendor_dir %>/angular-file-upload/dist/angular-file-upload.min.js',
+
                     '<%= vendor_dir %>/cropper/dist/cropper.js',
-                    '<%= vendor_dir %>/ng-cropper/dist/ngCropper.js',
 
                     '<%= vendor_dir %>/tinymce-dist/tinymce.js',
+
+                    '<%= vendor_dir %>/angular-simple-logger/dist/angular-simple-logger.js',
+
+                    '<%= vendor_dir %>/angular-google-maps/dist/angular-google-maps.js',
 
                     '<%= vendor_dir %>/magnific-popup/src/js/core.js',
                     '<%= vendor_dir %>/magnific-popup/src/js/image.js',

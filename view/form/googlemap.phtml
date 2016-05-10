@@ -1,0 +1,30 @@
+<div class="form-group<?= ($this->hasErrors) ? ' has-error has-feedback' : ''?>" ng-controller="GoogleMapController">
+    <label for="<?= $this->element->getName() ?>" class="col-sm-2 control-label">
+        <?= $this->translate($this->element->getLabel(), 'admin') ?>
+        <?php if($this->element->hasAttribute('required')): ?>
+            <abbr title="required">*</abbr>
+        <?php endif; ?>
+    </label>
+    <div class="col-sm-6">
+        <div ng-if="map.show">
+            <ui-gmap-google-map options="map.options" center="map.center" zoom="map.zoom" control="map.control" events="map.events">
+                <ui-gmap-marker coords="marker" events="marker.events" idkey="marker.id"></ui-gmap-marker>
+                <ui-gmap-search-box position="'RIGHT_TOP'" template="searchbox.template" events="searchbox.events"></ui-gmap-search-box>
+            </ui-gmap-google-map>
+        </div>
+    </div>
+    <div class="col-sm-4">
+        <input type="hidden" name="" value="{{ hiddenField }}">
+        <dl class="dl-horizontal">
+            <dt><?= $this->translate('label.google-maps.address', 'admin')?></dt>
+            <dd>{{ info.address }}</dd>
+            <dt><?= $this->translate('label.google-maps.latitude', 'admin')?></dt>
+            <dd>{{ info.latitude }}</dd>
+            <dt><?= $this->translate('label.google-maps.longitude', 'admin')?></dt>
+            <dd>{{ info.longitude }}</dd>
+        </dl>
+    </div>
+</div>
+<script id="searchbox.tpl.html" type="text/ng-template">
+    <input type="text" placeholder="Search" style="width: 300px;">
+</script>

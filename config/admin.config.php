@@ -60,6 +60,7 @@ return [
                 'formweek'                => 'Admin42\View\Helper\Form\FormWeek',
                 'formfileselect'          => 'Admin42\View\Helper\Form\FileSelect',
                 'formwysiwyg'             => 'Admin42\View\Helper\Form\FormWysiwyg',
+                'formgooglemap'           => 'Admin42\View\Helper\Form\FormGoogleMap',
             ],
             'factories' => [
                 'admin'                 => 'Admin42\View\Helper\Service\AdminFactory',
@@ -73,6 +74,10 @@ return [
             'logo-icon'     => 'assets/admin/core/images/logo-icon.png',
             'logo-lg'       => 'assets/admin/core/images/logo-lg.png',
             'logo-xs'       => 'assets/admin/core/images/logo-xs.png',
+        ],
+
+        'google_map' => [
+            'api_key' => 'AIzaSyBbVr_HG3DZB2PizS3ZRrX95HYEWfS3m6c',
         ],
     ],
 ];

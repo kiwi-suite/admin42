@@ -107,4 +107,8 @@ return array(
     'link-type.media'               => 'Media Link',
 
     'media.category.default'        => 'Default',
+
+    'label.google-maps.address'     => 'Address',
+    'label.google-maps.latitude'    => 'Latitude',
+    'label.google-maps.longitude'   => 'Longitude',
 );

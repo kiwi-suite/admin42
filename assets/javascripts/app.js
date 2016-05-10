@@ -9,7 +9,8 @@ angular.module('admin42', [
     'ngStorage',
     'ui.sortable',
     'ui.select',
-    'angularFileUpload'
+    'angularFileUpload',
+    'uiGmapgoogle-maps'
 ]);
 
 angular.module('admin42').config(['$httpProvider', function($httpProvider) {

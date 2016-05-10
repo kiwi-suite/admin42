@@ -144,7 +144,8 @@ class Admin extends AbstractHelper
             'locale' => \Locale::getDefault(),
             'defaultDateTimeFormat' => 'LLL',
             'timezone' => date_default_timezone_get(),
-            'displayTimezone' => $this->getDisplayTimezone()
+            'displayTimezone' => $this->getDisplayTimezone(),
+            'google_map_api' => $this->config['google_map']['api_key']
         ];
 
         $this->addJsonTemplate("mediaConfig", [
@@ -156,6 +157,7 @@ class Admin extends AbstractHelper
             . "angular.element(document).ready(function(){"
             . "APP = angular.module('APP', ".json_encode($this->config['angular']['modules']).");"
             . "APP.constant('appConfig', ".json_encode($appConfig).");"
+            . "APP.config(function(uiGmapGoogleMapApiProvider, appConfig) {uiGmapGoogleMapApiProvider.configure({key: appConfig.google_map_api, v:3, libraries: 'places'});});"
             . "angular.bootstrap(document, ['APP']);"
             . "});" . PHP_EOL;
     }

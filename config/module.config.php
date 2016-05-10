@@ -66,6 +66,7 @@ return array(
             'tags'       => 'Admin42\FormElements\Tags',
             'wysiwyg'    => 'Admin42\FormElements\Wysiwyg',
             'youtube'    => 'Admin42\FormElements\YouTube',
+            'googlemap'  => 'Admin42\FormElements\GoogleMap',
         ],
         'factories' => array(
             'role'      => 'Admin42\FormElements\Service\RoleFactory',
