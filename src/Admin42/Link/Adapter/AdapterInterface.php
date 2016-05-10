@@ -5,9 +5,10 @@ interface AdapterInterface
 {
     /**
      * @param mixed $value
+     * @param array $options
      * @return string
      */
-    public function assemble($value);
+    public function assemble($value, $options = array());
 
     /**
      * @param mixed $value

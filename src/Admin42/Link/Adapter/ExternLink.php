@@ -5,9 +5,10 @@ class ExternLink implements AdapterInterface
 {
     /**
      * @param mixed $value
+     * @param array $options
      * @return string
      */
-    public function assemble($value)
+    public function assemble($value, $options = array())
     {
         return $this->getLinkData($value);
     }
