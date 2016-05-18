@@ -1,5 +1,10 @@
 <?php
 $name = uniqid('wysiwyg_');
+
+$editorOptions = \Zend\Json\Json::encode($this->element->getEditorOptions());
+$jsonDataId = 'editor/' . md5($editorOptions) . '/options.json';
+$this->admin()->addJsonTemplate($jsonDataId, $this->element->getEditorOptions());
+
 ?>
 <div ng-controller="WysiwygController"
      ng-base-url="<?= $this->basePath('/assets/admin/core/js/tinymce') ?>"
@@ -7,6 +12,7 @@ $name = uniqid('wysiwyg_');
      ng-file-browser="<?= $this->url('admin/file-dialog') ?>"
      ng-file-browser-titles='{"file":"Link","image":"Link","media":"Link"}'
      ng-link-save-url="<?= $this->url('admin/link') ?>"
+     ng-json-data-id="<?= $jsonDataId ?>"
      class="form-group<?= ($this->hasErrors) ? ' has-error has-feedback' : '' ?>">
 
     <label for="<?= $this->element->getName() ?>" class="col-sm-2 control-label">

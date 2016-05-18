@@ -1635,34 +1635,14 @@ angular.module('admin42')
 }]);
 ;
 angular.module('admin42')
-    .controller('WysiwygController', function ($scope, $attrs, $http) {
+    .controller('WysiwygController', function ($scope, $attrs, $http, jsonCache) {
         if ($attrs.ngBaseUrl) {
             tinymce.baseURL = $attrs.ngBaseUrl;
         }
 
-        $scope.tinymceOptionsFull = {
-            trusted: true,
-            format: 'raw',
-            height : 400,
-            file_browser_callback: fileBrowser,
-            plugins: 'paste autolink lists charmap table code link' +
-                //'media link42 image42 ' +
-            '',
-            menubar: false,
-            // == http://www.tinymce.com/wiki.php/Controls
-            toolbar: 'undo redo paste | styleselect | bold italic | link unlink | alignleft aligncenter alignright alignjustify | ' +
-            'bullist numlist outdent indent | removeformat | table code | ' +
-                //"link42 image42 | " +
-            '',
-            skin: 'lightgray',
-            theme: 'modern',
-            elementpath: false,
-            convert_urls: false,
-            resize: true
-        };
+        $scope.tinymceOptionsFull = jsonCache.get($attrs.ngJsonDataId);
+        $scope.tinymceOptionsFull.file_browser_callback = fileBrowser;
 
-        // == http://www.tinymce.com/wiki.php/TinyMCE3x:How-to_implement_a_custom_file_browser
-        // == http://michaelbudd.org/tutorials/view/28/building-custom-file-browser-for-tinymce-version-4
         function fileBrowser(field_name, url, type, win) {
 
             var fileBrowserUrl = $attrs.ngFileBrowser;

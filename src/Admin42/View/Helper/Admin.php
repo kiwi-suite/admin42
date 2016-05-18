@@ -13,6 +13,7 @@ use Admin42\Media\MediaOptions;
 use Admin42\Model\User;
 use Admin42\TableGateway\UserTableGateway;
 use Zend\I18n\View\Helper\Translate;
+use Zend\Json\Json;
 use Zend\Mvc\Controller\Plugin\FlashMessenger;
 use Zend\View\Helper\AbstractHelper;
 
@@ -253,7 +254,7 @@ class Admin extends AbstractHelper
         $templates = [];
 
         foreach ($this->jsonTemplates as $id => $value) {
-            $templates[] = sprintf('<script id="%s" type="application/json">%s</script>', $id, json_encode($value));
+            $templates[] = sprintf('<script id="%s" type="application/json">%s</script>', $id, Json::encode($value));
         }
 
         return implode(PHP_EOL, $templates);
