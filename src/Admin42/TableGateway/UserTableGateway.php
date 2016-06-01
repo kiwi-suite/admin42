@@ -43,6 +43,4 @@ class UserTableGateway extends AbstractTableGateway
      * @var string
      */
     protected $modelPrototype = 'Admin42\\Model\\User';
-
-
 }
