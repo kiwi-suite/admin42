@@ -37,6 +37,4 @@ class NotificationTableGateway extends AbstractTableGateway
      * @var string
      */
     protected $modelPrototype = 'Admin42\\Model\\Notification';
-
-
 }
