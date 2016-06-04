@@ -5,6 +5,8 @@ angular.module('admin42')
             link: function (scope, element, attr, ctrl) {
                 var nameSpace = attr.stPersist;
 
+                var forceReload = (angular.isDefined(attr.stPersistForceReload));
+
                 //save the table state every time it changes
                 scope.$watch(function () {
                     return ctrl.tableState();
@@ -15,7 +17,7 @@ angular.module('admin42')
                 }, true);
 
                 //fetch the table state when the directive is loaded
-                if (localStorage.getItem(nameSpace)) {
+                if (!forceReload && localStorage.getItem(nameSpace)) {
                     var savedState = JSON.parse(localStorage.getItem(nameSpace));
                     var tableState = ctrl.tableState();
 
