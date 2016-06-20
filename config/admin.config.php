@@ -4,7 +4,7 @@ namespace Admin42;
 return [
     'admin' => [
         'job_auth' => '',
-        'angular' => [
+        'angular'  => [
             'modules' => ['admin42']
         ],
 
@@ -62,19 +62,22 @@ return [
                 'formwysiwyg'             => 'Admin42\View\Helper\Form\FormWysiwyg',
                 'formgooglemap'           => 'Admin42\View\Helper\Form\FormGoogleMap',
             ],
-            'factories' => [
-                'admin'                 => 'Admin42\View\Helper\Service\AdminFactory',
+            'factories'  => [
+                'admin' => 'Admin42\View\Helper\Service\AdminFactory',
             ],
         ],
 
         'display-timezone' => 'Europe/Vienna',
 
         'whitelabel' => [
-            'show-topbar-title' => true,
-            'topbar-title'      => 'kiw<span class="text-r42">i</span>42',
-            'logo-icon'         => 'assets/admin/core/images/logo-icon.png',
-            'logo-lg'           => 'assets/admin/core/images/logo-lg.png',
-            'logo-xs'           => 'assets/admin/core/images/logo-xs.png',
+            'show-topbar-title'         => true,
+            'topbar-title'              => 'kiw<span class="text-r42">i</span>42',
+            'logo-icon'                 => 'assets/admin/core/images/logo-icon.png',
+            'logo-lg'                   => 'assets/admin/core/images/logo-lg.png',
+            'logo-xs'                   => 'assets/admin/core/images/logo-icon.png',
+            'sidebar-bottom-text'       => 'kiw<span class="text-r42">i</span>42&nbsp;&copy;&nbsp;raum42 OG',
+            'sidebar-bottom-link'       => 'https://www.raum42.at',
+            'sidebar-bottom-link-title' => 'raum42 OG',
         ],
 
         'google_map' => [
