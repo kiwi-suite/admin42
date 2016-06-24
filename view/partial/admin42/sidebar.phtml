@@ -29,13 +29,15 @@
                 <ul class="nav m-b-lg">
                     <li class="line bg-dark"></li>
                     <li class="m-b-sm text-muted" style="cursor: default;">
-                        <a href="https://www.raum42.at" target="_blank" title="raum42 OG">
+                        <a href="<?= !empty($this->admin()->getWhitelabelOption('sidebar-bottom-link')) ? $this->admin()
+                            ->getWhitelabelOption('sidebar-bottom-link') : '#' ?>" target="_blank"
+                           title="<?= $this->admin()->getWhitelabelOption('sidebar-bottom-link-title') ?>">
                             <i class="icon fa fa-fw">
-                                <img class="icon icon-kiwi" src="<?= $this->basePath('assets/admin/core/images/logo-icon.png') ?>">
+                                <img class="icon icon-kiwi img-responsive inline"
+                                     src="<?= $this->basePath($this->admin()->getWhitelabelOption('logo-xs')); ?>">
                             </i>
                             <span class="hidden-folded text-xs">
-                                kiw<span class="text-r42">i</span>42
-                                &nbsp;&copy;&nbsp;raum42 OG<br>
+                                <?= trim($this->admin()->getWhitelabelOption('sidebar-bottom-text')) ?>
                             </span>
                         </a>
                     </li>
