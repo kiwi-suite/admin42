@@ -98,10 +98,10 @@ class RecoverPasswordCommand extends AbstractCommand
             return;
         }
 
-        $this->user = $this->getTableGateway('Admin42\User')->select(array(
+        $this->user = $this->getTableGateway('Admin42\User')->select([
             'email' => $this->email,
             'hash' => $this->hash,
-        ))->current();
+        ])->current();
 
         if (!($this->user instanceof User)) {
             $this->addError("user", "invalid user");

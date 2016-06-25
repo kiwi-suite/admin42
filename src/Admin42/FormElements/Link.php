@@ -21,9 +21,9 @@ class Link extends Hidden
     /**
      * @var array
      */
-    protected $attributes = array(
+    protected $attributes = [
         'type' => 'link',
-    );
+    ];
 
     /**
      * @param array $linkTypes

@@ -1,15 +1,15 @@
 <?php
 namespace Admin42;
 
-return array(
-    'translator' => array(
-        'translation_file_patterns' => array(
-            array(
+return [
+    'translator' => [
+        'translation_file_patterns' => [
+            [
                 'type' => 'phparray',
                 'base_dir' => __DIR__ . '/../data/language/',
                 'pattern' => '%s.php',
                 'text_domain' => 'admin',
-            ),
-        ),
-    ),
-);
+            ],
+        ],
+    ],
+];

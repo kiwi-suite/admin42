@@ -1,41 +1,41 @@
 <?php
 namespace Admin42;
 
-return array(
-    'view_manager' => array(
+return [
+    'view_manager' => [
         'display_not_found_reason'  => false,
         'display_exceptions'        => false,
         'not_found_template'        => 'admin/error/404',
         'exception_template'        => 'admin/error/index',
-        'template_map'              => array(
+        'template_map'              => [
             'admin/layout/layout'       => __DIR__ . '/../view/layout/layout.phtml',
             'admin/layout/layout-min'   => __DIR__ . '/../view/layout/layout-min.phtml',
             'admin/layout/dialog'       => __DIR__ . '/../view/layout/dialog.phtml',
             'admin/error/404'           => __DIR__ . '/../view/error/404.phtml',
             'admin/error/index'         => __DIR__ . '/../view/error/index.phtml',
-        ),
-        'template_path_stack'       => array(
+        ],
+        'template_path_stack'       => [
             __NAMESPACE__               => __DIR__ . '/../view',
-        ),
-        'strategies'                => array(
+        ],
+        'strategies'                => [
             'ViewJsonStrategy',
-        ),
-    ),
+        ],
+    ],
 
-    'migration' => array(
-        'directory'     => array(
+    'migration' => [
+        'directory'     => [
             __NAMESPACE__ => __DIR__ . '/../data/migrations'
-        ),
-    ),
+        ],
+    ],
 
     'media_url' => '/media',
 
-    'service_manager' => array(
+    'service_manager' => [
         'invokables' => [
             'Admin42\Link\ExternLink' => 'Admin42\Link\Adapter\ExternLink',
 
         ],
-        'factories' => array(
+        'factories' => [
             'Admin42\Authentication'    => 'Admin42\Authentication\Service\AuthenticationServiceFactory',
 
             'Admin42\IdentityRoleProvider' => 'Admin42\Permission\Rbac\Service\IdentityRoleProviderFactory',
@@ -54,10 +54,10 @@ return array(
 
             'Admin42\Crud\EventManager' => 'Admin42\Crud\Service\EventManagerFactory',
             'Admin42\Media\EventManager' => 'Admin42\Media\Service\EventManagerFactory',
-        ),
-    ),
+        ],
+    ],
 
-    'form_elements' => array(
+    'form_elements' => [
         'invokables' => [
             'fileSelect' => 'Admin42\FormElements\FileSelect',
             'datetime'   => 'Admin42\FormElements\DateTime',
@@ -68,13 +68,13 @@ return array(
             'youtube'    => 'Admin42\FormElements\YouTube',
             'googlemap'  => 'Admin42\FormElements\GoogleMap',
         ],
-        'factories' => array(
+        'factories' => [
             'role'      => 'Admin42\FormElements\Service\RoleFactory',
             'dynamic'   => 'Admin42\FormElements\Service\DynamicFactory',
             'link'      => 'Admin42\FormElements\Service\LinkFactory',
             'country'   => 'Admin42\FormElements\Service\CountryFactory',
-        ),
-    ),
+        ],
+    ],
 
     'link' => [
         'adapter' => [
@@ -90,4 +90,4 @@ return array(
             'mediaUrl'         => 'Admin42\View\Helper\Service\MediaUrlFactory',
         ],
     ],
-);
+];

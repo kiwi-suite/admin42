@@ -32,7 +32,7 @@ class MediaLink implements AdapterInterface
      * @param array $options
      * @return string
      */
-    public function assemble($value, $options = array())
+    public function assemble($value, $options = [])
     {
         $media = $this->getLinkData($value);
         if (empty($media)) {

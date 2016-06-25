@@ -1,51 +1,51 @@
 <?php
 
-return array(
-    'navigation' => array(
-        'containers' => array(
-            'admin42' => array(
+return [
+    'navigation' => [
+        'containers' => [
+            'admin42' => [
                 'content' => [
-                    'options' => array(
+                    'options' => [
                         'label' => 'label.content',
                         'order' => 1000,
                         'permission' => 'navigation/section/content',
-                    ),
+                    ],
                     'pages' => [
-                        'media' => array(
-                            'options' => array(
+                        'media' => [
+                            'options' => [
                                 'label' => 'label.media',
                                 'route' => 'admin/media',
                                 'icon' => 'fa fa-picture-o fa-fw',
                                 'order' => 5000,
                                 'permission' => 'route/admin/media'
-                            ),
-                        ),
+                            ],
+                        ],
                     ]
                 ],
                 'setting' => [
-                    'options' => array(
+                    'options' => [
                         'label' => 'label.settings',
                         'order' => 10000,
                         'permission' => 'navigation/section/settings',
-                    ),
+                    ],
                     'pages' => [
-                        'user' => array(
-                            'options' => array(
+                        'user' => [
+                            'options' => [
                                 'label' => 'label.users',
                                 'route' => 'admin/user',
                                 'icon' => 'fa fa-users fa-fw',
                                 'order' => 10000,
                                 'permission' => 'route/admin/user'
-                            ),
-                        ),
+                            ],
+                        ],
                     ]
                 ]
-            ),
-        ),
-        'listeners' => array(
-            'admin42' => array(
+            ],
+        ],
+        'listeners' => [
+            'admin42' => [
                 'Admin42\Navigation\Listener\RbacListener'
-            ),
-        ),
-    ),
-);
+            ],
+        ],
+    ],
+];

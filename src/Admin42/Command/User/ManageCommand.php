@@ -157,10 +157,10 @@ class ManageCommand extends AbstractCommand
         if (empty($this->email)) {
             $this->addError("email", "email can't be empty");
         } else {
-            $check = $this->getTableGateway('Admin42\User')->select(array(
+            $check = $this->getTableGateway('Admin42\User')->select([
                 'email' => $this->email,
                 new Operator('id', Operator::OPERATOR_NOT_EQUAL_TO, $this->user->getId())
-            ));
+            ]);
             if ($check->count() > 0) {
                 $this->addError("email", "duplicate email");
             }
@@ -176,10 +176,10 @@ class ManageCommand extends AbstractCommand
             if ($emailValidator->isValid($this->username)) {
                 $this->addError("username", "Username can't be an email");
             } else {
-                $check = $this->getTableGateway('Admin42\User')->select(array(
+                $check = $this->getTableGateway('Admin42\User')->select([
                     'username' => $this->username,
                     new Operator('id', Operator::OPERATOR_NOT_EQUAL_TO, $this->user->getId())
-                ));
+                ]);
                 if ($check->count() > 0) {
                     $this->addError("username", "duplicate username");
                 }

@@ -19,7 +19,7 @@ class CreateCommand extends AbstractCommand
     /**
      * @var array
      */
-    private $userIds = array();
+    private $userIds = [];
 
     /**
      * @var string
@@ -43,12 +43,12 @@ class CreateCommand extends AbstractCommand
     public function setUser($user)
     {
         if ($user instanceof User) {
-            $this->userIds = array($user->getId());
+            $this->userIds = [$user->getId()];
 
             return $this;
         }
 
-        $this->userIds = array((int) $user);
+        $this->userIds = [(int) $user];
 
         return $this;
     }
@@ -60,7 +60,7 @@ class CreateCommand extends AbstractCommand
     public function setUsers($users)
     {
         if ($users instanceof ResultSet) {
-            $this->userIds = array();
+            $this->userIds = [];
             foreach ($users as $_user) {
                 $this->userIds[] = $_user->getId();
             }

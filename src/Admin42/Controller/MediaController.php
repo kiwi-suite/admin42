@@ -176,15 +176,15 @@ class MediaController extends AbstractAdminController
         if ($this->getRequest()->isDelete()) {
             $deleteCmd = $this->getCommand('Admin42\Media\Delete');
 
-            $deleteParams = array();
+            $deleteParams = [];
             parse_str($this->getRequest()->getContent(), $deleteParams);
 
             $deleteCmd->setMediaId((int) $deleteParams['id'])
                 ->run();
 
-            return new JsonModel(array(
+            return new JsonModel([
                 'success' => true,
-            ));
+            ]);
         } elseif ($this->getRequest()->isPost()) {
             $deleteCmd = $this->getCommand('Admin42\Media\Delete');
 

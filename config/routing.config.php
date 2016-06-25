@@ -1,271 +1,271 @@
 <?php
 namespace Admin42;
 
-return array(
-    'router' => array(
-        'routes' => array(
-            'admin' => array(
+return [
+    'router' => [
+        'routes' => [
+            'admin' => [
                 'type' => 'Zend\Mvc\Router\Http\Segment',
-                'options' => array(
+                'options' => [
                     'route' => '/admin[/]',
-                    'defaults' => array(
+                    'defaults' => [
                         'controller' => __NAMESPACE__ . '\User',
                         'action' => 'dashboard',
-                    ),
-                ),
+                    ],
+                ],
                 'may_terminate' => true,
-                'child_routes' => array(
-                    'home' => array(
+                'child_routes' => [
+                    'home' => [
                         'type' => 'Zend\Mvc\Router\Http\Literal',
-                        'options' => array(
+                        'options' => [
                             'route' => 'home/',
-                            'defaults' => array(
+                            'defaults' => [
                                 'controller' => __NAMESPACE__ . '\User',
                                 'action' => 'home',
-                            ),
-                        ),
-                    ),
-                    'login' => array(
+                            ],
+                        ],
+                    ],
+                    'login' => [
                         'type' => 'Zend\Mvc\Router\Http\Literal',
-                        'options' => array(
+                        'options' => [
                             'route' => 'login/',
-                            'defaults' => array(
+                            'defaults' => [
                                 'controller' => __NAMESPACE__ . '\User',
                                 'action' => 'login',
-                            ),
-                        ),
-                    ),
-                    'lost-password' => array(
+                            ],
+                        ],
+                    ],
+                    'lost-password' => [
                         'type' => 'Zend\Mvc\Router\Http\Literal',
-                        'options' => array(
+                        'options' => [
                             'route' => 'lost-password/',
-                            'defaults' => array(
+                            'defaults' => [
                                 'controller' => __NAMESPACE__ . '\User',
                                 'action' => 'lost-password',
-                            ),
-                        ),
-                    ),
-                    'recover-password' => array(
+                            ],
+                        ],
+                    ],
+                    'recover-password' => [
                         'type' => 'Zend\Mvc\Router\Http\Segment',
-                        'options' => array(
+                        'options' => [
                             'route' => 'recover-password/:email/:hash/',
-                            'defaults' => array(
+                            'defaults' => [
                                 'controller' => __NAMESPACE__ . '\User',
                                 'action' => 'recover-password',
-                            ),
-                        ),
-                    ),
-                    'logout' => array(
+                            ],
+                        ],
+                    ],
+                    'logout' => [
                         'type' => 'Zend\Mvc\Router\Http\Literal',
-                        'options' => array(
+                        'options' => [
                             'route' => 'logout/',
-                            'defaults' => array(
+                            'defaults' => [
                                 'controller' => __NAMESPACE__ . '\User',
                                 'action' => 'logout',
-                            ),
-                        ),
-                    ),
-                    'user' => array(
+                            ],
+                        ],
+                    ],
+                    'user' => [
                         'type' => 'Zend\Mvc\Router\Http\Literal',
-                        'options' => array(
+                        'options' => [
                             'route' => 'user/',
-                            'defaults' => array(
+                            'defaults' => [
                                 'controller' => __NAMESPACE__ . '\User',
                                 'action' => 'index'
-                            ),
-                        ),
+                            ],
+                        ],
                         'may_terminate' => true,
-                        'child_routes' => array(
-                            'manage' => array(
+                        'child_routes' => [
+                            'manage' => [
                                 'type' => 'Zend\Mvc\Router\Http\Literal',
-                                'options' => array(
+                                'options' => [
                                     'route' => 'manage/',
-                                    'defaults' => array(
+                                    'defaults' => [
                                         'action' => 'manage',
-                                    ),
-                                ),
-                            ),
+                                    ],
+                                ],
+                            ],
 
-                            'edit' => array(
+                            'edit' => [
                                 'type' => 'Core42\Mvc\Router\Http\AngularSegment',
-                                'options' => array(
+                                'options' => [
                                     'route' => 'edit/:id/',
-                                    'defaults' => array(
+                                    'defaults' => [
                                         'action' => 'detail',
                                         'isEditMode' => true,
-                                    ),
-                                ),
-                            ),
-                            'add' => array(
+                                    ],
+                                ],
+                            ],
+                            'add' => [
                                 'type' => 'Zend\Mvc\Router\Http\Literal',
-                                'options' => array(
+                                'options' => [
                                     'route' => 'add/',
-                                    'defaults' => array(
+                                    'defaults' => [
                                         'action' => 'detail',
                                         'isEditMode' => false,
-                                    ),
-                                ),
-                            ),
+                                    ],
+                                ],
+                            ],
 
-                            'delete' => array(
+                            'delete' => [
                                 'type' => 'Zend\Mvc\Router\Http\Literal',
-                                'options' => array(
+                                'options' => [
                                     'route' => 'delete/',
-                                    'defaults' => array(
+                                    'defaults' => [
                                         'action' => 'delete',
-                                    ),
-                                ),
-                            ),
-                        ),
-                    ),
-                    'media' => array(
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                    'media' => [
                         'type' => 'Zend\Mvc\Router\Http\Segment',
-                        'options' => array(
+                        'options' => [
                             'route' => 'media/[:referrer/[:category/]]',
-                            'defaults' => array(
+                            'defaults' => [
                                 'controller' => __NAMESPACE__ . '\Media',
                                 'action' => 'index',
                                 'referrer' => 'index',
                                 'category' => 'default',
-                            ),
+                            ],
                             'constraints' => [
                                 'referrer' => '(index|modal)'
                             ],
-                        ),
+                        ],
                         'may_terminate' => true,
-                        'child_routes' => array(
-                            'upload' => array(
+                        'child_routes' => [
+                            'upload' => [
                                 'type' => 'Zend\Mvc\Router\Http\Literal',
-                                'options' => array(
+                                'options' => [
                                     'route' => 'upload/',
-                                    'defaults' => array(
+                                    'defaults' => [
                                         'action' => 'upload'
-                                    ),
-                                ),
-                            ),
-                            'crop' => array(
+                                    ],
+                                ],
+                            ],
+                            'crop' => [
                                 'type' => 'Core42\Mvc\Router\Http\AngularSegment',
-                                'options' => array(
+                                'options' => [
                                     'route' => 'crop/:id/:dimension/',
-                                    'defaults' => array(
+                                    'defaults' => [
                                         'action' => 'crop'
-                                    ),
-                                ),
-                            ),
-                            'edit' => array(
+                                    ],
+                                ],
+                            ],
+                            'edit' => [
                                 'type' => 'Core42\Mvc\Router\Http\AngularSegment',
-                                'options' => array(
+                                'options' => [
                                     'route' => 'edit/:id/',
-                                    'defaults' => array(
+                                    'defaults' => [
                                         'action' => 'edit'
-                                    ),
-                                ),
-                            ),
-                            'delete' => array(
+                                    ],
+                                ],
+                            ],
+                            'delete' => [
                                 'type' => 'Core42\Mvc\Router\Http\AngularSegment',
-                                'options' => array(
+                                'options' => [
                                     'route' => 'delete/',
-                                    'defaults' => array(
+                                    'defaults' => [
                                         'action' => 'delete'
-                                    ),
-                                ),
-                            ),
-                            'stream' => array(
+                                    ],
+                                ],
+                            ],
+                            'stream' => [
                                 'type' => 'Core42\Mvc\Router\Http\AngularSegment',
-                                'options' => array(
+                                'options' => [
                                     'route' => 'stream/:id/[:dimension/]',
-                                    'defaults' => array(
+                                    'defaults' => [
                                         'action' => 'stream'
-                                    ),
-                                ),
-                            ),
-                        ),
-                    ),
-                    'file-dialog' => array(
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                    'file-dialog' => [
                         'type' => 'Zend\Mvc\Router\Http\Literal',
-                        'options' => array(
+                        'options' => [
                             'route' => 'file-dialog/',
-                            'defaults' => array(
+                            'defaults' => [
                                 'controller' => __NAMESPACE__ . '\FileDialog',
                                 'action' => 'fileDialog'
-                            ),
-                        ),
+                            ],
+                        ],
                         'may_terminate' => true,
-                    ),
-                    'link' => array(
+                    ],
+                    'link' => [
                         'type' => 'Zend\Mvc\Router\Http\Literal',
-                        'options' => array(
+                        'options' => [
                             'route' => 'link/',
-                            'defaults' => array(
+                            'defaults' => [
                                 'controller' => __NAMESPACE__ . '\Link',
                                 'action' => 'save'
-                            ),
-                        ),
+                            ],
+                        ],
                         'may_terminate' => true,
-                    ),
-                    'api' => array(
+                    ],
+                    'api' => [
                         'type' => 'Zend\Mvc\Router\Http\Literal',
-                        'options' => array(
+                        'options' => [
                             'route' => 'api/',
-                            'defaults' => array(
+                            'defaults' => [
                                 'controller' => __NAMESPACE__ . '\Api\Api',
-                            )
-                        ),
+                            ]
+                        ],
                         'may_terminate' => true,
-                        'child_routes' => array(
-                            'tag-suggest' => array(
+                        'child_routes' => [
+                            'tag-suggest' => [
                                 'type' => 'Zend\Mvc\Router\Http\Literal',
-                                'options' => array(
+                                'options' => [
                                     'route' => 'tag-suggest',
-                                    'defaults' => array(
+                                    'defaults' => [
                                         'action' => 'tagSuggest'
-                                    ),
-                                ),
-                            ),
-                            'job' => array(
+                                    ],
+                                ],
+                            ],
+                            'job' => [
                                 'type' => 'Zend\Mvc\Router\Http\Segment',
-                                'options' => array(
+                                'options' => [
                                     'route' => 'job/',
-                                    'defaults' => array(
+                                    'defaults' => [
                                         'action' => 'run',
                                         'controller' => __NAMESPACE__ . '\Api\Job',
-                                    ),
-                                ),
-                            ),
-                            'notification' => array(
+                                    ],
+                                ],
+                            ],
+                            'notification' => [
                                 'type' => 'Zend\Mvc\Router\Http\Literal',
-                                'options' => array(
+                                'options' => [
                                     'route' => 'notification/',
-                                    'defaults' => array(
+                                    'defaults' => [
                                         'controller' => __NAMESPACE__ . '\Api\Notification',
-                                    )
-                                ),
+                                    ]
+                                ],
                                 'may_terminate' => true,
-                                'child_routes' => array(
-                                    'list' => array(
+                                'child_routes' => [
+                                    'list' => [
                                         'type' => 'Zend\Mvc\Router\Http\Literal',
-                                        'options' => array(
+                                        'options' => [
                                             'route' => 'list/',
-                                            'defaults' => array(
+                                            'defaults' => [
                                                 'action' => 'list',
-                                            ),
-                                        ),
-                                    ),
-                                    'clear' => array(
+                                            ],
+                                        ],
+                                    ],
+                                    'clear' => [
                                         'type' => 'Zend\Mvc\Router\Http\Literal',
-                                        'options' => array(
+                                        'options' => [
                                             'route' => 'clear/',
-                                            'defaults' => array(
+                                            'defaults' => [
                                                 'action' => 'clear',
-                                            ),
-                                        ),
-                                    ),
-                                ),
-                            ),
-                        ),
-                    ),
-                ),
-            ),
-        ),
-    ),
-);
+                                            ],
+                                        ],
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ],
+    ],
+];

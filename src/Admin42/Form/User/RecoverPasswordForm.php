@@ -40,18 +40,18 @@ class RecoverPasswordForm extends Form implements InputFilterProviderInterface
      */
     public function getInputFilterSpecification()
     {
-        return array(
-            'passwordRepeat' => array(
+        return [
+            'passwordRepeat' => [
                 'required' => true,
-                'validators' => array(
-                    array(
+                'validators' => [
+                    [
                         'name' => 'Identical',
-                        'options' => array(
+                        'options' => [
                             'token' => 'password'
-                        ),
-                    ),
-                ),
-            ),
-        );
+                        ],
+                    ],
+                ],
+            ],
+        ];
     }
 }

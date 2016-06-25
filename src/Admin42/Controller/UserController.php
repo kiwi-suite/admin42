@@ -79,7 +79,7 @@ class UserController extends AbstractAdminController
 
             $formCommand = $this->getFormCommand();
             $user = $formCommand->setForm($createEditForm)
-                            ->setProtectedData(array('password', 'status'))
+                            ->setProtectedData(['password', 'status'])
                             ->setCommand($cmd)
                             ->setData($prg)
                             ->run();
@@ -89,7 +89,7 @@ class UserController extends AbstractAdminController
                     'message' => 'toaster.user.detail.message.success',
                 ]);
 
-                return $this->redirect()->toRoute('admin/user/edit', array('id' => $user->getId()));
+                return $this->redirect()->toRoute('admin/user/edit', ['id' => $user->getId()]);
             } else {
                 $this->flashMessenger()->addErrorMessage([
                     'title' => 'toaster.user.detail.title.error',
@@ -102,19 +102,19 @@ class UserController extends AbstractAdminController
                 if (empty($user) || $user->getStatus() == User::STATUS_INACTIVE) {
                     return $this->redirect()->toRoute('admin/user');
                 }
-                $createEditForm->setData(array(
+                $createEditForm->setData([
                     'username' => $user->getUsername(),
                     'email' => $user->getEmail(),
                     'displayName' => $user->getDisplayName(),
                     'role' => $user->getRole(),
                     'shortName' => $user->getShortName(),
-                ));
+                ]);
             }
         }
 
-        return array(
+        return [
             'createEditForm' => $createEditForm,
-        );
+        ];
     }
 
     /**
@@ -125,15 +125,15 @@ class UserController extends AbstractAdminController
         if ($this->getRequest()->isDelete()) {
             $deleteCmd = $this->getCommand('Admin42\User\Delete');
 
-            $deleteParams = array();
+            $deleteParams = [];
             parse_str($this->getRequest()->getContent(), $deleteParams);
 
             $deleteCmd->setUserId((int) $deleteParams['id'])
                 ->run();
 
-            return new JsonModel(array(
+            return new JsonModel([
                 'success' => true,
-            ));
+            ]);
         } elseif ($this->getRequest()->isPost()) {
             $deleteCmd = $this->getCommand('Admin42\User\Delete');
 
@@ -231,9 +231,9 @@ class UserController extends AbstractAdminController
             }
         }
 
-        return array(
+        return [
             'loginForm' => $loginForm,
-        );
+        ];
     }
 
     /**
@@ -278,9 +278,9 @@ class UserController extends AbstractAdminController
                     ->run();
         }
 
-        return array(
+        return [
             'lostPasswordForm' => $lostPasswordForm,
-        );
+        ];
     }
 
     /**
@@ -313,7 +313,7 @@ class UserController extends AbstractAdminController
             $formCmd->setForm($recoverPasswordForm)
                 ->setCommand($recoverPassowordCommand)
                 ->setData($prg)
-                ->setProtectedData(array('email', 'hash'))
+                ->setProtectedData(['email', 'hash'])
                 ->run();
 
             if (!$formCmd->hasErrors()) {
@@ -321,9 +321,9 @@ class UserController extends AbstractAdminController
             }
         }
 
-        return array(
+        return [
             'recoverPasswordForm' => $recoverPasswordForm,
-        );
+        ];
     }
 
     /**
@@ -360,16 +360,16 @@ class UserController extends AbstractAdminController
                 ]);
             }
         } else {
-            $manageForm->setData(array(
+            $manageForm->setData([
                 'username' => $authenticationService->getIdentity()->getUsername(),
                 'email' => $authenticationService->getIdentity()->getEmail(),
                 'shortName' => $authenticationService->getIdentity()->getShortName(),
                 'displayName' => $authenticationService->getIdentity()->getDisplayName()
-            ));
+            ]);
         }
 
-        return array(
+        return [
             'manageForm' => $manageForm,
-        );
+        ];
     }
 }

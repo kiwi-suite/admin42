@@ -95,17 +95,17 @@ class StreamCommand extends AbstractCommand
                 ->setDimensionName($this->dimension)
                 ->run();
             $stream->setStream(fopen($media->getDirectory() . $media->getFilename(), 'r'));
-            $headers->addHeaders(array(
+            $headers->addHeaders([
                 'Content-Type' => $media->getMimeType(),
                 'Content-Length' => $media->getSize()
-            ));
+            ]);
         } else {
             $stream->setStream(fopen($this->media->getDirectory() . $this->media->getFilename(), 'r'));
-            $headers->addHeaders(array(
+            $headers->addHeaders([
                 'Content-Disposition' => 'attachment; filename="' . $this->media->getFilename() .'"',
                 'Content-Type' => $this->media->getMimeType(),
                 'Content-Length' => $this->media->getSize()
-            ));
+            ]);
         }
 
         $stream->setHeaders($headers);

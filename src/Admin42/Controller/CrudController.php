@@ -137,7 +137,7 @@ class CrudController extends AbstractAdminController
                     'message' => 'toaster.item.edit.message.success',
                 ]);
 
-                return $this->redirect()->toRoute($currentRoute . '/edit', array('id' => $model->getId()));
+                return $this->redirect()->toRoute($currentRoute . '/edit', ['id' => $model->getId()]);
             } else {
                 $this->flashMessenger()->addErrorMessage([
                     'title' => 'toaster.item.edit.title.error',
@@ -176,7 +176,7 @@ class CrudController extends AbstractAdminController
         if ($this->getRequest()->isDelete()) {
             $deleteCmd = $this->getCommand($cmdName);
 
-            $deleteParams = array();
+            $deleteParams = [];
             parse_str($this->getRequest()->getContent(), $deleteParams);
 
             $deleteCmd->setId((int) $deleteParams['id']);
@@ -187,9 +187,9 @@ class CrudController extends AbstractAdminController
 
             $deleteCmd->run();
 
-            return new JsonModel(array(
+            return new JsonModel([
                 'success' => true,
-            ));
+            ]);
         } elseif ($this->getRequest()->isPost()) {
             $deleteCmd = $this->getCommand($cmdName);
 

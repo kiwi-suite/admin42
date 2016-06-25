@@ -29,7 +29,7 @@ class RoleFactory implements FactoryInterface
         /** @var AuthorizationService $permService */
         $permService = $serviceLocator->getServiceLocator()->get('Core42\Permission')->getService('admin42');
         $permRoles = $permService->getAllRoles();
-        $roles = array();
+        $roles = [];
         foreach ($permRoles as $role) {
             if (is_string($role) && $role != $permService->getGuestRole()) {
                 $roles[$role] = $role;

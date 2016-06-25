@@ -85,7 +85,7 @@ class LostPasswordCommand extends AbstractCommand
         if (!empty($this->userId)) {
             $this->user = $this->getTableGateway('Admin42\User')->selectByPrimary((int) $this->userId);
         } elseif (!empty($this->email)) {
-            $this->user = $this->getTableGateway('Admin42\User')->select(array('email' => $this->email))->current();
+            $this->user = $this->getTableGateway('Admin42\User')->select(['email' => $this->email])->current();
         }
 
         if (!($this->user instanceof User)) {
@@ -96,7 +96,7 @@ class LostPasswordCommand extends AbstractCommand
 
         do {
             $hash = sha1($this->user->getPassword() . $this->user->getId() . uniqid());
-            $found = $this->getTableGateway('Admin42\User')->select(array('hash' => $hash))->count() > 0;
+            $found = $this->getTableGateway('Admin42\User')->select(['hash' => $hash])->count() > 0;
         } while ($found);
 
         $this->hash = $hash;
@@ -113,14 +113,14 @@ class LostPasswordCommand extends AbstractCommand
 
         $this->getTableGateway('Admin42\User')->update($this->user);
 
-        $url = $this->getServiceManager()->get('HttpRouter')->assemble(array(
+        $url = $this->getServiceManager()->get('HttpRouter')->assemble([
             'email' => urlencode($this->user->getEmail()),
             'hash' => $this->hash,
-        ), array('name' => 'admin/recover-password'));
+        ], ['name' => 'admin/recover-password']);
 
-        $mailModel = new MailModel(array(
+        $mailModel = new MailModel([
             'recoverUrl' => $url,
-        ));
+        ]);
         $mailModel->setHtmlTemplate("mail/admin42/scripts/lost-password.html.phtml");
         $mailModel->setPlainTemplate("mail/admin42/scripts/lost-password.plain.phtml");
 

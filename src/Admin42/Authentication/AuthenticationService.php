@@ -75,7 +75,7 @@ class AuthenticationService extends \Core42\Authentication\AuthenticationService
             return null;
         }
 
-        if (!in_array($identity->getStatus(), array(User::STATUS_ACTIVE))) {
+        if (!in_array($identity->getStatus(), [User::STATUS_ACTIVE])) {
             $this->clearIdentity();
 
             return null;

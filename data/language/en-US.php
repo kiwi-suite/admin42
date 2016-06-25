@@ -1,6 +1,6 @@
 <?php
 
-return array(
+return [
     'button.save'                   => 'Save',
     'button.ok'                     => 'Ok',
     'button.cancel'                 => 'Cancel',
@@ -111,4 +111,4 @@ return array(
     'label.google-maps.address'     => 'Address',
     'label.google-maps.latitude'    => 'Latitude',
     'label.google-maps.longitude'   => 'Longitude',
-);
+];

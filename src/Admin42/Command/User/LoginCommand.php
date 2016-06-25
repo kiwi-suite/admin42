@@ -94,9 +94,9 @@ class LoginCommand extends AbstractCommand
 
         $userTableGateway = $this->getTableGateway('Admin42\User');
 
-        $resultSet = $userTableGateway->select(array(
+        $resultSet = $userTableGateway->select([
             $this->identityType => $this->identity
-        ));
+        ]);
 
         $bCrypt = new Bcrypt();
 
@@ -116,7 +116,7 @@ class LoginCommand extends AbstractCommand
             return;
         }
 
-        if (!in_array($user->getStatus(), array(User::STATUS_ACTIVE))) {
+        if (!in_array($user->getStatus(), [User::STATUS_ACTIVE])) {
             $this->addError("identity", "Invalid username or password");
 
             return;

@@ -37,6 +37,6 @@ class IdentityRoleProvider implements IdentityRoleProviderInterface
             return null;
         }
 
-        return array($this->authenticationService->getIdentity()->getRole());
+        return [$this->authenticationService->getIdentity()->getRole()];
     }
 }

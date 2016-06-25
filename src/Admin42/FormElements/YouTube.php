@@ -16,7 +16,7 @@ class YouTube extends Hidden
     /**
      * @var array
      */
-    protected $attributes = array(
+    protected $attributes = [
         'type' => 'youtube',
-    );
+    ];
 }

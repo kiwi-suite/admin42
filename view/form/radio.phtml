@@ -2,11 +2,11 @@
     <div class="col-sm-10 col-sm-offset-2">
         <div class="radio">
             <label>
-                <?= $this->formRadio($this->element->setAttributes(array(
+                <?= $this->formRadio($this->element->setAttributes([
                     'id'            => $this->element->getName(),
                     'data-ng-model' => $this->admin()->generateAngularModelName($this->element->getName()),
                     'data-ng-initial' => '',
-                ))) ?>
+                ])) ?>
             </label>
 
         </div>

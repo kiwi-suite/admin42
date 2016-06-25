@@ -17,7 +17,7 @@ class Tags extends Text
     /**
      * @var array
      */
-    protected $attributes = array(
+    protected $attributes = [
         'type' => 'tags',
-    );
+    ];
 }

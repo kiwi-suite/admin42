@@ -172,7 +172,7 @@ class CreateCommand extends AbstractCommand
 
         if ($this->status === null) {
             $this->status = User::STATUS_ACTIVE;
-        } elseif (!in_array($this->status, array(User::STATUS_INACTIVE, User::STATUS_ACTIVE))) {
+        } elseif (!in_array($this->status, [User::STATUS_INACTIVE, User::STATUS_ACTIVE])) {
             $this->addError("status", "invalid status '{$this->status}'");
         }
 
@@ -237,11 +237,11 @@ class CreateCommand extends AbstractCommand
         if ($this->enablePasswordEmail === true) {
             $httpRouter = $this->getServiceManager()->get('HttpRouter');
 
-            $mailViewModel = new MailModel(array(
+            $mailViewModel = new MailModel([
                 'username' => $this->email,
                 'password' => $this->password,
-                'loginUrl' => $httpRouter->assemble(array(), array('name' => 'admin/login')),
-            ));
+                'loginUrl' => $httpRouter->assemble([], ['name' => 'admin/login']),
+            ]);
             $mailViewModel->setHtmlTemplate("mail/admin42/scripts/create-account.html.phtml");
             $mailViewModel->setPlainTemplate("mail/admin42/scripts/create-account.plain.phtml");
 
@@ -262,13 +262,13 @@ class CreateCommand extends AbstractCommand
      */
     public function consoleSetup(Route $route)
     {
-        $this->hydrate(array(
+        $this->hydrate([
             'username' => $route->getMatchedParam("username"),
             'password' => $route->getMatchedParam("password"),
             'email' => $route->getMatchedParam("email"),
             'status' => $route->getMatchedParam("status"),
             'displayName' => $route->getMatchedParam("displayName"),
             'role' => $route->getMatchedParam("role"),
-        ));
+        ]);
     }
 }

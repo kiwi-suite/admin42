@@ -3,10 +3,10 @@
         <?= $this->translate($this->element->getLabel(), 'admin') ?>
     </label>
     <div class="col-sm-10">
-        <?= $this->formColor($this->element->setAttributes(array(
+        <?= $this->formColor($this->element->setAttributes([
             'class'         => 'form-control',
             'id'            => $this->element->getName(),
-        ))) ?>
+        ])) ?>
         <?php if ($this->hasErrors): ?>
             <span class="glyphicon glyphicon-warning-sign form-control-feedback"></span>
             <ul class="list-unstyled text-danger">

@@ -6,12 +6,12 @@
         <?php endif; ?>
     </label>
     <div class="col-sm-10">
-        <?= $this->formEmail($this->element->setAttributes(array(
+        <?= $this->formEmail($this->element->setAttributes([
             'class'         => 'form-control',
             'id'            => $this->element->getName(),
             'data-ng-model' => $this->admin()->generateAngularModelName($this->element->getName()),
             'data-ng-initial' => '',
-        ))) ?>
+        ])) ?>
         <?php if ($this->hasErrors): ?>
             <span class="glyphicon glyphicon-warning-sign form-control-feedback"></span>
             <ul class="list-unstyled text-danger">

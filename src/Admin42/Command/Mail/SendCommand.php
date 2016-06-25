@@ -36,7 +36,7 @@ class SendCommand extends AbstractCommand
     /**
      * @var array
      */
-    private $parts = array();
+    private $parts = [];
 
     /**
      * @var string
@@ -54,14 +54,14 @@ class SendCommand extends AbstractCommand
         $this->layout->setHtmlTemplate("mail/admin42/layout.html.phtml");
         $this->layout->setPlainTemplate("mail/admin42/layout.plain.phtml");
 
-        $this->parts = array(
-            'plain' => array(
+        $this->parts = [
+            'plain' => [
                 'type' => Mime::TYPE_TEXT,
-            ),
-            'html' => array(
+            ],
+            'html' => [
                 'type' => Mime::TYPE_HTML,
-            ),
-        );
+            ],
+        ];
     }
 
     /**
@@ -160,15 +160,15 @@ class SendCommand extends AbstractCommand
         $config = $this->getServiceManager()->get('config');
         $config = $config['project'];
 
-        $this->body->setVariables(array(
+        $this->body->setVariables([
             'projectBaseUrl' => $config['project_base_url'],
             'projectName' => $config['project_name'],
-        ));
+        ]);
 
-        $this->layout->setVariables(array(
+        $this->layout->setVariables([
             'projectBaseUrl' => $config['project_base_url'],
             'projectName' => $config['project_name'],
-        ));
+        ]);
 
 
         $this->subject = $config['email_subject_prefix'] . $this->subject;

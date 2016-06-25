@@ -67,14 +67,14 @@ class DeleteCommand extends AbstractCommand
     {
         $dateTime = new \DateTime();
         $this->user->setStatus(User::STATUS_INACTIVE)
-            ->setEmail(json_encode(array(
+            ->setEmail(json_encode([
                 $this->user->getEmail(),
                 $dateTime->format('Y-m-d H:i:s')
-            )))
-            ->setUsername(json_encode(array(
+            ]))
+            ->setUsername(json_encode([
                 $this->user->getUsername(),
                 $dateTime->format('Y-m-d H:i:s')
-            )))
+            ]))
             ->setUpdated($dateTime);
         $this->getTableGateway('Admin42\User')->update($this->user);
     }
