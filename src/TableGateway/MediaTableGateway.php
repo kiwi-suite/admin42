@@ -35,11 +35,6 @@ class MediaTableGateway extends AbstractTableGateway
     ];
 
     /**
-     * @var boolean
-     */
-    protected $useMetaDataFeature = false;
-
-    /**
      * @var string
      */
     protected $modelPrototype = 'Admin42\\Model\\Media';
