@@ -1,11 +1,15 @@
 <?php
 namespace Admin42;
 
+use Core42\Mvc\Router\Http\AngularSegment;
+use Zend\Router\Http\Literal;
+use Zend\Router\Http\Segment;
+
 return [
     'router' => [
         'routes' => [
             'admin' => [
-                'type' => 'Zend\Mvc\Router\Http\Segment',
+                'type' => Segment::class,
                 'options' => [
                     'route' => '/admin[/]',
                     'defaults' => [
@@ -16,7 +20,7 @@ return [
                 'may_terminate' => true,
                 'child_routes' => [
                     'home' => [
-                        'type' => 'Zend\Mvc\Router\Http\Literal',
+                        'type' => Literal::class,
                         'options' => [
                             'route' => 'home/',
                             'defaults' => [
@@ -26,7 +30,7 @@ return [
                         ],
                     ],
                     'login' => [
-                        'type' => 'Zend\Mvc\Router\Http\Literal',
+                        'type' => Literal::class,
                         'options' => [
                             'route' => 'login/',
                             'defaults' => [
@@ -36,7 +40,7 @@ return [
                         ],
                     ],
                     'lost-password' => [
-                        'type' => 'Zend\Mvc\Router\Http\Literal',
+                        'type' => Literal::class,
                         'options' => [
                             'route' => 'lost-password/',
                             'defaults' => [
@@ -46,7 +50,7 @@ return [
                         ],
                     ],
                     'recover-password' => [
-                        'type' => 'Zend\Mvc\Router\Http\Segment',
+                        'type' => Segment::class,
                         'options' => [
                             'route' => 'recover-password/:email/:hash/',
                             'defaults' => [
@@ -56,7 +60,7 @@ return [
                         ],
                     ],
                     'logout' => [
-                        'type' => 'Zend\Mvc\Router\Http\Literal',
+                        'type' => Literal::class,
                         'options' => [
                             'route' => 'logout/',
                             'defaults' => [
@@ -66,7 +70,7 @@ return [
                         ],
                     ],
                     'user' => [
-                        'type' => 'Zend\Mvc\Router\Http\Literal',
+                        'type' => Literal::class,
                         'options' => [
                             'route' => 'user/',
                             'defaults' => [
@@ -77,7 +81,7 @@ return [
                         'may_terminate' => true,
                         'child_routes' => [
                             'manage' => [
-                                'type' => 'Zend\Mvc\Router\Http\Literal',
+                                'type' => Literal::class,
                                 'options' => [
                                     'route' => 'manage/',
                                     'defaults' => [
@@ -87,7 +91,7 @@ return [
                             ],
 
                             'edit' => [
-                                'type' => 'Core42\Mvc\Router\Http\AngularSegment',
+                                'type' => AngularSegment::class,
                                 'options' => [
                                     'route' => 'edit/:id/',
                                     'defaults' => [
@@ -97,7 +101,7 @@ return [
                                 ],
                             ],
                             'add' => [
-                                'type' => 'Zend\Mvc\Router\Http\Literal',
+                                'type' => Literal::class,
                                 'options' => [
                                     'route' => 'add/',
                                     'defaults' => [
@@ -108,7 +112,7 @@ return [
                             ],
 
                             'delete' => [
-                                'type' => 'Zend\Mvc\Router\Http\Literal',
+                                'type' => Literal::class,
                                 'options' => [
                                     'route' => 'delete/',
                                     'defaults' => [
@@ -119,7 +123,7 @@ return [
                         ],
                     ],
                     'media' => [
-                        'type' => 'Zend\Mvc\Router\Http\Segment',
+                        'type' => Segment::class,
                         'options' => [
                             'route' => 'media/[:referrer/[:category/]]',
                             'defaults' => [
@@ -135,7 +139,7 @@ return [
                         'may_terminate' => true,
                         'child_routes' => [
                             'upload' => [
-                                'type' => 'Zend\Mvc\Router\Http\Literal',
+                                'type' => Literal::class,
                                 'options' => [
                                     'route' => 'upload/',
                                     'defaults' => [
@@ -144,7 +148,7 @@ return [
                                 ],
                             ],
                             'crop' => [
-                                'type' => 'Core42\Mvc\Router\Http\AngularSegment',
+                                'type' => AngularSegment::class,
                                 'options' => [
                                     'route' => 'crop/:id/:dimension/',
                                     'defaults' => [
@@ -153,7 +157,7 @@ return [
                                 ],
                             ],
                             'edit' => [
-                                'type' => 'Core42\Mvc\Router\Http\AngularSegment',
+                                'type' => AngularSegment::class,
                                 'options' => [
                                     'route' => 'edit/:id/',
                                     'defaults' => [
@@ -162,7 +166,7 @@ return [
                                 ],
                             ],
                             'delete' => [
-                                'type' => 'Core42\Mvc\Router\Http\AngularSegment',
+                                'type' => AngularSegment::class,
                                 'options' => [
                                     'route' => 'delete/',
                                     'defaults' => [
@@ -171,7 +175,7 @@ return [
                                 ],
                             ],
                             'stream' => [
-                                'type' => 'Core42\Mvc\Router\Http\AngularSegment',
+                                'type' => AngularSegment::class,
                                 'options' => [
                                     'route' => 'stream/:id/[:dimension/]',
                                     'defaults' => [
@@ -182,7 +186,7 @@ return [
                         ],
                     ],
                     'file-dialog' => [
-                        'type' => 'Zend\Mvc\Router\Http\Literal',
+                        'type' => Literal::class,
                         'options' => [
                             'route' => 'file-dialog/',
                             'defaults' => [
@@ -193,7 +197,7 @@ return [
                         'may_terminate' => true,
                     ],
                     'link' => [
-                        'type' => 'Zend\Mvc\Router\Http\Literal',
+                        'type' => Literal::class,
                         'options' => [
                             'route' => 'link/',
                             'defaults' => [
@@ -204,7 +208,7 @@ return [
                         'may_terminate' => true,
                     ],
                     'api' => [
-                        'type' => 'Zend\Mvc\Router\Http\Literal',
+                        'type' => Literal::class,
                         'options' => [
                             'route' => 'api/',
                             'defaults' => [
@@ -214,7 +218,7 @@ return [
                         'may_terminate' => true,
                         'child_routes' => [
                             'tag-suggest' => [
-                                'type' => 'Zend\Mvc\Router\Http\Literal',
+                                'type' => Literal::class,
                                 'options' => [
                                     'route' => 'tag-suggest',
                                     'defaults' => [
@@ -223,7 +227,7 @@ return [
                                 ],
                             ],
                             'job' => [
-                                'type' => 'Zend\Mvc\Router\Http\Segment',
+                                'type' => Segment::class,
                                 'options' => [
                                     'route' => 'job/',
                                     'defaults' => [
@@ -233,7 +237,7 @@ return [
                                 ],
                             ],
                             'notification' => [
-                                'type' => 'Zend\Mvc\Router\Http\Literal',
+                                'type' => Literal::class,
                                 'options' => [
                                     'route' => 'notification/',
                                     'defaults' => [
@@ -243,7 +247,7 @@ return [
                                 'may_terminate' => true,
                                 'child_routes' => [
                                     'list' => [
-                                        'type' => 'Zend\Mvc\Router\Http\Literal',
+                                        'type' => Literal::class,
                                         'options' => [
                                             'route' => 'list/',
                                             'defaults' => [
@@ -252,7 +256,7 @@ return [
                                         ],
                                     ],
                                     'clear' => [
-                                        'type' => 'Zend\Mvc\Router\Http\Literal',
+                                        'type' => Literal::class,
                                         'options' => [
                                             'route' => 'clear/',
                                             'defaults' => [

@@ -9,24 +9,33 @@
 
 namespace Admin42\View\Helper\Service;
 
+use Admin42\TableGateway\UserTableGateway;
 use Admin42\View\Helper\Admin;
-use Zend\ServiceManager\FactoryInterface;
-use Zend\ServiceManager\ServiceLocatorInterface;
+use Interop\Container\ContainerInterface;
+use Interop\Container\Exception\ContainerException;
+use Zend\ServiceManager\Exception\ServiceNotCreatedException;
+use Zend\ServiceManager\Exception\ServiceNotFoundException;
+use Zend\ServiceManager\Factory\FactoryInterface;
 
 class AdminFactory implements FactoryInterface
 {
-
     /**
-     * Create service
+     * Create an object
      *
-     * @param ServiceLocatorInterface $serviceLocator
-     * @return Admin
+     * @param  ContainerInterface $container
+     * @param  string $requestedName
+     * @param  null|array $options
+     * @return object
+     * @throws ServiceNotFoundException if unable to resolve the service.
+     * @throws ServiceNotCreatedException if an exception is raised when
+     *     creating a service.
+     * @throws ContainerException if any other error occurs
      */
-    public function createService(ServiceLocatorInterface $serviceLocator)
+    public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
-        $config = $serviceLocator->getServiceLocator()->get('Config');
-        $userTableGateway = $serviceLocator->getServiceLocator()->get('TableGateway')->get('Admin42\User');
-        $mediaOptions = $serviceLocator->getServiceLocator()->get('Admin42\MediaOptions');
+        $config = $container->get('Config');
+        $userTableGateway = $container->get('TableGateway')->get(UserTableGateway::class);
+        $mediaOptions = $container->get('Admin42\MediaOptions');
 
         return new Admin($config['admin'], $userTableGateway, $mediaOptions, $config['media_url']);
     }

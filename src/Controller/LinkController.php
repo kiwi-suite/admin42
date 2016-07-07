@@ -43,11 +43,11 @@ class LinkController extends AbstractAdminController
 
         return new JsonModel([
             'linkId' => $link->getId(),
-            'linkDisplayName' => $this->getServiceLocator()->get('Admin42\LinkProvider')->getDisplayName(
+            'linkDisplayName' => $this->getServiceManager()->get('Admin42\LinkProvider')->getDisplayName(
                 $link->getType(),
                 $data['value']
             ),
-            'url' => $this->getServiceLocator()->get('Admin42\LinkProvider')->assemble(
+            'url' => $this->getServiceManager()->get('Admin42\LinkProvider')->assemble(
                 $link->getType(),
                 $data['value']
             ),

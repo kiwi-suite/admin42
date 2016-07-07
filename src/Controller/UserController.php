@@ -34,7 +34,7 @@ class UserController extends AbstractAdminController
     public function homeAction()
     {
         $identityRoles = $this
-            ->getServiceLocator()
+            ->getServiceManager()
             ->get('Core42\Permission')
             ->getService('admin42')
             ->getIdentityRoles();
@@ -170,10 +170,10 @@ class UserController extends AbstractAdminController
     public function loginAction()
     {
         /** @var AuthenticationService $authenticationService */
-        $authenticationService = $this->getServiceLocator()->get('Admin42\Authentication');
+        $authenticationService = $this->getServiceManager()->get('Admin42\Authentication');
         if ($authenticationService->hasIdentity()) {
             $identityRoles = $this
-                ->getServiceLocator()
+                ->getServiceManager()
                 ->get('Core42\Permission')
                 ->getService('admin42')
                 ->getIdentityRoles();
@@ -209,7 +209,7 @@ class UserController extends AbstractAdminController
                     return $this->redirect()->toUrl($this->params()->fromQuery('redirectTo'));
                 } else {
                     $identityRoles = $this
-                        ->getServiceLocator()
+                        ->getServiceManager()
                         ->get('Core42\Permission')
                         ->getService('admin42')
                         ->getIdentityRoles();
@@ -254,7 +254,7 @@ class UserController extends AbstractAdminController
     public function lostPasswordAction()
     {
         /** @var AuthenticationService $authenticationService */
-        $authenticationService = $this->getServiceLocator()->get('Admin42\Authentication');
+        $authenticationService = $this->getServiceManager()->get('Admin42\Authentication');
         if ($authenticationService->hasIdentity()) {
             return $this->redirect()->toRoute('admin/user/manage');
         }
@@ -290,7 +290,7 @@ class UserController extends AbstractAdminController
     public function recoverPasswordAction()
     {
         /** @var AuthenticationService $authenticationService */
-        $authenticationService = $this->getServiceLocator()->get('Admin42\Authentication');
+        $authenticationService = $this->getServiceManager()->get('Admin42\Authentication');
         if ($authenticationService->hasIdentity()) {
             return $this->redirect()->toRoute('admin/user/manage');
         }
@@ -338,7 +338,7 @@ class UserController extends AbstractAdminController
         }
 
         /** @var AuthenticationService $authenticationService */
-        $authenticationService = $this->getServiceLocator()->get('Admin42\Authentication');
+        $authenticationService = $this->getServiceManager()->get('Admin42\Authentication');
 
         $manageForm = $this->getForm('Admin42\User\Manage');
 

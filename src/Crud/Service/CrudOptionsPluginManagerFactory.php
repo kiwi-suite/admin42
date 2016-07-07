@@ -9,25 +9,32 @@
 
 namespace Admin42\Crud\Service;
 
-use Zend\ServiceManager\Config;
-use Zend\ServiceManager\FactoryInterface;
-use Zend\ServiceManager\ServiceLocatorInterface;
+use Interop\Container\ContainerInterface;
+use Interop\Container\Exception\ContainerException;
+use Zend\ServiceManager\Exception\ServiceNotCreatedException;
+use Zend\ServiceManager\Exception\ServiceNotFoundException;
+use Zend\ServiceManager\Factory\FactoryInterface;
 
 class CrudOptionsPluginManagerFactory implements FactoryInterface
 {
     /**
-     * Create service
+     * Create an object
      *
-     * @param ServiceLocatorInterface $serviceLocator
-     * @return mixed
+     * @param  ContainerInterface $container
+     * @param  string $requestedName
+     * @param  null|array $options
+     * @return object
+     * @throws ServiceNotFoundException if unable to resolve the service.
+     * @throws ServiceNotCreatedException if an exception is raised when
+     *     creating a service.
+     * @throws ContainerException if any other error occurs
      */
-    public function createService(ServiceLocatorInterface $serviceLocator)
+    public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
-        $config = $serviceLocator->get('config');
+        $config = $container->get('config');
         $config = (array_key_exists('crud_options', $config)) ? $config['crud_options'] : [];
 
-        $manager = new CrudOptionsPluginManager(new Config($config));
-        $manager->setServiceLocator($serviceLocator);
+        $manager = new CrudOptionsPluginManager($container, $config);
 
         return $manager;
     }

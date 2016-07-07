@@ -24,7 +24,7 @@ class CrudController extends AbstractAdminController
     protected function getCurrentRoute()
     {
         return $this
-            ->getServiceLocator()
+            ->getServiceManager()
             ->get('Application')
             ->getMvcEvent()
             ->getRouteMatch()
@@ -37,7 +37,7 @@ class CrudController extends AbstractAdminController
     protected function getCrudOptions()
     {
         return $this
-            ->getServiceLocator()
+            ->getServiceManager()
             ->get('Admin42\CrudOptionsPluginManager')
             ->get($this->params("crud"));
     }

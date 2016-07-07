@@ -1,6 +1,18 @@
 <?php
 namespace Admin42;
 
+use Admin42\Authentication\Service\AuthenticationServiceFactory;
+use Admin42\Crud\Service\CrudOptionsPluginManagerFactory;
+use Admin42\Crud\Service\EventManagerFactory as CrudEventManagerFactory;
+use Admin42\Media\Service\EventManagerFactory as MediaEventManagerFactory;
+use Admin42\Imagine\Service\ImagineFactory;
+use Admin42\Link\Adapter\Service\MediaLinkFactory;
+use Admin42\Link\Service\LinkProviderFactory;
+use Admin42\Media\Service\MediaOptionsFactory;
+use Admin42\Media\Service\MediaUrlFactory;
+use Admin42\Navigation\Listener\RbacListenerFactory;
+use Admin42\Permission\Rbac\Service\IdentityRoleProviderFactory;
+
 return [
     'view_manager' => [
         'display_not_found_reason'  => false,
@@ -36,24 +48,24 @@ return [
 
         ],
         'factories' => [
-            'Admin42\Authentication'    => 'Admin42\Authentication\Service\AuthenticationServiceFactory',
+            'Admin42\Authentication'    => AuthenticationServiceFactory::class,
 
-            'Admin42\IdentityRoleProvider' => 'Admin42\Permission\Rbac\Service\IdentityRoleProviderFactory',
+            'Admin42\IdentityRoleProvider' => IdentityRoleProviderFactory::class,
 
-            'Admin42\Navigation\Listener\RbacListener' => 'Admin42\Navigation\Listener\RbacListenerFactory',
+            'Admin42\Navigation\Listener\RbacListener' => RbacListenerFactory::class,
 
-            'Imagine' => 'Admin42\Imagine\Service\ImagineFactory',
+            'Imagine' => ImagineFactory::class,
 
-            'Admin42\MediaOptions' => 'Admin42\Media\Service\MediaOptionsFactory',
+            'Admin42\MediaOptions' => MediaOptionsFactory::class,
 
-            'Admin42\LinkProvider' => 'Admin42\Link\Service\LinkProviderFactory',
-            'Admin42\Link\MediaLink' => 'Admin42\Link\Adapter\Service\MediaLinkFactory',
+            'Admin42\LinkProvider' => LinkProviderFactory::class,
+            'Admin42\Link\MediaLink' => MediaLinkFactory::class,
 
-            'Admin42\CrudOptionsPluginManager' => 'Admin42\Crud\Service\CrudOptionsPluginManagerFactory',
-            'Admin42\MediaUrl'         => 'Admin42\Media\Service\MediaUrlFactory',
+            'Admin42\CrudOptionsPluginManager' => CrudOptionsPluginManagerFactory::class,
+            'Admin42\MediaUrl'         => MediaUrlFactory::class,
 
-            'Admin42\Crud\EventManager' => 'Admin42\Crud\Service\EventManagerFactory',
-            'Admin42\Media\EventManager' => 'Admin42\Media\Service\EventManagerFactory',
+            'Admin42\Crud\EventManager' => CrudEventManagerFactory::class,
+            'Admin42\Media\EventManager' => MediaEventManagerFactory::class,
         ],
     ],
 

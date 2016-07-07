@@ -3,8 +3,7 @@ namespace Admin42\Navigation\Badge\Service;
 
 use Admin42\Navigation\Badge\BadgeContainer;
 use Interop\Container\ContainerInterface;
-use Zend\ServiceManager\FactoryInterface;
-use Zend\ServiceManager\ServiceLocatorInterface;
+use Zend\ServiceManager\Factory\FactoryInterface;
 
 class BadgeContainerFactory implements FactoryInterface
 {
@@ -22,16 +21,5 @@ class BadgeContainerFactory implements FactoryInterface
         $badgeContainer = new BadgeContainer();
 
         return $badgeContainer;
-    }
-
-    /**
-     * Create service
-     *
-     * @param ServiceLocatorInterface $serviceLocator
-     * @return mixed
-     */
-    public function createService(ServiceLocatorInterface $serviceLocator)
-    {
-        return $this($serviceLocator, BadgeContainer::class);
     }
 }

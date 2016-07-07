@@ -63,10 +63,12 @@ class Module implements ConfigProviderInterface, BootstrapListenerInterface
 
                 $sm->get('MvcTranslator')->setLocale('en-US');
 
-                $viewHelperManager = $sm->get('viewHelperManager');
+
+                $viewHelperManager = $sm->get('ViewHelperManager');
 
                 $config = $sm->get('config');
                 $smConfig = new Config($config['admin']['view_helpers']);
+
                 $smConfig->configureServiceManager($viewHelperManager);
 
                 $headScript = $viewHelperManager->get('headScript');
@@ -101,7 +103,7 @@ class Module implements ConfigProviderInterface, BootstrapListenerInterface
 
         $guards = $serviceManager->get('Core42\Permission')->getGuards('admin42');
         foreach ($guards as $_guard) {
-            $eventManager->attachAggregate($_guard);
+            $_guard->attach($eventManager);
         }
     }
 }

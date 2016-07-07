@@ -9,22 +9,41 @@
 
 namespace Admin42\Crud\Service;
 
-use Core42\Command\CommandInterface;
-use Zend\ServiceManager\AbstractFactoryInterface;
-use Zend\ServiceManager\ServiceLocatorInterface;
+use Interop\Container\ContainerInterface;
+use Interop\Container\Exception\ContainerException;
+use Zend\ServiceManager\Exception\ServiceNotCreatedException;
+use Zend\ServiceManager\Exception\ServiceNotFoundException;
+use Zend\ServiceManager\Factory\AbstractFactoryInterface;
 
 class CrudOptionsFallbackAbstractFactory implements AbstractFactoryInterface
 {
+    /**
+     * @param string $name
+     * @return bool|string
+     */
+    protected function getFQCN($name)
+    {
+        if (class_exists($name)) {
+            return $name;
+        }
+        
+        if (strpos($name, '\\') === false) {
+            return false;
+        }
+
+        $parts = explode('\\', $name, 2);
+
+        return '\\' . $parts[0] . '\\Crud\\' .$parts[1] . 'Options';
+    }
 
     /**
-     * Determine if we can create a service with name
+     * Can the factory create an instance for the service?
      *
-     * @param ServiceLocatorInterface $serviceLocator
-     * @param string $name
-     * @param string $requestedName
+     * @param  ContainerInterface $container
+     * @param  string $requestedName
      * @return bool
      */
-    public function canCreateServiceWithName(ServiceLocatorInterface $serviceLocator, $name, $requestedName)
+    public function canCreate(ContainerInterface $container, $requestedName)
     {
         $fqcn = $this->getFQCN($requestedName);
         if ($fqcn === false) {
@@ -35,32 +54,21 @@ class CrudOptionsFallbackAbstractFactory implements AbstractFactoryInterface
     }
 
     /**
-     * Create service with name
+     * Create an object
      *
-     * @param ServiceLocatorInterface $serviceLocator
-     * @param string $name
-     * @param string $requestedName
-     * @return CommandInterface
+     * @param  ContainerInterface $container
+     * @param  string $requestedName
+     * @param  null|array $options
+     * @return object
+     * @throws ServiceNotFoundException if unable to resolve the service.
+     * @throws ServiceNotCreatedException if an exception is raised when
+     *     creating a service.
+     * @throws ContainerException if any other error occurs
      */
-    public function createServiceWithName(ServiceLocatorInterface $serviceLocator, $name, $requestedName)
+    public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
         $fqcn = $this->getFQCN($requestedName);
 
         return new $fqcn();
-    }
-
-    /**
-     * @param string $name
-     * @return bool|string
-     */
-    protected function getFQCN($name)
-    {
-        if (strpos($name, '\\') === false) {
-            return false;
-        }
-
-        $parts = explode('\\', $name, 2);
-
-        return '\\' . $parts[0] . '\\Crud\\' .$parts[1] . 'Options';
     }
 }

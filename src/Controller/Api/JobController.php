@@ -23,7 +23,7 @@ class JobController extends AbstractAdminController
         if (!$this->getRequest()->isPost()) {
             return new JsonModel();
         }
-        $jobAuth = $this->getServiceLocator()->get('config')['admin']['job_auth'];
+        $jobAuth = $this->getServiceManager()->get('config')['admin']['job_auth'];
         if (empty($jobAuth)) {
             return new JsonModel();
         }

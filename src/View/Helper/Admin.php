@@ -14,7 +14,7 @@ use Admin42\Model\User;
 use Admin42\TableGateway\UserTableGateway;
 use Zend\I18n\View\Helper\Translate;
 use Zend\Json\Json;
-use Zend\Mvc\Controller\Plugin\FlashMessenger;
+use Zend\Mvc\Plugin\FlashMessenger\FlashMessenger;
 use Zend\View\Helper\AbstractHelper;
 
 class Admin extends AbstractHelper

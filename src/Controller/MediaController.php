@@ -29,7 +29,7 @@ class MediaController extends AbstractAdminController
             return $this->getSelector('Admin42\SmartTable\Media')->getResult();
         }
 
-        $mediaOptions = $this->getServiceLocator()->get('Admin42\MediaOptions');
+        $mediaOptions = $this->getServiceManager()->get('Admin42\MediaOptions');
 
         $viewModel = new ViewModel([
             'uploadForm' => $this->getForm('Admin42\Media\Upload'),
@@ -85,11 +85,11 @@ class MediaController extends AbstractAdminController
             $editForm->setData($media->toArray());
         }
 
-        $mediaOptions = $this->getServiceLocator()->get('Admin42\MediaOptions');
+        $mediaOptions = $this->getServiceManager()->get('Admin42\MediaOptions');
 
         $imageSize = null;
         if (substr($media->getMimeType(), 0, 6) == "image/") {
-            $imagine = $this->getServiceLocator()->get('Imagine');
+            $imagine = $this->getServiceManager()->get('Imagine');
             $box = $imagine->open($media->getDirectory() . $media->getFilename())->getSize();
             $imageSize = [
                 'width' => $box->getWidth(),

@@ -11,27 +11,35 @@ namespace Admin42\Authentication\Service;
 
 use Admin42\Authentication\AuthenticationService;
 use Core42\Authentication\Storage\Session;
-use Zend\ServiceManager\FactoryInterface;
-use Zend\ServiceManager\ServiceLocatorInterface;
+use Interop\Container\ContainerInterface;
+use Interop\Container\Exception\ContainerException;
+use Zend\ServiceManager\Exception\ServiceNotCreatedException;
+use Zend\ServiceManager\Exception\ServiceNotFoundException;
+use Zend\ServiceManager\Factory\FactoryInterface;
 
 class AuthenticationServiceFactory implements FactoryInterface
 {
-
     /**
-     * Create service
+     * Create an object
      *
-     * @param ServiceLocatorInterface $serviceLocator
-     * @return mixed
+     * @param  ContainerInterface $container
+     * @param  string $requestedName
+     * @param  null|array $options
+     * @return object
+     * @throws ServiceNotFoundException if unable to resolve the service.
+     * @throws ServiceNotCreatedException if an exception is raised when
+     *     creating a service.
+     * @throws ContainerException if any other error occurs
      */
-    public function createService(ServiceLocatorInterface $serviceLocator)
+    public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
         $sessionStorage = new Session(
             'admin42_auth',
             'storage',
-            $serviceLocator->get('Zend\Session\Service\SessionManager')
+            $container->get('Zend\Session\Service\SessionManager')
         );
         $authenticationService = new AuthenticationService($sessionStorage);
-        $authenticationService->setTableGateway($serviceLocator->get('TableGateway')->get('Admin42\User'));
+        $authenticationService->setTableGateway($container->get('TableGateway')->get('Admin42\User'));
 
         return $authenticationService;
     }

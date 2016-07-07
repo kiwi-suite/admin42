@@ -5,7 +5,7 @@ return [
     'assets' => [
         __NAMESPACE__ => [
             'target' => 'public/assets/admin/core',
-            'source' => 'module/admin42/assets/dist/',
+            'source' =>  'vendor/fruit42/admin42/assets/dist/',
         ],
     ],
 ];
