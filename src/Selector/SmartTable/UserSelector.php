@@ -37,8 +37,8 @@ class UserSelector extends AbstractSmartTableSelector
     {
         return [
             'id' => 'Integer',
-            'lastLogin' => 'Datetime',
-            'created' => 'Datetime',
+            'lastLogin' => 'DateTime',
+            'created' => 'DateTime',
         ];
     }
 

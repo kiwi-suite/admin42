@@ -37,8 +37,8 @@ class MediaSelector extends AbstractSmartTableSelector
     {
         return [
             'id' => 'Integer',
-            'updated' => 'Datetime',
-            'created' => 'Datetime',
+            'updated' => 'DateTime',
+            'created' => 'DateTime',
         ];
     }
 
