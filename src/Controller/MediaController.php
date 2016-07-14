@@ -9,8 +9,16 @@
 
 namespace Admin42\Controller;
 
+use Admin42\Command\Media\DeleteCommand;
 use Admin42\Command\Media\EditCommand;
+use Admin42\Command\Media\ImageCropCommand;
+use Admin42\Command\Media\StreamCommand;
+use Admin42\Command\Media\UploadCommand;
+use Admin42\Form\Media\EditForm;
+use Admin42\Form\Media\UploadForm;
 use Admin42\Mvc\Controller\AbstractAdminController;
+use Admin42\Selector\SmartTable\MediaSelector;
+use Admin42\TableGateway\MediaTableGateway;
 use Core42\Stdlib\MaxUploadFileSize;
 use Core42\View\Model\JsonModel;
 use Zend\Http\PhpEnvironment\Response;
@@ -26,13 +34,13 @@ class MediaController extends AbstractAdminController
     {
         if ($this->getRequest()->isXmlHttpRequest() && $this->params("referrer") == "index") {
 
-            return $this->getSelector('Admin42\SmartTable\Media')->getResult();
+            return $this->getSelector(MediaSelector::class)->getResult();
         }
 
         $mediaOptions = $this->getServiceManager()->get('Admin42\MediaOptions');
 
         $viewModel = new ViewModel([
-            'uploadForm' => $this->getForm('Admin42\Media\Upload'),
+            'uploadForm' => $this->getForm(UploadForm::class),
             'maxFileSize' => MaxUploadFileSize::getSize(),
             'mediaCategories' => $mediaOptions->getCategories(),
             'uploadHost' => $mediaOptions->getUploadHost(),
@@ -51,7 +59,7 @@ class MediaController extends AbstractAdminController
      */
     public function editAction()
     {
-        $editForm = $this->getForm('Admin42\Media\Edit');
+        $editForm = $this->getForm(EditForm::class);
 
         $prg = $this->prg();
         if ($prg instanceof Response) {
@@ -64,7 +72,7 @@ class MediaController extends AbstractAdminController
             if ($editForm->isValid()) {
 
                 /* @var EditCommand $cmd */
-                $cmd = $this->getCommand('Admin42\Media\Edit');
+                $cmd = $this->getCommand(EditCommand::class);
                 $cmd->setMediaId($this->params()->fromRoute("id"));
 
                 $formCommand = $this->getFormCommand();
@@ -73,7 +81,7 @@ class MediaController extends AbstractAdminController
                     ->setData($prg)
                     ->run();
 
-                $this->getTableGateway('Admin42\Media')->update($media);
+                $this->getTableGateway(MediaTableGateway::class)->update($media);
                 $this->flashMessenger()->addSuccessMessage([
                     'title' => 'toaster.media.detail.title.success',
                     'message' => 'toaster.media.detail.message.success',
@@ -113,7 +121,7 @@ class MediaController extends AbstractAdminController
     {
         $data = Json::decode($this->getRequest()->getContent(), Json::TYPE_ARRAY);
 
-        $cmd = $this->getCommand('Admin42\Media\ImageCrop')
+        $cmd = $this->getCommand(ImageCropCommand::class)
             ->setMediaId($this->params("id"))
             ->setBoxWidth($data['width'])
             ->setBoxHeight($data['height'])
@@ -133,7 +141,7 @@ class MediaController extends AbstractAdminController
      */
     public function streamAction()
     {
-        return $this->getCommand('Admin42\Media\Stream')
+        return $this->getCommand(StreamCommand::class)
             ->setMediaId($this->params("id"))
             ->setDimension($this->params("dimension"))
             ->run();
@@ -146,7 +154,7 @@ class MediaController extends AbstractAdminController
     public function uploadAction()
     {
         $jsonModel = new JsonModel();
-        $form = $this->getForm('Admin42\Media\Upload');
+        $form = $this->getForm(UploadForm::class);
         $request = $this->getRequest();
         if ($request->isPost()) {
             $post = array_merge_recursive(
@@ -157,7 +165,7 @@ class MediaController extends AbstractAdminController
             $form->setData($post);
             if ($form->isValid()) {
                 $this->getFormCommand()
-                    ->setCommand($this->getCommand('Admin42\Media\Upload'))
+                    ->setCommand($this->getCommand(UploadCommand::class))
                     ->setForm($form)
                     ->enableAutomaticFormFill(false)
                     ->run();
@@ -174,7 +182,7 @@ class MediaController extends AbstractAdminController
     public function deleteAction()
     {
         if ($this->getRequest()->isDelete()) {
-            $deleteCmd = $this->getCommand('Admin42\Media\Delete');
+            $deleteCmd = $this->getCommand(DeleteCommand::class);
 
             $deleteParams = [];
             parse_str($this->getRequest()->getContent(), $deleteParams);
@@ -186,7 +194,7 @@ class MediaController extends AbstractAdminController
                 'success' => true,
             ]);
         } elseif ($this->getRequest()->isPost()) {
-            $deleteCmd = $this->getCommand('Admin42\Media\Delete');
+            $deleteCmd = $this->getCommand(DeleteCommand::class);
 
             $deleteCmd->setMediaId((int) $this->params()->fromPost('id'))
                 ->run();

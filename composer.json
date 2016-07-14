@@ -5,11 +5,6 @@
         "ext-fileinfo": "*",
         "imagine/imagine": "0.6.3"
     },
-    "extra": {
-        "zf": {
-            "component": "Admin42"
-        }
-    },
     "autoload": {
         "psr-4": {
             "Admin42\\": "src/"

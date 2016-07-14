@@ -12,6 +12,7 @@ namespace Admin42;
 use Admin42\Mvc\Controller\AbstractAdminController;
 use Core42\Console\Console;
 use Core42\Mvc\Environment\Environment;
+use Imagine\Exception\Exception;
 use Zend\EventManager\EventInterface;
 use Zend\ModuleManager\Feature\BootstrapListenerInterface;
 use Zend\ModuleManager\Feature\ConfigProviderInterface;
@@ -26,6 +27,11 @@ class Module implements
     BootstrapListenerInterface,
     DependencyIndicatorInterface
 {
+    /**
+     *
+     */
+    const ENVIRONMENT_ADMIN = 'admin';
+
     /**
      * @return array
      */
@@ -69,7 +75,7 @@ class Module implements
                 /** @var Environment $environment */
                 $environment = $serviceManager->get(Environment::class);
 
-                if (!$environment->is("admin")) {
+                if (!$environment->is(Module::ENVIRONMENT_ADMIN)) {
                     return;
                 }
 
@@ -104,7 +110,6 @@ class Module implements
                 $formElement->addClass('Admin42\FormElements\Link', 'formlink');
                 $formElement->addClass('Admin42\FormElements\Tags', 'fromtags');
                 $formElement->addClass('Admin42\FormElements\GoogleMap', 'formgooglemap');
-
             },
             999999
         );
@@ -125,6 +130,10 @@ class Module implements
                 }
 
                 $controller->layout()->setTemplate("admin/layout/layout");
+                $authenticationService = $serviceManager->get('Admin42\Authentication');
+                if (!$authenticationService->hasIdentity()) {
+                    $controller->layout()->setTemplate("admin/layout/layout-min");
+                }
             },
             100
         );

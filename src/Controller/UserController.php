@@ -10,8 +10,21 @@
 namespace Admin42\Controller;
 
 use Admin42\Authentication\AuthenticationService;
+use Admin42\Command\User\CreateCommand;
+use Admin42\Command\User\DeleteCommand;
+use Admin42\Command\User\EditCommand;
+use Admin42\Command\User\LoginCommand;
+use Admin42\Command\User\LostPasswordCommand;
+use Admin42\Command\User\ManageCommand;
+use Admin42\Command\User\RecoverPasswordCommand;
+use Admin42\Form\User\CreateEditForm;
+use Admin42\Form\User\LostPasswordForm;
+use Admin42\Form\User\ManageForm;
+use Admin42\Form\User\RecoverPasswordForm;
 use Admin42\Model\User;
 use Admin42\Mvc\Controller\AbstractAdminController;
+use Admin42\Selector\SmartTable\UserSelector;
+use Admin42\TableGateway\UserTableGateway;
 use Core42\Permission\Rbac\Role\RoleInterface;
 use Core42\View\Model\JsonModel;
 use Zend\Http\PhpEnvironment\Response;
@@ -24,7 +37,7 @@ class UserController extends AbstractAdminController
     public function indexAction()
     {
         if ($this->getRequest()->isXmlHttpRequest()) {
-            return $this->getSelector('Admin42\SmartTable\User')->getResult();
+            return $this->getSelector(UserSelector::class)->getResult();
         }
     }
 
@@ -67,14 +80,14 @@ class UserController extends AbstractAdminController
             return $prg;
         }
 
-        $createEditForm = $this->getForm('Admin42\User\CreateEdit');
+        $createEditForm = $this->getForm(CreateEditForm::class);
 
         if ($prg !== false) {
             if ($isEditMode === true) {
-                $cmd = $this->getCommand('Admin42\User\Edit');
+                $cmd = $this->getCommand(EditCommand::class);
                 $cmd->setUserId($this->params()->fromRoute("id"));
             } else {
-                $cmd = $this->getCommand('Admin42\User\Create');
+                $cmd = $this->getCommand(CreateCommand::class);
             }
 
             $formCommand = $this->getFormCommand();
@@ -98,7 +111,10 @@ class UserController extends AbstractAdminController
             }
         } else {
             if ($isEditMode === true) {
-                $user = $this->getTableGateway('Admin42\User')->selectByPrimary((int) $this->params()->fromRoute("id"));
+                $user = $this
+                    ->getTableGateway(UserTableGateway::class)
+                    ->selectByPrimary((int) $this->params()->fromRoute("id"));
+
                 if (empty($user) || $user->getStatus() == User::STATUS_INACTIVE) {
                     return $this->redirect()->toRoute('admin/user');
                 }
@@ -118,12 +134,12 @@ class UserController extends AbstractAdminController
     }
 
     /**
-     * @return \Zend\Http\Response
+     * @return JsonModel
      */
     public function deleteAction()
     {
         if ($this->getRequest()->isDelete()) {
-            $deleteCmd = $this->getCommand('Admin42\User\Delete');
+            $deleteCmd = $this->getCommand(DeleteCommand::class);
 
             $deleteParams = [];
             parse_str($this->getRequest()->getContent(), $deleteParams);
@@ -135,7 +151,7 @@ class UserController extends AbstractAdminController
                 'success' => true,
             ]);
         } elseif ($this->getRequest()->isPost()) {
-            $deleteCmd = $this->getCommand('Admin42\User\Delete');
+            $deleteCmd = $this->getCommand(DeleteCommand::class);
 
             $deleteCmd->setUserId((int) $this->params()->fromPost('id'))
                 ->run();
@@ -201,7 +217,7 @@ class UserController extends AbstractAdminController
             $formCmd = $this->getFormCommand();
 
             $formCmd->setForm($loginForm)
-                ->setCommand($this->getCommand('Admin42\User\Login'))
+                ->setCommand($this->getCommand(LoginCommand::class))
                 ->run();
 
             if (!$formCmd->hasErrors()) {
@@ -266,10 +282,10 @@ class UserController extends AbstractAdminController
             return $prg;
         }
 
-        $lostPasswordForm = $this->getForm('Admin42\User\LostPassword');
+        $lostPasswordForm = $this->getForm(LostPasswordForm::class);
 
         if ($prg !== false) {
-            $lostPasswordCommand = $this->getCommand('Admin42\User\LostPassword');
+            $lostPasswordCommand = $this->getCommand(LostPasswordCommand::class);
 
             $formCmd = $this->getFormCommand();
             $formCmd->setForm($lostPasswordForm)
@@ -297,7 +313,7 @@ class UserController extends AbstractAdminController
 
         $this->layout('admin/layout/layout-min');
 
-        $recoverPasswordForm = $this->getForm('Admin42\User\RecoverPassword');
+        $recoverPasswordForm = $this->getForm(RecoverPasswordForm::class);
 
         $prg = $this->prg();
         if ($prg instanceof Response) {
@@ -305,7 +321,7 @@ class UserController extends AbstractAdminController
         }
 
         if ($prg !== false) {
-            $recoverPassowordCommand = $this->getCommand('Admin42\User\RecoverPassword');
+            $recoverPassowordCommand = $this->getCommand(RecoverPasswordCommand::class);
             $recoverPassowordCommand->setEmail(urldecode($this->params()->fromRoute('email')));
             $recoverPassowordCommand->setHash($this->params()->fromRoute("hash"));
 
@@ -340,10 +356,10 @@ class UserController extends AbstractAdminController
         /** @var AuthenticationService $authenticationService */
         $authenticationService = $this->getServiceManager()->get('Admin42\Authentication');
 
-        $manageForm = $this->getForm('Admin42\User\Manage');
+        $manageForm = $this->getForm(ManageForm::class);
 
         if ($prg !== false) {
-            $manageCommand = $this->getCommand('Admin42\User\Manage');
+            $manageCommand = $this->getCommand(ManageCommand::class);
             $manageCommand->setUser($authenticationService->getIdentity());
 
             $formCmd = $this->getFormCommand();
