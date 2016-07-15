@@ -8,7 +8,6 @@ use Interop\Container\Exception\ContainerException;
 use Zend\ServiceManager\Exception\ServiceNotCreatedException;
 use Zend\ServiceManager\Exception\ServiceNotFoundException;
 use Zend\ServiceManager\Factory\FactoryInterface;
-use Zend\ServiceManager\ServiceLocatorInterface;
 
 class MediaUrlFactory implements FactoryInterface
 {
@@ -27,7 +26,7 @@ class MediaUrlFactory implements FactoryInterface
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
         return new MediaUrl(
-            $container->get('Admin42\MediaUrl')
+            $container->get(\Admin42\Media\MediaUrl::class)
         );
     }
 }

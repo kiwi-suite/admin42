@@ -9,6 +9,7 @@
 
 namespace Admin42;
 
+use Admin42\Authentication\AuthenticationService;
 use Admin42\Mvc\Controller\AbstractAdminController;
 use Core42\Console\Console;
 use Core42\Mvc\Environment\Environment;
@@ -48,6 +49,8 @@ class Module implements
             include __DIR__ . '/../config/admin.config.php',
             include __DIR__ . '/../config/media.config.php',
             include __DIR__ . '/../config/caches.config.php',
+            include __DIR__ . '/../config/form.config.php',
+            include __DIR__ . '/../config/services.config.php',
             include __DIR__ . '/../config/routing.config.php'
         );
     }
@@ -130,7 +133,7 @@ class Module implements
                 }
 
                 $controller->layout()->setTemplate("admin/layout/layout");
-                $authenticationService = $serviceManager->get('Admin42\Authentication');
+                $authenticationService = $serviceManager->get(AuthenticationService::class);
                 if (!$authenticationService->hasIdentity()) {
                     $controller->layout()->setTemplate("admin/layout/layout-min");
                 }

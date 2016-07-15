@@ -23,7 +23,7 @@ class NotificationController extends AbstractAdminController
     public function listAction()
     {
         /** @var AuthenticationService $authService */
-        $authService = $this->getServiceManager()->get('Admin42\Authentication');
+        $authService = $this->getServiceManager()->get(AuthenticationService::class);
 
         $notifications = [];
 
@@ -62,7 +62,7 @@ class NotificationController extends AbstractAdminController
     public function clearAction()
     {
         /** @var AuthenticationService $authenticationService */
-        $authenticationService = $this->getServiceManager()->get('Admin42\Authentication');
+        $authenticationService = $this->getServiceManager()->get(AuthenticationService::class);
 
         $this->getTableGateway('Admin42\Notification')->delete([
             'userId' => $authenticationService->getIdentity()->getId()

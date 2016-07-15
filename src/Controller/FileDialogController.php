@@ -9,6 +9,7 @@
 
 namespace Admin42\Controller;
 
+use Admin42\Link\LinkProvider;
 use Admin42\Mvc\Controller\AbstractAdminController;
 
 class FileDialogController extends AbstractAdminController
@@ -20,7 +21,7 @@ class FileDialogController extends AbstractAdminController
     {
         $this->layout('admin/layout/dialog');
 
-        $linkProvider = $this->getServiceManager()->get('Admin42\LinkProvider');
+        $linkProvider = $this->getServiceManager()->get(LinkProvider::class);
 
         return [
             'linkTypes' => $linkProvider->getAvailableAdapters(),

@@ -10,6 +10,7 @@
 namespace Admin42\Controller;
 
 use Admin42\Crud\AbstractOptions;
+use Admin42\Crud\Service\CrudOptionsPluginManager;
 use Admin42\Mvc\Controller\AbstractAdminController;
 use Core42\View\Model\JsonModel;
 use Zend\Http\Response;
@@ -38,7 +39,7 @@ class CrudController extends AbstractAdminController
     {
         return $this
             ->getServiceManager()
-            ->get('Admin42\CrudOptionsPluginManager')
+            ->get(CrudOptionsPluginManager::class)
             ->get($this->params("crud"));
     }
 

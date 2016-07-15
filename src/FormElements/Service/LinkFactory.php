@@ -10,6 +10,7 @@
 namespace Admin42\FormElements\Service;
 
 use Admin42\FormElements\Link;
+use Admin42\Link\LinkProvider;
 use Interop\Container\ContainerInterface;
 use Interop\Container\Exception\ContainerException;
 use Zend\ServiceManager\Exception\ServiceNotCreatedException;
@@ -32,7 +33,7 @@ class LinkFactory implements FactoryInterface
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
-        $linkProvider = $container->get('Admin42\LinkProvider');
+        $linkProvider = $container->get(LinkProvider::class);
         $link = new Link();
         $link->setLinkTypes($linkProvider->getAvailableAdapters());
 

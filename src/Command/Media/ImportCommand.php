@@ -9,6 +9,7 @@
 
 namespace Admin42\Command\Media;
 
+use Admin42\Media\MediaOptions;
 use Admin42\Model\Media;
 use Core42\Command\AbstractCommand;
 
@@ -63,7 +64,7 @@ class ImportCommand extends AbstractCommand
         $this->getTableGateway('Admin42\Media')->insert($media);
 
         if (substr($media->getMimeType(), 0, 6) == "image/") {
-            $mediaOptions = $this->getServiceManager()->get('Admin42\MediaOptions');
+            $mediaOptions = $this->getServiceManager()->get(MediaOptions::class);
 
             foreach (array_keys($mediaOptions->getDimensions()) as $dimension) {
                 /* @var ImageResizeCommand $cmd */

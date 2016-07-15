@@ -1,12 +1,14 @@
 <?php
 namespace Admin42;
 
+use Admin42\Permission\Rbac\Identity\IdentityRoleProvider;
+
 return [
     'permissions' => [
 
         'service' => [
             'admin42' => [
-                'identity_role_provider' => 'Admin42\IdentityRoleProvider',
+                'identity_role_provider' => IdentityRoleProvider::class,
 
                 'guest_role' => 'guest',
 

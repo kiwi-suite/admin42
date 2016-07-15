@@ -9,6 +9,7 @@
 
 namespace Admin42\Permission\Rbac\Service;
 
+use Admin42\Authentication\AuthenticationService;
 use Admin42\Permission\Rbac\Identity\IdentityRoleProvider;
 use Interop\Container\ContainerInterface;
 use Interop\Container\Exception\ContainerException;
@@ -32,6 +33,6 @@ class IdentityRoleProviderFactory implements FactoryInterface
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
-        return new IdentityRoleProvider($container->get('Admin42\Authentication'));
+        return new IdentityRoleProvider($container->get(AuthenticationService::class));
     }
 }

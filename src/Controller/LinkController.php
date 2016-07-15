@@ -9,6 +9,7 @@
 
 namespace Admin42\Controller;
 
+use Admin42\Link\LinkProvider;
 use Admin42\Model\Link;
 use Admin42\Mvc\Controller\AbstractAdminController;
 use Core42\View\Model\JsonModel;
@@ -17,7 +18,7 @@ use Zend\Json\Json;
 class LinkController extends AbstractAdminController
 {
     /**
-     * @return array
+     * @return JsonModel
      */
     public function saveAction()
     {
@@ -43,11 +44,11 @@ class LinkController extends AbstractAdminController
 
         return new JsonModel([
             'linkId' => $link->getId(),
-            'linkDisplayName' => $this->getServiceManager()->get('Admin42\LinkProvider')->getDisplayName(
+            'linkDisplayName' => $this->getServiceManager()->get(LinkProvider::class)->getDisplayName(
                 $link->getType(),
                 $data['value']
             ),
-            'url' => $this->getServiceManager()->get('Admin42\LinkProvider')->assemble(
+            'url' => $this->getServiceManager()->get(LinkProvider::class)->assemble(
                 $link->getType(),
                 $data['value']
             ),

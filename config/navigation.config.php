@@ -1,4 +1,5 @@
 <?php
+namespace Admin42;
 
 return [
     'navigation' => [

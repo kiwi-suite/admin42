@@ -9,6 +9,7 @@
 
 namespace Admin42\View\Helper\Service;
 
+use Admin42\Link\LinkProvider;
 use Admin42\TableGateway\LinkTableGateway;
 use Admin42\View\Helper\Link;
 use Interop\Container\ContainerInterface;
@@ -34,7 +35,7 @@ class LinkFactory implements FactoryInterface
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
         $linkTableGateway = $container->get('TableGateway')->get(LinkTableGateway::class);
-        $linkProvider = $container->get('Admin42\LinkProvider');
+        $linkProvider = $container->get(LinkProvider::class);
         $cache = $container->get('Cache\Link');
 
         return new Link($linkTableGateway, $linkProvider, $cache);

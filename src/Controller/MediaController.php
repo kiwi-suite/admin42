@@ -16,6 +16,7 @@ use Admin42\Command\Media\StreamCommand;
 use Admin42\Command\Media\UploadCommand;
 use Admin42\Form\Media\EditForm;
 use Admin42\Form\Media\UploadForm;
+use Admin42\Media\MediaOptions;
 use Admin42\Mvc\Controller\AbstractAdminController;
 use Admin42\Selector\SmartTable\MediaSelector;
 use Admin42\TableGateway\MediaTableGateway;
@@ -37,7 +38,7 @@ class MediaController extends AbstractAdminController
             return $this->getSelector(MediaSelector::class)->getResult();
         }
 
-        $mediaOptions = $this->getServiceManager()->get('Admin42\MediaOptions');
+        $mediaOptions = $this->getServiceManager()->get(MediaOptions::class);
 
         $viewModel = new ViewModel([
             'uploadForm' => $this->getForm(UploadForm::class),
@@ -93,7 +94,7 @@ class MediaController extends AbstractAdminController
             $editForm->setData($media->toArray());
         }
 
-        $mediaOptions = $this->getServiceManager()->get('Admin42\MediaOptions');
+        $mediaOptions = $this->getServiceManager()->get(MediaOptions::class);
 
         $imageSize = null;
         if (substr($media->getMimeType(), 0, 6) == "image/") {

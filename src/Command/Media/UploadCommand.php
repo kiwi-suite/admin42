@@ -10,6 +10,7 @@
 namespace Admin42\Command\Media;
 
 use Admin42\Media\MediaEvent;
+use Admin42\Media\MediaOptions;
 use Admin42\Model\Media;
 use Core42\Command\AbstractCommand;
 
@@ -62,7 +63,7 @@ class UploadCommand extends AbstractCommand
      */
     protected function preExecute()
     {
-        $mediaOptions = $this->getServiceManager()->get('Admin42\MediaOptions');
+        $mediaOptions = $this->getServiceManager()->get(MediaOptions::class);
         $categories = $mediaOptions->getCategories();
         $categories = array_keys($categories);
 
@@ -98,7 +99,7 @@ class UploadCommand extends AbstractCommand
             ->trigger(MediaEvent::EVENT_ADD, $media);
 
         if (substr($media->getMimeType(), 0, 6) == "image/") {
-            $mediaOptions = $this->getServiceManager()->get('Admin42\MediaOptions');
+            $mediaOptions = $this->getServiceManager()->get(MediaOptions::class);
 
             foreach (array_keys($mediaOptions->getDimensions()) as $dimension) {
                 /* @var ImageResizeCommand $cmd */

@@ -186,7 +186,7 @@ class UserController extends AbstractAdminController
     public function loginAction()
     {
         /** @var AuthenticationService $authenticationService */
-        $authenticationService = $this->getServiceManager()->get('Admin42\Authentication');
+        $authenticationService = $this->getServiceManager()->get(AuthenticationService::class);
         if ($authenticationService->hasIdentity()) {
             $identityRoles = $this
                 ->getServiceManager()
@@ -270,7 +270,7 @@ class UserController extends AbstractAdminController
     public function lostPasswordAction()
     {
         /** @var AuthenticationService $authenticationService */
-        $authenticationService = $this->getServiceManager()->get('Admin42\Authentication');
+        $authenticationService = $this->getServiceManager()->get(AuthenticationService::class);
         if ($authenticationService->hasIdentity()) {
             return $this->redirect()->toRoute('admin/user/manage');
         }
@@ -306,7 +306,7 @@ class UserController extends AbstractAdminController
     public function recoverPasswordAction()
     {
         /** @var AuthenticationService $authenticationService */
-        $authenticationService = $this->getServiceManager()->get('Admin42\Authentication');
+        $authenticationService = $this->getServiceManager()->get(AuthenticationService::class);
         if ($authenticationService->hasIdentity()) {
             return $this->redirect()->toRoute('admin/user/manage');
         }
@@ -354,7 +354,7 @@ class UserController extends AbstractAdminController
         }
 
         /** @var AuthenticationService $authenticationService */
-        $authenticationService = $this->getServiceManager()->get('Admin42\Authentication');
+        $authenticationService = $this->getServiceManager()->get(AuthenticationService::class);
 
         $manageForm = $this->getForm(ManageForm::class);
 

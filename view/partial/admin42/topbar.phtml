@@ -60,11 +60,11 @@
             <li class="dropdown" uib-dropdown>
                 <a href class="dropdown-toggle clear" uib-dropdown-toggle>
                     <span class="m-r-xs shortname-container-xs">
-                        <?= $this->auth('Admin42\Authentication')->getIdentity()->getShortName() ?>
+                        <?= $this->auth(\Admin42\Authentication\AuthenticationService::class)->getIdentity()->getShortName() ?>
                     </span>
                     <span class="font-bold text-lt">
                         <?= $this->admin()->getUserDisplayName(
-                            $this->auth('Admin42\Authentication')->getIdentity()
+                            $this->auth(\Admin42\Authentication\AuthenticationService::class)->getIdentity()
                         ) ?>
                     </span>
                     <b class="caret text-lt"></b>

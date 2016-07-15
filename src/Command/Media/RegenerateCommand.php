@@ -1,6 +1,7 @@
 <?php
 namespace Admin42\Command\Media;
 
+use Admin42\Media\MediaOptions;
 use Admin42\Model\Media;
 use Core42\Command\AbstractCommand;
 use Core42\Command\ConsoleAwareTrait;
@@ -49,7 +50,7 @@ class RegenerateCommand extends AbstractCommand
      */
     protected function execute()
     {
-        $mediaOptions = $this->getServiceManager()->get('Admin42\MediaOptions');
+        $mediaOptions = $this->getServiceManager()->get(MediaOptions::class);
 
 
         /** @var Media $media */

@@ -9,6 +9,7 @@
 
 namespace Admin42\Command\User;
 
+use Admin42\Authentication\AuthenticationService;
 use Core42\Command\AbstractCommand;
 
 class LogoutCommand extends AbstractCommand
@@ -19,6 +20,6 @@ class LogoutCommand extends AbstractCommand
      */
     protected function execute()
     {
-        $this->getServiceManager()->get('Admin42\Authentication')->clearIdentity();
+        $this->getServiceManager()->get(AuthenticationService::class)->clearIdentity();
     }
 }

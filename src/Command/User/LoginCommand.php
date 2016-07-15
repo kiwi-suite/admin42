@@ -79,7 +79,7 @@ class LoginCommand extends AbstractCommand
      */
     protected function preExecute()
     {
-        $this->authenticationService = $this->getServiceManager()->get('Admin42\Authentication');
+        $this->authenticationService = $this->getServiceManager()->get(AuthenticationService::class);
 
         if (empty($this->identity)) {
             $this->addError('identity', "Can't be empty");
