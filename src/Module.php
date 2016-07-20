@@ -47,7 +47,6 @@ class Module implements
             include __DIR__ . '/../config/project.config.php',
             include __DIR__ . '/../config/translation.config.php',
             include __DIR__ . '/../config/admin.config.php',
-            include __DIR__ . '/../config/media.config.php',
             include __DIR__ . '/../config/caches.config.php',
             include __DIR__ . '/../config/form.config.php',
             include __DIR__ . '/../config/services.config.php',
@@ -107,7 +106,6 @@ class Module implements
                 $headLink->appendStylesheet($basePath('/assets/admin/core/css/admin42.min.css'));
 
                 $formElement = $viewHelperManager->get('formElement');
-                $formElement->addClass('Admin42\FormElements\FileSelect', 'formfileselect');
                 $formElement->addClass('Admin42\FormElements\Wysiwyg', 'formwysiwyg');
                 $formElement->addClass('Admin42\FormElements\YouTube', 'formyoutube');
                 $formElement->addClass('Admin42\FormElements\Link', 'formlink');

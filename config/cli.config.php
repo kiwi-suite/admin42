@@ -20,12 +20,5 @@ return [
                 '--displayName'     => 'set the display name of the user'
             ],
         ],
-
-        'media-regenerate-images' => [
-            'route'                     => 'media-regenerate-images',
-            'command-name'              => 'Admin42\Media\Regenerate',
-            'description'               => 'Regenerate all Images',
-            'short_description'         => 'Regenerate all Images',
-        ],
     ],
 ];

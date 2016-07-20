@@ -3,14 +3,17 @@ angular.module('admin42', [
     'ui.bootstrap.datetimepicker',
     'ngAnimate',
     'ngSanitize',
-    'ui.utils',
+    'ui.validate',
+    'ui.indeterminate',
+    'ui.mask',
+    'ui.event',
+    'ui.scroll',
+    'ui.scrollpoint',
     'smart-table',
     'toaster',
     'ngStorage',
     'ui.sortable',
-    'ui.select',
-    'angularFileUpload',
-    'uiGmapgoogle-maps'
+    'ui.select'
 ]);
 
 angular.module('admin42').config(['$httpProvider', function($httpProvider) {

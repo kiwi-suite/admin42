@@ -122,69 +122,6 @@ return [
                             ],
                         ],
                     ],
-                    'media' => [
-                        'type' => Segment::class,
-                        'options' => [
-                            'route' => 'media/[:referrer/[:category/]]',
-                            'defaults' => [
-                                'controller' => __NAMESPACE__ . '\Media',
-                                'action' => 'index',
-                                'referrer' => 'index',
-                                'category' => 'default',
-                            ],
-                            'constraints' => [
-                                'referrer' => '(index|modal)'
-                            ],
-                        ],
-                        'may_terminate' => true,
-                        'child_routes' => [
-                            'upload' => [
-                                'type' => Literal::class,
-                                'options' => [
-                                    'route' => 'upload/',
-                                    'defaults' => [
-                                        'action' => 'upload'
-                                    ],
-                                ],
-                            ],
-                            'crop' => [
-                                'type' => AngularSegment::class,
-                                'options' => [
-                                    'route' => 'crop/:id/:dimension/',
-                                    'defaults' => [
-                                        'action' => 'crop'
-                                    ],
-                                ],
-                            ],
-                            'edit' => [
-                                'type' => AngularSegment::class,
-                                'options' => [
-                                    'route' => 'edit/:id/',
-                                    'defaults' => [
-                                        'action' => 'edit'
-                                    ],
-                                ],
-                            ],
-                            'delete' => [
-                                'type' => AngularSegment::class,
-                                'options' => [
-                                    'route' => 'delete/',
-                                    'defaults' => [
-                                        'action' => 'delete'
-                                    ],
-                                ],
-                            ],
-                            'stream' => [
-                                'type' => AngularSegment::class,
-                                'options' => [
-                                    'route' => 'stream/:id/[:dimension/]',
-                                    'defaults' => [
-                                        'action' => 'stream'
-                                    ],
-                                ],
-                            ],
-                        ],
-                    ],
                     'file-dialog' => [
                         'type' => Literal::class,
                         'options' => [

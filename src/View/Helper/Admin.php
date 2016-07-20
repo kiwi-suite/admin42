@@ -9,7 +9,6 @@
 
 namespace Admin42\View\Helper;
 
-use Admin42\Media\MediaOptions;
 use Admin42\Model\User;
 use Admin42\TableGateway\UserTableGateway;
 use Zend\I18n\View\Helper\Translate;
@@ -40,35 +39,20 @@ class Admin extends AbstractHelper
     private $userTableGateway;
 
     /**
-     * @var MediaOptions
-     */
-    private $mediaOptions;
-
-    /**
      * @var array
      */
     private $userCache = [];
 
     /**
-     * @var string
-     */
-    private $mediaUrls;
-
-    /**
      * @param array $config
      * @param UserTableGateway $userTableGateway
-     * @param MediaOptions $mediaOptions
      */
     public function __construct(
         array $config,
-        UserTableGateway $userTableGateway,
-        MediaOptions $mediaOptions,
-        $mediaUrls
+        UserTableGateway $userTableGateway
     ) {
         $this->config = $config;
         $this->userTableGateway = $userTableGateway;
-        $this->mediaOptions = $mediaOptions;
-        $this->mediaUrls = $mediaUrls;
     }
 
     /**
@@ -149,16 +133,10 @@ class Admin extends AbstractHelper
             'google_map_api' => $this->config['google_map']['api_key']
         ];
 
-        $this->addJsonTemplate("mediaConfig", [
-            "baseUrl" => $this->mediaUrls,
-            "dimensions" => $this->mediaOptions->getDimensions(),
-        ]);
-
         return "var APP;"
             . "angular.element(document).ready(function(){"
             . "APP = angular.module('APP', ".json_encode($this->config['angular']['modules']).");"
             . "APP.constant('appConfig', ".json_encode($appConfig).");"
-            . "APP.config(function(uiGmapGoogleMapApiProvider, appConfig) {uiGmapGoogleMapApiProvider.configure({key: appConfig.google_map_api, v:3, libraries: 'places'});});"
             . "angular.bootstrap(document, ['APP']);"
             . "});" . PHP_EOL;
     }

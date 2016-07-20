@@ -2,8 +2,6 @@
 namespace Admin42;
 
 use Admin42\Link\Adapter\ExternLink;
-use Admin42\Link\Adapter\MediaLink;
-use Admin42\View\Helper\Service\MediaFactory;
 
 return [
     'view_manager' => [
@@ -32,20 +30,15 @@ return [
         ],
     ],
 
-    'media_url' => '/media',
-
     'link' => [
         'adapter' => [
             'extern' => ExternLink::class,
-            'media'  => MediaLink::class,
         ],
     ],
 
     'view_helpers' => [
         'factories' => [
-            'media'            => MediaFactory::class,
             'link'             => \Admin42\View\Helper\Service\LinkFactory::class,
-            'mediaUrl'         => \Admin42\View\Helper\Service\MediaUrlFactory::class,
         ],
     ],
 ];

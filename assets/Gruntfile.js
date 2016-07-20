@@ -25,10 +25,10 @@ module.exports = function(grunt) {
 
                     '<%= vendor_dir %>/lodash/dist/lodash.js',
 
-                    '<%= vendor_dir %>/jquery-ui/ui/core.js',
-                    '<%= vendor_dir %>/jquery-ui/ui/widget.js',
-                    '<%= vendor_dir %>/jquery-ui/ui/mouse.js',
-                    '<%= vendor_dir %>/jquery-ui/ui/sortable.js',
+                    //'<%= vendor_dir %>/jquery-ui/ui/core.js',
+                    //'<%= vendor_dir %>/jquery-ui/ui/widget.js',
+                    //'<%= vendor_dir %>/jquery-ui/ui/mouse.js',
+                    //'<%= vendor_dir %>/jquery-ui/ui/sortable.js',
 
                     '<%= vendor_dir %>/angular/angular.js',
 
@@ -57,15 +57,9 @@ module.exports = function(grunt) {
 
                     '<%= vendor_dir %>/ngstorage/ngStorage.js',
 
-                    '<%= vendor_dir %>/angular-file-upload/dist/angular-file-upload.min.js',
-
-                    '<%= vendor_dir %>/cropper/dist/cropper.js',
-
                     '<%= vendor_dir %>/tinymce-dist/tinymce.js',
 
                     '<%= vendor_dir %>/angular-simple-logger/dist/angular-simple-logger.js',
-
-                    '<%= vendor_dir %>/angular-google-maps/dist/angular-google-maps.js',
 
                     '<%= vendor_dir %>/magnific-popup/src/js/core.js',
                     '<%= vendor_dir %>/magnific-popup/src/js/image.js',
@@ -112,7 +106,6 @@ module.exports = function(grunt) {
                     '<%= dist %>/css/admin42.min.css': [
                         '<%= vendor_dir %>/animate.css/animate.css',
                         '<%= vendor_dir %>/angularjs-toaster/toaster.css',
-                        '<%= vendor_dir %>/cropper/dist/cropper.css',
                         'less/main.less',
                         '<%= vendor_dir %>/angular-ui-select/dist/select.css',
                         '<%= vendor_dir %>/magnific-popup/dist/magnific-popup.css'

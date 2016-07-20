@@ -9,7 +9,6 @@
 
 namespace Admin42\View\Helper\Service;
 
-use Admin42\Media\MediaOptions;
 use Admin42\TableGateway\UserTableGateway;
 use Admin42\View\Helper\Admin;
 use Interop\Container\ContainerInterface;
@@ -36,8 +35,7 @@ class AdminFactory implements FactoryInterface
     {
         $config = $container->get('Config');
         $userTableGateway = $container->get('TableGateway')->get(UserTableGateway::class);
-        $mediaOptions = $container->get(MediaOptions::class);
 
-        return new Admin($config['admin'], $userTableGateway, $mediaOptions, $config['media_url']);
+        return new Admin($config['admin'], $userTableGateway);
     }
 }
