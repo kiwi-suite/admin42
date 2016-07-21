@@ -173,36 +173,6 @@ return [
                                     ],
                                 ],
                             ],
-                            'notification' => [
-                                'type' => Literal::class,
-                                'options' => [
-                                    'route' => 'notification/',
-                                    'defaults' => [
-                                        'controller' => __NAMESPACE__ . '\Api\Notification',
-                                    ]
-                                ],
-                                'may_terminate' => true,
-                                'child_routes' => [
-                                    'list' => [
-                                        'type' => Literal::class,
-                                        'options' => [
-                                            'route' => 'list/',
-                                            'defaults' => [
-                                                'action' => 'list',
-                                            ],
-                                        ],
-                                    ],
-                                    'clear' => [
-                                        'type' => Literal::class,
-                                        'options' => [
-                                            'route' => 'clear/',
-                                            'defaults' => [
-                                                'action' => 'clear',
-                                            ],
-                                        ],
-                                    ],
-                                ],
-                            ],
                         ],
                     ],
                 ],
