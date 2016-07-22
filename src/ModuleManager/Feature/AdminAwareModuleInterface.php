@@ -17,5 +17,12 @@ interface AdminAwareModuleInterface
     /**
      * @return array
      */
-    public function getAdminFormViewHelpers();
+    public function getAdminViewHelpers();
+
+
+    /**
+     * @return array
+     */
+    public function getAdminFormElements();
+
 }

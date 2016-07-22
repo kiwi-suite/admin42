@@ -53,6 +53,7 @@ class FormElement extends \Zend\Form\View\Helper\FormElement
         if (isset($this->typeMap[$type])) {
             return substr($this->typeMap[$type], 4);
         }
-        return null;
+
+        return $type;
     }
 }

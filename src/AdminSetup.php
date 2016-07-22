@@ -8,6 +8,7 @@ use Zend\EventManager\EventManagerInterface;
 use Zend\ModuleManager\ModuleManager;
 use Zend\Mvc\MvcEvent;
 use Zend\ServiceManager\Config;
+use Zend\Stdlib\ArrayUtils;
 use Zend\View\HelperPluginManager;
 
 class AdminSetup extends AbstractListenerAggregate
@@ -53,15 +54,9 @@ class AdminSetup extends AbstractListenerAggregate
         $serviceManager->get('MvcTranslator')->setLocale('en-US');
 
         $this->viewHelperManager = $serviceManager->get('ViewHelperManager');
-        $config = $serviceManager->get('config');
-        $smConfig = new Config($config['admin']['view_helpers']);
-        $smConfig->configureServiceManager($this->viewHelperManager);
 
-        $formElementManager = $serviceManager->get("FormElementManager");
-        $config = $serviceManager->get("config");
-        $smConfig = new Config($config['admin']['form_elements']);
-        $smConfig->configureServiceManager($formElementManager);
-
+        $formElementConfig = [];
+        $viewHelperConfig = [];
 
         /** @var ModuleManager $moduleManager */
         $moduleManager = $serviceManager->get(ModuleManager::class);
@@ -73,8 +68,17 @@ class AdminSetup extends AbstractListenerAggregate
 
             $this->setupJavascript($module);
             $this->setupStylesheets($module);
-            $this->setupFormElements($module);
+
+            $formElementConfig = ArrayUtils::merge($module->getAdminFormElements(), $formElementConfig);
+            $viewHelperConfig = ArrayUtils::merge($module->getAdminViewHelpers(), $viewHelperConfig);
         }
+
+        $smConfig = new Config($viewHelperConfig);
+        $smConfig->configureServiceManager($this->viewHelperManager);
+
+        $formElementManager = $serviceManager->get("FormElementManager");
+        $smConfig = new Config($formElementConfig);
+        $smConfig->configureServiceManager($formElementManager);
     }
 
     /**
@@ -101,31 +105,10 @@ class AdminSetup extends AbstractListenerAggregate
         $headScript = $this->viewHelperManager->get('headScript');
         $basePath = $this->viewHelperManager->get('basePath');
 
-        $javascripts = $module->getAdminJavascript();
-        if (!empty($javascripts) && is_array($javascripts)) {
-            foreach ($javascripts as $js) {
+        $javaScripts = $module->getAdminJavascript();
+        if (!empty($javaScripts) && is_array($javaScripts)) {
+            foreach ($javaScripts as $js) {
                 $headScript->appendFile($basePath($js));
-            }
-        }
-    }
-
-    /**
-     * @param AdminAwareModuleInterface $module
-     */
-    protected function setupFormElements(AdminAwareModuleInterface $module)
-    {
-        $formElementHelper = $this->viewHelperManager->get('formElement');
-
-        $formElements = $module->getAdminFormViewHelpers();
-        if (!empty($formElements) && is_array($formElements)) {
-            foreach ($formElements as $formClass => $formAlias) {
-                if (!is_string($formClass)) {
-                    $formClass = $formAlias;
-
-                    $formAlias = 'form' . strtolower(substr($formAlias, strrpos($formAlias, '\\') + 1));
-                }
-
-                $formElementHelper->addClass($formClass, $formAlias);
             }
         }
     }
