@@ -10,23 +10,24 @@
 namespace Admin42;
 
 use Admin42\Authentication\AuthenticationService;
-use Admin42\Mvc\Controller\AbstractAdminController;
+use Admin42\FormElements\Link;
+use Admin42\FormElements\Tags;
+use Admin42\FormElements\Wysiwyg;
+use Admin42\FormElements\YouTube;
+use Admin42\ModuleManager\Feature\AdminAwareModuleInterface;
 use Core42\Console\Console;
 use Core42\Mvc\Environment\Environment;
-use Imagine\Exception\Exception;
 use Zend\EventManager\EventInterface;
 use Zend\ModuleManager\Feature\BootstrapListenerInterface;
 use Zend\ModuleManager\Feature\ConfigProviderInterface;
 use Zend\ModuleManager\Feature\DependencyIndicatorInterface;
-use Zend\ModuleManager\Feature\InitProviderInterface;
-use Zend\ModuleManager\ModuleManagerInterface;
 use Zend\Mvc\MvcEvent;
-use Zend\ServiceManager\Config;
 
 class Module implements
     ConfigProviderInterface,
     BootstrapListenerInterface,
-    DependencyIndicatorInterface
+    DependencyIndicatorInterface,
+    AdminAwareModuleInterface
 {
     /**
      *
@@ -48,7 +49,6 @@ class Module implements
             include __DIR__ . '/../config/translation.config.php',
             include __DIR__ . '/../config/admin.config.php',
             include __DIR__ . '/../config/caches.config.php',
-            include __DIR__ . '/../config/form.config.php',
             include __DIR__ . '/../config/services.config.php',
             include __DIR__ . '/../config/routing.config.php'
         );
@@ -66,54 +66,8 @@ class Module implements
             return;
         }
 
-        $e->getApplication()->getEventManager()->attach(
-            MvcEvent::EVENT_ROUTE,
-            function(MvcEvent $event){
-                /* @var \Zend\Mvc\Application $application */
-                $application    = $event->getApplication();
-                $serviceManager = $application->getServiceManager();
-                $eventManager   = $application->getEventManager();
-
-                /** @var Environment $environment */
-                $environment = $serviceManager->get(Environment::class);
-
-                if (!$environment->is(Module::ENVIRONMENT_ADMIN)) {
-                    return;
-                }
-
-                $guards = $serviceManager->get('Core42\Permission')->getGuards('admin42');
-                foreach ($guards as $_guard) {
-                    $_guard->attach($eventManager);
-                }
-
-                $serviceManager->get('MvcTranslator')->setLocale('en-US');
-
-
-                $viewHelperManager = $serviceManager->get('ViewHelperManager');
-
-                $config = $serviceManager->get('config');
-                $smConfig = new Config($config['admin']['view_helpers']);
-
-                $smConfig->configureServiceManager($viewHelperManager);
-
-                $headScript = $viewHelperManager->get('headScript');
-                $headLink = $viewHelperManager->get('headLink');
-                $basePath = $viewHelperManager->get('basePath');
-
-                $headScript->appendFile($basePath('/assets/admin/core/js/vendor.min.js'));
-                $headScript->appendFile($basePath('/assets/admin/core/js/admin42.min.js'));
-
-                $headLink->appendStylesheet($basePath('/assets/admin/core/css/admin42.min.css'));
-
-                $formElement = $viewHelperManager->get('formElement');
-                $formElement->addClass('Admin42\FormElements\Wysiwyg', 'formwysiwyg');
-                $formElement->addClass('Admin42\FormElements\YouTube', 'formyoutube');
-                $formElement->addClass('Admin42\FormElements\Link', 'formlink');
-                $formElement->addClass('Admin42\FormElements\Tags', 'fromtags');
-                $formElement->addClass('Admin42\FormElements\GoogleMap', 'formgooglemap');
-            },
-            999999
-        );
+        $adminSetup = new AdminSetup();
+        $adminSetup->attach($e->getTarget()->getEventManager(), 999999);
 
         $e->getApplication()->getEventManager()->getSharedManager()->attach(
             'Zend\Mvc\Controller\AbstractController',
@@ -149,6 +103,40 @@ class Module implements
     {
         return [
             'Core42',
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public function getAdminStylesheets()
+    {
+        return [
+            '/assets/admin/core/css/admin42.min.css'
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public function getAdminJavascript()
+    {
+        return [
+            '/assets/admin/core/js/vendor.min.js',
+            '/assets/admin/core/js/admin42.min.js',
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public function getAdminFormViewHelpers()
+    {
+        return [
+            Wysiwyg::class,
+            YouTube::class,
+            Link::class,
+            Tags::class,
         ];
     }
 }
