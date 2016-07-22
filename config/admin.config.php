@@ -1,15 +1,6 @@
 <?php
 namespace Admin42;
 
-use Admin42\View\Helper\Admin;
-use Admin42\View\Helper\Form\Form;
-use Admin42\View\Helper\Form\FormCollection;
-use Admin42\View\Helper\Form\FormElement;
-use Admin42\View\Helper\Form\FormRow;
-use Admin42\View\Helper\Form\FormWysiwyg;
-use Admin42\View\Helper\Service\AdminFactory;
-use Zend\ServiceManager\Factory\InvokableFactory;
-
 return [
     'admin' => [
         'job_auth' => '',
