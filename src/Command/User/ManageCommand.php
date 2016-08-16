@@ -10,6 +10,7 @@
 namespace Admin42\Command\User;
 
 use Admin42\Model\User;
+use Admin42\TableGateway\UserTableGateway;
 use Core42\Command\AbstractCommand;
 use Zend\Crypt\Password\Bcrypt;
 use Zend\Db\Sql\Predicate\Operator;
@@ -147,7 +148,7 @@ class ManageCommand extends AbstractCommand
     protected function preExecute()
     {
         if (!empty($this->userId)) {
-            $this->user = $this->getTableGateway('Admin42\User')->selectByPrimary((int) $this->userId);
+            $this->user = $this->getTableGateway(UserTableGateway::class)->selectByPrimary((int) $this->userId);
         }
 
         if (!($this->user instanceof User)) {
@@ -157,7 +158,7 @@ class ManageCommand extends AbstractCommand
         if (empty($this->email)) {
             $this->addError("email", "email can't be empty");
         } else {
-            $check = $this->getTableGateway('Admin42\User')->select([
+            $check = $this->getTableGateway(UserTableGateway::class)->select([
                 'email' => $this->email,
                 new Operator('id', Operator::OPERATOR_NOT_EQUAL_TO, $this->user->getId())
             ]);
@@ -176,7 +177,7 @@ class ManageCommand extends AbstractCommand
             if ($emailValidator->isValid($this->username)) {
                 $this->addError("username", "Username can't be an email");
             } else {
-                $check = $this->getTableGateway('Admin42\User')->select([
+                $check = $this->getTableGateway(UserTableGateway::class)->select([
                     'username' => $this->username,
                     new Operator('id', Operator::OPERATOR_NOT_EQUAL_TO, $this->user->getId())
                 ]);
@@ -222,6 +223,6 @@ class ManageCommand extends AbstractCommand
             $this->user->setUpdated(new \DateTime());
         }
 
-        $this->getTableGateway('Admin42\User')->update($this->user);
+        $this->getTableGateway(UserTableGateway::class)->update($this->user);
     }
 }

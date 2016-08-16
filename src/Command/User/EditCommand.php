@@ -10,6 +10,7 @@
 namespace Admin42\Command\User;
 
 use Admin42\Model\User;
+use Admin42\TableGateway\UserTableGateway;
 use Core42\Command\AbstractCommand;
 use Zend\Db\Sql\Select;
 use Zend\Db\Sql\Where;
@@ -147,7 +148,7 @@ class EditCommand extends AbstractCommand
     protected function preExecute()
     {
         if (!empty($this->userId)) {
-            $this->user = $this->getTableGateway('Admin42\User')->selectByPrimary((int) $this->userId);
+            $this->user = $this->getTableGateway(UserTableGateway::class)->selectByPrimary((int) $this->userId);
         }
 
         if (!($this->user instanceof User)) {
@@ -180,7 +181,7 @@ class EditCommand extends AbstractCommand
             });
         };
 
-        if ($this->getTableGateway('Admin42\User')->select($userSelect)->count() > 0) {
+        if ($this->getTableGateway(UserTableGateway::class)->select($userSelect)->count() > 0) {
             $this->addError("email", "Email already taken");
         }
 
@@ -217,7 +218,7 @@ class EditCommand extends AbstractCommand
                 ->setUpdated($dateTime);
 
 
-        $this->getTableGateway('Admin42\User')->update($this->user);
+        $this->getTableGateway(UserTableGateway::class)->update($this->user);
 
         return $this->user;
     }

@@ -11,6 +11,7 @@ namespace Admin42\Command\User;
 
 use Admin42\Command\Mail\SendCommand;
 use Admin42\Model\User;
+use Admin42\TableGateway\UserTableGateway;
 use Core42\Command\AbstractCommand;
 use Core42\Command\ConsoleAwareTrait;
 use Core42\View\Model\MailModel;
@@ -230,7 +231,7 @@ class CreateCommand extends AbstractCommand
                 ->setCreated($dateTime);
 
 
-        $this->getServiceManager()->get('TableGateway')->get('Admin42\User')->insert($user);
+        $this->getServiceManager()->get('TableGateway')->get(UserTableGateway::class)->insert($user);
 
         $this->consoleOutput("<info>User {$this->email} created</info>");
 
@@ -246,7 +247,7 @@ class CreateCommand extends AbstractCommand
             $mailViewModel->setPlainTemplate("mail/admin42/scripts/create-account.plain.phtml");
 
             /** @var SendCommand $mailSending */
-            $mailSending = $this->getCommand('Admin42\Mail\Send');
+            $mailSending = $this->getCommand(SendCommand::class);
             $mailSending->setSubject('Account created')
                 ->addTo($this->email)
                 ->setBody($mailViewModel)

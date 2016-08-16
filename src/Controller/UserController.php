@@ -14,6 +14,7 @@ use Admin42\Command\User\CreateCommand;
 use Admin42\Command\User\DeleteCommand;
 use Admin42\Command\User\EditCommand;
 use Admin42\Command\User\LoginCommand;
+use Admin42\Command\User\LogoutCommand;
 use Admin42\Command\User\LostPasswordCommand;
 use Admin42\Command\User\ManageCommand;
 use Admin42\Command\User\RecoverPasswordCommand;
@@ -258,7 +259,7 @@ class UserController extends AbstractAdminController
      */
     public function logoutAction()
     {
-        $this->getCommand('Admin42\User\Logout')->run();
+        $this->getCommand(LogoutCommand::class)->run();
 
         return $this->redirect()->toRoute('admin/login');
     }

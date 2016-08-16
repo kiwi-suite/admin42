@@ -10,6 +10,7 @@
 namespace Admin42\Authentication\Service;
 
 use Admin42\Authentication\AuthenticationService;
+use Admin42\TableGateway\UserTableGateway;
 use Core42\Authentication\Storage\Session;
 use Interop\Container\ContainerInterface;
 use Interop\Container\Exception\ContainerException;
@@ -39,7 +40,7 @@ class AuthenticationServiceFactory implements FactoryInterface
             $container->get('Zend\Session\Service\SessionManager')
         );
         $authenticationService = new AuthenticationService($sessionStorage);
-        $authenticationService->setTableGateway($container->get('TableGateway')->get('Admin42\User'));
+        $authenticationService->setTableGateway($container->get('TableGateway')->get(UserTableGateway::class));
 
         return $authenticationService;
     }

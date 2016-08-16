@@ -11,6 +11,7 @@ namespace Admin42\Command\User;
 
 use Admin42\Authentication\AuthenticationService;
 use Admin42\Model\User;
+use Admin42\TableGateway\UserTableGateway;
 use Core42\Command\Migration\AbstractCommand;
 use Zend\Authentication\Result;
 use Zend\Crypt\Password\Bcrypt;
@@ -92,7 +93,7 @@ class LoginCommand extends AbstractCommand
         $emailValidator = new EmailAddress();
         $this->identityType = ($emailValidator->isValid($this->identity)) ? 'email' : 'username';
 
-        $userTableGateway = $this->getTableGateway('Admin42\User');
+        $userTableGateway = $this->getTableGateway(UserTableGateway::class);
 
         $resultSet = $userTableGateway->select([
             $this->identityType => $this->identity
@@ -139,6 +140,6 @@ class LoginCommand extends AbstractCommand
         $this->authenticationService->authenticate();
 
         $this->user->setLastLogin(new \DateTime());
-        $this->getTableGateway('Admin42\User')->update($this->user);
+        $this->getTableGateway(UserTableGateway::class)->update($this->user);
     }
 }

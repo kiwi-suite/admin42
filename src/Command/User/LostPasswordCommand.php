@@ -11,6 +11,7 @@ namespace Admin42\Command\User;
 
 use Admin42\Command\Mail\SendCommand;
 use Admin42\Model\User;
+use Admin42\TableGateway\UserTableGateway;
 use Core42\Command\AbstractCommand;
 use Core42\View\Model\MailModel;
 
@@ -83,9 +84,9 @@ class LostPasswordCommand extends AbstractCommand
     protected function preExecute()
     {
         if (!empty($this->userId)) {
-            $this->user = $this->getTableGateway('Admin42\User')->selectByPrimary((int) $this->userId);
+            $this->user = $this->getTableGateway(UserTableGateway::class)->selectByPrimary((int) $this->userId);
         } elseif (!empty($this->email)) {
-            $this->user = $this->getTableGateway('Admin42\User')->select(['email' => $this->email])->current();
+            $this->user = $this->getTableGateway(UserTableGateway::class)->select(['email' => $this->email])->current();
         }
 
         if (!($this->user instanceof User)) {
@@ -96,7 +97,7 @@ class LostPasswordCommand extends AbstractCommand
 
         do {
             $hash = sha1($this->user->getPassword() . $this->user->getId() . uniqid());
-            $found = $this->getTableGateway('Admin42\User')->select(['hash' => $hash])->count() > 0;
+            $found = $this->getTableGateway(UserTableGateway::class)->select(['hash' => $hash])->count() > 0;
         } while ($found);
 
         $this->hash = $hash;
@@ -111,7 +112,7 @@ class LostPasswordCommand extends AbstractCommand
         $this->user->setHash($this->hash)
             ->setUpdated(new \DateTime());
 
-        $this->getTableGateway('Admin42\User')->update($this->user);
+        $this->getTableGateway(UserTableGateway::class)->update($this->user);
 
         $url = $this->getServiceManager()->get('HttpRouter')->assemble([
             'email' => urlencode($this->user->getEmail()),
@@ -125,7 +126,7 @@ class LostPasswordCommand extends AbstractCommand
         $mailModel->setPlainTemplate("mail/admin42/scripts/lost-password.plain.phtml");
 
         /** @var SendCommand $mailSending */
-        $mailSending = $this->getCommand('Admin42\Mail\Send');
+        $mailSending = $this->getCommand(SendCommand::class);
         $mailSending->setSubject('Recover account')
             ->addTo($this->user->getEmail())
             ->setBody($mailModel)

@@ -10,6 +10,7 @@
 namespace Admin42\Controller\Api;
 
 use Admin42\Mvc\Controller\AbstractAdminController;
+use Admin42\TableGateway\TagTableGateway;
 use Core42\View\Model\JsonModel;
 use Zend\Db\Sql\Predicate\IsNull;
 use Zend\Db\Sql\Predicate\Like;
@@ -25,7 +26,7 @@ class ApiController extends AbstractAdminController
 
         $tags = [];
         if (!empty($searchTag)) {
-            $tagResult = $this->getTableGateway('Admin42\Tag')->select([
+            $tagResult = $this->getTableGateway(TagTableGateway::class)->select([
                 new Like('tag', $searchTag . '%'),
                 new IsNull('namespace')
             ]);

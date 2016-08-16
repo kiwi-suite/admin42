@@ -10,6 +10,7 @@
 namespace Admin42\Command\Tag;
 
 use Admin42\Model\Tag;
+use Admin42\TableGateway\TagTableGateway;
 use Core42\Command\AbstractCommand;
 
 class SaveCommand extends AbstractCommand
@@ -31,7 +32,7 @@ class SaveCommand extends AbstractCommand
      */
     protected function execute()
     {
-        $tagsTableGateway = $this->getTableGateway('Admin42\Tag');
+        $tagsTableGateway = $this->getTableGateway(TagTableGateway::class);
 
         $data = explode(',', $this->tags);
         foreach ($data as $tag) {

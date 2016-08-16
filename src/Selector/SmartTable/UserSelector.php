@@ -1,6 +1,7 @@
 <?php
 namespace Admin42\Selector\SmartTable;
 
+use Admin42\TableGateway\UserTableGateway;
 use Core42\Db\ResultSet\ResultSet;
 use Zend\Db\Sql\Predicate\PredicateSet;
 use Zend\Db\Sql\Select;
@@ -13,7 +14,7 @@ class UserSelector extends AbstractSmartTableSelector
      */
     protected function getSelect()
     {
-        $gateway = $this->getTableGateway('Admin42\User');
+        $gateway = $this->getTableGateway(UserTableGateway::class);
 
         $select = $gateway->getSql()->select();
 

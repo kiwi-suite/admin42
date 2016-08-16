@@ -10,6 +10,7 @@
 namespace Admin42\Command\User;
 
 use Admin42\Model\User;
+use Admin42\TableGateway\UserTableGateway;
 use Core42\Command\AbstractCommand;
 
 class DeleteCommand extends AbstractCommand
@@ -52,7 +53,7 @@ class DeleteCommand extends AbstractCommand
     protected function preExecute()
     {
         if (!empty($this->userId)) {
-            $this->user = $this->getTableGateway('Admin42\User')->selectByPrimary((int) $this->userId);
+            $this->user = $this->getTableGateway(UserTableGateway::class)->selectByPrimary((int) $this->userId);
         }
 
         if (!($this->user instanceof User)) {
@@ -76,6 +77,6 @@ class DeleteCommand extends AbstractCommand
                 $dateTime->format('Y-m-d H:i:s')
             ]))
             ->setUpdated($dateTime);
-        $this->getTableGateway('Admin42\User')->update($this->user);
+        $this->getTableGateway(UserTableGateway::class)->update($this->user);
     }
 }

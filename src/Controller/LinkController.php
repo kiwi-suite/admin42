@@ -12,6 +12,7 @@ namespace Admin42\Controller;
 use Admin42\Link\LinkProvider;
 use Admin42\Model\Link;
 use Admin42\Mvc\Controller\AbstractAdminController;
+use Admin42\TableGateway\LinkTableGateway;
 use Core42\View\Model\JsonModel;
 use Zend\Json\Json;
 
@@ -26,7 +27,7 @@ class LinkController extends AbstractAdminController
 
         $encodedValue = Json::encode($data['value']);
 
-        $result = $this->getTableGateway('Admin42\Link')->select([
+        $result = $this->getTableGateway(LinkTableGateway::class)->select([
             'type' => $data['type'],
             'hash' => md5($encodedValue),
         ]);
@@ -39,7 +40,7 @@ class LinkController extends AbstractAdminController
                 ->setHash(md5($encodedValue))
                 ->setValue($encodedValue);
 
-            $this->getTableGateway('Admin42\Link')->insert($link);
+            $this->getTableGateway(LinkTableGateway::class)->insert($link);
         }
 
         return new JsonModel([

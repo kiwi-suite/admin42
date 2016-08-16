@@ -10,6 +10,7 @@
 namespace Admin42\Command\User;
 
 use Admin42\Model\User;
+use Admin42\TableGateway\UserTableGateway;
 use Core42\Command\AbstractCommand;
 use Zend\Crypt\Password\Bcrypt;
 use Zend\Validator\EmailAddress;
@@ -98,7 +99,7 @@ class RecoverPasswordCommand extends AbstractCommand
             return;
         }
 
-        $this->user = $this->getTableGateway('Admin42\User')->select([
+        $this->user = $this->getTableGateway(UserTableGateway::class)->select([
             'email' => $this->email,
             'hash' => $this->hash,
         ])->current();
@@ -119,6 +120,6 @@ class RecoverPasswordCommand extends AbstractCommand
         $this->user->setPassword($cryptedPassword);
         $this->user->setHash(null);
         
-        $this->getTableGateway('Admin42\User')->update($this->user);
+        $this->getTableGateway(UserTableGateway::class)->update($this->user);
     }
 }
