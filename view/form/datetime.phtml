@@ -3,13 +3,18 @@
         <?= $this->element->getLabel() ?>
     </label>
     <?php
-    $value = $this->element->getValue();
+    $value = $this->element->getValue(false);
     if (empty($value)) {
         $value = "";
     } elseif (is_string($value)) {
         $value = new \DateTime($value);
         $value->setTimezone(new \DateTimeZone($this->admin()->getDisplayTimezone()));
         $value = $value->format("Y-m-d H:i");
+    } elseif ($value instanceof \DateTime) {
+        $value->setTimezone(new \DateTimeZone($this->admin()->getDisplayTimezone()));
+        $value = $value->format("Y-m-d H:i");
+    } else {
+        $value = "";
     }
     ?>
     <div class="col-sm-10">

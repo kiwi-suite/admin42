@@ -197,7 +197,8 @@ class Module implements
                 GoogleMap::class    => InvokableFactory::class,
             ],
             'aliases' => [
-                'datetime'   => DateTime::class ,
+                'datetime'   => DateTime::class,
+                'dateTime'   => DateTime::class,
                 'date'       => Date::class,
                 'tags'       => Tags::class,
                 'wysiwyg'    => Wysiwyg::class,

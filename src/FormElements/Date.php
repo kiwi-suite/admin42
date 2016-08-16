@@ -9,6 +9,10 @@
 
 namespace Admin42\FormElements;
 
+use Admin42\Filter\ToDateTime;
+use Zend\Filter\StringTrim;
+use Zend\Filter\ToNull;
+
 class Date extends \Zend\Form\Element\Date
 {
     /**
@@ -20,8 +24,9 @@ class Date extends \Zend\Form\Element\Date
             'name' => $this->getName(),
             'required' => false,
             'filters' => [
-                ['name' => 'Zend\Filter\StringTrim'],
-                ['name' => 'Zend\Filter\ToNull'],
+                ['name' => StringTrim::class],
+                ['name' => ToNull::class],
+                ['name' => ToDateTime::class],
             ],
             'validators' => $this->getValidators(),
         ];
