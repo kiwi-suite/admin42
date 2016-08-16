@@ -9,10 +9,21 @@
 
 namespace Admin42\Mvc\Controller;
 
+use Admin42\Authentication\AuthenticationService;
 use Core42\Mvc\Controller\AbstractActionController;
-use Zend\View\Model\ViewModel;
 
 abstract class AbstractAdminController extends AbstractActionController
 {
+    /**
+     * @return \Admin42\Model\User|null
+     */
+    protected function getIdentity()
+    {
+        /** @var AuthenticationService $authenticationService */
+        $authenticationService = $this->getServiceManager()->get(AuthenticationService::class);
 
+        if ($authenticationService->hasIdentity()) {
+            return $authenticationService->getIdentity();
+        }
+    }
 }
