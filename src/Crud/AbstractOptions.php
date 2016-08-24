@@ -1,6 +1,10 @@
 <?php
 namespace Admin42\Crud;
 
+use Admin42\Command\Crud\CreateCommand;
+use Admin42\Command\Crud\DeleteCommand;
+use Admin42\Command\Crud\EditCommand;
+
 abstract class AbstractOptions
 {
     /**
@@ -38,7 +42,7 @@ abstract class AbstractOptions
      */
     public function getEditCommandName()
     {
-        return 'Admin42\Crud\Edit';
+        return EditCommand::class;
     }
 
     /**
@@ -46,7 +50,7 @@ abstract class AbstractOptions
      */
     public function getCreateCommandName()
     {
-        return 'Admin42\Crud\Create';
+        return CreateCommand::class;
     }
 
     /**
@@ -54,6 +58,6 @@ abstract class AbstractOptions
      */
     public function getDeleteCommandName()
     {
-        return 'Admin42\Crud\Delete';
+        return DeleteCommand::class;
     }
 }
