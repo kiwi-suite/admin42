@@ -7,8 +7,8 @@ $this->admin()->addJsonTemplate($jsonDataId, $this->element->getEditorOptions())
 
 ?>
 <div ng-controller="WysiwygController"
-     ng-base-url="<?= $this->basePath('/assets/admin/core/js/tinymce') ?>"
-     ng-content-css="<?= $this->basePath('/assets/admin/core/css/admin42.min.css') ?>"
+     ng-base-url="<?= $this->basePath('/assets/admin/admin42/js/tinymce') ?>"
+     ng-content-css="<?= $this->basePath('/assets/admin/admin42/css/admin42.min.css') ?>"
      ng-file-browser="<?= $this->url('admin/file-dialog') ?>"
      ng-file-browser-titles='{"file":"Link","image":"Link","media":"Link"}'
      ng-link-save-url="<?= $this->url('admin/link') ?>"

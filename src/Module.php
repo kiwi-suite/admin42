@@ -85,6 +85,12 @@ class Module implements
         $adminSetup = new AdminSetup();
         $adminSetup->attach($e->getTarget()->getEventManager(), 999999);
 
+        $eventManager   = $e->getApplication()->getEventManager();
+        $guards = $e->getApplication()->getServiceManager()->get('Permission')->getGuards('admin42');
+        foreach ($guards as $_guard) {
+            $_guard->attach($eventManager);
+        }
+
         $e->getApplication()->getEventManager()->getSharedManager()->attach(
             'Zend\Mvc\Controller\AbstractController',
             MvcEvent::EVENT_DISPATCH,
@@ -96,7 +102,7 @@ class Module implements
                 /** @var Environment $environment */
                 $environment = $serviceManager->get(Environment::class);
 
-                if (!$environment->is("admin")) {
+                if (!$environment->is(self::ENVIRONMENT_ADMIN)) {
                     return;
                 }
 
@@ -128,7 +134,7 @@ class Module implements
     public function getAdminStylesheets()
     {
         return [
-            '/assets/admin/core/css/admin42.min.css'
+            '/assets/admin/admin42/css/admin42.min.css'
         ];
     }
 
@@ -138,8 +144,8 @@ class Module implements
     public function getAdminJavascript()
     {
         return [
-            '/assets/admin/core/js/vendor.min.js',
-            '/assets/admin/core/js/admin42.min.js',
+            '/assets/admin/admin42/js/vendor.min.js',
+            '/assets/admin/admin42/js/admin42.min.js',
         ];
     }
 

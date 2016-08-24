@@ -5,6 +5,7 @@ use Admin42\ModuleManager\Feature\AdminAwareModuleInterface;
 use Core42\Mvc\Environment\Environment;
 use Zend\EventManager\AbstractListenerAggregate;
 use Zend\EventManager\EventManagerInterface;
+use Zend\I18n\Translator\TranslatorInterface;
 use Zend\ModuleManager\ModuleManager;
 use Zend\Mvc\MvcEvent;
 use Zend\ServiceManager\Config;
@@ -45,13 +46,7 @@ class AdminSetup extends AbstractListenerAggregate
             return;
         }
 
-        $eventManager   = $application->getEventManager();
-        $guards = $serviceManager->get('Core42\Permission')->getGuards('admin42');
-        foreach ($guards as $_guard) {
-            $_guard->attach($eventManager);
-        }
-
-        $serviceManager->get('MvcTranslator')->setLocale('en-US');
+        $serviceManager->get(TranslatorInterface::class)->setLocale('en-US');
 
         $this->viewHelperManager = $serviceManager->get('ViewHelperManager');
 
