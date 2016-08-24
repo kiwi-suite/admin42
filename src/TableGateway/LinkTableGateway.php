@@ -23,7 +23,7 @@ class LinkTableGateway extends AbstractTableGateway
         'id' => 'Integer',
         'hash' => 'String',
         'type' => 'String',
-        'value' => 'String',
+        'value' => 'Json',
     ];
 
     /**

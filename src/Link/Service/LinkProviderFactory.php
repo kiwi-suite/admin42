@@ -29,7 +29,7 @@ class LinkProviderFactory implements FactoryInterface
 
         $linkProvider = new LinkProvider(
             $container->get('TableGateway')->get(LinkTableGateway::class),
-            $container->get('Cache\Link')
+            $container->get('Cache')->get('link')
         );
 
         foreach ($config['adapter'] as $name => $service) {

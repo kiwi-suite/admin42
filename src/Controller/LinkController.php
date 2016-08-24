@@ -38,7 +38,7 @@ class LinkController extends AbstractAdminController
             $link = new Link();
             $link->setType($data['type'])
                 ->setHash(md5($encodedValue))
-                ->setValue($encodedValue);
+                ->setValue($data['value']);
 
             $this->getTableGateway(LinkTableGateway::class)->insert($link);
         }

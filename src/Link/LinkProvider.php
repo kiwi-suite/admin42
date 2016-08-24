@@ -2,9 +2,9 @@
 namespace Admin42\Link;
 
 use Admin42\Link\Adapter\AdapterInterface;
+use Admin42\Model\Link;
 use Admin42\TableGateway\LinkTableGateway;
-use Zend\Cache\Storage\StorageInterface;
-use Zend\Json\Json;
+use Psr\Cache\CacheItemPoolInterface;
 
 class LinkProvider
 {
@@ -19,16 +19,16 @@ class LinkProvider
     protected $linkTableGateway;
 
     /**
-     * @var StorageInterface
+     * @var CacheItemPoolInterface
      */
     protected $cache;
 
     /**
      * LinkProvider constructor.
      * @param LinkTableGateway $linkTableGateway
-     * @param StorageInterface $cache
+     * @param CacheItemPoolInterface $cache
      */
-    public function __construct(LinkTableGateway $linkTableGateway, StorageInterface $cache)
+    public function __construct(LinkTableGateway $linkTableGateway, CacheItemPoolInterface $cache)
     {
         $this->linkTableGateway = $linkTableGateway;
 
@@ -82,6 +82,23 @@ class LinkProvider
 
     /**
      * @param int $id
+     * @return Link
+     */
+    public function getLink($id)
+    {
+        $cacheItem = $this->cache->getItem($id);
+        $link = $cacheItem->get();
+        if (!$cacheItem->isHit()) {
+            $link = $this->linkTableGateway->selectByPrimary((int) $id);
+            $cacheItem->set($link);
+            $this->cache->save($cacheItem);
+        }
+
+        return $link;
+    }
+
+    /**
+     * @param int $id
      * @return string
      * @throws \Exception
      */
@@ -91,15 +108,12 @@ class LinkProvider
             return "";
         }
 
-        if (!$this->cache->hasItem('link_'. $id)) {
-            $link = $this->linkTableGateway->selectByPrimary((int) $id);
-            $this->cache->setItem('link_'. $id, $link);
-        }
-        $link = $this->cache->getItem('link_'. $id);
+        $link = $this->getLink($id);
+
         if (empty($link)) {
             return "";
         }
 
-        return $this->assemble($link->getType(), Json::decode($link->getValue(), Json::TYPE_ARRAY));
+        return $this->assemble($link->getType(), $link->getValue());
     }
 }

@@ -18,34 +18,17 @@ use Zend\View\Helper\AbstractHelper;
 class Link extends AbstractHelper
 {
     /**
-     * @var LinkTableGateway
-     */
-    protected $linkTableGateway;
-
-    /**
      * @var LinkProvider
      */
     protected $linkProvider;
 
     /**
-     * @var StorageInterface
-     */
-    protected $cache;
-
-    /**
-     * @param LinkTableGateway $linkTableGateway
      * @param LinkProvider $linkProvider
      */
     public function __construct(
-        LinkTableGateway $linkTableGateway,
-        LinkProvider $linkProvider,
-        StorageInterface $cache
+        LinkProvider $linkProvider
     ) {
-        $this->linkTableGateway = $linkTableGateway;
-
         $this->linkProvider = $linkProvider;
-
-        $this->cache = $cache;
     }
 
     /**
@@ -77,7 +60,7 @@ class Link extends AbstractHelper
             return "";
         }
 
-        return $this->linkProvider->getDisplayName($link->getType(), Json::decode($link->getValue(), Json::TYPE_ARRAY));
+        return $this->linkProvider->getDisplayName($link->getType(), $link->getValue());
     }
 
     /**
@@ -87,18 +70,6 @@ class Link extends AbstractHelper
      */
     public function getLink($linkId)
     {
-        $linkId = (int) $linkId;
-        if (empty($linkId)) {
-            return;
-        }
-
-        if (!$this->cache->hasItem('link_'. $linkId)) {
-            $this->cache->setItem(
-                'link_'. $linkId,
-                $this->linkTableGateway->selectByPrimary($linkId)
-            );
-        }
-
-        return $this->cache->getItem('link_'. $linkId);
+        return $this->linkProvider->getLink($linkId);
     }
 }

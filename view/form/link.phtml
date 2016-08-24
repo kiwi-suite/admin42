@@ -14,7 +14,7 @@ if ($linkId > 0) {
         $jsonData = [
             'linkId' => $linkModel->getId(),
             'linkType' => $linkModel->getType(),
-            'linkValue' => \Zend\Json\Json::decode($linkModel->getValue(), \Zend\Json\Json::TYPE_ARRAY),
+            'linkValue' => $linkModel->getValue(),
             'linkDisplayName' => $this->link()->getDisplayName($linkId),
         ];
     }
