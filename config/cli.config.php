@@ -1,11 +1,14 @@
 <?php
+namespace Admin42;
+
+use Admin42\Command\User\CreateCommand;
 
 return [
     'cli' => [
         'admin-create-user' => [
             'route'                     => 'admin-create-user --email= --role='
                 .' [--username=] [--password=] [--status=] [--displayName=]',
-            'command-name'              => 'Admin42\User\Create',
+            'command-name'              => CreateCommand::class,
             'description'               => 'Creates an admin user',
             'short_description'         => 'Creates an admin user',
             'defaults' => [
