@@ -9,7 +9,6 @@
 
 namespace Admin42\Controller;
 
-use Admin42\Authentication\AuthenticationService;
 use Admin42\Command\User\CreateCommand;
 use Admin42\Command\User\DeleteCommand;
 use Admin42\Command\User\EditCommand;
@@ -26,7 +25,6 @@ use Admin42\Model\User;
 use Admin42\Mvc\Controller\AbstractAdminController;
 use Admin42\Selector\SmartTable\UserSelector;
 use Admin42\TableGateway\UserTableGateway;
-use Core42\Permission\Rbac\Role\RoleInterface;
 use Core42\View\Model\JsonModel;
 use Zend\Http\PhpEnvironment\Response;
 
@@ -42,30 +40,31 @@ class UserController extends AbstractAdminController
         }
     }
 
+    public function permissionDeniedAction()
+    {
+        if ($this->getRequest()->isXmlHttpRequest()) {
+            return new JsonModel(['error' => 'Permission denied']);
+        }
+    }
+
     /**
      * @return \Zend\Http\Response
      */
     public function homeAction()
     {
-        $identityRoles = $this
-            ->getServiceManager()
-            ->get('Core42\Permission')
-            ->getService('admin42')
-            ->getIdentityRoles();
+        if ($this->hasIdentity()) {
+            $identityRole = $this->getPermissionService()->getRole($this->getIdentity()->getRole());
 
-        if (empty($identityRoles)) {
-            return $this->redirect()->toRoute('admin/user/manage');
+            $roleOptions = $identityRole->getOptions();
+
+            if (empty($roleOptions['redirect_after_login'])) {
+                return $this->redirect()->toRoute('admin/user/manage');
+            }
+
+            return $this->redirect()->toRoute($roleOptions['redirect_after_login']);
         }
 
-        /** @var RoleInterface $role */
-        $role = current($identityRoles);
-        $roleOptions = $role->getOptions();
-
-        if (empty($roleOptions['redirect_after_login'])) {
-            return $this->redirect()->toRoute('admin/user/manage');
-        }
-
-        return $this->redirect()->toRoute($roleOptions['redirect_after_login']);
+        return $this->redirect()->toRoute('admin/user/manage');
     }
 
     /**
@@ -186,22 +185,10 @@ class UserController extends AbstractAdminController
      */
     public function loginAction()
     {
-        /** @var AuthenticationService $authenticationService */
-        $authenticationService = $this->getServiceManager()->get(AuthenticationService::class);
-        if ($authenticationService->hasIdentity()) {
-            $identityRoles = $this
-                ->getServiceManager()
-                ->get('Core42\Permission')
-                ->getService('admin42')
-                ->getIdentityRoles();
+        if ($this->hasIdentity()) {
+            $identityRole = $this->getPermissionService()->getRole($this->getIdentity()->getRole());
 
-            if (empty($identityRoles)) {
-                return $this->redirect()->toRoute('admin/user/manage');
-            }
-
-            /** @var RoleInterface $role */
-            $role = current($identityRoles);
-            $roleOptions = $role->getOptions();
+            $roleOptions = $identityRole->getOptions();
 
             if (empty($roleOptions['redirect_after_login'])) {
                 return $this->redirect()->toRoute('admin/user/manage');
@@ -225,19 +212,9 @@ class UserController extends AbstractAdminController
                 if ($this->params()->fromQuery('redirectTo', null) !== null) {
                     return $this->redirect()->toUrl($this->params()->fromQuery('redirectTo'));
                 } else {
-                    $identityRoles = $this
-                        ->getServiceManager()
-                        ->get('Core42\Permission')
-                        ->getService('admin42')
-                        ->getIdentityRoles();
+                    $identityRole = $this->getPermissionService()->getRole($this->getIdentity()->getRole());
 
-                    if (empty($identityRoles)) {
-                        return $this->redirect()->toRoute('admin/user/manage');
-                    }
-
-                    /** @var RoleInterface $role */
-                    $role = current($identityRoles);
-                    $roleOptions = $role->getOptions();
+                    $roleOptions = $identityRole->getOptions();
 
                     if (empty($roleOptions['redirect_after_login'])) {
                         return $this->redirect()->toRoute('admin/user/manage');
@@ -270,9 +247,7 @@ class UserController extends AbstractAdminController
      */
     public function lostPasswordAction()
     {
-        /** @var AuthenticationService $authenticationService */
-        $authenticationService = $this->getServiceManager()->get(AuthenticationService::class);
-        if ($authenticationService->hasIdentity()) {
+        if ($this->hasIdentity()) {
             return $this->redirect()->toRoute('admin/user/manage');
         }
 
@@ -306,9 +281,7 @@ class UserController extends AbstractAdminController
      */
     public function recoverPasswordAction()
     {
-        /** @var AuthenticationService $authenticationService */
-        $authenticationService = $this->getServiceManager()->get(AuthenticationService::class);
-        if ($authenticationService->hasIdentity()) {
+        if ($this->hasIdentity()) {
             return $this->redirect()->toRoute('admin/user/manage');
         }
 
@@ -354,14 +327,11 @@ class UserController extends AbstractAdminController
             return $prg;
         }
 
-        /** @var AuthenticationService $authenticationService */
-        $authenticationService = $this->getServiceManager()->get(AuthenticationService::class);
-
         $manageForm = $this->getForm(ManageForm::class);
 
         if ($prg !== false) {
             $manageCommand = $this->getCommand(ManageCommand::class);
-            $manageCommand->setUser($authenticationService->getIdentity());
+            $manageCommand->setUser($this->getIdentity());
 
             $formCmd = $this->getFormCommand();
             $formCmd->setForm($manageForm)
@@ -378,10 +348,10 @@ class UserController extends AbstractAdminController
             }
         } else {
             $manageForm->setData([
-                'username' => $authenticationService->getIdentity()->getUsername(),
-                'email' => $authenticationService->getIdentity()->getEmail(),
-                'shortName' => $authenticationService->getIdentity()->getShortName(),
-                'displayName' => $authenticationService->getIdentity()->getDisplayName()
+                'username' => $this->getIdentity()->getUsername(),
+                'email' => $this->getIdentity()->getEmail(),
+                'shortName' => $this->getIdentity()->getShortName(),
+                'displayName' => $this->getIdentity()->getDisplayName()
             ]);
         }
 

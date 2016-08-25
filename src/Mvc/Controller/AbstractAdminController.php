@@ -11,6 +11,8 @@ namespace Admin42\Mvc\Controller;
 
 use Admin42\Authentication\AuthenticationService;
 use Core42\Mvc\Controller\AbstractActionController;
+use Core42\Permission\PermissionInterface;
+use Core42\Permission\Service\PermissionPluginManager;
 
 abstract class AbstractAdminController extends AbstractActionController
 {
@@ -25,5 +27,24 @@ abstract class AbstractAdminController extends AbstractActionController
         if ($authenticationService->hasIdentity()) {
             return $authenticationService->getIdentity();
         }
+    }
+
+    /**
+     * @return bool
+     */
+    protected function hasIdentity()
+    {
+        /** @var AuthenticationService $authenticationService */
+        $authenticationService = $this->getServiceManager()->get(AuthenticationService::class);
+
+        return $authenticationService->hasIdentity();
+    }
+
+    /**
+     * @return PermissionInterface
+     */
+    protected function getPermissionService()
+    {
+        return $this->getServiceManager()->get(PermissionPluginManager::class)->get('admin42');
     }
 }

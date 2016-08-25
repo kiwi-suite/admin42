@@ -13,7 +13,6 @@ use Admin42\Authentication\AuthenticationService;
 use Admin42\FormElements\Date;
 use Admin42\FormElements\DateTime;
 use Admin42\FormElements\GoogleMap;
-use Admin42\FormElements\Link;
 use Admin42\FormElements\Service\CountryFactory;
 use Admin42\FormElements\Service\DynamicFactory;
 use Admin42\FormElements\Service\LinkFactory;
@@ -84,12 +83,6 @@ class Module implements
 
         $adminSetup = new AdminSetup();
         $adminSetup->attach($e->getTarget()->getEventManager(), 999999);
-
-        $eventManager   = $e->getApplication()->getEventManager();
-        $guards = $e->getApplication()->getServiceManager()->get('Permission')->getGuards('admin42');
-        foreach ($guards as $_guard) {
-            $_guard->attach($eventManager);
-        }
 
         $e->getApplication()->getEventManager()->getSharedManager()->attach(
             'Zend\Mvc\Controller\AbstractController',

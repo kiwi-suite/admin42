@@ -1,6 +1,7 @@
 <?php
 namespace Admin42;
 
+use Admin42\Middleware\AdminMiddleware;
 use Core42\Mvc\Router\Http\AngularSegment;
 use Zend\Router\Http\Literal;
 use Zend\Router\Http\Segment;
@@ -13,6 +14,7 @@ return [
                 'options' => [
                     'route' => '/admin[/]',
                     'defaults' => [
+                        'middleware' => AdminMiddleware::class,
                         'controller' => __NAMESPACE__ . '\User',
                         'action' => 'dashboard',
                     ],
@@ -26,6 +28,16 @@ return [
                             'defaults' => [
                                 'controller' => __NAMESPACE__ . '\User',
                                 'action' => 'home',
+                            ],
+                        ],
+                    ],
+                    'permission-denied' => [
+                        'type' => Literal::class,
+                        'options' => [
+                            'route' => 'permission-denied/',
+                            'defaults' => [
+                                'controller' => __NAMESPACE__ . '\User',
+                                'action' => 'permission-denied',
                             ],
                         ],
                     ],

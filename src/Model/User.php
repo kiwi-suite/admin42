@@ -2,6 +2,7 @@
 namespace Admin42\Model;
 
 use Core42\Model\AbstractModel;
+use Core42\Permission\IdentityRoleProviderInterface;
 
 /**
  * @method User setId() setId(int $id)
@@ -13,7 +14,6 @@ use Core42\Model\AbstractModel;
  * @method User setEmail() setEmail(string $email)
  * @method string getEmail() getEmail()
  * @method User setRole() setRole(string $role)
- * @method string getRole() getRole()
  * @method User setDisplayName() setDisplayName(string $displayName)
  * @method string getDisplayName() getDisplayName()
  * @method User setShortName() setShortName(string $shortName)
@@ -29,7 +29,7 @@ use Core42\Model\AbstractModel;
  * @method User setCreated() setCreated(\DateTime $created)
  * @method \DateTime getCreated() getCreated()
  */
-class User extends AbstractModel
+class User extends AbstractModel implements IdentityRoleProviderInterface
 {
     const STATUS_ACTIVE = "active";
     const STATUS_INACTIVE = "inactive";
@@ -50,4 +50,12 @@ class User extends AbstractModel
         'updated',
         'created',
     ];
+
+    /**
+     * @return string
+     */
+    public function getRole()
+    {
+        return $this->get("role");
+    }
 }

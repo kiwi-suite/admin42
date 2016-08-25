@@ -35,7 +35,7 @@ return [
         ],
         'listeners' => [
             'admin42' => [
-                'Admin42\Navigation\Listener\RbacListener'
+                //'Admin42\Navigation\Listener\RbacListener'
             ],
         ],
     ],

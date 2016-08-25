@@ -1,71 +1,56 @@
 <?php
 namespace Admin42;
 
-use Admin42\Permission\Rbac\Identity\IdentityRoleProvider;
+use Admin42\Permission\Service\PermissionFactory;
 
 return [
     'permissions' => [
 
-        'service' => [
+        'permission_service' => [
             'admin42' => [
-                'identity_role_provider' => IdentityRoleProvider::class,
-
-                'guest_role' => 'guest',
-
-                'role_provider' => [
-                    'name' => 'InMemoryRoleProvider',
+                'user' => [
+                    'permissions' => [
+                        'route/admin/user/manage',
+                        'route/admin/permission-denied',
+                        'route/admin/home',
+                        'route/admin/logout'
+                    ],
                     'options' => [
-                        'user' => [
-                            'permissions' => [
-                                'route/admin/user/manage',
-                                'route/admin/home',
-                                'route/admin/logout'
-                            ],
-                            'options' => [
-                                'redirect_after_login' => 'admin/user/manage',
-                            ]
-                        ],
-                        'admin' => [
-                            'children' => [
-                                'user'
-                            ],
-                            'permissions' => [
-                                'route/admin*',
-                                'navigation/section*',
-                                'dynamic/manage*',
-
-                            ],
-                            'options' => [
-                                'redirect_after_login' => 'admin/user/manage',
-                            ]
-                        ],
-                        'guest' => [
-                            'permissions' => [
-                                'route/admin/login',
-                                'route/admin/lost-password',
-                                'route/admin/recover-password',
-                                'route/home',
-                                'route/admin/api/job',
-                            ],
-                            'options' => []
-                        ],
-                    ],
+                        'redirect_after_login' => 'admin/user/manage',
+                        'assignable'           => false,
+                    ]
                 ],
+                'admin' => [
+                    'parent' => 'user',
+                    'permissions' => [
+                        'route/admin*',
+                        'navigation/section*',
+                        'dynamic/manage*',
 
-                'guards' => [
-                    'RouteGuard' => [
-                        'protected_route' => 'admin'
                     ],
+                    'options' => [
+                        'redirect_after_login' => 'admin/user/manage',
+                    ]
                 ],
-
-                'redirect_strategy' => [
-                    'redirect_when_connected' => false,
-                    'redirect_to_route_connected' => 'home',
-                    'redirect_to_route_disconnected' => 'admin/login',
-                    'append_previous_uri' => true,
-                    'previous_uri_query_key' => 'redirectTo'
+                'guest' => [
+                    'permissions' => [
+                        'route/admin/login',
+                        'route/admin/lost-password',
+                        'route/admin/recover-password',
+                        'route/home',
+                        'route/admin/api/job',
+                        'route/admin/permission-denied',
+                    ],
+                    'options' => [
+                        'assignable'           => false,
+                    ]
                 ],
             ],
+        ],
+        'service_manager' => [
+            'factories' => [
+                'admin42' => PermissionFactory::class,
+            ]
         ],
     ],
 ];

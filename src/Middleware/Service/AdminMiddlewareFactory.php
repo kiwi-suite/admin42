@@ -1,24 +1,16 @@
 <?php
-/**
- * admin42 (www.raum42.at)
- *
- * @link http://www.raum42.at
- * @copyright Copyright (c) 2010-2014 raum42 OG (http://www.raum42.at)
- *
- */
+namespace Admin42\Middleware\Service;
 
-namespace Admin42\Permission\Rbac\Service;
-
-use Admin42\Authentication\AuthenticationService;
-use Admin42\Permission\Rbac\Identity\IdentityRoleProvider;
+use Admin42\Middleware\AdminMiddleware;
 use Interop\Container\ContainerInterface;
 use Interop\Container\Exception\ContainerException;
 use Zend\ServiceManager\Exception\ServiceNotCreatedException;
 use Zend\ServiceManager\Exception\ServiceNotFoundException;
 use Zend\ServiceManager\Factory\FactoryInterface;
 
-class IdentityRoleProviderFactory implements FactoryInterface
+class AdminMiddlewareFactory implements FactoryInterface
 {
+
     /**
      * Create an object
      *
@@ -33,6 +25,6 @@ class IdentityRoleProviderFactory implements FactoryInterface
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
-        return new IdentityRoleProvider($container->get(AuthenticationService::class));
+        return new AdminMiddleware($container);
     }
 }

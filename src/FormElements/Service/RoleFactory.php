@@ -9,11 +9,10 @@
 
 namespace Admin42\FormElements\Service;
 
-use Admin42\FormElements\Role;
-use Core42\Permission\Rbac\AuthorizationService;
-use Core42\Permission\Rbac\Role\RoleInterface;
+use Core42\Permission\Service\PermissionPluginManager;
 use Interop\Container\ContainerInterface;
 use Interop\Container\Exception\ContainerException;
+use Zend\Form\Element\Select;
 use Zend\ServiceManager\Exception\ServiceNotCreatedException;
 use Zend\ServiceManager\Exception\ServiceNotFoundException;
 use Zend\ServiceManager\Factory\FactoryInterface;
@@ -34,19 +33,26 @@ class RoleFactory implements FactoryInterface
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
-        /** @var AuthorizationService $permService */
-        $permService = $container->get('Core42\Permission')->getService('admin42');
-        $permRoles = $permService->getAllRoles();
+        $guestRole = $container->get(PermissionPluginManager::class)->get('admin42')->getGuestRole();
+        $permRoles = $container->get(PermissionPluginManager::class)->get('admin42')->getRoles();
         $roles = [];
         foreach ($permRoles as $role) {
-            if (is_string($role) && $role != $permService->getGuestRole()) {
-                $roles[$role] = $role;
-            } elseif ($role instanceof RoleInterface && $role->getName() != $permService->getGuestRole()) {
-                $roles[$role->getName()] = $role->getName();
+            if ($role == $guestRole) {
+                continue;
             }
+            $role = $container->get(PermissionPluginManager::class)->get('admin42')->getRole($role);
+
+            $options = $role->getOptions();
+            if (array_key_exists('assignable', $options) && $options['assignable'] == false) {
+                continue;
+            }
+
+            $name = (!empty($options['label'])) ? $options['label'] : ucfirst($role->getName());
+
+            $roles[$role->getName()] = $name;
         }
 
-        $element = new Role();
+        $element = new Select();
         $element->setValueOptions($roles);
 
         return $element;
