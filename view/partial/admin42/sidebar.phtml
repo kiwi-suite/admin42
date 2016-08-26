@@ -24,7 +24,7 @@
 
             <nav ui-nav class="navi clearfix">
 
-                <?= $this->menu('partial/admin42/main-menu', 'admin42')->setMaxDepth(1) ?>
+                <?= $this->menu('partial/admin42/main-menu', 'admin42')->enableFilter('adminPermission')->setMaxDepth(1) ?>
 
                 <ul class="nav m-b-lg">
                     <li class="line bg-dark"></li>

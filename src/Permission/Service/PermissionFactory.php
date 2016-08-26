@@ -11,6 +11,7 @@ use Interop\Container\Exception\ContainerException;
 use Zend\ServiceManager\Exception\ServiceNotCreatedException;
 use Zend\ServiceManager\Exception\ServiceNotFoundException;
 use Zend\ServiceManager\Factory\FactoryInterface;
+use Zend\Stdlib\ArrayUtils;
 
 class PermissionFactory implements FactoryInterface
 {
@@ -58,8 +59,11 @@ class PermissionFactory implements FactoryInterface
         }
 
         foreach ($config as $roleName => $roleOptions) {
-            if (!empty($roleOptions['parent']) && isset($roles[$roleOptions['parent']])) {
-                $roles[$roleName]->addChild($roles[$roleOptions['parent']]);
+            if (!empty($roleOptions['inherit_from']) && isset($roles[$roleOptions['inherit_from']])) {
+                $options = $roles[$roleName]->getOptions();
+                $options = ArrayUtils::merge($options, $roles[$roleOptions['inherit_from']]->getOptions());
+                $roles[$roleName]->setOptions($options);
+                $roles[$roleName]->addChild($roles[$roleOptions['inherit_from']]);
             }
             $permissionService->addRole($roles[$roleName]);
         }

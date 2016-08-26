@@ -1,24 +1,17 @@
 <?php
-/**
- * admin42 (www.raum42.at)
- *
- * @link http://www.raum42.at
- * @copyright Copyright (c) 2010-2014 raum42 OG (http://www.raum42.at)
- *
- */
+namespace Admin42\Navigation\Filter\Service;
 
-namespace Admin42\Navigation\Listener;
-
-use Core42\Navigation\Listener\RbacListener;
+use Admin42\Navigation\Filter\PermissionFilter;
+use Core42\Permission\Service\PermissionPluginManager;
 use Interop\Container\ContainerInterface;
 use Interop\Container\Exception\ContainerException;
 use Zend\ServiceManager\Exception\ServiceNotCreatedException;
 use Zend\ServiceManager\Exception\ServiceNotFoundException;
 use Zend\ServiceManager\Factory\FactoryInterface;
-use Zend\ServiceManager\ServiceLocatorInterface;
 
-class RbacListenerFactory implements FactoryInterface
+class PermissionFilterFactory implements FactoryInterface
 {
+
     /**
      * Create an object
      *
@@ -33,6 +26,9 @@ class RbacListenerFactory implements FactoryInterface
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
-        return new RbacListener($container->get('Core42\Permission')->getService('admin42'));
+        return new PermissionFilter(
+            $options['container'],
+            $container->get(PermissionPluginManager::class)->get('admin42')
+        );
     }
 }

@@ -17,20 +17,17 @@ return [
                     ],
                     'options' => [
                         'redirect_after_login' => 'admin/user/manage',
+                        'redirect_after_login_params' => [],
                         'assignable'           => false,
                     ]
                 ],
                 'admin' => [
-                    'parent' => 'user',
+                    'inherit_from' => 'user',
                     'permissions' => [
                         'route/admin*',
-                        'navigation/section*',
                         'dynamic/manage*',
 
                     ],
-                    'options' => [
-                        'redirect_after_login' => 'admin/user/manage',
-                    ]
                 ],
                 'guest' => [
                     'permissions' => [
