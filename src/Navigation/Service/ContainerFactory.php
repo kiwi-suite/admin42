@@ -5,6 +5,7 @@ use Admin42\Navigation\Page\Page;
 use Core42\Navigation\Container;
 use Interop\Container\ContainerInterface;
 use Interop\Container\Exception\ContainerException;
+use Zend\Router\RouteMatch;
 use Zend\Router\RouteStackInterface;
 use Zend\ServiceManager\Exception\ServiceNotCreatedException;
 use Zend\ServiceManager\Exception\ServiceNotFoundException;
@@ -18,9 +19,9 @@ class ContainerFactory implements FactoryInterface
     protected $router;
 
     /**
-     * @var string
+     * @var RouteMatch
      */
-    protected $currentRoute;
+    protected $routeMatch;
 
     /**
      * Create an object
@@ -37,7 +38,7 @@ class ContainerFactory implements FactoryInterface
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
         $this->router = $container->get("Router");
-        $this->currentRoute = $container->get('Application')->getMvcEvent()->getRouteMatch()->getMatchedRouteName();
+        $this->routeMatch = $container->get('Application')->getMvcEvent()->getRouteMatch();
 
         $navigation = new Container();
 
@@ -55,7 +56,7 @@ class ContainerFactory implements FactoryInterface
      */
     protected function createPage($pageSpec)
     {
-        $page = new Page($this->router, $this->currentRoute);
+        $page = new Page($this->router, $this->routeMatch);
         $page->setIcon((!empty($pageSpec['icon'])) ? $pageSpec['icon'] : null);
         $page->setRoute((!empty($pageSpec['route'])) ? $pageSpec['route'] : null);
         $page->setLabel((!empty($pageSpec['label'])) ? $pageSpec['label'] : null);

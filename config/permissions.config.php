@@ -26,8 +26,10 @@ return [
                     'permissions' => [
                         'route/admin*',
                         'dynamic/manage*',
-
                     ],
+                    'options' => [
+                        'assignable'           => true,
+                    ]
                 ],
                 'guest' => [
                     'permissions' => [

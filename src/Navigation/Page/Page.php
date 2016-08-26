@@ -3,6 +3,7 @@ namespace Admin42\Navigation\Page;
 
 use Core42\Navigation\Page\AbstractPage;
 use Core42\Navigation\Page\PageInterface;
+use Zend\Router\RouteMatch;
 use Zend\Router\RouteStackInterface;
 
 class Page extends AbstractPage implements PageInterface
@@ -24,9 +25,9 @@ class Page extends AbstractPage implements PageInterface
     protected $router;
 
     /**
-     * @var string
+     * @var RouteMatch
      */
-    protected $currentRoute;
+    protected $routeMatch;
 
     /**
      * @var array
@@ -35,12 +36,12 @@ class Page extends AbstractPage implements PageInterface
 
     /**
      * @param RouteStackInterface $router
-     * @param $currentRoute
+     * @param RouteMatch $routeMatch
      */
-    public function __construct(RouteStackInterface $router, $currentRoute)
+    public function __construct(RouteStackInterface $router, RouteMatch $routeMatch)
     {
         $this->router = $router;
-        $this->currentRoute = $currentRoute;
+        $this->routeMatch = $routeMatch;
     }
 
     /**
@@ -101,10 +102,24 @@ class Page extends AbstractPage implements PageInterface
      */
     public function isActive()
     {
-        if (strlen($this->getRoute()) > strlen($this->currentRoute)) {
+        if (strlen($this->getRoute()) > strlen($this->routeMatch->getMatchedRouteName())) {
             return false;
         }
 
-        return (substr($this->currentRoute, 0, strlen($this->getRoute())) == $this->getRoute());
+        if (substr($this->routeMatch->getMatchedRouteName(), 0, strlen($this->getRoute())) != $this->getRoute()) {
+            return false;
+        }
+
+        if (empty($this->params)) {
+            return true;
+        }
+
+        foreach ($this->params as $name => $value) {
+            if ($this->routeMatch->getParam($name) !== $value) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }
