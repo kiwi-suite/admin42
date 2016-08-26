@@ -65,7 +65,7 @@ class ContainerFactory implements FactoryInterface
         $page->setParams((!empty($pageSpec['params'])) ? $pageSpec['params'] : []);
         $permission = null;
         if (strlen($page->getRoute())) {
-            $permission = 'route/' . $page->getPermission();
+            $permission = 'route/' . $page->getRoute();
         }
         if (array_key_exists('permission', $pageSpec)) {
             $permission = $pageSpec['permission'];

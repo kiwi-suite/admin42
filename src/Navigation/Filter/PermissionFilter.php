@@ -34,10 +34,10 @@ class PermissionFilter extends AbstractFilter
      */
     protected function isAccepted()
     {
-        if (!strlen($this->current()->getRoute())) {
+        if (!strlen($this->current()->getPermission())) {
             return true;
         }
 
-        return $this->permission->isGranted('route/' . $this->current()->getRoute());
+        return $this->permission->isGranted($this->current()->getPermission());
     }
 }
