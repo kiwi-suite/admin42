@@ -1,5 +1,5 @@
 <?php
-$baseFormName = uniqid('dynamic_form/base') . '.html';
+$baseFormName = 'dynamic_form/base/' . $this->uuid()->uuid4() . '.html';
 
 if ($this->element->getOption("compact") === true) {
     $baseFormContent = $this->partial('partial/admin42/dynamic/base-form-compact');
@@ -16,7 +16,7 @@ $prototypesElements = [];
 
 <?php foreach ($this->elements as $element): ?>
     <?php
-    $preparedFormElementTemplateName = uniqid('dynamic_form/element/') . '.html';
+    $preparedFormElementTemplateName = 'dynamic_form/element/' . $this->uuid()->uuid4() . '.html';
     $preparedFormElements[] = [
         'deleted' => false,
         'collapsed' => false,
@@ -34,7 +34,7 @@ $prototypesElements = [];
 
 <?php foreach($this->templateProtoTypes as $element): ?>
     <?php
-    $prototypeFormElementTemplateName = uniqid('dynamic_form/prototype/') . '.html';
+    $prototypeFormElementTemplateName = 'dynamic_form/prototype/' . $this->uuid()->uuid4() . '.html';
     $prototypesElements[] = [
         'deleted' => false,
         'collapsed' => false,
@@ -55,10 +55,10 @@ usort($prototypesElements, function ($a, $b) {
    return strcasecmp($a['label'], $b['label']);
 });
 
-$prepareFormUniqueId = uniqid('dynamic_form/prepare') . '.json';
+$prepareFormUniqueId = 'dynamic_form/prepare/' . $this->uuid()->uuid4() . '.json';
 $this->admin()->addJsonTemplate($prepareFormUniqueId, $preparedFormElements);
 
-$prototypeFormUniqueId = uniqid('dynamic_form/prototype') . '.json';
+$prototypeFormUniqueId = 'dynamic_form/prototype/' . $this->uuid()->uuid4() . '.json';
 $this->admin()->addJsonTemplate($prototypeFormUniqueId, $prototypesElements);
 
 ?>

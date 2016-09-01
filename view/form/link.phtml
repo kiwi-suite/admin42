@@ -1,5 +1,4 @@
 <?php
-$jsonDataId = uniqid("linkData_");
 $jsonData = [
     'linkId' => null,
     'linkType' => null,
@@ -19,7 +18,7 @@ if ($linkId > 0) {
         ];
     }
 }
-
+$jsonDataId = 'link/'.md5(json_encode($jsonData)). '.json';
 $this->admin()->addJsonTemplate($jsonDataId, $jsonData);
 ?>
 <div class="form-group<?= ($this->hasErrors) ? ' has-error has-feedback' : ''?>">

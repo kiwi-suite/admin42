@@ -1,5 +1,5 @@
 <?php
-$jsonDataId = uniqid('form/tags/') . '.json';
+$jsonDataId = 'form/tags/' . $this->uuid()->uuid5($this->uuid()->uuid4(), 'form_tags') . '.json';
 $values = [];
 if (strlen($this->element->getValue())) {
     $tmp = explode(",", $this->element->getValue());
@@ -12,10 +12,9 @@ if (strlen($this->element->getValue())) {
 }
 $this->admin()->addJsonTemplate($jsonDataId, $values);
 
-$id = uniqid("tags_");
 ?>
 <div class="form-group<?= ($this->hasErrors) ? ' has-error has-feedback' : ''?>">
-    <label for="<?= $id ?>" class="col-sm-2 control-label">
+    <label class="col-sm-2 control-label">
         <?= $this->translate($this->element->getLabel(), 'admin') ?>
         <?php if($this->element->hasAttribute('required')): ?>
             <abbr title="required">*</abbr>

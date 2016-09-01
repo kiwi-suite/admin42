@@ -1,8 +1,5 @@
-<?php
-$id = uniqid("youtube_");
-?>
 <div class="form-group<?= ($this->hasErrors) ? ' has-error has-feedback' : ''?>">
-    <label for="<?= $id ?>" class="col-sm-2 control-label">
+    <label class="col-sm-2 control-label">
         <?= $this->translate($this->element->getLabel(), 'admin') ?>
         <?php if($this->element->hasAttribute('required')): ?>
             <abbr title="required">*</abbr>
@@ -10,7 +7,6 @@ $id = uniqid("youtube_");
     </label>
     <div class="col-sm-10">
         <youtube youtube-code="<?= $this->element->getValue() ?>">
-            {{ test }}
             <input type="hidden" name="<?= $this->element->getName() ?>" ng-model="youtubeCode" value="{{ youtubeCode }}">
             <div class="row">
                 <div ng-if="youtubeCode" class="col-sm-4">

@@ -1,6 +1,4 @@
 <?php
-$name = uniqid('wysiwyg_');
-
 $editorOptions = \Zend\Json\Json::encode($this->element->getEditorOptions());
 $jsonDataId = 'editor/' . md5($editorOptions) . '/options.json';
 $this->admin()->addJsonTemplate($jsonDataId, $this->element->getEditorOptions());
