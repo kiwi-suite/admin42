@@ -61,7 +61,7 @@ class PermissionFactory implements FactoryInterface
         foreach ($config as $roleName => $roleOptions) {
             if (!empty($roleOptions['inherit_from']) && isset($roles[$roleOptions['inherit_from']])) {
                 $options = $roles[$roleName]->getOptions();
-                $options = ArrayUtils::merge($options, $roles[$roleOptions['inherit_from']]->getOptions());
+                $options = ArrayUtils::merge($roles[$roleOptions['inherit_from']]->getOptions(), $options);
                 $roles[$roleName]->setOptions($options);
                 $roles[$roleName]->addChild($roles[$roleOptions['inherit_from']]);
             }
