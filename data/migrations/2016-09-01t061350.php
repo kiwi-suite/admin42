@@ -9,7 +9,7 @@ ADD COLUMN `payload` LONGTEXT NOT NULL AFTER `status`";
 
         $serviceManager->get('Db\Master')->query($sql, \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
 
-        $sal = "UPDATE `admin42_user` SET payload = '[]'";
+        $sql = "UPDATE `admin42_user` SET payload = '[]'";
         $serviceManager->get('Db\Master')->query($sql, \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
     }
 
