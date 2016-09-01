@@ -54,6 +54,11 @@ class EditCommand extends AbstractCommand
     private $shortName;
 
     /**
+     * @var array
+     */
+    private $payload = [];
+
+    /**
      * @param User $user
      * @return $this
      */
@@ -131,6 +136,17 @@ class EditCommand extends AbstractCommand
     }
 
     /**
+     * @param array $payload
+     * @return $this
+     */
+    public function setPayload(array $payload)
+    {
+        $this->payload = $payload;
+
+        return $this;
+    }
+
+    /**
      * @param array $values
      */
     public function hydrate(array $values)
@@ -140,6 +156,7 @@ class EditCommand extends AbstractCommand
         $this->setDisplayName(array_key_exists('displayName', $values) ? $values['displayName'] : null);
         $this->setRole(array_key_exists('role', $values) ? $values['role'] : null);
         $this->setShortName(array_key_exists('shortName', $values) ? $values['shortName'] : null);
+        $this->setPayload(array_key_exists('payload', $values) ? $values['payload'] : []);
     }
 
     /**
@@ -215,6 +232,7 @@ class EditCommand extends AbstractCommand
                 ->setDisplayName($this->displayName)
                 ->setRole($this->role)
                 ->setShortName($this->shortName)
+                ->setPayload($this->payload)
                 ->setUpdated($dateTime);
 
 

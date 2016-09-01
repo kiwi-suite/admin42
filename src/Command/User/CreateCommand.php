@@ -64,6 +64,11 @@ class CreateCommand extends AbstractCommand
     private $shortName;
 
     /**
+     * @var array
+     */
+    private $payload = [];
+
+    /**
      * @var bool
      */
     private $enablePasswordEmail = true;
@@ -146,6 +151,17 @@ class CreateCommand extends AbstractCommand
     }
 
     /**
+     * @param array $payload
+     * @return $this
+     */
+    public function setPayload(array $payload)
+    {
+        $this->payload = $payload;
+
+        return $this;
+    }
+
+    /**
      * @param array $values
      */
     public function hydrate(array $values)
@@ -156,6 +172,7 @@ class CreateCommand extends AbstractCommand
         $this->setStatus(array_key_exists('status', $values) ? $values['status'] : null);
         $this->setDisplayName(array_key_exists('displayName', $values) ? $values['displayName'] : null);
         $this->setRole(array_key_exists('role', $values) ? $values['role'] : null);
+        $this->setPayload(array_key_exists('payload', $values) ? $values['payload'] : []);
     }
 
     /**
@@ -227,6 +244,7 @@ class CreateCommand extends AbstractCommand
                 ->setRole($this->role)
                 ->setStatus($this->status)
                 ->setShortName($this->shortName)
+                ->setPayload($this->payload)
                 ->setUpdated($dateTime)
                 ->setCreated($dateTime);
 

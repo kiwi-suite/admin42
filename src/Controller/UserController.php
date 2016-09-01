@@ -18,6 +18,7 @@ use Admin42\Command\User\LostPasswordCommand;
 use Admin42\Command\User\ManageCommand;
 use Admin42\Command\User\RecoverPasswordCommand;
 use Admin42\Form\User\CreateEditForm;
+use Admin42\Form\User\LoginForm;
 use Admin42\Form\User\LostPasswordForm;
 use Admin42\Form\User\ManageForm;
 use Admin42\Form\User\RecoverPasswordForm;
@@ -27,6 +28,7 @@ use Admin42\Selector\SmartTable\UserSelector;
 use Admin42\TableGateway\UserTableGateway;
 use Core42\View\Model\JsonModel;
 use Zend\Http\PhpEnvironment\Response;
+use Zend\Stdlib\ArrayUtils;
 
 class UserController extends AbstractAdminController
 {
@@ -93,6 +95,24 @@ class UserController extends AbstractAdminController
             $formCommand = $this->getFormCommand();
             $user = $formCommand->setForm($createEditForm)
                             ->setProtectedData(['password', 'status'])
+                            ->setValueCallback(function($values) {
+                                $newValues = [
+                                    'payload' => [],
+                                ];
+                                foreach ($values as $name => $value) {
+                                    if ($name == 'csrf') {
+                                        continue;
+                                    }
+                                    if (in_array($name, ['username', 'email', 'displayName', 'role', 'shortName'])) {
+                                        $newValues[$name] = $value;
+                                        continue;
+                                    }
+
+                                    $newValues['payload'][$name] = $value;
+                                }
+
+                                return $newValues;
+                            })
                             ->setCommand($cmd)
                             ->setData($prg)
                             ->run();
@@ -118,13 +138,13 @@ class UserController extends AbstractAdminController
                 if (empty($user) || $user->getStatus() == User::STATUS_INACTIVE) {
                     return $this->redirect()->toRoute('admin/user');
                 }
-                $createEditForm->setData([
+                $createEditForm->setData(ArrayUtils::merge([
                     'username' => $user->getUsername(),
                     'email' => $user->getEmail(),
                     'displayName' => $user->getDisplayName(),
                     'role' => $user->getRole(),
                     'shortName' => $user->getShortName(),
-                ]);
+                ], $user->getPayload()));
             }
         }
 
@@ -199,7 +219,7 @@ class UserController extends AbstractAdminController
 
         $this->layout('admin/layout/layout-min');
 
-        $loginForm = $this->getForm('Admin42\User\Login');
+        $loginForm = $this->getForm(LoginForm::class);
 
         if ($this->getRequest()->isPost()) {
             $formCmd = $this->getFormCommand();
@@ -336,6 +356,33 @@ class UserController extends AbstractAdminController
             $formCmd = $this->getFormCommand();
             $formCmd->setForm($manageForm)
                         ->setData($prg)
+                        ->setValueCallback(function($values) {
+                            $newValues = [
+                                'payload' => [],
+                            ];
+                            foreach ($values as $name => $value) {
+                                if ($name == 'csrf') {
+                                    continue;
+                                }
+
+                                $check = [
+                                    'username',
+                                    'email',
+                                    'displayName',
+                                    'password',
+                                    'passwordRepeat',
+                                    'shortName'
+                                ];
+                                if (in_array($name, $check)) {
+                                    $newValues[$name] = $value;
+                                    continue;
+                                }
+
+                                $newValues['payload'][$name] = $value;
+                            }
+
+                            return $newValues;
+                        })
                         ->setCommand($manageCommand)
                         ->run();
 
@@ -347,12 +394,12 @@ class UserController extends AbstractAdminController
                 ]);
             }
         } else {
-            $manageForm->setData([
+            $manageForm->setData(ArrayUtils::merge([
                 'username' => $this->getIdentity()->getUsername(),
                 'email' => $this->getIdentity()->getEmail(),
                 'shortName' => $this->getIdentity()->getShortName(),
                 'displayName' => $this->getIdentity()->getDisplayName()
-            ]);
+            ], $this->getIdentity()->getPayload()));
         }
 
         return [

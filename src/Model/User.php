@@ -22,6 +22,8 @@ use Core42\Permission\IdentityRoleProviderInterface;
  * @method string getHash() getHash()
  * @method User setStatus() setStatus(string $status)
  * @method string getStatus() getStatus()
+ * @method User setPayload() setPayload(array $payload)
+ * @method array getPayload() getPayload()
  * @method User setLastLogin() setLastLogin(\DateTime $lastLogin)
  * @method \DateTime getLastLogin() getLastLogin()
  * @method User setUpdated() setUpdated(\DateTime $updated)
@@ -46,6 +48,7 @@ class User extends AbstractModel implements IdentityRoleProviderInterface
         'shortName',
         'hash',
         'status',
+        'payload',
         'lastLogin',
         'updated',
         'created',

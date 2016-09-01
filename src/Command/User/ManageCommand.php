@@ -54,6 +54,11 @@ class ManageCommand extends AbstractCommand
     private $shortName;
 
     /**
+     * @var array
+     */
+    private $payload = [];
+
+    /**
      * @param string $displayName
      * @return $this
      */
@@ -131,6 +136,17 @@ class ManageCommand extends AbstractCommand
     }
 
     /**
+     * @param array $payload
+     * @return $this
+     */
+    public function setPayload(array $payload)
+    {
+        $this->payload = $payload;
+
+        return $this;
+    }
+
+    /**
      * @param array $values
      */
     public function hydrate(array $values)
@@ -140,6 +156,7 @@ class ManageCommand extends AbstractCommand
         $this->setUsername((array_key_exists('username', $values)) ? $values['username'] : null);
         $this->setDisplayName((array_key_exists('displayName', $values)) ? $values['displayName'] : null);
         $this->setShortName(array_key_exists('shortName', $values) ? $values['shortName'] : null);
+        $this->setPayload(array_key_exists('payload', $values) ? $values['payload'] : []);
     }
 
     /**
@@ -212,6 +229,7 @@ class ManageCommand extends AbstractCommand
     {
         $this->user->setEmail($this->email)
                     ->setShortName($this->shortName)
+                    ->setPayload($this->payload)
                     ->setUsername(!empty($this->username) ? $this->username : null)
                     ->setDisplayName(!empty($this->displayName) ? $this->displayName : null);
 
