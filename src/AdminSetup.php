@@ -82,12 +82,12 @@ class AdminSetup extends AbstractListenerAggregate
     protected function setupStylesheets(AdminAwareModuleInterface $module)
     {
         $headLink = $this->viewHelperManager->get('headLink');
-        $basePath = $this->viewHelperManager->get('basePath');
+        $assetUrl = $this->viewHelperManager->get('assetUrl');
 
         $stylesheets = $module->getAdminStylesheets();
         if (!empty($stylesheets) && is_array($stylesheets)) {
             foreach ($stylesheets as $css) {
-                $headLink->appendStylesheet($basePath($css));
+                $headLink->appendStylesheet($assetUrl($css));
             }
         }
     }
@@ -98,12 +98,12 @@ class AdminSetup extends AbstractListenerAggregate
     protected function setupJavascript(AdminAwareModuleInterface $module)
     {
         $headScript = $this->viewHelperManager->get('headScript');
-        $basePath = $this->viewHelperManager->get('basePath');
+        $assetUrl = $this->viewHelperManager->get('assetUrl');
 
         $javaScripts = $module->getAdminJavascript();
         if (!empty($javaScripts) && is_array($javaScripts)) {
             foreach ($javaScripts as $js) {
-                $headScript->appendFile($basePath($js));
+                $headScript->appendFile($assetUrl($js));
             }
         }
     }

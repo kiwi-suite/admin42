@@ -7,7 +7,7 @@
             <i class="glyphicon glyphicon-align-justify"></i>
         </button>
         <a href="<?= $this->url('admin/home') ?>" class="navbar-brand">
-            <img src="<?= $this->basePath($this->admin()->getWhitelabelOption('logo-icon')); ?>" class="img-responsive">
+            <img src="<?= $this->assetUrl($this->admin()->getWhitelabelOption('logo-icon')); ?>" class="img-responsive">
             <?php if(!empty(trim($this->admin()->getWhitelabelOption('topbar-title'))) && !empty($this->admin()->getWhitelabelOption('show-topbar-title'))): ?>
                 <span class="hidden-folded m-l-xs"><?= $this->admin()->getWhitelabelOption('topbar-title') ?></span>
             <?php endif ?>
