@@ -19,17 +19,17 @@ use Zend\View\Renderer\PhpRenderer;
 
 class SendCommand extends \Core42\Command\Mail\SendCommand
 {
+
     /**
      *
      */
-    protected function configure()
+    protected function init()
     {
-        parent::configure();
-
         $this->getServiceManager()->get(TranslatorInterface::class)->setLocale('en-US');
 
         $this->layout = new MailModel();
         $this->layout->setHtmlTemplate("mail/admin42/layout.html.phtml");
         $this->layout->setPlainTemplate("mail/admin42/layout.plain.phtml");
+
     }
 }
