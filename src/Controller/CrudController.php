@@ -48,8 +48,8 @@ class CrudController extends AbstractAdminController
      */
     public function indexAction()
     {
-        $selector = $this->getSelector($this->getCrudOptions()->getSelectorName());
         if ($this->getRequest()->isXmlHttpRequest()) {
+            $selector = $this->getSelector($this->getCrudOptions()->getSelectorName());
             return $selector->getResult();
         }
 
