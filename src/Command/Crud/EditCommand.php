@@ -121,12 +121,6 @@ class EditCommand extends AbstractCommand
      */
     protected function execute()
     {
-        foreach ($this->data as $name => $value) {
-            if (is_array($value)) {
-                $this->data[$name] = Json::encode($value);
-            }
-        }
-
         $this->model->populate($this->data);
         if ($this->model->hasChanged()) {
 

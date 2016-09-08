@@ -88,12 +88,6 @@ class CreateCommand extends AbstractCommand
     {
         $model = $this->getTableGateway($this->tableGatewayName)->getModel();
 
-        foreach ($this->data as $name => $value) {
-            if (is_array($value)) {
-                $this->data[$name] = Json::encode($value);
-            }
-        }
-
         if (method_exists($model, "getProperties")) {
             $dateTime = new \DateTime();
             $properties = $model->getProperties();
