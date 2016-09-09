@@ -11,17 +11,14 @@ use Admin42\Link\LinkProvider;
 use Admin42\Link\Service\LinkProviderFactory;
 use Admin42\Middleware\AdminMiddleware;
 use Admin42\Middleware\Service\AdminMiddlewareFactory;
-use Admin42\Navigation\Listener\RbacListenerFactory;
-use Admin42\Permission\Rbac\Identity\IdentityRoleProvider;
-use Admin42\Permission\Rbac\Service\IdentityRoleProviderFactory;
+use Admin42\Session\Service\SessionConfigFactory;
+use Admin42\Session\Service\SessionManagerFactory;
 use Zend\ServiceManager\Factory\InvokableFactory;
 
 return [
     'service_manager' => [
         'factories' => [
             AuthenticationService::class        => AuthenticationServiceFactory::class,
-
-            'Admin42\Navigation\Listener\RbacListener' => RbacListenerFactory::class,
 
             LinkProvider::class             => LinkProviderFactory::class,
             ExternLink::class               => InvokableFactory::class,
@@ -31,6 +28,9 @@ return [
             'Admin42\Crud\EventManager'     => CrudEventManagerFactory::class,
 
             AdminMiddleware::class          => AdminMiddlewareFactory::class,
+
+            'Admin42\SessionConfig'         => SessionConfigFactory::class,
+            'Admin42\SessionManager'        => SessionManagerFactory::class,
         ],
     ],
 ];

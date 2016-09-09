@@ -37,7 +37,7 @@ class AuthenticationServiceFactory implements FactoryInterface
         $sessionStorage = new Session(
             'admin42_auth',
             'storage',
-            $container->get('Zend\Session\Service\SessionManager')
+            $container->get('Admin42\SessionManager')
         );
         $authenticationService = new AuthenticationService($sessionStorage);
         $authenticationService->setTableGateway($container->get('TableGateway')->get(UserTableGateway::class));
