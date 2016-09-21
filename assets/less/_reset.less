@@ -1,6 +1,6 @@
 // reset
 html {
-  background-color: @body-bg;  
+  background-color: @body-bg;
 }
 body {
   font-family: @font-family-base;
@@ -149,7 +149,7 @@ blockquote{
   border-color: @input-border;
   border-radius: @input-border-radius;
   &,
-  &:focus {    
+  &:focus {
     .box-shadow(none);
   }
   &:focus{
@@ -158,9 +158,9 @@ blockquote{
 }
 
 .form-horizontal{
-   .control-label.text-left{
-      text-align: left;
-   }
+  .control-label.text-left{
+    text-align: left;
+  }
 }
 
 .form-control-spin{
@@ -171,17 +171,13 @@ blockquote{
   margin-top: -7px;
 }
 
-.input-lg{
-  height: 45px;
-}
-
 .input-group-addon{
   border-color: @input-border;
   background-color: @brand-light;
 }
 
 .list-group{
-  border-radius: @border-radius-base;  
+  border-radius: @border-radius-base;
   &.no-radius {
     .list-group-item{
       border-radius: 0 !important;
@@ -207,15 +203,15 @@ blockquote{
 .list-group-item{
   border-color: @list-group-item-border;
   padding-right: 15px;
-    &.media{
-        margin-top:0;
-    }
-  a & {
+  a&{
     &:hover,
     &:focus,
     &.hover{
       background-color: @list-group-item-hover;
     }
+  }
+  &.media {
+    margin-top: 0;
   }
   &.active {
     color: #fff;
@@ -294,7 +290,7 @@ blockquote{
     > a{
       &:hover,
       &:focus{
-        background-color: @nav-bg;
+        background-color: rgba(0,0,0,0.05);
       }
     }
   }
@@ -333,7 +329,7 @@ blockquote{
       &,
       &:hover,
       &:focus{
-        background-color: @nav-bg;
+        background-color: rgba(0,0,0,0.05);
       }
     }
   }
@@ -343,13 +339,13 @@ blockquote{
   border-color: @border-color;
   > li{
     > a{
-      border-radius: @panel-border-radius @panel-border-radius 0 0;      
+      border-radius: @panel-border-radius @panel-border-radius 0 0;
       border-bottom-color: @border-color;
     }
     &:hover > a,
     &.active > a,
     &.active > a:hover{
-      border-color: @border-color;      
+      border-color: @border-color;
     }
     &.active > a{
       border-bottom-color: #fff !important;
@@ -371,9 +367,9 @@ blockquote{
       }
       &.active{
         > a {
-          border-bottom-color: @brand-info !important;          
+          border-bottom-color: @brand-info !important;
         }
-      }      
+      }
     }
   }
 }
@@ -384,7 +380,7 @@ blockquote{
     padding:15px;
     background-color: #fff;
     border: 1px solid @border-color;
-    border-top-width: 0; 
+    border-top-width: 0;
     border-radius: 0 0 @panel-border-radius @panel-border-radius;
   }
 }
@@ -460,6 +456,7 @@ blockquote{
   > tbody,
   > tfoot {
     > tr {
+      > th,
       > td {
         padding:8px 15px;
         border-top: 1px solid @table-border-color;
@@ -488,17 +485,16 @@ blockquote{
   > tbody {
     > tr{
       &:nth-child(odd){
-          // @lcs td,th nested rule breaks row color classes (.success,.info.danger...)
-//        > td,
-//        > th{
+        > td,
+        > th{
           background-color: @table-striped-color;
-//        }
+        }
       }
     }
   }
   > thead {
-    background-color: @table-striped-color;
     > th{
+      background-color: @table-striped-color;
       border-right: 1px solid @table-border-color;
       &:last-child{
         border-right: none
@@ -530,12 +526,12 @@ blockquote{
   > li > a:hover,
   > li > a:focus,
   > .active > a,
-  > .active > a:hover, 
+  > .active > a:hover,
   > .active > a:focus{
     background-image: none;
     filter:none;
     background-color: @brand-light !important;
-    color: @link-hover-color;
+    color: @text-color;
   }
 }
 
@@ -550,7 +546,7 @@ blockquote{
     > a{
       background-color: @brand-light !important;
       color: @text-color;
-    }    
+    }
     > .dropdown-menu {
       display: block;
     }

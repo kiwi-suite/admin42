@@ -1,17 +1,17 @@
 .i-switch{
-	cursor: pointer;
-	position: relative;
+  cursor: pointer;
+  position: relative;
   display: inline-block;
   width: @switch-width;
   height: @switch-height;
   border-radius: 30px;
   background-color: @brand-success;
   margin: 0;
-	input{
-		position: absolute;
-		.opacity(0);
-		&:checked{
-			+ i{
+  input{
+    position: absolute;
+    .opacity(0);
+    &:checked{
+      + i{
         &:before{
           top: 50%;
           bottom: 50%;
@@ -20,13 +20,13 @@
           border-width: 0;
           border-radius: 5px;
         }
-				&:after{
-					margin-left: @switch-width - @switch-height + 1;
-				}
-			}
-		}
-	}
-	i{
+        &:after{
+          margin-left: @switch-width - @switch-height + 1;
+        }
+      }
+    }
+  }
+  i{
     &:before{
       content: "";
       position: absolute;
@@ -39,18 +39,18 @@
       border-radius: 30px;
       .transition(all 0.2s);
     }
-		&:after{
-			content: "";
-			position: absolute;
-			background-color: #fff;
-			width: @switch-height - 2;
-			top: 1px;
-			bottom: 1px;
-			border-radius: 50%;
-			.box-shadow(1px 1px 3px rgba(0, 0, 0, 0.25));
+    &:after{
+      content: "";
+      position: absolute;
+      background-color: #fff;
+      width: @switch-height - 2;
+      top: 1px;
+      bottom: 1px;
+      border-radius: 50%;
+      .box-shadow(1px 1px 3px rgba(0, 0, 0, 0.25));
       .transition(margin-left 0.3s);
-		}
-	}
+    }
+  }
 }
 
 .i-switch-md{
@@ -201,20 +201,7 @@
 }
 
 // ui.bootstrap datepicker
-.datepicker{margin: 0 5px}
-.datepicker .btn-default{border-width: 0;box-shadow: none;}
-.datepicker .btn[disabled]{opacity: 0.4}
-.datepicker .btn-info .text-info{color: #fff !important;}
-
-// ui.tabs
-
-.nav-tabs {
-  >li {
-    &.has-errors {
-      a {
-        color: @brand-danger;
-        border-color: @brand-danger;
-      }
-    }
-  }
-}
+.uib-datepicker{margin: 0 5px}
+.uib-datepicker .btn-default{border-width: 0;box-shadow: none;}
+.uib-datepicker .btn[disabled]{opacity: 0.4}
+.uib-datepicker .btn-info .text-info{color: #fff !important;}

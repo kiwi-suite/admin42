@@ -1,21 +1,16 @@
 angular.module('admin42', [
     'ui.bootstrap',
-    'ui.bootstrap.datetimepicker',
     'ngAnimate',
     'ngSanitize',
     'ui.validate',
-    'ui.indeterminate',
-    'ui.mask',
-    'ui.event',
-    'ui.scroll',
-    'ui.scrollpoint',
     'smart-table',
     'toaster',
     'ngStorage',
-    'ui.sortable',
-    'ui.select'
+    'ui.select',
+    'ui.tree'
 ]);
 
-angular.module('admin42').config(['$httpProvider', function($httpProvider) {
+angular.module('admin42').config(['$httpProvider', '$compileProvider', function($httpProvider, $compileProvider) {
     $httpProvider.defaults.headers.common["X-Requested-With"] = 'XMLHttpRequest';
+    $compileProvider.debugInfoEnabled(false);
 }]);
