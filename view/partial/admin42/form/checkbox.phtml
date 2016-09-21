@@ -1,0 +1,13 @@
+<div class="form-group" ng-class="{'has-error': formData.errors.length, 'has-feedback': formData.errors.length}">
+    <div class="col-sm-10 col-sm-offset-2">
+        <div class="checkbox">
+            <input type="hidden" name="{{ formData.name }}" value="{{ formData.value }}">
+            <label class="i-checks">
+                <input type="checkbox" ng-model="model" ng-change="onChange()"><i></i>{{ formData.label }}
+            </label>
+        </div>
+        <ul ng-if="formData.errors.length" class="list-unstyled text-danger">
+            <li ng-repeat="message in formData.errors">{{ message }}</li>
+        </ul>
+    </div>
+</div>

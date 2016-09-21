@@ -9,9 +9,7 @@
 
 namespace Admin42\Form\User;
 
-use Zend\Form\Element\Csrf;
-use Zend\Form\Element\Text;
-use Zend\Form\Form;
+use Admin42\FormElements\Form;
 
 class LostPasswordForm extends Form
 {
@@ -20,10 +18,17 @@ class LostPasswordForm extends Form
      */
     public function init()
     {
-        $this->add(new Csrf("csrf"));
+        $this->add([
+            'name' => "csrf",
+            "type" => "csrf",
+        ]);
 
-        $email = new Text("email");
-        $email->setLabel("field.email");
-        $this->add($email);
+        $this->add([
+            'name' => "email",
+            "type" => "email",
+            "options" => [
+                "label" => "field.email"
+            ]
+        ]);
     }
 }

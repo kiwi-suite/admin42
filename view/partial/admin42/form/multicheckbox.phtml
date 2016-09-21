@@ -1,17 +1,17 @@
-<div class="form-group" ng-class="{'has-error': errorMessages.length, 'has-feedback': errorMessages.length}">
+<div class="form-group">
     <div class="col-sm-2 control-label">
         <abbr ng-if="required" title="">*</abbr>
     </div>
-    <div class="col-sm-10">
-        <input type="hidden" name="{{ name }}" value="{{ value }}">
+    <div class="col-sm-10" ng-class="{'has-error': formData.errors.length}">
+        <input ng-repeat="value in values" type="hidden" name="{{ formData.name }}" value="{{value}}">
         <div class="checkbox" ng-repeat="option in options">
             <label>
-                <input name="{{ formId }}" ng-model="checkboxModel[option.id]" type="checkbox">
+                <input ng-model="checkboxModel[option.id]" type="checkbox" ng-change="select()">
                 {{ option.label }}
             </label>
         </div>
-        <ul ng-if="errorMessages.length" class="list-unstyled text-danger">
-            <li ng-repeat="message in errorMessages">{{ message }}</li>
+        <ul ng-if="formData.errors.length" class="list-unstyled text-danger">
+            <li ng-repeat="message in formData.errors">{{ message }}</li>
         </ul>
     </div>
 </div>

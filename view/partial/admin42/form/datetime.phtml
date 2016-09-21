@@ -1,0 +1,37 @@
+<div class="form-group" ng-class="{'has-error': formData.errors.length, 'has-feedback': formData.errors.length}">
+    <label class="col-sm-2 control-label">
+        <abbr ng-if="formData.required" title="">*</abbr>
+        {{ formData.label }}
+    </label>
+    <div class="col-sm-10">
+        <input type="hidden" name="{{ formData.name }}" value="{{ getValue(date, time) }}">
+        <div class="row">
+            <div class="col-sm-6 col-md-3">
+                <input
+                    type="hidden"
+                    ng-model="date"
+                    uib-datepicker-popup="yyyy-MM-dd"
+                    is-open="popup.opened"
+                    datepicker-options="dateOptions"
+                >
+                <div class="input-group w-md">
+                    <input type="text" class="form-control" value="{{ date | datetime:'':'YYYY-MM-DD'}}" disabled>
+                    <span class="input-group-btn">
+                        <button type="button" class="btn" ng-class="{'btn-default': !formData.errors.length, 'btn-danger': formData.errors.length}" ng-click="open($event)">
+                            <i class="fa fa-calendar"></i>
+                        </button>
+                    </span>
+                </div>
+            </div>
+            <div class="col-sm-6 col-md-9">
+                <div uib-timepicker ng-model="time" show-spinners="false" show-meridian="false"></div>
+            </div>
+        </div>
+
+
+        <span ng-if="formData.errors.length" class="glyphicon glyphicon-warning-sign form-control-feedback"></span>
+        <ul ng-if="formData.errors.length" class="list-unstyled text-danger">
+            <li ng-repeat="message in formData.errors">{{ message }}</li>
+        </ul>
+    </div>
+</div>

@@ -9,16 +9,17 @@
 
 namespace Admin42\FormElements;
 
-use Admin42\Filter\ToDateTime;
+use Core42\Hydrator\Strategy\DateTimeStrategy;
 use Zend\Filter\StringTrim;
 use Zend\Filter\ToNull;
+use Zend\Hydrator\Strategy\StrategyInterface;
 
-class DateTime extends \Zend\Form\Element\DateTime
+class DateTime extends \Zend\Form\Element\DateTime implements StrategyAwareInterface
 {
     /**
      * @var string
      */
-    protected $format = 'Y-m-d H:i';
+    protected $format = 'Y-m-d H:i:s';
 
     /**
      * @return array
@@ -31,9 +32,16 @@ class DateTime extends \Zend\Form\Element\DateTime
             'filters' => [
                 ['name' => StringTrim::class],
                 ['name' => ToNull::class],
-                ['name' => ToDateTime::class],
             ],
             'validators' => $this->getValidators(),
         ];
+    }
+
+    /**
+     * @return string|StrategyInterface
+     */
+    public function getStrategy()
+    {
+        return DateTimeStrategy::class;
     }
 }

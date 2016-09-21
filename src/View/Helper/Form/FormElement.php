@@ -13,47 +13,30 @@ use Zend\Form\ElementInterface;
 class FormElement extends \Zend\Form\View\Helper\FormElement
 {
     /**
-     * @param ElementInterface $element
-     * @return string
+     * @param ElementInterface|null $element
+     * @return $this|string
      */
-    public function renderElement(ElementInterface $element)
+    public function __invoke(ElementInterface $element = null)
     {
-        $type = $this->getType($element);
-        if ($type === null) {
-            return $this->render($element);
+        if (!$element) {
+            return $this;
         }
 
-        $resolved = $this->getView()->resolver('form/'.$type);
-        if ($resolved === false) {
-            return $this->render($element);
-        }
-
-        $partialHelper = $this->view->plugin('partial');
-        return $partialHelper('form/'.$type, [
-            'element'       => $element,
-            'hasErrors'     => count($element->getMessages()) > 0
-        ]);
+        return $this->render($element);
     }
 
     /**
-     *
      * @param ElementInterface $element
-     * @return string|null
+     * @return string
      */
-    protected function getType(ElementInterface $element)
+    public function render(ElementInterface $element)
     {
-        foreach ($this->classMap as $class => $pluginName) {
-            if ($element instanceof $class) {
-                return substr($pluginName, 4);
-            }
+        $name = (new \ReflectionClass($element))->getShortName();
+
+        if ($this->getView()->getHelperPluginManager()->has('form'.$name)) {
+            return $this->renderHelper('form'.$name, $element);
         }
 
-        $type = $element->getAttribute('type');
-
-        if (isset($this->typeMap[$type])) {
-            return substr($this->typeMap[$type], 4);
-        }
-
-        return $type;
+        return parent::render($element);
     }
 }

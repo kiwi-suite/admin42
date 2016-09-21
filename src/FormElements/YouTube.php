@@ -9,14 +9,9 @@
 
 namespace Admin42\FormElements;
 
-use Zend\Form\Element\Hidden;
+use Zend\Form\Element;
 
-class YouTube extends Hidden
+class YouTube extends Element
 {
-    /**
-     * @var array
-     */
-    protected $attributes = [
-        'type' => 'youtube',
-    ];
+
 }

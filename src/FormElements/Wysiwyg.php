@@ -14,17 +14,10 @@ use Zend\Stdlib\ArrayUtils;
 
 class Wysiwyg extends Textarea
 {
-    /**
-     * @var array
-     */
-    protected $attributes = [
-        'type' => 'wysiwyg',
-    ];
-
     protected $editorOptions = [
         'trusted' => true,
         'format' => 'raw',
-        'height' => 400,
+        'height' => 300,
         'plugins'=> 'paste autolink lists charmap table code link',
         'menubar'=> false,
         'toolbar'=> 'undo redo paste | styleselect | bold italic | link unlink | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | table code | ',
@@ -52,11 +45,15 @@ class Wysiwyg extends Textarea
 
     /**
      * @param $editorOptions
+     * @param bool $merge
      * @return $this
      */
-    public function setEditorOptions($editorOptions)
+    public function setEditorOptions($editorOptions, $merge = true)
     {
-        $this->editorOptions = ArrayUtils::merge($editorOptions, $this->editorOptions);
+        if ($merge == true) {
+            $editorOptions = ArrayUtils::merge($editorOptions, $this->editorOptions);
+        }
+        $this->editorOptions = $editorOptions;
 
         return $this;
     }

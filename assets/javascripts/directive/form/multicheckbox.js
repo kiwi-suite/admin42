@@ -1,42 +1,34 @@
 angular.module('admin42')
-    .directive('formMulticheckbox', ['jsonCache', function() {
+    .directive('formMulticheckbox', [function() {
         return {
             restrict: 'E',
             templateUrl: 'element/form/multicheckbox.html',
             scope: {
-                formId: '@formId',
-                label: '@label',
-                name: '@name',
-                jsonCacheId: '@jsonCacheId',
-                isRequired: '@isRequired',
-                valueOptions: '@valueOptions',
-                errors: '@errors'
+                jsonCacheId: '@jsonCacheId'
             },
             controller: ['$scope', 'jsonCache', function($scope, jsonCache) {
-                var value = jsonCache.get($scope.jsonCacheId);
-                $scope.option = {};
-                $scope.options = jsonCache.get($scope.valueOptions);
-                $scope.required = ($scope.isRequired === "1");
+                $scope.formData = jsonCache.get($scope.jsonCacheId);
+                var initialValues = $scope.formData.value;
+                $scope.values = [];
+                $scope.options = $scope.formData.valueOptions;
+                $scope.checkboxModel = {};
 
-                if ($scope.errors.length > 0) {
-                    $scope.errorMessages = jsonCache.get($scope.errors);
-                } else {
-                    $scope.errorMessages = [];
-                }
+                angular.forEach($scope.options, function(option){
+                    $scope.checkboxModel[option.id] = (initialValues.indexOf(option.id) != -1);
+                });
 
-
-
-                $scope.select = function(id){
-                    angular.forEach($scope.options, function(option){
-                        if (option.id == id) {
-                            $scope.option.selected = option;
+                $scope.select = function(){
+                    var values = [];
+                    angular.forEach($scope.checkboxModel, function(value, index){
+                        if (value === false) {
+                            return;
                         }
+                        values.push(index)
                     });
+                    $scope.values = values;
                 };
 
-                if (value.length > 0) {
-                    $scope.select(value);
-                }
+                $scope.select();
             }]
         }
     }]);

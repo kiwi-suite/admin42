@@ -9,27 +9,36 @@
 
 namespace Admin42\Form\User;
 
-use Zend\Form\Element\Csrf;
-use Zend\Form\Element\Password;
-use Zend\Form\Form;
+use Admin42\FormElements\Form;
 use Zend\InputFilter\InputFilterProviderInterface;
 
-class RecoverPasswordForm extends Form implements InputFilterProviderInterface
+class RecoverPasswordForm extends Form  implements InputFilterProviderInterface
 {
     /**
      *
      */
     public function init()
     {
-        $this->add(new Csrf('csrf'));
+        $this->add([
+            'name' => "csrf",
+            "type" => "csrf",
+        ]);
 
-        $password = new Password("password");
-        $password->setLabel("field.password");
-        $this->add($password);
+        $this->add([
+            'name' => "password",
+            "type" => "password",
+            "options" => [
+                "label" => "field.password"
+            ]
+        ]);
 
-        $passwordRepeat = new Password("passwordRepeat");
-        $passwordRepeat->setLabel("field.password-repeat");
-        $this->add($passwordRepeat);
+        $this->add([
+            'name' => "passwordRepeat",
+            "type" => "password",
+            "options" => [
+                "label" => "field.password-repeat"
+            ]
+        ]);
     }
 
     /**

@@ -9,10 +9,10 @@
 
 namespace Admin42\FormElements\Service;
 
+use Admin42\FormElements\Select;
 use Core42\Permission\Service\PermissionPluginManager;
 use Interop\Container\ContainerInterface;
 use Interop\Container\Exception\ContainerException;
-use Zend\Form\Element\Select;
 use Zend\ServiceManager\Exception\ServiceNotCreatedException;
 use Zend\ServiceManager\Exception\ServiceNotFoundException;
 use Zend\ServiceManager\Factory\FactoryInterface;
@@ -51,8 +51,7 @@ class RoleFactory implements FactoryInterface
 
             $roles[$role->getName()] = $name;
         }
-
-        $element = new Select();
+        $element = $container->get('FormElementManager')->get(Select::class);
         $element->setValueOptions($roles);
 
         return $element;

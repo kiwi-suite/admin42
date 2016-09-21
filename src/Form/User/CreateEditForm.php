@@ -9,12 +9,8 @@
 
 namespace Admin42\Form\User;
 
-use Admin42\FormElements\Role;
-use Admin42\FormElements\Wysiwyg;
-use Zend\Form\Element\Csrf;
-use Zend\Form\Element\Email;
-use Zend\Form\Element\Text;
-use Zend\Form\Form;
+
+use Admin42\FormElements\Form;
 
 class CreateEditForm extends Form
 {
@@ -23,31 +19,59 @@ class CreateEditForm extends Form
      */
     public function init()
     {
-        $this->add(new Csrf('csrf'));
+        $this->add([
+            'name' => "csrf",
+            "type" => "csrf",
+        ]);
 
-        $username = new Text("username");
-        $username->setLabel("Username");
-        $this->add($username);
+        $this->add([
+            'name' => "username",
+            "type" => "text",
+            "options" => [
+                "label" => "Username"
+            ]
+        ]);
 
-        $email = new Email('email');
-        $email->setLabel('Email');
-        $email->setAttribute("required", "required");
-        $this->add($email);
+        $this->add([
+            'name' => "email",
+            "type" => "email",
+            "options" => [
+                "label" => "Username"
+            ],
+            "attribute" => [
+                "required" => true
+            ]
+        ]);
 
-        $displayName = new Text('displayName');
-        $displayName->setLabel('Display Name');
-        $this->add($displayName);
+        $this->add([
+            'name' => "displayName",
+            "type" => "text",
+            "options" => [
+                "label" => "Display Name"
+            ]
+        ]);
 
-        /** @var Role $role */
-        $role = $this->getFormFactory()->getFormElementManager()->get('role');
-        $role->setName("role");
-        $role->setLabel("Role");
-        $role->setAttribute("required", "required");
-        $this->add($role);
+        $this->add([
+            'name' => "role",
+            "type" => "role",
+            "options" => [
+                "label" => "Role"
+            ],
+            "attribute" => [
+                "required" => true
+            ]
+        ]);
 
-        $shortName = new Text('shortName');
-        $shortName->setLabel('field.short-name');
-        $shortName->setAttribute("maxlength", 2);
-        $this->add($shortName);
+
+        $this->add([
+            'name' => "shortName",
+            "type" => "text",
+            "options" => [
+                "label" => "field.short-name"
+            ],
+            "attribute" => [
+                "maxlength" => 2
+            ]
+        ]);
     }
 }

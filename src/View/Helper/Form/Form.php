@@ -8,11 +8,24 @@
  */
 namespace Admin42\View\Helper\Form;
 
-use Zend\Form\FieldsetInterface;
 use Zend\Form\FormInterface;
+use Zend\View\Helper\AbstractHelper;
 
-class Form extends \Zend\Form\View\Helper\Form
+class Form extends AbstractHelper
 {
+
+    /**
+     * @param FormInterface|null $form
+     * @return $this|string
+     */
+    public function __invoke(FormInterface $form = null)
+    {
+        if (!$form) {
+            return $this;
+        }
+
+        return $this->render($form);
+    }
 
     /**
      * Render a form from the provided $form,
@@ -29,24 +42,9 @@ class Form extends \Zend\Form\View\Helper\Form
         $formContent = '';
 
         foreach ($form as $element) {
-            if ($element instanceof FieldsetInterface) {
-                $formContent.= $this->getView()->formCollection($element);
-            } else {
-                $formContent.= $this->getView()->formRow($element);
-            }
+            $formContent.= $this->getView()->formRow($element);
         }
 
         return $formContent;
-    }
-
-    /**
-     * Render a form from the provided $form,
-     *
-     * @param  FormInterface $form
-     * @return string
-     */
-    public function renderWithFormTag(FormInterface $form)
-    {
-        return parent::render($form);
     }
 }

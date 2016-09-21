@@ -1,0 +1,117 @@
+<?php
+/**
+ * admin42 (www.raum42.at)
+ *
+ * @link http://www.raum42.at
+ * @copyright Copyright (c) 2010-2014 raum42 OG (http://www.raum42.at)
+ *
+ */
+
+namespace Admin42\View\Helper\Form;
+
+use Zend\Form\ElementInterface;
+use Zend\Form\FieldsetInterface;
+
+class FormStack extends FormFieldset
+{
+    public function getValue(ElementInterface $element)
+    {
+        return [];
+    }
+
+    /**
+     * @param ElementInterface $element
+     * @param bool $angularNameRendering
+     * @return array
+     */
+    public function getElementData(ElementInterface $element, $angularNameRendering = true)
+    {
+        $elementData = parent::getElementData($element, $angularNameRendering);
+
+        $translateHelper = $this->getView()->plugin('translate');
+
+        $protoTypes = [];
+        /** @var FieldsetInterface $fieldset */
+        foreach($element->getProtoTypes() as $fieldset) {
+            $name = (new \ReflectionClass($fieldset))->getShortName();
+
+            if (!$this->getView()->getHelperPluginManager()->has('form'.$name)) {
+                continue;
+            }
+
+            $formHelper = $this->getView()->plugin('form'.$name);
+            if (!($formHelper instanceof AngularHelperInterface)) {
+                continue;
+            }
+
+            $fieldset = clone $fieldset;
+            $fieldset->remove('__index__');
+            $fieldset->remove('__type__');
+            $fieldset->remove('__name__');
+            $fieldset->remove('__deleted__');
+
+            $formHelper->addElementTemplate($fieldset);
+
+            $label = $fieldset->getLabel();
+            if (!empty($label)) {
+                $label = $translateHelper($label, 'admin');
+            }
+            $protoTypes[] = [
+                'label' => $label,
+                'directive' => $formHelper->getAngularDirective($fieldset),
+                'elementData' => $this->getAngularHelper()->generateJsonTemplate(
+                    $formHelper->getElementData($fieldset),
+                    'element/form/value/'
+                ),
+            ];
+        }
+        usort($protoTypes, function ($a, $b) {
+            return strcasecmp($a['label'], $b['label']);
+        });
+
+        $elementData['protoTypes'] = $protoTypes;
+
+
+        $elements = [];
+        foreach ($element->getIterator() as $fieldset) {
+            $name = (new \ReflectionClass($fieldset))->getShortName();
+
+            if (!$this->getView()->getHelperPluginManager()->has('form'.$name)) {
+                continue;
+            }
+            $formHelper = $this->getView()->plugin('form'.$name);
+            if (!($formHelper instanceof AngularHelperInterface)) {
+                continue;
+            }
+
+            $fieldset->remove('__index__');
+            $fieldset->remove('__type__');
+
+            $value = $fieldset->get('__name__')->getValue();
+            if (empty($value)) {
+                $value = "";
+            }
+            $fieldset->setOption('fieldsetName', $value);
+            $fieldset->remove('__name__');
+
+            $value = $fieldset->get('__deleted__')->getValue();
+            $value = ($value == "true");
+            $fieldset->setOption('fieldsetDeleted', $value);
+            $fieldset->remove('__deleted__');
+
+
+            $formHelper->addElementTemplate($fieldset);
+            $elements[] = [
+                'directive' => $formHelper->getAngularDirective($fieldset),
+                'elementData' => $this->getAngularHelper()->generateJsonTemplate(
+                    $formHelper->getElementData($fieldset),
+                    'element/form/value/'
+                ),
+            ];
+        }
+
+        $elementData['elements'] = $elements;
+
+        return $elementData;
+    }
+}

@@ -6,14 +6,14 @@ use Ramsey\Uuid\Uuid;
 use Zend\Form\ElementInterface;
 use Zend\View\Helper\AbstractHelper;
 
-class FormInput extends AbstractHelper
+class FormHelper extends AbstractHelper implements AngularHelperInterface
 {
 
     /**
      *
      * @var string
      */
-    protected $defaultHelper = 'formInput';
+    protected $defaultHelper = 'formHelper';
 
     /**
      * @param ElementInterface|null $element
@@ -34,20 +34,14 @@ class FormInput extends AbstractHelper
      */
     public function render(ElementInterface $element)
     {
-        $type = $this->getType($element);
-        $this
-            ->getAngularHelper()
-            ->addHtmlPartial(
-                'element/form/'.strtolower($type).'.html',
-                'partial/admin42/form/'.$type
-            );
+        $this->addElementTemplate($element);
 
         $angularDirective = $this->getAngularDirective($element);
         return sprintf(
             '<%s json-cache-id="%s"></%s>',
             $angularDirective,
             $this->getAngularHelper()->generateJsonTemplate(
-                $this->getElementData($element),
+                $this->getElementData($element, false),
                 'element/form/value/'
             ),
             $angularDirective
@@ -79,10 +73,12 @@ class FormInput extends AbstractHelper
 
     /**
      * @param ElementInterface $element
+     * @param bool $angularNameRendering
      * @return array
      */
-    public function getElementData(ElementInterface $element)
+    public function getElementData(ElementInterface $element, $angularNameRendering = true)
     {
+
         $translateHelper = $this->getView()->plugin('translate');
 
         $label = $element->getLabel();
@@ -99,7 +95,19 @@ class FormInput extends AbstractHelper
             'options' => $element->getOptions(),
             'attributes' => $element->getAttributes(),
             'errors' => array_values($element->getMessages()),
+            'angularNameRendering' => $angularNameRendering,
         ];
+    }
+
+    public function addElementTemplate(ElementInterface $element)
+    {
+        $type = $this->getType($element);
+        $this
+            ->getAngularHelper()
+            ->addHtmlPartial(
+                'element/form/'.strtolower($type).'.html',
+                'partial/admin42/form/'.$type
+            );
     }
 
     /**

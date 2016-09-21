@@ -9,47 +9,71 @@
 
 namespace Admin42\Form\User;
 
-use Zend\Form\Element\Csrf;
-use Zend\Form\Element\Email;
-use Zend\Form\Element\Password;
-use Zend\Form\Element\Text;
-use Zend\Form\Form;
+use Admin42\FormElements\Form;
 use Zend\InputFilter\InputFilterProviderInterface;
 
-class ManageForm extends Form implements InputFilterProviderInterface
+class ManageForm extends Form  implements InputFilterProviderInterface
 {
     /**
      *
      */
     public function init()
     {
-        $this->add(new Csrf('csrf'));
+        $this->add([
+            'name' => "csrf",
+            "type" => "csrf",
+        ]);
 
-        $username = new Text("username");
-        $username->setLabel("field.username");
-        $this->add($username);
+        $this->add([
+            'name' => "username",
+            "type" => "text",
+            "options" => [
+                "label" => "field.username"
+            ],
+        ]);
 
-        $email = new Email('email');
-        $email->setLabel('field.email');
-        $email->setAttribute("required", "required");
-        $this->add($email);
+        $this->add([
+            'name' => "email",
+            "type" => "email",
+            "options" => [
+                "label" => "field.email"
+            ]
+        ]);
 
-        $password = new Password("password");
-        $password->setLabel("field.password");
-        $this->add($password);
+        $this->add([
+            'name' => "password",
+            "type" => "password",
+            "options" => [
+                "label" => "field.password"
+            ]
+        ]);
 
-        $passwordRepeat = new Password("passwordRepeat");
-        $passwordRepeat->setLabel("field.password-repeat");
-        $this->add($passwordRepeat);
+        $this->add([
+            'name' => "passwordRepeat",
+            "type" => "password",
+            "options" => [
+                "label" => "field.password-repeat"
+            ]
+        ]);
 
-        $displayName = new Text('displayName');
-        $displayName->setLabel('field.display-name');
-        $this->add($displayName);
+        $this->add([
+            'name' => "displayName",
+            "type" => "text",
+            "options" => [
+                "label" => "Display Name"
+            ]
+        ]);
 
-        $shortName = new Text('shortName');
-        $shortName->setLabel('field.short-name');
-        $shortName->setAttribute("maxlength", 2);
-        $this->add($shortName);
+        $this->add([
+            'name' => "shortName",
+            "type" => "text",
+            "options" => [
+                "label" => "field.short-name"
+            ],
+            "attribute" => [
+                "maxlength" => 2
+            ]
+        ]);
     }
 
     /**

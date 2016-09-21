@@ -9,21 +9,14 @@
 
 namespace Admin42\FormElements;
 
-use Zend\Form\Element\Hidden;
+use Zend\Form\Element;
 
-class Link extends Hidden
+class Link extends Element
 {
     /**
      * @var array
      */
     protected $linkTypes;
-
-    /**
-     * @var array
-     */
-    protected $attributes = [
-        'type' => 'link',
-    ];
 
     /**
      * @param array $linkTypes

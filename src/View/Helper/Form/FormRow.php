@@ -9,39 +9,36 @@
 namespace Admin42\View\Helper\Form;
 
 use Zend\Form\ElementInterface;
+use Zend\Form\View\Helper\FormElement;
+use Zend\View\Helper\AbstractHelper;
 
-class FormRow extends \Zend\Form\View\Helper\FormRow
+class FormRow extends AbstractHelper
 {
+
+    public function __invoke(ElementInterface $element = null)
+    {
+        if (!$element) {
+            return $this;
+        }
+
+        return $this->render($element);
+    }
+
     /**
      * @param ElementInterface $element
-     * @param null $labelPosition
      * @return string
      */
-    public function render(ElementInterface $element, $labelPosition = null)
+    public function render(ElementInterface $element)
     {
-        if ($element->getAttribute("type") === 'hidden') {
-            return parent::render($element);
-        }
+        return $this->getElementHelper()->render($element) . PHP_EOL;
+    }
 
-        $elementHelper       = $this->getElementHelper();
-
-        if ($this->partial) {
-            $label = $element->getLabel();
-
-            if (!empty($label) && '' !== $label) {
-                // Translate the label
-                if (null !== ($translator = $this->getTranslator())) {
-                    $label = $translator->translate($label, 'admin');
-                }
-            }
-
-            return $this->view->render($this->partial, [
-                'element' => $element,
-                'label' => $label,
-                'renderErrors' => $this->renderErrors,
-            ]);
-        }
-
-        return $elementHelper->renderElement($element) . PHP_EOL;
+    /**
+     *
+     * @return FormElement
+     */
+    protected function getElementHelper()
+    {
+        return $this->elementHelper = $this->getView()->plugin('formElement');
     }
 }

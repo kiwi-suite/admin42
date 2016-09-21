@@ -9,11 +9,7 @@
 
 namespace Admin42\Form\User;
 
-use Zend\Form\Element\Csrf;
-use Zend\Form\Element\Hidden;
-use Zend\Form\Element\Password;
-use Zend\Form\Element\Text;
-use Zend\Form\Form;
+use Admin42\FormElements\Form;
 
 class LoginForm extends Form
 {
@@ -22,17 +18,25 @@ class LoginForm extends Form
      */
     public function init()
     {
-        $this->add(new Csrf("csrf"));
+        $this->add([
+            'name' => "csrf",
+            "type" => "csrf",
+        ]);
 
-        $username = new Text("identity");
-        $username->setLabel("field.usernameoremail");
-        $this->add($username);
+        $this->add([
+            'name' => "identity",
+            "type" => "text",
+            "options" => [
+                "label" => "field.usernameoremail"
+            ]
+        ]);
 
-        $password = new Password("password");
-        $password->setLabel("field.password");
-        $this->add($password);
-
-        $redirectTo = new Hidden("redirectTo");
-        $this->add($redirectTo);
+        $this->add([
+            'name' => "password",
+            "type" => "password",
+            "options" => [
+                "label" => "field.password"
+            ]
+        ]);
     }
 }
