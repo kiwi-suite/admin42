@@ -1,24 +1,18 @@
 <?php
-/**
- * admin42 (www.raum42.at)
- *
- * @link http://www.raum42.at
- * @copyright Copyright (c) 2010-2014 raum42 OG (http://www.raum42.at)
- *
- */
-
 namespace Admin42\View\Helper\Service;
 
-use Admin42\TableGateway\UserTableGateway;
-use Admin42\View\Helper\Admin;
+use Core42\Model\GenericModel;
+use Core42\View\Helper\Proxy;
 use Interop\Container\ContainerInterface;
 use Interop\Container\Exception\ContainerException;
+use Zend\Filter\Word\DashToCamelCase;
 use Zend\ServiceManager\Exception\ServiceNotCreatedException;
 use Zend\ServiceManager\Exception\ServiceNotFoundException;
 use Zend\ServiceManager\Factory\FactoryInterface;
 
-class AdminFactory implements FactoryInterface
+class WhitelabelFactory implements FactoryInterface
 {
+
     /**
      * Create an object
      *
@@ -33,8 +27,20 @@ class AdminFactory implements FactoryInterface
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
-        $config = $container->get('Config');
+        $config = $container->get('config');
+        $config = (isset($config['whitelabel'])) ? $config['whitelabel'] : [];
 
-        return new Admin($config['admin']);
+        $filteredConfig = [];
+
+        /** @var DashToCamelCase $filter */
+        $filter = $container->get('FilterManager')->get(DashToCamelCase::class);
+        foreach ($config as $name => $value) {
+            $filteredConfig[lcfirst($filter->filter($name))] = $value;
+        }
+
+        $genericModel = new GenericModel($filteredConfig);
+        return new Proxy(
+            $genericModel
+        );
     }
 }

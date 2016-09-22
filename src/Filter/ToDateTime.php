@@ -7,7 +7,31 @@ use DateTime;
 
 class ToDateTime extends AbstractFilter
 {
+    /**
+     * @var string
+     */
+    protected $format;
 
+    /**
+     * @param null $options
+     */
+    public function __construct($options = null)
+    {
+        if (is_array($options) || $options instanceof \Traversable) {
+            $this->setOptions($options);
+        }
+    }
+
+    /**
+     * @param string $format
+     * @return $this
+     */
+    public function setFormat($format)
+    {
+        $this->format = $format;
+
+        return $this;
+    }
     /**
      * Returns the result of filtering $value
      *
@@ -21,13 +45,13 @@ class ToDateTime extends AbstractFilter
             return $value;
         }
 
+
         if (is_int($value)) {
             //timestamp
             $value = new DateTime('@' . $value);
         } elseif (!$value instanceof DateTime) {
-            $value = new DateTime($value);
+            $value = DateTime::createFromFormat($this->format, $value);
         }
-
         return $value;
     }
 }

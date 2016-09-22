@@ -1,8 +1,6 @@
-<?php
-$modalContent = <<<EOT
 <div ng-controller="LinkExternController">
 <label class="col-sm-2 control-label">
-        {$this->translate('label.extern-link', 'admin')}
+        <?= $this->translate('label.extern-link', 'admin') ?>
 </label>
 <div class="col-sm-2">
     <select ng-model="externType" class="form-control" ng-change="change()">
@@ -15,5 +13,3 @@ $modalContent = <<<EOT
     <input type=text class="form-control" ng-model="externUrl" ng-change="change()">
 </div>
 </div>
-EOT;
-$this->admin()->addHtmlTemplate('/link/extern.html', $modalContent);

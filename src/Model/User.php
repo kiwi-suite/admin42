@@ -26,6 +26,10 @@ use Core42\Permission\IdentityRoleProviderInterface;
  * @method array getPayload() getPayload()
  * @method User setLastLogin() setLastLogin(\DateTime $lastLogin)
  * @method \DateTime getLastLogin() getLastLogin()
+ * @method User setLocale() setLocale($locale)
+ * @method string getLocale() getLocale()
+ * @method User setTimezone() setTimezone($timezone)
+ * @method string getTimezone() getTimezone()
  * @method User setUpdated() setUpdated(\DateTime $updated)
  * @method \DateTime getUpdated() getUpdated()
  * @method User setCreated() setCreated(\DateTime $created)
@@ -50,6 +54,8 @@ class User extends AbstractModel implements IdentityRoleProviderInterface
         'status',
         'payload',
         'lastLogin',
+        'locale',
+        'timezone',
         'updated',
         'created',
     ];

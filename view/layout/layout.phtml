@@ -31,7 +31,7 @@
     <?= $this->headScript() ?>
 
     <script>
-        <?= $this->admin()->angularBootstrap() ?>
+        <?= $this->angular()->angularBootstrap() ?>
 
         <?= $this->admin()->flashMessenger() ?>
     </script>
@@ -61,9 +61,9 @@
     <toaster-container toaster-options="{'position-class': 'toast-top-right', 'close-button':true}"></toaster-container>
 </div>
 
-<?= $this->admin()->getHtmlTemplates() ?>
+<?= $this->angular()->getHtmlTemplates() ?>
 
-<?= $this->admin()->getJsonTemplates() ?>
+<?= $this->angular()->getJsonTemplates() ?>
 
 <?= $this->inlineScript() ?>
 

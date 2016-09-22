@@ -9,10 +9,9 @@
 
 namespace Admin42\View\Helper;
 
-use Admin42\Model\User;
-use Admin42\TableGateway\UserTableGateway;
+use Admin42\Authentication\AuthenticationService;
+use Core42\View\Helper\Auth;
 use Zend\I18n\View\Helper\Translate;
-use Zend\Json\Json;
 use Zend\Mvc\Plugin\FlashMessenger\FlashMessenger;
 use Zend\View\Helper\AbstractHelper;
 
@@ -24,121 +23,41 @@ class Admin extends AbstractHelper
     private $config = [];
 
     /**
-     * @var array
-     */
-    private $jsonTemplates = [];
-
-    /**
-     * @var array
-     */
-    private $htmlTemplates = [];
-
-    /**
-     * @var UserTableGateway
-     */
-    private $userTableGateway;
-
-    /**
-     * @var array
-     */
-    private $userCache = [];
-
-    /**
      * @param array $config
-     * @param UserTableGateway $userTableGateway
      */
-    public function __construct(
-        array $config,
-        UserTableGateway $userTableGateway
-    ) {
+    public function __construct(array $config)
+    {
         $this->config = $config;
-        $this->userTableGateway = $userTableGateway;
-    }
-
-    /**
-     * @param User $user
-     * @return string
-     */
-    public function getUserDisplayName(User $user)
-    {
-        $displayName = $user->getDisplayName();
-        if (empty($displayName)) {
-            $displayName = $user->getUsername();
-        }
-        if (empty($displayName)) {
-            $displayName = $user->getEmail();
-        }
-
-        return $displayName;
     }
 
     /**
      * @return string
      */
-    public function getDisplayTimezone()
+    public function getLocale()
     {
-        return $this->config['display-timezone'];
-    }
+        /** @var Auth $translator */
+        $auth = $this->getView()->plugin('auth');
 
-    /**
-     * @param int $userId
-     * @return string
-     * @throws \Exception
-     */
-    public function getUserShortNameNameById($userId)
-    {
-        if (array_key_exists($userId, $this->userCache)) {
-            return $this->userCache[$userId]->getShortName();
+        if ($auth(AuthenticationService::class)->hasIdentity()) {
+            $auth(AuthenticationService::class)->getIdentity()->getLocale();
         }
 
-        $user = $this->userTableGateway->selectByPrimary($userId);
-        if ($user !== null) {
-            $this->userCache[$userId] = $user;
-            return $this->userCache[$userId]->getShortName();
-        }
-
-        return '';
-    }
-
-    /**
-     * @param int $userId
-     * @return string
-     * @throws \Exception
-     */
-    public function getUserDisplayNameById($userId)
-    {
-        if (array_key_exists($userId, $this->userCache)) {
-            return $this->getUserDisplayName($this->userCache[$userId]);
-        }
-
-        $user = $this->userTableGateway->selectByPrimary($userId);
-        if ($user !== null) {
-            $this->userCache[$userId] = $user;
-            return $this->getUserDisplayName($this->userCache[$userId]);
-        }
-
-        return '';
+        return $this->config['locale'];
     }
 
     /**
      * @return string
      */
-    public function angularBootstrap()
+    public function getTimezone()
     {
-        $appConfig = [
-            'locale' => \Locale::getDefault(),
-            'defaultDateTimeFormat' => 'LLL',
-            'timezone' => date_default_timezone_get(),
-            'displayTimezone' => $this->getDisplayTimezone(),
-            'google_map_api' => $this->config['google_map']['api_key']
-        ];
+        /** @var Auth $translator */
+        $auth = $this->getView()->plugin('auth');
 
-        return "var APP;"
-            . "angular.element(document).ready(function(){"
-            . "APP = angular.module('APP', ".json_encode($this->config['angular']['modules']).");"
-            . "APP.constant('appConfig', ".json_encode($appConfig).");"
-            . "angular.bootstrap(document, ['APP']);"
-            . "});" . PHP_EOL;
+        if ($auth(AuthenticationService::class)->hasIdentity()) {
+            $auth(AuthenticationService::class)->getIdentity()->getTimezone();
+        }
+
+        return $this->config['timezone'];
     }
 
     /**
@@ -182,98 +101,5 @@ class Admin extends AbstractHelper
 
 
         return "var FLASH_MESSAGE = " . json_encode($messages) . ";" . PHP_EOL;
-    }
-
-    /**
-     * @param string $name
-     * @return string
-     */
-    public function generateAngularModelName($name)
-    {
-        $name = preg_replace('#\{\{(.*?)\}\}#', '${1}', $name);
-        $name = str_replace("]", "", str_replace("[", ".", $name));
-
-        $parts = explode(".", $name);
-        $newName = "formElement";
-        foreach ($parts as $_part) {
-            $_part = trim($_part);
-            if (is_numeric($_part)) {
-                $newName .= '[' . $_part . ']';
-                continue;
-            }
-
-            if (is_numeric(substr($_part, 0, 1))) {
-                $_part = "ph" . $_part;
-            }
-            $newName .= '.' . $_part;
-        }
-
-        return $newName;
-    }
-
-
-    /**
-     * @param string $id
-     * @param mixed $value
-     * @return $this
-     */
-    public function addJsonTemplate($id, $value)
-    {
-        $this->jsonTemplates[$id] = $value;
-
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getJsonTemplates()
-    {
-        $templates = [];
-
-        foreach ($this->jsonTemplates as $id => $value) {
-            $templates[] = sprintf('<script id="%s" type="application/json">%s</script>', $id, Json::encode($value));
-        }
-
-        return implode(PHP_EOL, $templates);
-    }
-
-    /**
-     * @param string $id
-     * @param string $html
-     * @return $this
-     */
-    public function addHtmlTemplate($id, $html)
-    {
-        $this->htmlTemplates[$id] = $html;
-
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getHtmlTemplates()
-    {
-        $templates = [];
-
-        foreach ($this->htmlTemplates as $id => $html) {
-            $templates[] = sprintf('<script id="%s" type="text/ng-template">%s</script>', $id, $html);
-        }
-
-        return implode(PHP_EOL, $templates);
-    }
-
-    /**
-     * @param string $option
-     * @return string
-     */
-    public function getWhitelabelOption($option)
-    {
-        if (empty($this->config['whitelabel'][$option])) {
-            return "";
-        }
-
-        return $this->config['whitelabel'][$option];
     }
 }

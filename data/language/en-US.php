@@ -21,6 +21,7 @@ return [
     'button.cancel_all'             => 'Cancel All',
     'button.remove_all'             => 'Remove All',
     'button.add'                    => 'Add',
+    'button.preview'                => 'Preview',
 
     'label.profile'                 => 'Profile',
     'label.logout'                  => 'Logout',

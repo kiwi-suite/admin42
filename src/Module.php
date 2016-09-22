@@ -10,38 +10,47 @@
 namespace Admin42;
 
 use Admin42\Authentication\AuthenticationService;
+use Admin42\FormElements\Checkbox;
 use Admin42\FormElements\Date;
 use Admin42\FormElements\DateTime;
-use Admin42\FormElements\GoogleMap;
+use Admin42\FormElements\Email;
+use Admin42\FormElements\Factory\ElementFactory;
+use Admin42\FormElements\Fieldset;
+use Admin42\FormElements\Hidden;
+use Admin42\FormElements\MultiCheckbox;
+use Admin42\FormElements\Password;
+use Admin42\FormElements\Radio;
+use Admin42\FormElements\Select;
 use Admin42\FormElements\Service\CountryFactory;
-use Admin42\FormElements\Service\DynamicFactory;
 use Admin42\FormElements\Service\LinkFactory;
 use Admin42\FormElements\Service\RoleFactory;
+use Admin42\FormElements\Stack;
 use Admin42\FormElements\Tags;
+use Admin42\FormElements\Text;
+use Admin42\FormElements\Textarea;
 use Admin42\FormElements\Wysiwyg;
 use Admin42\FormElements\YouTube;
+use Admin42\ModuleManager\ApplicationConfigCleanup;
 use Admin42\ModuleManager\Feature\AdminAwareModuleInterface;
-use Admin42\View\Helper\Admin;
-use Admin42\View\Helper\Form\Form;
-use Admin42\View\Helper\Form\FormCollection;
-use Admin42\View\Helper\Form\FormElement;
-use Admin42\View\Helper\Form\FormRow;
-use Admin42\View\Helper\Form\FormWysiwyg;
-use Admin42\View\Helper\Service\AdminFactory;
+use Admin42\ModuleManager\GetAdminConfigTrait;
 use Core42\Console\Console;
+use Core42\ModuleManager\Feature\CliConfigProviderInterface;
+use Core42\ModuleManager\GetConfigTrait;
 use Core42\Mvc\Environment\Environment;
 use Zend\EventManager\EventInterface;
 use Zend\ModuleManager\Feature\BootstrapListenerInterface;
 use Zend\ModuleManager\Feature\ConfigProviderInterface;
 use Zend\ModuleManager\Feature\DependencyIndicatorInterface;
-use Zend\Mvc\MvcEvent;
-use Zend\ServiceManager\Factory\InvokableFactory;
-
+use Zend\ModuleManager\Feature\InitProviderInterface;
+use Zend\ModuleManager\ModuleEvent;
+use Zend\ModuleManager\ModuleManagerInterface;
+use Zend\Stdlib\ArrayUtils;
 
 class Module implements
     ConfigProviderInterface,
-    BootstrapListenerInterface,
+    InitProviderInterface,
     DependencyIndicatorInterface,
+    CliConfigProviderInterface,
     AdminAwareModuleInterface
 {
     /**
@@ -49,64 +58,56 @@ class Module implements
      */
     const ENVIRONMENT_ADMIN = 'admin';
 
+    use GetConfigTrait;
+    use GetAdminConfigTrait;
+
     /**
-     * @return array
+     * Initialize workflow
+     *
+     * @param  ModuleManagerInterface $manager
+     * @return void
      */
-    public function getConfig()
+    public function init(ModuleManagerInterface $manager)
     {
-        return array_merge(
-            include __DIR__ . '/../config/module.config.php',
-            include __DIR__ . '/../config/cli.config.php',
-            include __DIR__ . '/../config/permissions.config.php',
-            include __DIR__ . '/../config/assets.config.php',
-            include __DIR__ . '/../config/navigation.config.php',
-            include __DIR__ . '/../config/project.config.php',
-            include __DIR__ . '/../config/translation.config.php',
-            include __DIR__ . '/../config/admin.config.php',
-            include __DIR__ . '/../config/caches.config.php',
-            include __DIR__ . '/../config/services.config.php',
-            include __DIR__ . '/../config/routing.config.php'
-        );
+        $serviceManager = $manager->getEvent()->getParam('ServiceManager');
+        if ($serviceManager->get(Environment::class)->is(self::ENVIRONMENT_ADMIN)) {
+            $manager->getEventManager()->attach(
+                ModuleEvent::EVENT_LOAD_MODULES_POST,
+                [$this, 'setupAdminConfig'],
+                PHP_INT_MAX
+            );
+        }
     }
 
     /**
-     * Listen to the bootstrap event
-     *
-     * @param EventInterface $e
-     * @return array
+     * @param ModuleEvent $e
      */
-    public function onBootstrap(EventInterface $e)
+    public function setupAdminConfig(ModuleEvent $e)
     {
-        if (Console::isConsole()) {
-            return;
+        $configListener = $e->getConfigListener();
+        $config         = $configListener->getMergedConfig(false);
+        $config = ApplicationConfigCleanup::cleanup($config);
+
+        $adminConfig = [];
+
+        foreach ($e->getTarget()->getLoadedModules() as $module) {
+            if (!($module instanceof AdminAwareModuleInterface)) {
+                continue;
+            }
+
+            $moduleConfig = $module->getAdminConfig();
+            if (!is_array($moduleConfig)) {
+                continue;
+            }
+
+            $adminConfig = ArrayUtils::merge($adminConfig, $moduleConfig);
         }
 
-        $adminSetup = new AdminSetup();
-        $adminSetup->attach($e->getTarget()->getEventManager(), 999999);
+        if (!empty($adminConfig)) {
+            $config = ArrayUtils::merge($config, $adminConfig);
+        }
 
-        $e->getApplication()->getEventManager()->getSharedManager()->attach(
-            'Zend\Mvc\Controller\AbstractController',
-            MvcEvent::EVENT_DISPATCH,
-            function ($e) {
-                $controller      = $e->getTarget();
-
-                $serviceManager = $e->getApplication()->getServiceManager();
-
-                /** @var Environment $environment */
-                $environment = $serviceManager->get(Environment::class);
-
-                if (!$environment->is(self::ENVIRONMENT_ADMIN)) {
-                    return;
-                }
-
-                $controller->layout()->setTemplate("admin/layout/layout");
-                $authenticationService = $serviceManager->get(AuthenticationService::class);
-                if (!$authenticationService->hasIdentity()) {
-                    $controller->layout()->setTemplate("admin/layout/layout-min");
-                }
-            },
-            100
-        );
+        $configListener->setMergedConfig($config);
     }
 
     /**
@@ -122,88 +123,10 @@ class Module implements
     }
 
     /**
-     * @return array
+     * @return mixed
      */
-    public function getAdminStylesheets()
+    public function getCliConfig()
     {
-        return [
-            '/assets/admin/admin42/css/admin42.min.css'
-        ];
-    }
-
-    /**
-     * @return array
-     */
-    public function getAdminJavascript()
-    {
-        return [
-            '/assets/admin/admin42/js/vendor.min.js',
-            '/assets/admin/admin42/js/admin42.min.js',
-        ];
-    }
-
-    /**
-     * @return array
-     */
-    public function getAdminViewHelpers()
-    {
-        return [
-            'factories'  => [
-                Admin::class            => AdminFactory::class,
-
-                Form::class             => InvokableFactory::class,
-                FormCollection::class   => InvokableFactory::class,
-                FormElement::class      => InvokableFactory::class,
-                FormRow::class          => InvokableFactory::class,
-                FormWysiwyg::class      => InvokableFactory::class,
-            ],
-            'aliases' => [
-                'admin'                 => Admin::class,
-                'form'                  => Form::class,
-                'formcollection'        => FormCollection::class,
-                'form_collection'       => FormCollection::class,
-                'formCollection'        => FormCollection::class,
-                'formelement'           => FormElement::class,
-                'formElement'           => FormElement::class,
-                'form_element'          => FormElement::class,
-                'formrow'               => FormRow::class,
-                'form_row'              => FormRow::class,
-                'formRow'               => FormRow::class,
-                'formwysiwyg'           => FormWysiwyg::class,
-                'formWysiwyg'           => FormWysiwyg::class,
-                'form_wysiwyg'          => FormWysiwyg::class,
-            ],
-        ];
-    }
-
-    /**
-     * @return array
-     */
-    public function getAdminFormElements()
-    {
-        return [
-            'factories' => [
-                'role'              => RoleFactory::class,
-                'dynamic'           => DynamicFactory::class,
-                'link'              => LinkFactory::class,
-                'country'           => CountryFactory::class,
-
-                DateTime::class     => InvokableFactory::class,
-                Date::class         => InvokableFactory::class,
-                Tags::class         => InvokableFactory::class,
-                Wysiwyg::class      => InvokableFactory::class,
-                YouTube::class      => InvokableFactory::class,
-                GoogleMap::class    => InvokableFactory::class,
-            ],
-            'aliases' => [
-                'datetime'   => DateTime::class,
-                'dateTime'   => DateTime::class,
-                'date'       => Date::class,
-                'tags'       => Tags::class,
-                'wysiwyg'    => Wysiwyg::class,
-                'youtube'    => YouTube::class,
-                'googlemap'  => GoogleMap::class,
-            ],
-        ];
+        return include_once __DIR__ . '/../config/cli/cli.config.php';
     }
 }

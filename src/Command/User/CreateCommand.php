@@ -245,6 +245,8 @@ class CreateCommand extends AbstractCommand
                 ->setStatus($this->status)
                 ->setShortName($this->shortName)
                 ->setPayload($this->payload)
+                ->setLocale('en-US')
+                ->setTimezone('Europe/Vienna')
                 ->setUpdated($dateTime)
                 ->setCreated($dateTime);
 

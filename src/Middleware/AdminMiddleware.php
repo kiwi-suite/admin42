@@ -2,10 +2,14 @@
 namespace Admin42\Middleware;
 
 use Admin42\Authentication\AuthenticationService;
+use Core42\Hydrator\BaseHydrator;
+use Core42\Model\GenericModel;
 use Core42\Permission\PermissionInterface;
 use Core42\Permission\Service\PermissionPluginManager;
 use Core42\Stdlib\DefaultGetterTrait;
 use Zend\Diactoros\Response\RedirectResponse;
+use Zend\Form\FieldsetInterface;
+use Zend\I18n\Translator\TranslatorInterface;
 use Zend\Mvc\MvcEvent;
 use Zend\ServiceManager\ServiceManager;
 use Psr\Http\Message\ResponseInterface as Response;
@@ -35,14 +39,62 @@ class AdminMiddleware
 
         $routeName = 'route/' . $mvcEvent->getRouteMatch()->getMatchedRouteName();
 
+        $hasIdentity = $this->serviceManager->get(AuthenticationService::class)->hasIdentity();
+
         if (!$permission->isGranted($routeName)) {
             $router = $this->getServiceManager()->get('Router');
-            $hasIdentity = $this->serviceManager->get(AuthenticationService::class)->hasIdentity();
             $url = $router->assemble([], ['name' => 'admin/permission-denied']);
             if (!$hasIdentity) {
                 $url = $router->assemble([], ['name' => 'admin/login']);
             }
             return new RedirectResponse($url);
+        }
+
+        $assetsConfig = $this->getServiceManager()->get('config')['admin']['assets'];
+        foreach ($assetsConfig as $namespace => $spec) {
+            $this->setupStylesheets(($spec['css']) ? $spec['css'] : []);
+            $this->setupJavascript(($spec['js']) ? $spec['js'] : []);
+        }
+
+        $this->getServiceManager()->get('FormElementManager')->addInitializer(function($container, $element){
+            if (method_exists($element, 'setHydratorPrototype')) {
+                $element->setHydratorPrototype($container->get('HydratorManager')->get(BaseHydrator::class));
+            }
+            if ($element instanceof FieldsetInterface) {
+                $element->setObject(new GenericModel());
+            }
+        });
+
+        $locale = 'en-US';
+        if ($hasIdentity) {
+            $locale = $this->serviceManager->get(AuthenticationService::class)->getIdentity()->getLocale();
+        }
+        $this->getServiceManager()->get(TranslatorInterface::class)->setLocale($locale);
+    }
+
+    /**
+     * @param array $stylesheets
+     */
+    protected function setupStylesheets(array $stylesheets)
+    {
+        $headLink = $this->getServiceManager()->get('ViewHelperManager')->get('headLink');
+        $assetUrl = $this->getServiceManager()->get('ViewHelperManager')->get('assetUrl');
+
+        foreach ($stylesheets as $css) {
+            $headLink->appendStylesheet($assetUrl($css));
+        }
+    }
+
+    /**
+     * @param array $javaScripts
+     */
+    protected function setupJavascript(array $javaScripts)
+    {
+        $headScript = $this->getServiceManager()->get('ViewHelperManager')->get('headScript');
+        $assetUrl = $this->getServiceManager()->get('ViewHelperManager')->get('assetUrl');
+
+        foreach ($javaScripts as $js) {
+            $headScript->appendFile($assetUrl($js));
         }
     }
 }

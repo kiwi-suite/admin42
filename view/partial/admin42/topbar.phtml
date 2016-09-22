@@ -7,9 +7,9 @@
             <i class="glyphicon glyphicon-align-justify"></i>
         </button>
         <a href="<?= $this->url('admin/home') ?>" class="navbar-brand">
-            <img src="<?= $this->assetUrl($this->admin()->getWhitelabelOption('logo-icon')); ?>" class="img-responsive">
-            <?php if(!empty(trim($this->admin()->getWhitelabelOption('topbar-title'))) && !empty($this->admin()->getWhitelabelOption('show-topbar-title'))): ?>
-                <span class="hidden-folded m-l-xs"><?= $this->admin()->getWhitelabelOption('topbar-title') ?></span>
+            <img src="<?= $this->assetUrl($this->whitelabel()->getLogoIcon()); ?>" class="img-responsive">
+            <?php if(!empty(trim($this->whitelabel()->getTopbarTitle())) && !empty($this->whitelabel()->getShowTopbarTitle())): ?>
+                <span class="hidden-folded m-l-xs"><?= $this->whitelabel()->getTopbarTitle() ?></span>
             <?php endif ?>
         </a>
     </div>
@@ -28,7 +28,7 @@
                         <?= $this->auth(\Admin42\Authentication\AuthenticationService::class)->getIdentity()->getShortName() ?>
                     </span>
                     <span class="font-bold text-lt">
-                        <?= $this->admin()->getUserDisplayName(
+                        <?= $this->user()->getDisplayName(
                             $this->auth(\Admin42\Authentication\AuthenticationService::class)->getIdentity()
                         ) ?>
                     </span>

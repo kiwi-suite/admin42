@@ -10,14 +10,14 @@
 namespace Admin42\View\Helper\Service;
 
 use Admin42\TableGateway\UserTableGateway;
-use Admin42\View\Helper\Admin;
+use Admin42\View\Helper\User;
 use Interop\Container\ContainerInterface;
 use Interop\Container\Exception\ContainerException;
 use Zend\ServiceManager\Exception\ServiceNotCreatedException;
 use Zend\ServiceManager\Exception\ServiceNotFoundException;
 use Zend\ServiceManager\Factory\FactoryInterface;
 
-class AdminFactory implements FactoryInterface
+class UserFactory implements FactoryInterface
 {
     /**
      * Create an object
@@ -33,8 +33,8 @@ class AdminFactory implements FactoryInterface
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
-        $config = $container->get('Config');
+        $userTableGateway = $container->get('TableGateway')->get(UserTableGateway::class);
 
-        return new Admin($config['admin']);
+        return new User($userTableGateway);
     }
 }

@@ -1,24 +1,16 @@
 <?php
-/**
- * admin42 (www.raum42.at)
- *
- * @link http://www.raum42.at
- * @copyright Copyright (c) 2010-2014 raum42 OG (http://www.raum42.at)
- *
- */
-
 namespace Admin42\View\Helper\Service;
 
-use Admin42\TableGateway\UserTableGateway;
-use Admin42\View\Helper\Admin;
+use Admin42\View\Helper\Angular;
 use Interop\Container\ContainerInterface;
 use Interop\Container\Exception\ContainerException;
 use Zend\ServiceManager\Exception\ServiceNotCreatedException;
 use Zend\ServiceManager\Exception\ServiceNotFoundException;
 use Zend\ServiceManager\Factory\FactoryInterface;
 
-class AdminFactory implements FactoryInterface
+class AngularFactory implements FactoryInterface
 {
+
     /**
      * Create an object
      *
@@ -33,8 +25,8 @@ class AdminFactory implements FactoryInterface
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
-        $config = $container->get('Config');
-
-        return new Admin($config['admin']);
+        return new Angular(
+            $container->get('config')['angular']
+        );
     }
 }

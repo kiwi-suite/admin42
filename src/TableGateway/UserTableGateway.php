@@ -31,6 +31,8 @@ class UserTableGateway extends AbstractTableGateway
         'status' => 'String',
         'payload' => 'Json',
         'lastLogin' => 'DateTime',
+        'locale' => 'String',
+        'timezone' => 'String',
         'updated' => 'DateTime',
         'created' => 'DateTime',
     ];

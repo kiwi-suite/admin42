@@ -2,7 +2,6 @@
 namespace Admin42;
 
 return [
-    'asset_url' => null,
     'assets' => [
         __NAMESPACE__ => [
             'target' => 'public/assets/admin/admin42',

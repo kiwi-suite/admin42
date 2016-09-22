@@ -12,7 +12,7 @@ $deleteContent = <<<EOT
     <i ng-class="deleteLoading ? 'fa fa-spin fa-refresh' : icon"></i>
 </button>
 EOT;
-$this->admin()->addHtmlTemplate("element/delete.html", $deleteContent);
+$this->angular()->addHtmlTemplate("element/delete.html", $deleteContent);
 
 
 $deleteContent = <<<EOT
@@ -30,4 +30,4 @@ $deleteContent = <<<EOT
     <button ng-disabled="deleteLoading" class="btn btn-default" ng-click="cancel()">{$this->translate('button.cancel', 'admin')}</button>
 </div>
 EOT;
-$this->admin()->addHtmlTemplate("element/delete-modal.html", $deleteContent);
+$this->angular()->addHtmlTemplate("element/delete-modal.html", $deleteContent);

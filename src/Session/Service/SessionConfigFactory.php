@@ -38,7 +38,7 @@ class SessionConfigFactory implements FactoryInterface
 
     protected function getConfig(ContainerInterface $container)
     {
-        $config = $container->get('config')['admin']['session_config'];
+        $config = $container->get('config')['session_config'];
 
         if (!array_key_exists('cookie_path', $config)) {
             $config['cookie_path'] = $this->getAdminUri($container)->getPath();
