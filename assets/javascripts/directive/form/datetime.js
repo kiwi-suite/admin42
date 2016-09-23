@@ -4,10 +4,10 @@ angular.module('admin42')
             restrict: 'E',
             templateUrl: 'element/form/datetime.html',
             scope: {
-                jsonCacheId: '@jsonCacheId'
+                elementDataId: '@elementDataId'
             },
-            controller: ['$scope', 'jsonCache', 'appConfig', function($scope, jsonCache, appConfig) {
-                $scope.formData = jsonCache.get($scope.jsonCacheId);
+            controller: ['$scope', 'jsonCache', 'appConfig', '$formService', function($scope, jsonCache, appConfig, $formService) {
+                $scope.formData = jsonCache.get($scope.elementDataId);
                 var date = $scope.formData.value;
                 if (date.length > 0) {
                     $scope.date = moment.tz(moment.utc(date), 'UTC').toDate();
@@ -42,6 +42,14 @@ angular.module('admin42')
 
                     var result = moment.tz(date.format("YYYY-MM-DD") + " " + time.format("HH:mm"), appConfig.displayTimezone);
                     return result.tz('UTC').format("YYYY-MM-DD HH:mm") + ":00";
+                }
+
+                if (angular.isDefined($scope.formData.options.formServiceHash)) {
+                    $formService.put(
+                        $scope.formData.options.formServiceHash,
+                        $scope.formData.name,
+                        $scope.elementDataId
+                    );
                 }
             }]
         }

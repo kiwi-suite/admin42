@@ -14,10 +14,5 @@ use Zend\Form\Element\Text;
 
 class Tags extends Text
 {
-    /**
-     * @var array
-     */
-    protected $attributes = [
-        'type' => 'tags',
-    ];
+
 }

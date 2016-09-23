@@ -4,10 +4,10 @@ angular.module('admin42')
             restrict: 'E',
             templateUrl: 'element/form/multicheckbox.html',
             scope: {
-                jsonCacheId: '@jsonCacheId'
+                elementDataId: '@elementDataId'
             },
-            controller: ['$scope', 'jsonCache', function($scope, jsonCache) {
-                $scope.formData = jsonCache.get($scope.jsonCacheId);
+            controller: ['$scope', 'jsonCache', '$formService', function($scope, jsonCache, $formService) {
+                $scope.formData = jsonCache.get($scope.elementDataId);
                 var initialValues = $scope.formData.value;
                 $scope.values = [];
                 $scope.options = $scope.formData.valueOptions;
@@ -17,6 +17,7 @@ angular.module('admin42')
                     $scope.checkboxModel[option.id] = (initialValues.indexOf(option.id) != -1);
                 });
 
+                var initial = true;
                 $scope.select = function(){
                     var values = [];
                     angular.forEach($scope.checkboxModel, function(value, index){
@@ -26,9 +27,22 @@ angular.module('admin42')
                         values.push(index)
                     });
                     $scope.values = values;
+
+                    if (initial === false) {
+                        $scope.formData.errors = [];
+                    }
+                    initial = false;
                 };
 
                 $scope.select();
+
+                if (angular.isDefined($scope.formData.options.formServiceHash)) {
+                    $formService.put(
+                        $scope.formData.options.formServiceHash,
+                        $scope.formData.name,
+                        $scope.elementDataId
+                    );
+                }
             }]
         }
     }]);

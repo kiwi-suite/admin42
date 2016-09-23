@@ -9,11 +9,13 @@
 
 namespace Admin42\FormElements;
 
-use Zend\Form\Element\Textarea;
+use Zend\Form\Element;
 use Zend\Stdlib\ArrayUtils;
 
-class Wysiwyg extends Textarea
+class Wysiwyg extends Element  implements AngularAwareInterface
 {
+    use ElementTrait;
+
     protected $editorOptions = [
         'trusted' => true,
         'format' => 'raw',
@@ -32,15 +34,11 @@ class Wysiwyg extends Textarea
      * @param array|\Traversable $options
      * @return \Zend\Form\Element|\Zend\Form\ElementInterface
      */
-    public function setOptions($options)
+    public function handleExtraOptions($options)
     {
-        $return = parent::setOptions($options);
-
-        if (!empty($options['editor_options'])) {
-            $this->setEditorOptions($options['editor_options']);
+        if (!empty($options['editorOptions'])) {
+            $this->setEditorOptions($options['editorOptions']);
         }
-
-        return $return;
     }
 
     /**

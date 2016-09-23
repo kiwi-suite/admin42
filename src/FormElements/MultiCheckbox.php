@@ -9,7 +9,7 @@
 
 namespace Admin42\FormElements;
 
-class MultiCheckbox extends \Zend\Form\Element\MultiCheckbox
+class MultiCheckbox extends \Zend\Form\Element\MultiCheckbox implements AngularAwareInterface
 {
-
+    use ElementTrait;
 }

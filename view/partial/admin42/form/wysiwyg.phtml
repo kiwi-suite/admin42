@@ -1,5 +1,6 @@
 <div class="form-group" ng-class="{'has-error': formData.errors.length, 'has-feedback': formData.errors.length}">
     <label for="{{ formData.id }}" class="col-sm-2 control-label">
+        <i ng-if="formData.options.description.length" class="fa fa-question-circle" uib-popover="{{ formData.options.description }}"></i>
         <abbr ng-if="formData.required" title="">*</abbr>
         {{ formData.label }}
     </label>

@@ -9,7 +9,20 @@
 
 namespace Admin42\FormElements;
 
-class Csrf extends \Zend\Form\Element\Csrf
+class Csrf extends \Zend\Form\Element\Csrf implements AngularAwareInterface
 {
+    use ElementTrait;
 
+    /**
+     * @param array|\Traversable $options
+     * @return $this
+     */
+    public function setOptions($options)
+    {
+        if (isset($options['csrf_options'])) {
+            $this->setCsrfValidatorOptions($options['csrf_options']);
+        }
+
+        return $this;
+    }
 }

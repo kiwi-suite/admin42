@@ -4,14 +4,22 @@ angular.module('admin42')
             restrict: 'E',
             templateUrl: 'element/form/link.html',
             scope: {
-                jsonCacheId: '@jsonCacheId'
+                elementDataId: '@elementDataId'
             },
-            controller: ['$scope', 'jsonCache', '$uibModal', '$sce', function($scope, jsonCache, $uibModal, $sce) {
-                $scope.formData = jsonCache.get($scope.jsonCacheId);
+            controller: ['$scope', 'jsonCache', '$uibModal', '$sce', '$formService', function($scope, jsonCache, $uibModal, $sce, $formService) {
+                $scope.formData = jsonCache.get($scope.elementDataId);
                 $scope.linkData = $scope.formData.value;
 
                 $scope.getUrl = function() {
                     return $sce.trustAsResourceUrl($scope.linkData.previewUrl);
+                }
+
+                if (angular.isDefined($scope.formData.options.formServiceHash)) {
+                    $formService.put(
+                        $scope.formData.options.formServiceHash,
+                        $scope.formData.name,
+                        $scope.elementDataId
+                    );
                 }
 
                 $scope.selectLink = function() {
@@ -101,6 +109,7 @@ angular.module('admin42')
                         $scope.linkData.linkValue = data.linkValue;
                         $scope.linkData.linkType = data.linkType;
                         $scope.linkData.previewUrl = data.previewUrl;
+                        $scope.formData.errors = [];
                     }, function () {
 
                     });

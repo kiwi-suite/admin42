@@ -11,8 +11,9 @@ namespace Admin42\FormElements;
 
 use Zend\Form\Element;
 
-class Link extends Element
+class Link extends Element implements AngularAwareInterface
 {
+    use ElementTrait;
     /**
      * @var array
      */

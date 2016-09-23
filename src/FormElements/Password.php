@@ -9,7 +9,7 @@
 
 namespace Admin42\FormElements;
 
-class Password extends \Zend\Form\Element\Password
+class Password extends \Zend\Form\Element\Password implements AngularAwareInterface
 {
-
+    use ElementTrait;
 }

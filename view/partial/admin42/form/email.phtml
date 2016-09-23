@@ -1,11 +1,12 @@
 <div class="form-group" ng-class="{'has-error': formData.errors.length, 'has-feedback': formData.errors.length}">
     <label for="{{ formData.id }}" class="col-sm-2 control-label">
-        <abbr ng-if="required" title="">*</abbr>
+        <i ng-if="formData.options.description.length" class="fa fa-question-circle" uib-popover="{{ formData.options.description }}"></i>
+        <abbr ng-if="formData.required" title="">*</abbr>
         {{ formData.label }}
     </label>
     <div class="col-sm-10">
         <input type="hidden" name="{{ formData.name }}" value="{{ formData.value }}">
-        <input id="{{ formData.id }}" type="text" class="form-control" ng-model="formData.value">
+        <input id="{{ formData.id }}" type="text" class="form-control" ng-model="formData.value" ng-change="onChange()">
         <span ng-if="formData.errors.length" class="glyphicon glyphicon-warning-sign form-control-feedback"></span>
         <ul ng-if="formData.errors.length" class="list-unstyled text-danger">
             <li ng-repeat="message in formData.errors">{{ message }}</li>

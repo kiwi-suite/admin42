@@ -1,31 +1,31 @@
 <?php
 namespace Admin42\View\Helper\Form;
 
-use Zend\Form\ElementInterface;
+use Admin42\FormElements\AngularAwareInterface;
 
 interface AngularHelperInterface
 {
     /**
-     * @param ElementInterface $element
+     * @param AngularAwareInterface $element
      * @return string
      */
-    public function getAngularDirective(ElementInterface $element);
+    public function getAngularDirective(AngularAwareInterface $element);
 
     /**
-     * @param ElementInterface $element
+     * @param AngularAwareInterface $element
      * @return mixed
      */
-    public function getValue(ElementInterface $element);
+    public function getValue(AngularAwareInterface $element);
 
     /**
-     * @param ElementInterface $element
+     * @param AngularAwareInterface $element
      * @param bool $angularNameRendering
      * @return array
      */
-    public function getElementData(ElementInterface $element, $angularNameRendering);
+    public function getElementData(AngularAwareInterface $element, $angularNameRendering);
 
     /**
-     * @param ElementInterface $element
+     * @param AngularAwareInterface $element
      */
-    public function addElementTemplate(ElementInterface $element);
+    public function addElementTemplate(AngularAwareInterface $element);
 }

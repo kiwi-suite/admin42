@@ -1,5 +1,6 @@
 <div class="form-group">
     <div class="col-sm-2 control-label">
+        <i ng-if="formData.options.description.length" class="fa fa-question-circle" uib-popover="{{ formData.options.description }}"></i>
         <abbr ng-if="required" title="">*</abbr>
     </div>
     <div class="col-sm-10" ng-class="{'has-error': formData.errors.length}">

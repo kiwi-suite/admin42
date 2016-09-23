@@ -9,16 +9,16 @@
 
 namespace Admin42\View\Helper\Form;
 
-use Zend\Form\ElementInterface;
+use Admin42\FormElements\AngularAwareInterface;
 
 class FormWysiwyg extends FormHelper
 {
     /**
-     * @param ElementInterface $element
+     * @param AngularAwareInterface $element
      * @param bool $angularNameRendering
      * @return array
      */
-    public function getElementData(ElementInterface $element, $angularNameRendering = true)
+    public function getElementData(AngularAwareInterface $element, $angularNameRendering = true)
     {
         $elementData = parent::getElementData($element, $angularNameRendering);
         $elementData['editorOptions'] = $element->getEditorOptions();

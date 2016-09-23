@@ -14,8 +14,9 @@ use Zend\Filter\StringTrim;
 use Zend\Filter\ToNull;
 use Zend\Hydrator\Strategy\StrategyInterface;
 
-class DateTime extends \Zend\Form\Element\DateTime implements StrategyAwareInterface
+class DateTime extends \Zend\Form\Element\DateTime implements StrategyAwareInterface, AngularAwareInterface
 {
+    use ElementTrait;
     /**
      * @var string
      */

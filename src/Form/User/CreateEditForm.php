@@ -27,51 +27,35 @@ class CreateEditForm extends Form
         $this->add([
             'name' => "username",
             "type" => "text",
-            "options" => [
-                "label" => "Username"
-            ]
+            "label" => "Username",
         ]);
 
         $this->add([
             'name' => "email",
             "type" => "email",
-            "options" => [
-                "label" => "Username"
-            ],
-            "attribute" => [
-                "required" => true
-            ]
+            "label" => "Email",
+            "required" => true
         ]);
 
         $this->add([
             'name' => "displayName",
             "type" => "text",
-            "options" => [
-                "label" => "Display Name"
-            ]
+            "label" => "Display Name"
         ]);
 
         $this->add([
             'name' => "role",
             "type" => "role",
-            "options" => [
-                "label" => "Role"
-            ],
-            "attribute" => [
-                "required" => true
-            ]
+            "label" => "Role",
+            "required" => true,
         ]);
 
 
         $this->add([
             'name' => "shortName",
             "type" => "text",
-            "options" => [
-                "label" => "field.short-name"
-            ],
-            "attribute" => [
-                "maxlength" => 2
-            ]
+            "label" => "field.short-name",
+            "maxLength" => 2
         ]);
     }
 }

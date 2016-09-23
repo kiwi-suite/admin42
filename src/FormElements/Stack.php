@@ -57,37 +57,19 @@ class Stack extends Fieldset
      * @param array|\Traversable $options
      * @return void|\Zend\Form\Element|\Zend\Form\ElementInterface
      */
-    public function setOptions($options)
+    public function handleExtraOptions($options)
     {
-        if (!empty($options['fieldsets'])) {
-            foreach ($options['fieldsets'] as $name => $spec) {
-                $factory = $this->getFormFactory();
-                $fieldset = $factory->create($spec);
-                if (!($fieldset instanceof FieldsetInterface)) {
-                    $newFieldset = $factory->create([
-                        'type' => Fieldset::class,
-                        'name' => $fieldset->getName(),
-                        'options' => [
-                            'label' => $fieldset->getLabel(),
-                        ],
-                    ]);
-
-                    $newFieldset->add($fieldset);
-                    $fieldset = $newFieldset;
-                }
-
-                $this->addProtoType($fieldset->getName(), $fieldset);
-            }
+        if (!empty($options['sets']) && is_array($options['sets'])) {
+            $this->handleSets($options['sets']);
         }
-        if (!empty($options['allowed_object_binding_class'])) {
-            unset($options['allowed_object_binding_class']);
-        }
+    }
 
-        if (!empty($options['use_as_base_fieldset'])) {
-            unset($options['use_as_base_fieldset']);
+    protected function handleSets(array $sets)
+    {
+        foreach ($sets as $spec) {
+            $element = $this->getFormFactory()->createFieldset($spec);
+            $this->addProtoType($element->getName(), $element);
         }
-
-        parent::setOptions($options);
     }
 
     /**

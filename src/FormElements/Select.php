@@ -9,7 +9,14 @@
 
 namespace Admin42\FormElements;
 
-class Select extends \Zend\Form\Element\Select
+class Select extends \Zend\Form\Element\Select implements AngularAwareInterface
 {
+    use ElementTrait;
 
+    public function handleExtraOptions($options)
+    {
+        if (isset($options['selectOptions'])) {
+            $this->setValueOptions($options['selectOptions']);
+        }
+    }
 }

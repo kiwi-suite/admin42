@@ -4,20 +4,26 @@ angular.module('admin42')
             restrict: 'E',
             templateUrl: 'element/form/wysiwyg.html',
             scope: {
-                jsonCacheId: '@jsonCacheId'
+                elementDataId: '@elementDataId'
             },
-            controller: ['$scope', function($scope) {
-                $scope.formData = jsonCache.get($scope.jsonCacheId);
+            controller: ['$scope', '$formService', function($scope, $formService) {
+                $scope.formData = jsonCache.get($scope.elementDataId);
 
                 $scope.$on('$dynamic:sort-start', function() {
-                    console.log("start");
                     $scope.$broadcast('$tinyWysiwyg:disable');
                 });
 
                 $scope.$on('$dynamic:sort-stop', function() {
-                    console.log("stop");
                     $scope.$broadcast('$tinyWysiwyg:enable');
                 });
+
+                if (angular.isDefined($scope.formData.options.formServiceHash)) {
+                    $formService.put(
+                        $scope.formData.options.formServiceHash,
+                        $scope.formData.name,
+                        $scope.elementDataId
+                    );
+                }
             }]
         }
     }]);

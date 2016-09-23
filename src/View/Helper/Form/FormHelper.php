@@ -1,9 +1,9 @@
 <?php
 namespace Admin42\View\Helper\Form;
 
+use Admin42\FormElements\AngularAwareInterface;
 use Admin42\View\Helper\Angular;
 use Ramsey\Uuid\Uuid;
-use Zend\Form\ElementInterface;
 use Zend\View\Helper\AbstractHelper;
 
 class FormHelper extends AbstractHelper implements AngularHelperInterface
@@ -16,10 +16,10 @@ class FormHelper extends AbstractHelper implements AngularHelperInterface
     protected $defaultHelper = 'formHelper';
 
     /**
-     * @param ElementInterface|null $element
+     * @param AngularAwareInterface|null $element
      * @return $this|string
      */
-    public function __invoke(ElementInterface $element = null)
+    public function __invoke(AngularAwareInterface $element = null)
     {
         if (!$element) {
             return $this;
@@ -29,16 +29,16 @@ class FormHelper extends AbstractHelper implements AngularHelperInterface
     }
 
     /**
-     * @param ElementInterface $element
+     * @param AngularAwareInterface $element
      * @return string
      */
-    public function render(ElementInterface $element)
+    public function render(AngularAwareInterface $element)
     {
         $this->addElementTemplate($element);
 
         $angularDirective = $this->getAngularDirective($element);
         return sprintf(
-            '<%s json-cache-id="%s"></%s>',
+            '<%s element-data-id="%s"></%s>',
             $angularDirective,
             $this->getAngularHelper()->generateJsonTemplate(
                 $this->getElementData($element, false),
@@ -49,19 +49,19 @@ class FormHelper extends AbstractHelper implements AngularHelperInterface
     }
 
     /**
-     * @param ElementInterface $element
+     * @param AngularAwareInterface $element
      * @return string
      */
-    public function getAngularDirective(ElementInterface $element)
+    public function getAngularDirective(AngularAwareInterface $element)
     {
         return 'form-' . strtolower($this->getType($element));
     }
 
     /**
-     * @param ElementInterface $element
+     * @param AngularAwareInterface $element
      * @return mixed|string
      */
-    public function getValue(ElementInterface $element)
+    public function getValue(AngularAwareInterface $element)
     {
         $value = $element->getValue();
         if (!is_string($value)) {
@@ -72,11 +72,11 @@ class FormHelper extends AbstractHelper implements AngularHelperInterface
     }
 
     /**
-     * @param ElementInterface $element
+     * @param AngularAwareInterface $element
      * @param bool $angularNameRendering
      * @return array
      */
-    public function getElementData(ElementInterface $element, $angularNameRendering = true)
+    public function getElementData(AngularAwareInterface $element, $angularNameRendering = true)
     {
 
         $translateHelper = $this->getView()->plugin('translate');
@@ -91,15 +91,17 @@ class FormHelper extends AbstractHelper implements AngularHelperInterface
             'name' => $element->getName(),
             'label' => $label,
             'value' => $this->getValue($element),
-            'required' => $element->hasAttribute("required"),
+            'required' => $element->isRequired(),
+            'description' => $element->getDescription(),
+            'readonly' => $element->isReadonly(),
+            'template' => $this->getTemplate($element),
             'options' => $element->getOptions(),
-            'attributes' => $element->getAttributes(),
             'errors' => array_values($element->getMessages()),
             'angularNameRendering' => $angularNameRendering,
         ];
     }
 
-    public function addElementTemplate(ElementInterface $element)
+    public function addElementTemplate(AngularAwareInterface $element)
     {
         $type = $this->getType($element);
         $this
@@ -110,11 +112,16 @@ class FormHelper extends AbstractHelper implements AngularHelperInterface
             );
     }
 
+    protected function getTemplate(AngularAwareInterface $element)
+    {
+
+    }
+
     /**
-     * @param ElementInterface $element
+     * @param AngularAwareInterface $element
      * @return string
      */
-    protected function getType(ElementInterface $element)
+    protected function getType(AngularAwareInterface $element)
     {
         return (new \ReflectionClass($element))->getShortName();
     }

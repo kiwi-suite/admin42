@@ -4,10 +4,10 @@ angular.module('admin42')
             restrict: 'E',
             templateUrl: 'element/form/date.html',
             scope: {
-                jsonCacheId: '@jsonCacheId'
+                elementDataId: '@elementDataId'
             },
-            controller: ['$scope', 'jsonCache', function($scope, jsonCache) {
-                $scope.formData = jsonCache.get($scope.jsonCacheId);
+            controller: ['$scope', 'jsonCache', '$formService', function($scope, jsonCache, $formService) {
+                $scope.formData = jsonCache.get($scope.elementDataId);
                 var date = $scope.formData.value;
                 if (date.length > 0) {
                     $scope.value = moment(date).toDate();
@@ -29,6 +29,14 @@ angular.module('admin42')
                     startingDay: 1,
                     showWeeks: false
                 };
+
+                if (angular.isDefined($scope.formData.options.formServiceHash)) {
+                    $formService.put(
+                        $scope.formData.options.formServiceHash,
+                        $scope.formData.name,
+                        $scope.elementDataId
+                    );
+                }
             }]
         }
     }]);

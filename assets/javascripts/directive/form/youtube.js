@@ -4,10 +4,10 @@ angular.module('admin42')
             restrict: 'E',
             templateUrl: 'element/form/youtube.html',
             scope: {
-                jsonCacheId: '@jsonCacheId'
+                elementDataId: '@elementDataId'
             },
-            controller: ['$scope', 'jsonCache', '$sce', function($scope, jsonCache, $sce) {
-                $scope.formData = jsonCache.get($scope.jsonCacheId);
+            controller: ['$scope', 'jsonCache', '$sce', '$formService', function($scope, jsonCache, $sce, $formService) {
+                $scope.formData = jsonCache.get($scope.elementDataId);
                 $scope.youtubeLink = "";
 
                 if ($scope.formData.value.length > 0) {
@@ -22,10 +22,20 @@ angular.module('admin42')
                     } else {
                         $scope.formData.value = "";
                     }
+
+                    $scope.formData.errors = [];
                 }
 
                 $scope.videoUrl = function() {
                     return $sce.trustAsResourceUrl("https://www.youtube.com/embed/" + $scope.formData.value);
+                }
+
+                if (angular.isDefined($scope.formData.options.formServiceHash)) {
+                    $formService.put(
+                        $scope.formData.options.formServiceHash,
+                        $scope.formData.name,
+                        $scope.elementDataId
+                    );
                 }
             }]
         }

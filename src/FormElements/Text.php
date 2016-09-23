@@ -9,7 +9,50 @@
 
 namespace Admin42\FormElements;
 
-class Text extends \Zend\Form\Element\Text
-{
+use Zend\Filter\StringTrim;
+use Zend\Form\Element;
+use Zend\InputFilter\InputProviderInterface;
+use Zend\Validator\StringLength;
 
+class Text extends Element implements InputProviderInterface, AngularAwareInterface
+{
+    use ElementTrait;
+
+    /**
+     * @param array|\Traversable $options
+     * @return $this
+     */
+    public function handleExtraOptions($options)
+    {
+        $minLength = (!empty($options['minLength'])) ? (int) $options['minLength'] : 0;
+        $minLength = max($minLength, 0);
+        $this->setOption('minLength', $minLength);
+
+        $maxLength = (!empty($options['maxLength'])) ? (int) $options['maxLength'] : 524288;
+        $maxLength = min($maxLength, 524288);
+        $this->setOption('maxLength', $maxLength);
+    }
+
+    /**
+     * Should return an array specification compatible with
+     * {@link Zend\InputFilter\Factory::createInput()}.
+     *
+     * @return array
+     */
+    public function getInputSpecification()
+    {
+        return [
+            'name' => $this->getName(),
+            'required' => $this->isRequired(),
+            'filters' => [
+                ['name' => StringTrim::class],
+            ],
+            'validators' => [
+                [
+                    'name' => StringLength::class,
+                    'options' => ['max' => $this->getOption("maxLength"), 'min' => $this->getOption("minLength")]
+                ],
+            ],
+        ];
+    }
 }

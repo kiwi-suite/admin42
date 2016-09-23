@@ -4,10 +4,10 @@ angular.module('admin42')
             restrict: 'E',
             templateUrl: 'element/form/stack.html',
             scope: {
-                jsonCacheId: '@jsonCacheId'
+                elementDataId: '@elementDataId'
             },
-            controller: ['$scope', 'jsonCache', '$templateCache', function($scope, jsonCache, $templateCache) {
-                var elementData = jsonCache.get($scope.jsonCacheId);
+            controller: ['$scope', 'jsonCache', '$templateCache', '$formService', function($scope, jsonCache, $templateCache, $formService) {
+                var elementData = jsonCache.get($scope.elementDataId);
 
                 $scope.protoTypes = elementData.protoTypes;
                 $scope.data = {
@@ -23,7 +23,7 @@ angular.module('admin42')
 
                     var templateName = 'element/form/stack/' + id + '.html';
 
-                    var elementOrFieldsetData = angular.copy(jsonCache.get(element.elementData));
+                    var elementOrFieldsetData = angular.copy(jsonCache.get(element.elementDataId));
                     var elementOrFieldsetDataKey = 'element/form/value/' + id + '.json';
 
                     elementOrFieldsetData.id = id;
@@ -32,7 +32,7 @@ angular.module('admin42')
                     jsonCache.put(elementOrFieldsetDataKey, elementOrFieldsetData);
                     $templateCache.put(
                         templateName,
-                        '<' + element.directive + ' json-cache-id="' + elementOrFieldsetDataKey +'"></' + element.directive + '>'
+                        '<' + element.directive + ' element-data-id="' + elementOrFieldsetDataKey +'"></' + element.directive + '>'
                     );
 
                     $scope.elements.push({
@@ -41,7 +41,7 @@ angular.module('admin42')
                         name: elementOrFieldsetData.options.fieldsetName,
                         nameEditing: false,
                         template: templateName,
-                        elementData: elementOrFieldsetDataKey,
+                        elementDataId: elementOrFieldsetDataKey,
                         label: elementOrFieldsetData.label,
                         deleted: elementOrFieldsetData.options.fieldsetDeleted,
                         collapsed: $scope.sortingMode,
@@ -50,25 +50,31 @@ angular.module('admin42')
                     });
                 });
 
+                $scope.collapse = function() {
+                    angular.forEach($scope.elements, function(element){
+                        element.collapsedState = element.collapsed;
+                        element.collapsed = true;
+                    });
+                }
+
+                $scope.expand = function() {
+                    angular.forEach($scope.elements, function(element){
+                        element.collapsed = element.collapsedState;
+                    });
+                }
+
                 $scope.startSortingMode = function() {
                     if ($scope.sortingMode === false) {
                         $scope.$broadcast('$dynamic:sort-start');
 
                         $scope.sortingMode = true;
-                        angular.forEach($scope.elements, function(element){
-                            element.collapsedState = element.collapsed;
-                            element.collapsed = true;
-                        });
+                        $scope.collapse();
 
                         return;
                     }
 
-                    angular.forEach($scope.elements, function(element){
-                        element.collapsed = element.collapsedState;
-                    });
-
+                    $scope.expand();
                     $scope.$broadcast('$dynamic:sort-stop');
-
                     $scope.sortingMode = false;
                 };
                 
@@ -88,7 +94,7 @@ angular.module('admin42')
                     jsonCache.put(elementOrFieldsetDataKey, elementOrFieldsetData);
                     $templateCache.put(
                         templateName,
-                        '<' + element.directive + ' json-cache-id="' + elementOrFieldsetDataKey +'"></' + element.directive + '>'
+                        '<' + element.directive + ' element-data-id="' + elementOrFieldsetDataKey +'"></' + element.directive + '>'
                     );
 
                     $scope.elements.push({
@@ -97,13 +103,21 @@ angular.module('admin42')
                         name: "",
                         nameEditing: false,
                         template: templateName,
-                        elementData: elementOrFieldsetDataKey,
+                        elementDataId: elementOrFieldsetDataKey,
                         label: elementOrFieldsetData.label,
                         deleted: false,
                         collapsed: $scope.sortingMode,
                         collapsedState: false,
                         nodes: []
                     });
+                }
+
+                if (angular.isDefined(elementData.options.formServiceHash)) {
+                    $formService.put(
+                        elementData.options.formServiceHash,
+                        elementData.name,
+                        $scope.elementDataId
+                    );
                 }
             }]
         }

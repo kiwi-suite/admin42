@@ -4,10 +4,10 @@ angular.module('admin42')
             restrict: 'E',
             templateUrl: 'element/form/fieldset.html',
             scope: {
-                jsonCacheId: '@jsonCacheId'
+                elementDataId: '@elementDataId'
             },
-            controller: ['$scope', 'jsonCache', '$templateCache', function($scope, jsonCache, $templateCache) {
-                var elementData = jsonCache.get($scope.jsonCacheId);
+            controller: ['$scope', 'jsonCache', '$templateCache', '$formService', function($scope, jsonCache, $templateCache, $formService) {
+                var elementData = jsonCache.get($scope.elementDataId);
                 $scope.elements = [];
 
                 angular.forEach(elementData.elements, function(element){
@@ -15,7 +15,7 @@ angular.module('admin42')
 
                     var templateName = 'element/form/fieldset/' + id + '.html';
 
-                    var elementOrFieldsetData = angular.copy(jsonCache.get(element.elementData));
+                    var elementOrFieldsetData = angular.copy(jsonCache.get(element.elementDataId));
                     var elementOrFieldsetDataKey = 'element/form/value/' + id + '.json';
 
                     elementOrFieldsetData.id = id;
@@ -24,16 +24,22 @@ angular.module('admin42')
                     jsonCache.put(elementOrFieldsetDataKey, elementOrFieldsetData);
                     $templateCache.put(
                         templateName,
-                        '<' + element.directive + ' json-cache-id="' + elementOrFieldsetDataKey +'"></' + element.directive + '>'
+                        '<' + element.directive + ' element-data-id="' + elementOrFieldsetDataKey +'"></' + element.directive + '>'
                     );
 
                     $scope.elements.push({
                         template: templateName,
-                        elementData: elementOrFieldsetDataKey
+                        elementDataId: elementOrFieldsetDataKey
                     });
                 });
 
-
+                if (angular.isDefined(elementData.options.formServiceHash)) {
+                    $formService.put(
+                        elementData.options.formServiceHash,
+                        elementData.name,
+                        $scope.elementDataId
+                    );
+                }
             }]
         }
     }]);

@@ -9,7 +9,7 @@
 
 namespace Admin42\FormElements;
 
-class Checkbox extends \Zend\Form\Element\Checkbox
+class Checkbox extends \Zend\Form\Element\Checkbox implements AngularAwareInterface
 {
-
+    use ElementTrait;
 }

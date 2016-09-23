@@ -9,22 +9,22 @@
 
 namespace Admin42\View\Helper\Form;
 
-use Zend\Form\ElementInterface;
+use Admin42\FormElements\AngularAwareInterface;
 use Zend\Form\FieldsetInterface;
 
 class FormStack extends FormFieldset
 {
-    public function getValue(ElementInterface $element)
+    public function getValue(AngularAwareInterface $element)
     {
         return [];
     }
 
     /**
-     * @param ElementInterface $element
+     * @param AngularAwareInterface $element
      * @param bool $angularNameRendering
      * @return array
      */
-    public function getElementData(ElementInterface $element, $angularNameRendering = true)
+    public function getElementData(AngularAwareInterface $element, $angularNameRendering = true)
     {
         $elementData = parent::getElementData($element, $angularNameRendering);
 
@@ -103,7 +103,7 @@ class FormStack extends FormFieldset
             $formHelper->addElementTemplate($fieldset);
             $elements[] = [
                 'directive' => $formHelper->getAngularDirective($fieldset),
-                'elementData' => $this->getAngularHelper()->generateJsonTemplate(
+                'elementDataId' => $this->getAngularHelper()->generateJsonTemplate(
                     $formHelper->getElementData($fieldset),
                     'element/form/value/'
                 ),

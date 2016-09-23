@@ -1,7 +1,16 @@
 <div class="line line-dashed b-b line-lg"></div>
-<button class="btn btn-xs btn-default m-b-sm" type="button" ng-click="startSortingMode()" ng-show="elements.length > 0">
-    Start Sorting
-</button>
+<div ng-show="elements.length > 0">
+    <button class="btn btn-xs btn-default m-b-sm" ng-class="{'btn-default': !sortingMode, 'btn-info': sortingMode}" type="button" ng-click="startSortingMode()">
+        <i class="fa fa-fw fa-sort"></i> Sorting
+    </button>
+    <button class="btn btn-xs btn-default m-b-sm"  type="button" ng-click="collapse()" ng-hide="sortingMode">
+        <i class="fa fa-fw fa-chevron-right"></i> Collapse
+    </button>
+    <button class="btn btn-xs btn-default m-b-sm"  type="button" ng-click="expand()" ng-hide="sortingMode">
+        <i class="fa fa-fw fa-chevron-down"></i> Expand
+    </button>
+</div>
+
 <fieldset ui-tree data-drag-enabled="sortingMode" data-max-depth="1" data-empty-placeholder-enabled="false">
     <div ui-tree-nodes="" ng-model="elements">
         <div ui-tree-node ng-repeat="element in elements track by $index" data-collapsed="false">

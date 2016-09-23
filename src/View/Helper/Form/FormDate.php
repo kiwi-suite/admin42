@@ -9,11 +9,15 @@
 
 namespace Admin42\View\Helper\Form;
 
-use Zend\Form\ElementInterface;
+use Admin42\FormElements\AngularAwareInterface;
 
 class FormDate extends FormHelper
 {
-    public function getValue(ElementInterface $element)
+    /**
+     * @param AngularAwareInterface $element
+     * @return \DateTime|mixed|string
+     */
+    public function getValue(AngularAwareInterface $element)
     {
         $value = $element->getValue(false);
         if (empty($value)) {

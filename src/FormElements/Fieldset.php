@@ -1,13 +1,20 @@
 <?php
 namespace Admin42\FormElements;
 
+use Admin42\FormElements\Service\Factory;
 use Zend\Form\ElementPrepareAwareInterface;
 use Zend\Form\FormInterface;
 use Zend\Hydrator\HydratorInterface;
 
-class Fieldset extends \Zend\Form\Fieldset
+class Fieldset extends \Zend\Form\Fieldset implements AngularAwareInterface
 {
     use HydratorTrait;
+    use ElementTrait;
+
+    /**
+     * @var Factory
+     */
+    protected $factory;
 
     /**
      * @param FormInterface $form
@@ -31,11 +38,30 @@ class Fieldset extends \Zend\Form\Fieldset
         }
     }
 
+    /**
+     * @return HydratorInterface
+     */
     public function getHydrator()
     {
         if (!($this->hydrator instanceof HydratorInterface)) {
             $this->setHydrator($this->prepareHydrator($this));
         }
         return parent::getHydrator();
+    }
+
+    /**
+     * Retrieve composed form factory
+     *
+     * Lazy-loads one if none present.
+     *
+     * @return Factory
+     */
+    public function getFormFactory()
+    {
+        if (null === $this->factory) {
+            $this->setFormFactory(new Factory());
+        }
+
+        return $this->factory;
     }
 }

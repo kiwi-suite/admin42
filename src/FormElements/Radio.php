@@ -9,7 +9,7 @@
 
 namespace Admin42\FormElements;
 
-class Radio extends \Zend\Form\Element\Radio
+class Radio extends \Zend\Form\Element\Radio implements AngularAwareInterface
 {
-
+    use ElementTrait;
 }

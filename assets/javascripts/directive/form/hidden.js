@@ -4,10 +4,18 @@ angular.module('admin42')
             restrict: 'E',
             templateUrl: 'element/form/hidden.html',
             scope: {
-                jsonCacheId: '@jsonCacheId'
+                elementDataId: '@elementDataId'
             },
-            controller: ['$scope', 'jsonCache', function($scope, jsonCache) {
-                $scope.formData = jsonCache.get($scope.jsonCacheId);
+            controller: ['$scope', 'jsonCache', '$formService', function($scope, jsonCache, $formService) {
+                $scope.formData = jsonCache.get($scope.elementDataId);
+
+                if (angular.isDefined($scope.formData.options.formServiceHash)) {
+                    $formService.put(
+                        $scope.formData.options.formServiceHash,
+                        $scope.formData.name,
+                        $scope.elementDataId
+                    );
+                }
             }]
         }
     }]);

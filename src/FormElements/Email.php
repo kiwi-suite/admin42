@@ -9,7 +9,29 @@
 
 namespace Admin42\FormElements;
 
-class Email extends \Zend\Form\Element\Email
-{
+use Zend\Filter\StringTrim;
+use Zend\Form\Element;
+use Zend\InputFilter\InputProviderInterface;
+use Zend\Validator\EmailAddress;
 
+class Email extends Element implements AngularAwareInterface, InputProviderInterface
+{
+    use ElementTrait;
+
+    /**
+     * @return array
+     */
+    public function getInputSpecification()
+    {
+        return [
+            'name' => $this->getName(),
+            'required' => $this->isRequired(),
+            'filters' => [
+                ['name' => StringTrim::class],
+            ],
+            'validators' => [
+                ['name' => EmailAddress::class]
+            ],
+        ];
+    }
 }

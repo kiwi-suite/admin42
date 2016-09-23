@@ -9,16 +9,17 @@
 
 namespace Admin42\View\Helper\Form;
 
+use Admin42\FormElements\AngularAwareInterface;
 use Zend\Form\ElementInterface;
 
 class FormLink extends FormHelper
 {
     /**
-     * @param ElementInterface $element
+     * @param AngularAwareInterface $element
      * @param bool $angularNameRendering
      * @return array
      */
-    public function getElementData(ElementInterface $element, $angularNameRendering = true)
+    public function getElementData(AngularAwareInterface $element, $angularNameRendering = true)
     {
         $elementData = parent::getElementData($element, $angularNameRendering);
 
@@ -36,10 +37,10 @@ class FormLink extends FormHelper
     }
 
     /**
-     * @param ElementInterface $element
+     * @param AngularAwareInterface $element
      * @return array
      */
-    public function getValue(ElementInterface $element)
+    public function getValue(AngularAwareInterface $element)
     {
         $value = [
             'linkId' => null,
@@ -65,9 +66,9 @@ class FormLink extends FormHelper
     }
 
     /**
-     * @param ElementInterface $element
+     * @param AngularAwareInterface $element
      */
-    public function addElementTemplate(ElementInterface $element)
+    public function addElementTemplate(AngularAwareInterface $element)
     {
         parent::addElementTemplate($element);
         $this
