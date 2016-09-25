@@ -2,7 +2,9 @@ angular.module('admin42')
     .directive('formDatetime', [function() {
         return {
             restrict: 'E',
-            templateUrl: 'element/form/datetime.html',
+            templateUrl: function(elem, attrs) {
+                return attrs.template;
+            },
             scope: {
                 elementDataId: '@elementDataId'
             },

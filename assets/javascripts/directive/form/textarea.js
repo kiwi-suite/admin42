@@ -2,7 +2,9 @@ angular.module('admin42')
     .directive('formTextarea', [function() {
         return {
             restrict: 'E',
-            templateUrl: 'element/form/textarea.html',
+            templateUrl: function(elem, attrs) {
+                return attrs.template;
+            },
             scope: {
                 elementDataId: '@elementDataId'
             },

@@ -2,7 +2,9 @@ angular.module('admin42')
     .directive('formFieldset', [function() {
         return {
             restrict: 'E',
-            templateUrl: 'element/form/fieldset.html',
+            templateUrl: function(elem, attrs) {
+                return attrs.template;
+            },
             scope: {
                 elementDataId: '@elementDataId'
             },
@@ -24,7 +26,7 @@ angular.module('admin42')
                     jsonCache.put(elementOrFieldsetDataKey, elementOrFieldsetData);
                     $templateCache.put(
                         templateName,
-                        '<' + element.directive + ' element-data-id="' + elementOrFieldsetDataKey +'"></' + element.directive + '>'
+                        '<' + element.directive + ' element-data-id="' + elementOrFieldsetDataKey +'" template="'+ elementOrFieldsetData.template +'"></' + element.directive + '>'
                     );
 
                     $scope.elements.push({

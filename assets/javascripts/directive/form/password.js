@@ -2,7 +2,9 @@ angular.module('admin42')
     .directive('formPassword', [function() {
         return {
             restrict: 'E',
-            templateUrl: 'element/form/password.html',
+            templateUrl: function(elem, attrs) {
+                return attrs.template;
+            },
             scope: {
                 elementDataId: '@elementDataId'
             },

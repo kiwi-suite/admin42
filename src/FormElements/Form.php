@@ -17,6 +17,15 @@ class Form extends \Zend\Form\Form
     protected $factory;
 
     /**
+     * @param array|\Traversable $options
+     * @return $this
+     */
+    public function setOptions($options)
+    {
+        return $this;
+    }
+
+    /**
      * @return $this
      */
     public function prepare()

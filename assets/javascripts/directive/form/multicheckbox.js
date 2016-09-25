@@ -2,7 +2,9 @@ angular.module('admin42')
     .directive('formMulticheckbox', [function() {
         return {
             restrict: 'E',
-            templateUrl: 'element/form/multicheckbox.html',
+            templateUrl: function(elem, attrs) {
+                return attrs.template;
+            },
             scope: {
                 elementDataId: '@elementDataId'
             },

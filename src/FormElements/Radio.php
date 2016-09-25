@@ -12,4 +12,13 @@ namespace Admin42\FormElements;
 class Radio extends \Zend\Form\Element\Radio implements AngularAwareInterface
 {
     use ElementTrait;
+
+    /**
+     * @param array|\Traversable $options
+     * @return $this
+     */
+    public function setOptions($options)
+    {
+        return $this;
+    }
 }

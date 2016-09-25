@@ -1,5 +1,6 @@
 <div class="line line-dashed b-b line-lg"></div>
-<div ng-show="elements.length > 0">
+<h4>{{ label }}</h4>
+<div ng-show="elements.length > 1">
     <button class="btn btn-xs btn-default m-b-sm" ng-class="{'btn-default': !sortingMode, 'btn-info': sortingMode}" type="button" ng-click="startSortingMode()">
         <i class="fa fa-fw fa-sort"></i> Sorting
     </button>
@@ -11,9 +12,9 @@
     </button>
 </div>
 
-<fieldset ui-tree data-drag-enabled="sortingMode" data-max-depth="1" data-empty-placeholder-enabled="false">
+<fieldset ui-tree data-drag-enabled="sortingMode" data-empty-placeholder-enabled="false">
     <div ui-tree-nodes="" ng-model="elements">
-        <div ui-tree-node ng-repeat="element in elements track by $index" data-collapsed="false">
+        <div ui-tree-node ng-repeat="element in elements" data-collapsed="false">
             <div class="panel panel-default" ng-class="{'marked-deleted' : element.deleted}">
                 <div class="panel-heading">
                     <input type="hidden" name="{{ element.formName }}[__index__]" value="{{ $index }}">
@@ -54,7 +55,7 @@
                             </div>
                             <div ng-show="element.nameEditing">
                                 <div class="input-group input-group-sm">
-                                    <input type="text" ng-model="element.name" class="form-control" placeholder="<?= $this->translate('stack.no-name', 'admin')?>">
+                                    <input tabindex="-1" ng-keydown="preventEnter(element, $event)" ng-keypress="preventEnter(element, $event)" ng-keyup="preventEnter(element, $event)" type="text" ng-model="element.name" class="form-control" placeholder="<?= $this->translate('stack.no-name', 'admin')?>">
                                     <span class="input-group-btn">
                                         <button class="btn btn-default" type="button" ng-click="element.nameEditing = false">
                                             <i class="fa fa-check"></i>

@@ -2,7 +2,9 @@ angular.module('admin42')
     .directive('formSelect', ['jsonCache', function() {
         return {
             restrict: 'E',
-            templateUrl: 'element/form/select.html',
+            templateUrl: function(elem, attrs) {
+                return attrs.template;
+            },
             scope: {
                 elementDataId: '@elementDataId'
             },

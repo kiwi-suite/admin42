@@ -22,10 +22,11 @@ interface AngularHelperInterface
      * @param bool $angularNameRendering
      * @return array
      */
-    public function getElementData(AngularAwareInterface $element, $angularNameRendering);
+    public function getElementData(AngularAwareInterface $element, $angularNameRendering = true);
 
     /**
-     * @param AngularAwareInterface $element
+     * @param string $template
+     * @param string $partial
      */
-    public function addElementTemplate(AngularAwareInterface $element);
+    public function addElementTemplate($template, $partial);
 }

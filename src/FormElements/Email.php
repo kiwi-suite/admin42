@@ -19,6 +19,15 @@ class Email extends Element implements AngularAwareInterface, InputProviderInter
     use ElementTrait;
 
     /**
+     * @param array|\Traversable $options
+     * @return $this
+     */
+    public function setOptions($options)
+    {
+        return $this;
+    }
+
+    /**
      * @return array
      */
     public function getInputSpecification()

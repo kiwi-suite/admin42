@@ -2,7 +2,9 @@ angular.module('admin42')
     .directive('formCsrf', [function() {
         return {
             restrict: 'E',
-            templateUrl: 'element/form/csrf.html',
+            templateUrl: function(elem, attrs) {
+                return attrs.template;
+            },
             scope: {
                 elementDataId: '@elementDataId'
             },

@@ -2,7 +2,9 @@ angular.module('admin42')
     .directive('formText', [function() {
         return {
             restrict: 'E',
-            templateUrl: 'element/form/text.html',
+            templateUrl: function(elem, attrs) {
+                return attrs.template;
+            },
             scope: {
                 elementDataId: '@'
             },

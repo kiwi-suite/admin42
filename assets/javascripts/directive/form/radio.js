@@ -2,7 +2,9 @@ angular.module('admin42')
     .directive('formRadio', ['jsonCache', function() {
         return {
             restrict: 'E',
-            templateUrl: 'element/form/radio.html',
+            templateUrl: function(elem, attrs) {
+                return attrs.template;
+            },
             scope: {
                 elementDataId: '@elementDataId'
             },

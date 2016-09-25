@@ -34,4 +34,13 @@ class Link extends Element implements AngularAwareInterface
     {
         return $this->linkTypes;
     }
+
+    /**
+     * @param array|\Traversable $options
+     * @return $this
+     */
+    public function setOptions($options)
+    {
+        return $this;
+    }
 }

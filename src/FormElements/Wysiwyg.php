@@ -34,11 +34,13 @@ class Wysiwyg extends Element  implements AngularAwareInterface
      * @param array|\Traversable $options
      * @return \Zend\Form\Element|\Zend\Form\ElementInterface
      */
-    public function handleExtraOptions($options)
+    public function setOptions($options)
     {
         if (!empty($options['editorOptions'])) {
             $this->setEditorOptions($options['editorOptions']);
         }
+
+        return $this;
     }
 
     /**

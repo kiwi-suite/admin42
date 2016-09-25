@@ -2,7 +2,9 @@ angular.module('admin42')
     .directive('formYoutube', [function() {
         return {
             restrict: 'E',
-            templateUrl: 'element/form/youtube.html',
+            templateUrl: function(elem, attrs) {
+                return attrs.template;
+            },
             scope: {
                 elementDataId: '@elementDataId'
             },

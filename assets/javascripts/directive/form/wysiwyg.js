@@ -1,12 +1,14 @@
 angular.module('admin42')
-    .directive('formWysiwyg', ['$timeout', 'jsonCache', function($timeout, jsonCache) {
+    .directive('formWysiwyg', [function() {
         return {
             restrict: 'E',
-            templateUrl: 'element/form/wysiwyg.html',
+            templateUrl: function(elem, attrs) {
+                return attrs.template;
+            },
             scope: {
                 elementDataId: '@elementDataId'
             },
-            controller: ['$scope', '$formService', function($scope, $formService) {
+            controller: ['$scope', '$formService', 'jsonCache', function($scope, $formService, jsonCache) {
                 $scope.formData = jsonCache.get($scope.elementDataId);
 
                 $scope.$on('$dynamic:sort-start', function() {

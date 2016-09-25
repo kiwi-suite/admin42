@@ -57,11 +57,13 @@ class Stack extends Fieldset
      * @param array|\Traversable $options
      * @return void|\Zend\Form\Element|\Zend\Form\ElementInterface
      */
-    public function handleExtraOptions($options)
+    public function setOptions($options)
     {
         if (!empty($options['sets']) && is_array($options['sets'])) {
             $this->handleSets($options['sets']);
         }
+
+        return $this;
     }
 
     protected function handleSets(array $sets)

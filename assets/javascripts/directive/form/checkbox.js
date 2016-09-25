@@ -1,12 +1,14 @@
 angular.module('admin42')
-    .directive('formCheckbox', [function() {
+    .directive('formCheckbox', 'jsonCache', [function(jsonCache) {
         return {
             restrict: 'E',
-            templateUrl: 'element/form/checkbox.html',
+            templateUrl: function(elem, attrs) {
+                return attrs.template;
+            },
             scope: {
                 elementDataId: '@elementDataId'
             },
-            controller: ['$scope', 'jsonCache', '$formService', function($scope, jsonCache, $formService) {
+            controller: ['$scope', '$formService', function($scope, $formService) {
                 $scope.formData = jsonCache.get($scope.elementDataId);
 
                 $scope.model = ($scope.formData.value == $scope.formData.checkedValue);

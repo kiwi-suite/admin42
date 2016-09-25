@@ -34,16 +34,15 @@ class FormHelper extends AbstractHelper implements AngularHelperInterface
      */
     public function render(AngularAwareInterface $element)
     {
-        $this->addElementTemplate($element);
-
         $angularDirective = $this->getAngularDirective($element);
         return sprintf(
-            '<%s element-data-id="%s"></%s>',
+            '<%s element-data-id="%s" template="%s"></%s>',
             $angularDirective,
             $this->getAngularHelper()->generateJsonTemplate(
                 $this->getElementData($element, false),
                 'element/form/value/'
             ),
+            $this->getTemplate($element),
             $angularDirective
         );
     }
@@ -101,20 +100,32 @@ class FormHelper extends AbstractHelper implements AngularHelperInterface
         ];
     }
 
-    public function addElementTemplate(AngularAwareInterface $element)
+    /**
+     * @param string $template
+     * @param string $partial
+     */
+    public function addElementTemplate($template, $partial)
     {
-        $type = $this->getType($element);
         $this
             ->getAngularHelper()
             ->addHtmlPartial(
-                'element/form/'.strtolower($type).'.html',
-                'partial/admin42/form/'.$type
+                $template,
+                $partial
             );
     }
 
     protected function getTemplate(AngularAwareInterface $element)
     {
+        $template = $element->getTemplate();
 
+        if (empty($template)) {
+            $template = 'partial/admin42/form/' . $this->getType($element);
+        }
+
+        $templateName = 'element/form/' . md5($template) . '.html';
+        $this->addElementTemplate($templateName, $template);
+
+        return $templateName;
     }
 
     /**

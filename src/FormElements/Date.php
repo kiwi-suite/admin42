@@ -17,6 +17,16 @@ use Zend\Hydrator\Strategy\StrategyInterface;
 class Date extends \Zend\Form\Element\Date implements StrategyAwareInterface, AngularAwareInterface
 {
     use ElementTrait;
+
+    /**
+     * @param array|\Traversable $options
+     * @return $this
+     */
+    public function setOptions($options)
+    {
+        return $this;
+    }
+
     /**
      * @return array
      */

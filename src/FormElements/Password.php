@@ -12,4 +12,13 @@ namespace Admin42\FormElements;
 class Password extends \Zend\Form\Element\Password implements AngularAwareInterface
 {
     use ElementTrait;
+
+    /**
+     * @param array|\Traversable $options
+     * @return $this
+     */
+    public function setOptions($options)
+    {
+        return $this;
+    }
 }

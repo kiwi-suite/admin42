@@ -12,4 +12,13 @@ namespace Admin42\FormElements;
 class MultiCheckbox extends \Zend\Form\Element\MultiCheckbox implements AngularAwareInterface
 {
     use ElementTrait;
+
+    /**
+     * @param array|\Traversable $options
+     * @return $this
+     */
+    public function setOptions($options)
+    {
+        return $this;
+    }
 }

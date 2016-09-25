@@ -2,12 +2,15 @@ angular.module('admin42')
     .directive('formStack', [function() {
         return {
             restrict: 'E',
-            templateUrl: 'element/form/stack.html',
+            templateUrl: function(elem, attrs) {
+                return attrs.template;
+            },
             scope: {
                 elementDataId: '@elementDataId'
             },
             controller: ['$scope', 'jsonCache', '$templateCache', '$formService', function($scope, jsonCache, $templateCache, $formService) {
                 var elementData = jsonCache.get($scope.elementDataId);
+                $scope.label = elementData.label;
 
                 $scope.protoTypes = elementData.protoTypes;
                 $scope.data = {
@@ -32,7 +35,7 @@ angular.module('admin42')
                     jsonCache.put(elementOrFieldsetDataKey, elementOrFieldsetData);
                     $templateCache.put(
                         templateName,
-                        '<' + element.directive + ' element-data-id="' + elementOrFieldsetDataKey +'"></' + element.directive + '>'
+                        '<' + element.directive + ' element-data-id="' + elementOrFieldsetDataKey +'" template="'+ elementOrFieldsetData.template +'"></' + element.directive + '>'
                     );
 
                     $scope.elements.push({
@@ -52,6 +55,9 @@ angular.module('admin42')
 
                 $scope.collapse = function() {
                     angular.forEach($scope.elements, function(element){
+                        if (element.collapsed === true) {
+                            return;
+                        }
                         element.collapsedState = element.collapsed;
                         element.collapsed = true;
                     });
@@ -61,6 +67,14 @@ angular.module('admin42')
                     angular.forEach($scope.elements, function(element){
                         element.collapsed = element.collapsedState;
                     });
+                }
+
+                $scope.preventEnter = function(element, $event) {
+                    if ($event.keyCode != 13) {
+                        return;
+                    }
+                    element.nameEditing = false;
+                    $event.preventDefault();
                 }
 
                 $scope.startSortingMode = function() {
@@ -94,7 +108,7 @@ angular.module('admin42')
                     jsonCache.put(elementOrFieldsetDataKey, elementOrFieldsetData);
                     $templateCache.put(
                         templateName,
-                        '<' + element.directive + ' element-data-id="' + elementOrFieldsetDataKey +'"></' + element.directive + '>'
+                        '<' + element.directive + ' element-data-id="' + elementOrFieldsetDataKey +'" template="'+ elementOrFieldsetData.template +'"></' + element.directive + '>'
                     );
 
                     $scope.elements.push({
@@ -122,3 +136,46 @@ angular.module('admin42')
             }]
         }
     }]);
+
+angular.module('ui.tree')
+
+    .controller('TreeController', ['$scope', '$element',
+        function ($scope, $element) {
+            this.scope = $scope;
+
+            $scope.$element = $element;
+            $scope.$nodesScope = null; // root nodes
+            $scope.$type = 'uiTree';
+            $scope.$emptyElm = null;
+            $scope.$callbacks = null;
+
+            $scope.dragEnabled = true;
+            $scope.emptyPlaceholderEnabled = true;
+            $scope.maxDepth = 0;
+            $scope.dragDelay = 0;
+            $scope.cloneEnabled = false;
+            $scope.nodropEnabled = false;
+
+            // Check if it's a empty tree
+            $scope.isEmpty = function () {
+                return ($scope.$nodesScope && $scope.$nodesScope.$modelValue
+                && $scope.$nodesScope.$modelValue.length === 0);
+            };
+
+            // add placeholder to empty tree
+            $scope.place = function (placeElm) {
+                $scope.$nodesScope.$element.append(placeElm);
+                $scope.$emptyElm.remove();
+            };
+
+            this.resetEmptyElement = function () {
+                if ($scope.emptyPlaceholderEnabled && (!$scope.$nodesScope.$modelValue || $scope.$nodesScope.$modelValue.length === 0)) {
+                    $element.append($scope.$emptyElm);
+                } else {
+                    $scope.$emptyElm.remove();
+                }
+            };
+
+            $scope.resetEmptyElement = this.resetEmptyElement;
+        }
+    ]);

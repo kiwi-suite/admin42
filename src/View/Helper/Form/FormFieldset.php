@@ -36,7 +36,6 @@ class FormFieldset extends FormHelper
                 continue;
             }
 
-            $formHelper->addElementTemplate($elementOrFieldset);
             $elements[] = [
                 'directive' => $formHelper->getAngularDirective($elementOrFieldset),
                 'elementDataId' => $this->getAngularHelper()->generateJsonTemplate(

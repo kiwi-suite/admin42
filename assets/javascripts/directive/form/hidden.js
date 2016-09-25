@@ -2,7 +2,9 @@ angular.module('admin42')
     .directive('formHidden', [function() {
         return {
             restrict: 'E',
-            templateUrl: 'element/form/hidden.html',
+            templateUrl: function(elem, attrs) {
+                return attrs.template;
+            },
             scope: {
                 elementDataId: '@elementDataId'
             },

@@ -13,10 +13,16 @@ class Select extends \Zend\Form\Element\Select implements AngularAwareInterface
 {
     use ElementTrait;
 
-    public function handleExtraOptions($options)
+    /**
+     * @param array|\Traversable $options
+     * @return $this
+     */
+    public function setOptions($options)
     {
         if (isset($options['selectOptions'])) {
             $this->setValueOptions($options['selectOptions']);
         }
+
+        return $this;
     }
 }

@@ -26,9 +26,8 @@ class LostPasswordForm extends Form
         $this->add([
             'name' => "email",
             "type" => "email",
-            "options" => [
-                "label" => "field.email"
-            ]
+            "label" => "field.email",
+            "template" => "partial/admin42/form/no-layout/email"
         ]);
     }
 }

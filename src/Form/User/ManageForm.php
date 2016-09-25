@@ -27,52 +27,38 @@ class ManageForm extends Form  implements InputFilterProviderInterface
         $this->add([
             'name' => "username",
             "type" => "text",
-            "options" => [
-                "label" => "field.username"
-            ],
+            "label" => "field.username"
         ]);
 
         $this->add([
             'name' => "email",
             "type" => "email",
-            "options" => [
-                "label" => "field.email"
-            ]
+            "label" => "field.email"
         ]);
 
         $this->add([
             'name' => "password",
             "type" => "password",
-            "options" => [
-                "label" => "field.password"
-            ]
+            "label" => "field.password"
         ]);
 
         $this->add([
             'name' => "passwordRepeat",
             "type" => "password",
-            "options" => [
-                "label" => "field.password-repeat"
-            ]
+            "label" => "field.password-repeat"
         ]);
 
         $this->add([
             'name' => "displayName",
             "type" => "text",
-            "options" => [
-                "label" => "Display Name"
-            ]
+            "label" => "Display Name"
         ]);
 
         $this->add([
             'name' => "shortName",
             "type" => "text",
-            "options" => [
-                "label" => "field.short-name"
-            ],
-            "attribute" => [
-                "maxlength" => 2
-            ]
+            "label" => "field.short-name",
+            "maxLength" => 2,
         ]);
     }
 

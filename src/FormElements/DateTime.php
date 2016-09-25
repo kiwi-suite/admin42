@@ -23,6 +23,15 @@ class DateTime extends \Zend\Form\Element\DateTime implements StrategyAwareInter
     protected $format = 'Y-m-d H:i:s';
 
     /**
+     * @param array|\Traversable $options
+     * @return $this
+     */
+    public function setOptions($options)
+    {
+        return $this;
+    }
+
+    /**
      * @return array
      */
     public function getInputSpecification()

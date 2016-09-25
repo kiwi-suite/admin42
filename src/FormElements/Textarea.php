@@ -21,7 +21,7 @@ class Textarea extends Element  implements AngularAwareInterface
      * @param array|\Traversable $options
      * @return $this
      */
-    public function handleExtraOptions($options)
+    public function setOptions($options)
     {
         $minLength = (!empty($options['minLength'])) ? (int) $options['minLength'] : 0;
         $minLength = max($minLength, 0);
@@ -33,6 +33,8 @@ class Textarea extends Element  implements AngularAwareInterface
 
         $rows = (!empty($options['rows'])) ? (int) $options['rows'] : 5;
         $this->setOption('rows', $rows);
+
+        return $this;
     }
 
     /**

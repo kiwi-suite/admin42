@@ -12,4 +12,13 @@ namespace Admin42\FormElements;
 class Hidden extends \Zend\Form\Element\Hidden implements AngularAwareInterface
 {
     use ElementTrait;
+
+    /**
+     * @param array|\Traversable $options
+     * @return $this
+     */
+    public function setOptions($options)
+    {
+        return $this;
+    }
 }

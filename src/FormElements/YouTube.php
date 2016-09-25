@@ -14,4 +14,13 @@ use Zend\Form\Element;
 class YouTube extends Element implements AngularAwareInterface
 {
     use ElementTrait;
+
+    /**
+     * @param array|\Traversable $options
+     * @return $this
+     */
+    public function setOptions($options)
+    {
+        return $this;
+    }
 }

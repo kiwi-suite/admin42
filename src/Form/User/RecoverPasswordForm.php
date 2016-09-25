@@ -27,17 +27,15 @@ class RecoverPasswordForm extends Form  implements InputFilterProviderInterface
         $this->add([
             'name' => "password",
             "type" => "password",
-            "options" => [
-                "label" => "field.password"
-            ]
+            "label" => "field.password",
+            "template" => "partial/admin42/form/no-layout/password",
         ]);
 
         $this->add([
             'name' => "passwordRepeat",
             "type" => "password",
-            "options" => [
-                "label" => "field.password-repeat"
-            ]
+            "label" => "field.password-repeat",
+            "template" => "partial/admin42/form/no-layout/password",
         ]);
     }
 

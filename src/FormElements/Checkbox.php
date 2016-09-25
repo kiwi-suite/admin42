@@ -12,4 +12,13 @@ namespace Admin42\FormElements;
 class Checkbox extends \Zend\Form\Element\Checkbox implements AngularAwareInterface
 {
     use ElementTrait;
+
+    /**
+     * @param array|\Traversable $options
+     * @return $this
+     */
+    public function setOptions($options)
+    {
+        return $this;
+    }
 }

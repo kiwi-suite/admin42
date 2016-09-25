@@ -50,8 +50,6 @@ class FormStack extends FormFieldset
             $fieldset->remove('__name__');
             $fieldset->remove('__deleted__');
 
-            $formHelper->addElementTemplate($fieldset);
-
             $label = $fieldset->getLabel();
             if (!empty($label)) {
                 $label = $translateHelper($label, 'admin');
@@ -99,8 +97,6 @@ class FormStack extends FormFieldset
             $fieldset->setOption('fieldsetDeleted', $value);
             $fieldset->remove('__deleted__');
 
-
-            $formHelper->addElementTemplate($fieldset);
             $elements[] = [
                 'directive' => $formHelper->getAngularDirective($fieldset),
                 'elementDataId' => $this->getAngularHelper()->generateJsonTemplate(

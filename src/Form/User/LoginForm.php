@@ -26,17 +26,15 @@ class LoginForm extends Form
         $this->add([
             'name' => "identity",
             "type" => "text",
-            "options" => [
-                "label" => "field.usernameoremail"
-            ]
+            "label" => "field.usernameoremail",
+            "template" => "partial/admin42/form/no-layout/text"
         ]);
 
         $this->add([
             'name' => "password",
             "type" => "password",
-            "options" => [
-                "label" => "field.password"
-            ]
+            "label" => "field.password",
+            "template" => "partial/admin42/form/no-layout/password"
         ]);
     }
 }

@@ -21,6 +21,18 @@ class FormLink extends FormHelper
      */
     public function getElementData(AngularAwareInterface $element, $angularNameRendering = true)
     {
+
+        $this
+            ->getAngularHelper()
+            ->addHtmlPartial(
+                'element/form/link-modal.html',
+                'partial/admin42/form/link-modal'
+            );
+
+        foreach($element->getLinkTypes() as $type) {
+            $this->getAngularHelper()->addHtmlPartial('link/'.$type.'.html', 'link/' . $type);
+        }
+
         $elementData = parent::getElementData($element, $angularNameRendering);
 
         $translateHelper = $this->getView()->plugin('translate');
@@ -63,23 +75,5 @@ class FormLink extends FormHelper
         }
 
         return $value;
-    }
-
-    /**
-     * @param AngularAwareInterface $element
-     */
-    public function addElementTemplate(AngularAwareInterface $element)
-    {
-        parent::addElementTemplate($element);
-        $this
-            ->getAngularHelper()
-            ->addHtmlPartial(
-                'element/form/link-modal.html',
-                'partial/admin42/form/link-modal'
-            );
-
-        foreach($element->getLinkTypes() as $type) {
-            $this->getAngularHelper()->addHtmlPartial('link/'.$type.'.html', 'link/' . $type);
-        }
     }
 }

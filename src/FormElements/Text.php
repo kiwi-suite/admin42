@@ -22,7 +22,7 @@ class Text extends Element implements InputProviderInterface, AngularAwareInterf
      * @param array|\Traversable $options
      * @return $this
      */
-    public function handleExtraOptions($options)
+    public function setOptions($options)
     {
         $minLength = (!empty($options['minLength'])) ? (int) $options['minLength'] : 0;
         $minLength = max($minLength, 0);
@@ -31,6 +31,8 @@ class Text extends Element implements InputProviderInterface, AngularAwareInterf
         $maxLength = (!empty($options['maxLength'])) ? (int) $options['maxLength'] : 524288;
         $maxLength = min($maxLength, 524288);
         $this->setOption('maxLength', $maxLength);
+
+        return $this;
     }
 
     /**
