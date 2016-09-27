@@ -12,7 +12,7 @@ namespace Admin42\View\Helper\Form;
 use Admin42\FormElements\AngularAwareInterface;
 use Zend\Form\FieldsetInterface;
 
-class FormStack extends FormFieldset
+class FormStack extends FormHelper
 {
     public function getValue(AngularAwareInterface $element)
     {
@@ -92,6 +92,7 @@ class FormStack extends FormFieldset
             $fieldset->setOption('fieldsetName', $value);
             $fieldset->remove('__name__');
 
+
             $value = $fieldset->get('__deleted__')->getValue();
             $value = ($value == "true");
             $fieldset->setOption('fieldsetDeleted', $value);
@@ -105,6 +106,7 @@ class FormStack extends FormFieldset
                 ),
             ];
         }
+
 
         $elementData['elements'] = $elements;
 

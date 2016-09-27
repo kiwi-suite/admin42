@@ -10,7 +10,6 @@
 namespace Admin42\FormElements;
 
 use Ramsey\Uuid\Uuid;
-use Zend\Form\Element\Hidden;
 use Zend\Form\ElementPrepareAwareInterface;
 use Zend\Form\FieldsetInterface;
 use Zend\Form\FormInterface;
@@ -126,7 +125,6 @@ class Stack extends Fieldset
         }
 
         $this->shouldCreateChildrenOnPrepareElement = false;
-
         uasort($data, function ($value1, $value2) {
             if (!array_key_exists('__index__', $value1) || !array_key_exists('__index__', $value2)) {
                 return 0;
@@ -137,29 +135,18 @@ class Stack extends Fieldset
             return ($value1['__index__'] < $value2['__index__']) ? -1 : 1;
         });
 
-        foreach ($this->getIterator() as $name => $fieldset) {
-            if (isset($data[$name])) {
-                continue;
-            }
-
-            $this->remove($name);
-        }
-
         foreach ($data as $key => $value) {
-            if ($this->has($key)) {
-                $fieldset = $this->get($key);
-            } else {
-                if (!array_key_exists('__type__', $value)) {
-                    throw new \Exception(sprintf(
-                        '%s expects array items with an attribute "__type__"',
-                        __METHOD__
-                    ));
-                }
-                $fieldset = $this->attachFieldset($value['__type__'], $key);
 
-                if ($fieldset === false) {
-                    continue;
-                }
+            if (!array_key_exists('__type__', $value)) {
+                throw new \Exception(sprintf(
+                    '%s expects array items with an attribute "__type__"',
+                    __METHOD__
+                ));
+            }
+            $fieldset = $this->attachFieldset($value['__type__'], $key);
+
+            if ($fieldset === false) {
+                continue;
             }
 
             if ($fieldset instanceof FieldsetInterface) {
@@ -202,7 +189,7 @@ class Stack extends Fieldset
     {
         $factory = $this->getFormFactory();
         if (is_array($fieldset) || ($fieldset instanceof \Traversable && !$fieldset instanceof FieldsetInterface)) {
-            $fieldset = $factory->create($fieldset);
+            $fieldset = $factory->createFieldset($fieldset);
         }
 
         if (!$fieldset instanceof FieldsetInterface) {
