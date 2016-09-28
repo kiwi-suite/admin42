@@ -36,7 +36,9 @@ class Fieldset extends \Zend\Form\Fieldset implements AngularAwareInterface
         $this->setOption("formServiceHash", $form->getOption("formServiceHash"));
 
         foreach ($this->iterator as $elementOrFieldset) {
-            $elementOrFieldset->setOption('originalName', $elementOrFieldset->getName());
+            if ($elementOrFieldset->getOption('originalName') === null) {
+                $elementOrFieldset->setOption('originalName', $elementOrFieldset->getName());
+            }
             $elementOrFieldset->setOption("formServiceHash", $form->getOption("formServiceHash"));
             $elementOrFieldset->setName($name . '[' . $elementOrFieldset->getName() . ']');
 

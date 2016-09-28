@@ -42,7 +42,9 @@ class Form extends \Zend\Form\Form
             $this->prepareElement($this);
         } else {
             foreach ($this->getIterator() as $elementOrFieldset) {
-                $elementOrFieldset->setOption('originalName', $elementOrFieldset->getName());
+                if ($elementOrFieldset->getOption('originalName') === null) {
+                    $elementOrFieldset->setOption('originalName', $elementOrFieldset->getName());
+                }
                 $elementOrFieldset->setOption('formServiceHash', $this->getOption("formServiceHash"));
 
                 if ($elementOrFieldset instanceof FormInterface) {
@@ -67,7 +69,9 @@ class Form extends \Zend\Form\Form
 
         foreach ($this->iterator as $elementOrFieldset) {
             if ($form->wrapElements()) {
-                $elementOrFieldset->setOption('originalName', $elementOrFieldset->getName());
+                if ($elementOrFieldset->getOption('originalName') === null) {
+                    $elementOrFieldset->setOption('originalName', $elementOrFieldset->getName());
+                }
                 $elementOrFieldset->setOption('formServiceHash', $this->getOption("formServiceHash"));
                 $elementOrFieldset->setName($name . '[' . $elementOrFieldset->getName() . ']');
             }

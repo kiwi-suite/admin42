@@ -65,6 +65,9 @@ class Stack extends Fieldset
         return $this;
     }
 
+    /**
+     * @param array $sets
+     */
     protected function handleSets(array $sets)
     {
         foreach ($sets as $spec) {
@@ -100,7 +103,9 @@ class Stack extends Fieldset
 
         $name = $this->getName();
         foreach ($this->getProtoTypes() as $fieldset) {
-            $fieldset->setOption('originalName', $fieldset->getName());
+            if ($fieldset->getOption('originalName') === null) {
+                $fieldset->setOption('originalName', $fieldset->getName());
+            }
             $fieldset->setOption("formServiceHash", $form->getOption("formServiceHash"));
             $fieldset->setName($name . '[' . $fieldset->getName() . ']');
 
@@ -152,7 +157,7 @@ class Stack extends Fieldset
             if ($fieldset instanceof FieldsetInterface) {
                 $fieldset->populateValues($value);
             } else {
-                $fieldset->setValue('value', $value);
+                $fieldset->setValue($value);
             }
         }
     }
