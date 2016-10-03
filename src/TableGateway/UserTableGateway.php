@@ -20,21 +20,21 @@ class UserTableGateway extends AbstractTableGateway
      * @var array
      */
     protected $databaseTypeMap = [
-        'id' => 'Integer',
-        'username' => 'String',
-        'password' => 'String',
-        'email' => 'String',
-        'role' => 'String',
-        'displayName' => 'String',
-        'shortName' => 'String',
-        'hash' => 'String',
-        'status' => 'String',
-        'payload' => 'Json',
-        'lastLogin' => 'DateTime',
-        'locale' => 'String',
-        'timezone' => 'String',
-        'updated' => 'DateTime',
-        'created' => 'DateTime',
+        'id' => 'integer',
+        'username' => 'string',
+        'password' => 'string',
+        'email' => 'string',
+        'role' => 'string',
+        'displayName' => 'string',
+        'shortName' => 'string',
+        'hash' => 'string',
+        'status' => 'string',
+        'payload' => 'json',
+        'lastLogin' => 'dateTime',
+        'locale' => 'string',
+        'timezone' => 'string',
+        'updated' => 'dateTime',
+        'created' => 'dateTime',
     ];
 
     /**

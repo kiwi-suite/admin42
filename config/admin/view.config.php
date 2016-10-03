@@ -16,6 +16,7 @@ use Admin42\View\Helper\Form\FormRadio;
 use Admin42\View\Helper\Form\FormRow;
 use Admin42\View\Helper\Form\FormSelect;
 use Admin42\View\Helper\Form\FormStack;
+use Admin42\View\Helper\Form\FormSwitcher;
 use Admin42\View\Helper\Form\FormWysiwyg;
 use Admin42\View\Helper\Service\AdminFactory;
 use Admin42\View\Helper\Service\AngularFactory;
@@ -63,7 +64,8 @@ return [
             FormDate::class         => InvokableFactory::class,
             FormCheckbox::class     => InvokableFactory::class,
             FormStack::class        => InvokableFactory::class,
-            FormMultiCheckbox::class=> InvokableFactory::class
+            FormMultiCheckbox::class=> InvokableFactory::class,
+            FormSwitcher::class     => InvokableFactory::class,
         ],
         'aliases' => [
             'admin'                 => Admin::class,
@@ -89,6 +91,7 @@ return [
             'formCheckbox'          => FormCheckbox::class,
             'formHidden'            => FormHelper::class,
             'formStack'             => FormStack::class,
+            'formSwitcher'          => FormSwitcher::class,
         ],
     ],
 ];

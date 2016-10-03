@@ -19,19 +19,65 @@ class Text extends Element implements InputProviderInterface, AngularAwareInterf
     use ElementTrait;
 
     /**
+     * @var int
+     */
+    protected $minLength = 0;
+
+    /**
+     * @var int
+     */
+    protected $maxLength = 524288;
+
+    /**
      * @param array|\Traversable $options
      * @return $this
      */
     public function setOptions($options)
     {
-        $minLength = (!empty($options['minLength'])) ? (int) $options['minLength'] : 0;
-        $minLength = max($minLength, 0);
-        $this->setOption('minLength', $minLength);
+        if (!empty($options['minLength'])) {
+            $this->setMinLength(max((int) $options['minLength'], 0));
+        }
 
-        $maxLength = (!empty($options['maxLength'])) ? (int) $options['maxLength'] : 524288;
-        $maxLength = min($maxLength, 524288);
-        $this->setOption('maxLength', $maxLength);
+        if (!empty($options['maxLength'])) {
+            $this->setMaxLength(min((int) $options['maxLength'], 524288));
+        }
 
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getMinLength()
+    {
+        return $this->minLength;
+    }
+
+    /**
+     * @param int $minLength
+     * @return Text
+     */
+    public function setMinLength($minLength)
+    {
+        $this->minLength = $minLength;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getMaxLength()
+    {
+        return $this->maxLength;
+    }
+
+    /**
+     * @param int $maxLength
+     * @return Text
+     */
+    public function setMaxLength($maxLength)
+    {
+        $this->maxLength = $maxLength;
         return $this;
     }
 
@@ -52,7 +98,7 @@ class Text extends Element implements InputProviderInterface, AngularAwareInterf
             'validators' => [
                 [
                     'name' => StringLength::class,
-                    'options' => ['max' => $this->getOption("maxLength"), 'min' => $this->getOption("minLength")]
+                    'options' => ['max' => $this->getMaxLength(), 'min' => $this->getMinLength()]
                 ],
             ],
         ];

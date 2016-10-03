@@ -1,5 +1,5 @@
 angular.module('admin42')
-    .directive('formRadio', [function() {
+    .directive('formSwitcher', [function() {
         return {
             restrict: 'E',
             templateUrl: function(elem, attrs) {
@@ -10,14 +10,13 @@ angular.module('admin42')
             },
             controller: ['$scope', 'jsonCache', '$formService', function($scope, jsonCache, $formService) {
                 $scope.formData = jsonCache.get($scope.elementDataId);
-                $scope.options = $scope.formData.valueOptions;
 
-                $scope.radioModel = $scope.formData.value;
+                $scope.model = ($scope.formData.value == $scope.formData.checkedValue);
 
-                $scope.select = function(radioModel) {
-                    $scope.formData.value = radioModel;
+                $scope.onChange = function () {
+                    $scope.formData.value = ($scope.model == true) ? $scope.formData.checkedValue : $scope.formData.uncheckedValue;
                     $scope.formData.errors = [];
-                }
+                };
 
                 if (angular.isDefined($scope.formData.options.formServiceHash)) {
                     $formService.put(

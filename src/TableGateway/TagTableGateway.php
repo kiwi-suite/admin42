@@ -20,10 +20,10 @@ class TagTableGateway extends AbstractTableGateway
      * @var array
      */
     protected $databaseTypeMap = [
-        'id' => 'Integer',
-        'tag' => 'String',
-        'namespace' => 'String',
-        'created' => 'DateTime',
+        'id' => 'integer',
+        'tag' => 'string',
+        'namespace' => 'string',
+        'created' => 'dateTime',
     ];
 
     /**

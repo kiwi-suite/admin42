@@ -24,14 +24,16 @@ class FormDate extends FormHelper
             $value = "";
         } elseif (is_string($value)) {
             try {
+                $adminHelper = $this->getView()->plugin('admin');
                 $value = new \DateTime($value);
-                $value->setTimezone(new \DateTimeZone($this->admin()->getDisplayTimezone()));
+                $value->setTimezone(new \DateTimeZone($adminHelper->getTimezone()));
                 $value = $value->format("Y-m-d");
             } catch (\Exception $e) {
                 $value = "";
             }
         } elseif ($value instanceof \DateTime) {
-            $value->setTimezone(new \DateTimeZone($this->admin()->getDisplayTimezone()));
+            $adminHelper = $this->getView()->plugin('admin');
+            $value->setTimezone(new \DateTimeZone($adminHelper->getTimezone()));
             $value = $value->format("Y-m-d");
         } else {
             $value = "";

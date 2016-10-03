@@ -17,6 +17,7 @@ use Admin42\FormElements\Service\CountryFactory;
 use Admin42\FormElements\Service\LinkFactory;
 use Admin42\FormElements\Service\RoleFactory;
 use Admin42\FormElements\Stack;
+use Admin42\FormElements\Switcher;
 use Admin42\FormElements\Tags;
 use Admin42\FormElements\Text;
 use Admin42\FormElements\Textarea;
@@ -49,6 +50,7 @@ return [
             Select::class               => ElementFactory::class,
             Email::class                => ElementFactory::class,
             Csrf::class                 => ElementFactory::class,
+            Switcher::class             => ElementFactory::class,
         ],
         'aliases' => [
             'dateTime'                  => DateTime::class,
@@ -67,6 +69,7 @@ return [
             'select'                    => Select::class,
             'email'                     => Email::class,
             'csrf'                      => Csrf::class,
+            'switcher'                  => Switcher::class,
         ]
     ],
 ];

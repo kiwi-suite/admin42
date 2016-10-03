@@ -25,6 +25,13 @@ class FormSelect extends FormHelper
         $elementData = parent::getElementData($element, $angularNameRendering);
 
         $valueOptions = [];
+        if ($element->getEmptyValue() !== null) {
+            $id = key($element->getEmptyValue());
+            $valueOptions[] = [
+                'id' => $id,
+                'label' => $translateHelper($element->getEmptyValue()[$id], 'admin')
+            ];
+        }
         foreach ($element->getValueOptions() as $id => $value) {
             $valueOptions[] = [
                 'id'    => $id,
@@ -32,6 +39,10 @@ class FormSelect extends FormHelper
             ];
         }
         $elementData['valueOptions'] = $valueOptions;
+        $elementData['emptyValue'] = null;
+        if ($element->getEmptyValue() !== null) {
+            $elementData['emptyValue'] = array_values($element->getEmptyValue())[0];
+        }
 
         return $elementData;
     }

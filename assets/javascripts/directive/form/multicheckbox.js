@@ -11,6 +11,7 @@ angular.module('admin42')
             controller: ['$scope', 'jsonCache', '$formService', function($scope, jsonCache, $formService) {
                 $scope.formData = jsonCache.get($scope.elementDataId);
                 var initialValues = $scope.formData.value;
+                console.log(initialValues);
                 $scope.values = [];
                 $scope.options = $scope.formData.valueOptions;
                 $scope.checkboxModel = {};

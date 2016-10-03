@@ -13,9 +13,12 @@ use Zend\Filter\StringTrim;
 use Zend\Form\Element;
 use Zend\Validator\StringLength;
 
-class Textarea extends Element  implements AngularAwareInterface
+class Textarea extends Text implements AngularAwareInterface
 {
-    use ElementTrait;
+    /**
+     * @var int
+     */
+    protected $rows = 5;
 
     /**
      * @param array|\Traversable $options
@@ -23,40 +26,30 @@ class Textarea extends Element  implements AngularAwareInterface
      */
     public function setOptions($options)
     {
-        $minLength = (!empty($options['minLength'])) ? (int) $options['minLength'] : 0;
-        $minLength = max($minLength, 0);
-        $this->setOption('minLength', $minLength);
+        parent::setOptions($options);
 
-        $maxLength = (!empty($options['maxLength'])) ? (int) $options['maxLength'] : PHP_INT_MAX;
-        $maxLength = min($maxLength, PHP_INT_MAX);
-        $this->setOption('maxLength', $maxLength);
-
-        $rows = (!empty($options['rows'])) ? (int) $options['rows'] : 5;
-        $this->setOption('rows', $rows);
+        if (!empty($options['rows'])) {
+            $this->setRows((int) $options['rows']);
+        }
 
         return $this;
     }
 
     /**
-     * Should return an array specification compatible with
-     * {@link Zend\InputFilter\Factory::createInput()}.
-     *
-     * @return array
+     * @return int
      */
-    public function getInputSpecification()
+    public function getRows()
     {
-        return [
-            'name' => $this->getName(),
-            'required' => $this->isRequired(),
-            'filters' => [
-                ['name' => StringTrim::class],
-            ],
-            'validators' => [
-                [
-                    'name' => StringLength::class,
-                    'options' => ['max' => $this->getOption("maxLength"), 'min' => $this->getOption("minLength")]
-                ],
-            ],
-        ];
+        return $this->rows;
+    }
+
+    /**
+     * @param int $rows
+     * @return Textarea
+     */
+    public function setRows($rows)
+    {
+        $this->rows = $rows;
+        return $this;
     }
 }

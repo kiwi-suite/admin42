@@ -1,5 +1,5 @@
 angular.module('admin42')
-    .directive('formSelect', ['jsonCache', function() {
+    .directive('formSelect', [function() {
         return {
             restrict: 'E',
             templateUrl: function(elem, attrs) {
@@ -13,6 +13,8 @@ angular.module('admin42')
                 $scope.option = {};
                 $scope.options = $scope.formData.valueOptions;
 
+                $scope.searchEnabled = $scope.options.length > 5;
+
                 if (angular.isDefined($scope.formData.options.formServiceHash)) {
                     $formService.put(
                         $scope.formData.options.formServiceHash,
@@ -25,6 +27,10 @@ angular.module('admin42')
                     $scope.formData.errors = [];
                     $scope.formData.value = $model.id;
                 };
+
+                if ($scope.formData.value.length == 0 && $scope.formData.emptyValue !== null) {
+                    $scope.formData.value = $scope.formData.emptyValue;
+                }
 
                 if ($scope.formData.value.length > 0) {
                     angular.forEach($scope.options, function(option){

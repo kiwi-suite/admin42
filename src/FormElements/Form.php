@@ -2,6 +2,7 @@
 namespace Admin42\FormElements;
 
 use Admin42\FormElements\Service\Factory;
+use Core42\Model\GenericModel;
 use Ramsey\Uuid\Uuid;
 use Zend\Form\ElementPrepareAwareInterface;
 use Zend\Form\FormInterface;
@@ -83,6 +84,9 @@ class Form extends \Zend\Form\Form
         }
     }
 
+    /**
+     * @return HydratorInterface
+     */
     public function getHydrator()
     {
         if (!($this->hydrator instanceof HydratorInterface)) {
@@ -102,5 +106,20 @@ class Form extends \Zend\Form\Form
         }
 
         return $this->factory;
+    }
+
+    /**
+     * @param int $flag
+     * @return array|object
+     */
+    public function getData($flag = FormInterface::VALUES_NORMALIZED)
+    {
+        $data = parent::getData($flag);
+
+        if ($data instanceof GenericModel) {
+            $data = $data->toArray();
+        }
+
+        return $data;
     }
 }

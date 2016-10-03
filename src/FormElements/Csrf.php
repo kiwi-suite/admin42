@@ -9,9 +9,27 @@
 
 namespace Admin42\FormElements;
 
-class Csrf extends \Zend\Form\Element\Csrf implements AngularAwareInterface
+use Zend\Filter\StringTrim;
+use Zend\Form\Element;
+use Zend\Form\ElementPrepareAwareInterface;
+use Zend\Form\FormInterface;
+use Zend\InputFilter\InputProviderInterface;
+use Zend\Validator\Csrf as CsrfValidator;
+
+class Csrf extends Element implements AngularAwareInterface, InputProviderInterface, ElementPrepareAwareInterface
 {
     use ElementTrait;
+
+    /**
+     * @var array
+     */
+    protected $csrfValidatorOptions = [];
+
+    /**
+     * @var CsrfValidator
+     *
+     */
+    protected $csrfValidator;
 
     /**
      * @param array|\Traversable $options
@@ -19,10 +37,78 @@ class Csrf extends \Zend\Form\Element\Csrf implements AngularAwareInterface
      */
     public function setOptions($options)
     {
-        if (isset($options['csrf_options'])) {
-            $this->setCsrfValidatorOptions($options['csrf_options']);
+        if (isset($options['csrfOptions'])) {
+            $this->setCsrfValidatorOptions($options['csrfOptions']);
         }
 
         return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getCsrfValidatorOptions()
+    {
+        return $this->csrfValidatorOptions;
+    }
+
+    /**
+     * @param  array $options
+     * @return Csrf
+     */
+    public function setCsrfValidatorOptions(array $options)
+    {
+        $this->csrfValidatorOptions = $options;
+        return $this;
+    }
+
+    /**
+     * Prepare the form element
+     */
+    public function prepareElement(FormInterface $form)
+    {
+        $this->getCsrfValidator()->getHash(true);
+    }
+
+    /**
+     *
+     * @return CsrfValidator
+     */
+    public function getCsrfValidator()
+    {
+        if (null === $this->csrfValidator) {
+            $csrfOptions = $this->getCsrfValidatorOptions();
+            $csrfOptions = array_merge($csrfOptions, ['name' => $this->getName()]);
+            $this->csrfValidator = new CsrfValidator($csrfOptions);
+        }
+        return $this->csrfValidator;
+    }
+
+    /**
+     *
+     * @return array
+     */
+    public function getInputSpecification()
+    {
+        return [
+            'name' => $this->getName(),
+            'required' => $this->isRequired(),
+            'filters' => [
+                ['name' => StringTrim::class],
+            ],
+            'validators' => [
+                $this->getCsrfValidator(),
+            ],
+        ];
+    }
+
+    /**
+     *
+     * @return string
+     */
+    public function getValue()
+    {
+        $validator = $this->getCsrfValidator();
+        return $validator->getHash();
     }
 }

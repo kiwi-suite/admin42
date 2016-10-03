@@ -20,10 +20,10 @@ class LinkTableGateway extends AbstractTableGateway
      * @var array
      */
     protected $databaseTypeMap = [
-        'id' => 'Integer',
-        'hash' => 'String',
-        'type' => 'String',
-        'value' => 'Json',
+        'id' => 'integer',
+        'hash' => 'string',
+        'type' => 'string',
+        'value' => 'json',
     ];
 
     /**

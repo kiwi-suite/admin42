@@ -12,11 +12,19 @@ namespace Admin42\FormElements;
 use Core42\Hydrator\Strategy\DateStrategy;
 use Zend\Filter\StringTrim;
 use Zend\Filter\ToNull;
+use Zend\Form\Element;
 use Zend\Hydrator\Strategy\StrategyInterface;
+use Zend\InputFilter\InputProviderInterface;
 
-class Date extends \Zend\Form\Element\Date implements StrategyAwareInterface, AngularAwareInterface
+class Date extends Element implements StrategyAwareInterface, AngularAwareInterface, InputProviderInterface
 {
     use ElementTrait;
+
+    /**
+     *
+     * @var string
+     */
+    protected $format = 'Y-m-d';
 
     /**
      * @param array|\Traversable $options
@@ -39,8 +47,37 @@ class Date extends \Zend\Form\Element\Date implements StrategyAwareInterface, An
                 ['name' => StringTrim::class],
                 ['name' => ToNull::class],
             ],
-            'validators' => $this->getValidators(),
+            'validators' => [
+                [
+                    'name' => \Zend\Validator\Date::class,
+                    'options' => [
+                        'format' => $this->getFormat(),
+                    ]
+                ]
+            ],
         ];
+    }
+
+    /**
+     * @return string
+     */
+    public function getFormat()
+    {
+        return $this->format;
+    }
+
+    /**
+     * @param bool $returnFormattedValue
+     * @return mixed
+     */
+    public function getValue($returnFormattedValue = true)
+    {
+        $value = parent::getValue();
+        if (!$value instanceof \DateTime || !$returnFormattedValue) {
+            return $value;
+        }
+        $format = $this->getFormat();
+        return $value->format($format);
     }
 
     /**

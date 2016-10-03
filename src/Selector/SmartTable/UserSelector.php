@@ -37,9 +37,9 @@ class UserSelector extends AbstractSmartTableSelector
     protected function getDatabaseTypeMap()
     {
         return [
-            'id' => 'Integer',
-            'lastLogin' => 'DateTime',
-            'created' => 'DateTime',
+            'id' => 'integer',
+            'lastLogin' => 'dateTime',
+            'created' => 'dateTime',
         ];
     }
 

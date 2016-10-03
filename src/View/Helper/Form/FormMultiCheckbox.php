@@ -13,6 +13,16 @@ use Admin42\FormElements\AngularAwareInterface;
 
 class FormMultiCheckbox extends FormHelper
 {
+    public function getValue(AngularAwareInterface $element)
+    {
+        $value = $element->getValue();
+        if (!is_array($value)) {
+            $value = [];
+        }
+
+        return array_values($value);
+    }
+
     /**
      * @param AngularAwareInterface $element
      * @param bool $angularNameRendering
