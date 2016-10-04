@@ -29,17 +29,22 @@ class FormLink extends FormHelper
                 'partial/admin42/form/link-modal'
             );
 
-        foreach($element->getLinkTypes() as $type) {
+        $linkTypes = $element->getLinkTypes();
+        if ($linkTypes === null) {
+            $linkTypes = $element->getAllLinkTypes();
+        }
+
+        foreach($linkTypes as $type) {
             $this->getAngularHelper()->addHtmlPartial('link/'.$type.'.html', 'link/' . $type);
         }
 
         $elementData = parent::getElementData($element, $angularNameRendering);
 
         $translateHelper = $this->getView()->plugin('translate');
-        $urlHelper = $this->getView()->plugin('urk');
+        $urlHelper = $this->getView()->plugin('url');
 
         $availableLinkTypes = [];
-        foreach($element->getLinkTypes() as $type) {
+        foreach($linkTypes as $type) {
             $availableLinkTypes[$type] = $translateHelper('link-type.'.$type, 'admin');
         }
         $elementData['availableLinkTypes'] = $availableLinkTypes;

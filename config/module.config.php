@@ -1,10 +1,8 @@
 <?php
 namespace Admin42;
 
-use Admin42\Filter\ToDateTime;
-use Admin42\Link\Adapter\ExternLink;
+use Admin42\Link\Adapter\ExternalLink;
 use Admin42\View\Helper\Service\LinkFactory;
-use Zend\ServiceManager\Factory\InvokableFactory;
 
 return [
     'migration' => [
@@ -15,22 +13,13 @@ return [
 
     'link' => [
         'adapter' => [
-            'extern' => ExternLink::class,
+            'external' => ExternalLink::class,
         ],
     ],
 
     'view_helpers' => [
         'factories' => [
             'link'             => LinkFactory::class,
-        ],
-    ],
-
-    'filters' => [
-        'factories' => [
-            ToDateTime::class   => InvokableFactory::class,
-        ],
-        'aliases' => [
-            'toDateTime'        => ToDateTime::class,
         ],
     ],
 ];

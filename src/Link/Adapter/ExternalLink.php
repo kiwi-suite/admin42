@@ -1,7 +1,7 @@
 <?php
 namespace Admin42\Link\Adapter;
 
-class ExternLink implements AdapterInterface
+class ExternalLink implements AdapterInterface
 {
     /**
      * @param mixed $value

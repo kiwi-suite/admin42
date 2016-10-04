@@ -10,11 +10,21 @@ angular.module('admin42')
             },
             controller: ['$scope', 'jsonCache', '$uibModal', '$sce', '$formService', function($scope, jsonCache, $uibModal, $sce, $formService) {
                 $scope.formData = jsonCache.get($scope.elementDataId);
-                $scope.linkData = $scope.formData.value;
 
                 $scope.getUrl = function() {
-                    return $sce.trustAsResourceUrl($scope.linkData.previewUrl);
-                }
+                    return $sce.trustAsResourceUrl($scope.formData.value.previewUrl);
+                };
+
+                $scope.empty = function() {
+                    $scope.formData.value = {
+                        linkId: null,
+                        linkType: null,
+                        linkValue: null,
+                        linkDisplayName: null,
+                        previewUrl: null
+                    };
+                    $scope.formData.errors = [];
+                };
 
                 if (angular.isDefined($scope.formData.options.formServiceHash)) {
                     $formService.put(
@@ -106,11 +116,11 @@ angular.module('admin42')
                     });
 
                     modalInstance.result.then(function(data) {
-                        $scope.linkData.linkId = data.linkId;
-                        $scope.linkData.linkDisplayName = data.linkDisplayName;
-                        $scope.linkData.linkValue = data.linkValue;
-                        $scope.linkData.linkType = data.linkType;
-                        $scope.linkData.previewUrl = data.previewUrl;
+                        $scope.formData.value.linkId = data.linkId;
+                        $scope.formData.value.linkDisplayName = data.linkDisplayName;
+                        $scope.formData.value.linkValue = data.linkValue;
+                        $scope.formData.value.linkType = data.linkType;
+                        $scope.formData.value.previewUrl = data.previewUrl;
                         $scope.formData.errors = [];
                     }, function () {
 

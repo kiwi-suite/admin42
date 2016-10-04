@@ -20,6 +20,11 @@ class Link extends Element implements AngularAwareInterface
     protected $linkTypes;
 
     /**
+     * @var
+     */
+    protected $allLinkTypes;
+
+    /**
      * @param array $linkTypes
      */
     public function setLinkTypes(array $linkTypes)
@@ -36,11 +41,30 @@ class Link extends Element implements AngularAwareInterface
     }
 
     /**
+     * @param array $allLinkTypes
+     */
+    public function setAllLinkTypes(array $allLinkTypes)
+    {
+        $this->allLinkTypes = $allLinkTypes;
+    }
+
+    /**
+     * @return array
+     */
+    public function getAllLinkTypes()
+    {
+        return $this->allLinkTypes;
+    }
+
+    /**
      * @param array|\Traversable $options
      * @return $this
      */
     public function setOptions($options)
     {
+        if (isset($options['linkTypes'])) {
+            $this->setLinkTypes($options['linkTypes']);
+        }
         return $this;
     }
 }

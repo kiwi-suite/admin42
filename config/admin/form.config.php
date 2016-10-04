@@ -9,6 +9,7 @@ use Admin42\FormElements\Email;
 use Admin42\FormElements\Fieldset;
 use Admin42\FormElements\Form;
 use Admin42\FormElements\Hidden;
+use Admin42\FormElements\Link;
 use Admin42\FormElements\MultiCheckbox;
 use Admin42\FormElements\Password;
 use Admin42\FormElements\Radio;
@@ -29,7 +30,6 @@ return [
     'form_elements' => [
         'factories' => [
             'role'                      => RoleFactory::class,
-            'link'                      => LinkFactory::class,
             'country'                   => CountryFactory::class,
 
             DateTime::class             => ElementFactory::class,
@@ -51,6 +51,7 @@ return [
             Email::class                => ElementFactory::class,
             Csrf::class                 => ElementFactory::class,
             Switcher::class             => ElementFactory::class,
+            Link::class                 => LinkFactory::class,
         ],
         'aliases' => [
             'dateTime'                  => DateTime::class,
@@ -70,6 +71,7 @@ return [
             'email'                     => Email::class,
             'csrf'                      => Csrf::class,
             'switcher'                  => Switcher::class,
+            'link'                      => Link::class,
         ]
     ],
 ];

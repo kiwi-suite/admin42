@@ -33,9 +33,24 @@ class LinkFactory implements FactoryInterface
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
+        if ($options === null) {
+            $options = [];
+        }
+
+        $name = null;
+        if (isset($options['name'])) {
+            $name = $options['name'];
+        }
+
+        if (isset($options['options'])) {
+            $options = $options['options'];
+        }
+
         $linkProvider = $container->get(LinkProvider::class);
-        $link = new Link();
-        $link->setLinkTypes($linkProvider->getAvailableAdapters());
+
+        $link = new Link($name, $options);
+
+        $link->setAllLinkTypes($linkProvider->getAvailableAdapters());
 
         return $link;
     }

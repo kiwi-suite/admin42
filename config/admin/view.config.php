@@ -11,6 +11,7 @@ use Admin42\View\Helper\Form\FormDateTime;
 use Admin42\View\Helper\Form\FormElement;
 use Admin42\View\Helper\Form\FormFieldset;
 use Admin42\View\Helper\Form\FormHelper;
+use Admin42\View\Helper\Form\FormLink;
 use Admin42\View\Helper\Form\FormMultiCheckbox;
 use Admin42\View\Helper\Form\FormRadio;
 use Admin42\View\Helper\Form\FormRow;
@@ -68,6 +69,7 @@ return [
             FormMultiCheckbox::class=> InvokableFactory::class,
             FormText::class         => InvokableFactory::class,
             FormTextarea::class     => InvokableFactory::class,
+            FormLink::class         => InvokableFactory::class,
         ],
         'aliases' => [
             'admin'                 => Admin::class,
@@ -94,6 +96,7 @@ return [
             'formHidden'            => FormHelper::class,
             'formStack'             => FormStack::class,
             'formSwitcher'          => FormCheckbox::class,
+            'formLink'              => FormLink::class,
         ],
     ],
 ];

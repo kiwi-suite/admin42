@@ -57,7 +57,6 @@ return [
     'title.user-edit'               => 'Edit user',
     'title.user-add'                => 'Add user',
 
-    'title.media'                   => 'Media management',
     'title.link'                    => 'Link',
 
     'search.id'                     => 'Search for #ID',
@@ -104,8 +103,7 @@ return [
     'media.warning.image-too-small' => 'Image too small',
 
     'label.link-type-selector'      => 'Link Type',
-    'link-type.extern'              => 'Externer Link',
-    'link-type.media'               => 'Media Link',
+    'link-type.external'            => 'Exterernal Link',
 
     'media.category.default'        => 'Default',
 

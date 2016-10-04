@@ -67,6 +67,10 @@ class LinkProvider
      */
     public function assemble($name, $value)
     {
+        if (!isset($this->adapter[$name])) {
+            return "";
+        }
+
         return $this->adapter[$name]->assemble($value);
     }
 
@@ -77,6 +81,10 @@ class LinkProvider
      */
     public function getDisplayName($name, $value)
     {
+        if (!isset($this->adapter[$name])) {
+            return "";
+        }
+
         return $this->adapter[$name]->getDisplayName($value);
     }
 
