@@ -9,7 +9,9 @@
 
 namespace Admin42\FormElements;
 
-class Hidden extends \Zend\Form\Element\Hidden implements AngularAwareInterface
+use Zend\Form\Element;
+
+class Hidden extends Element implements AngularAwareInterface
 {
     use ElementTrait;
 

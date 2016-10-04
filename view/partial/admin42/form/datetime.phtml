@@ -1,13 +1,24 @@
-<div class="form-group" ng-class="{'has-error': formData.errors.length, 'has-feedback': formData.errors.length}">
-    <label class="col-sm-2 control-label">
-        <i ng-if="formData.options.description.length" class="fa fa-question-circle" uib-popover="{{ formData.options.description }}"></i>
-        <abbr ng-if="formData.required" title="">*</abbr>
-        {{ formData.label }}
-    </label>
-    <div class="col-sm-10">
-        <input type="hidden" name="{{ formData.name }}" value="{{ getValue(date, time) }}">
-        <div class="row">
-            <div class="col-sm-6 col-md-3">
+<div class="form-group" ng-class="{'has-error': formData.errors.length}">
+    <div class="col-sm-3 col-md-2 control-label">
+        <div class="pull-left hidden-sm hidden-xs">
+            <span class="fa fa-fw text-danger" ng-class="{'fa-exclamation-triangle': formData.errors.length}"></span>
+            <a ng-show="formData.value" class="text-light" ng-click="empty()">
+                <i class="fa fa-fw fa-trash"></i>
+            </a>
+        </div>
+        <div class="pull-right">
+            <a class="text-muted" ng-if="formData.description != null" uib-popover="{{ formData.description }}" popover-trigger="'mouseenter'">
+                <i class="fa fa-question-circle"></i>
+            </a>
+            <label>{{ formData.label }}</label>
+            <span ng-if="formData.required">*</span>
+        </div>
+        <div class="clearfix"></div>
+    </div>
+    <div class="col-sm-9 col-md-10">
+        <input type="hidden" name="{{ formData.name }}" value="{{ formData.value }}">
+        <div>
+            <div class="pull-left">
                 <input
                     type="hidden"
                     ng-model="date"
@@ -24,13 +35,11 @@
                     </span>
                 </div>
             </div>
-            <div class="col-sm-6 col-md-9">
+            <div class="pull-left m-l-md">
                 <div uib-timepicker ng-model="time" show-spinners="false" show-meridian="false"></div>
             </div>
+            <div class="clearfix"></div>
         </div>
-
-
-        <span ng-if="formData.errors.length" class="glyphicon glyphicon-warning-sign form-control-feedback"></span>
         <ul ng-if="formData.errors.length" class="list-unstyled text-danger">
             <li ng-repeat="message in formData.errors">{{ message }}</li>
         </ul>

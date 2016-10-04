@@ -13,7 +13,19 @@ angular.module('admin42')
 
                 $scope.onChange = function () {
                     $scope.formData.errors = [];
-                }
+                };
+
+                $scope.empty = function() {
+                    $scope.formData.value = "";
+                    $scope.onChange();
+                };
+
+                $scope.preventEnter = function($event) {
+                    if ($event.keyCode != 13) {
+                        return;
+                    }
+                    $event.preventDefault();
+                };
 
                 if (angular.isDefined($scope.formData.options.formServiceHash)) {
                     $formService.put(

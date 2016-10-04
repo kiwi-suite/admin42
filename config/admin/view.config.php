@@ -16,7 +16,8 @@ use Admin42\View\Helper\Form\FormRadio;
 use Admin42\View\Helper\Form\FormRow;
 use Admin42\View\Helper\Form\FormSelect;
 use Admin42\View\Helper\Form\FormStack;
-use Admin42\View\Helper\Form\FormSwitcher;
+use Admin42\View\Helper\Form\FormText;
+use Admin42\View\Helper\Form\FormTextarea;
 use Admin42\View\Helper\Form\FormWysiwyg;
 use Admin42\View\Helper\Service\AdminFactory;
 use Admin42\View\Helper\Service\AngularFactory;
@@ -65,7 +66,8 @@ return [
             FormCheckbox::class     => InvokableFactory::class,
             FormStack::class        => InvokableFactory::class,
             FormMultiCheckbox::class=> InvokableFactory::class,
-            FormSwitcher::class     => InvokableFactory::class,
+            FormText::class         => InvokableFactory::class,
+            FormTextarea::class     => InvokableFactory::class,
         ],
         'aliases' => [
             'admin'                 => Admin::class,
@@ -76,9 +78,9 @@ return [
             'formElement'           => FormElement::class,
             'formRow'               => FormRow::class,
             'formFieldset'          => FormFieldset::class,
-            'formText'              => FormHelper::class,
+            'formText'              => FormText::class,
             'formCsrf'              => FormHelper::class,
-            'formTextarea'          => FormHelper::class,
+            'formTextarea'          => FormTextarea::class,
             'formWysiwyg'           => FormWysiwyg::class,
             'formEmail'             => FormHelper::class,
             'formSelect'            => FormSelect::class,
@@ -91,7 +93,7 @@ return [
             'formCheckbox'          => FormCheckbox::class,
             'formHidden'            => FormHelper::class,
             'formStack'             => FormStack::class,
-            'formSwitcher'          => FormSwitcher::class,
+            'formSwitcher'          => FormCheckbox::class,
         ],
     ],
 ];

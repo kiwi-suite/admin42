@@ -15,6 +15,11 @@ angular.module('admin42')
                     $scope.formData.errors = [];
                 }
 
+                $scope.empty = function() {
+                    $scope.formData.value = "";
+                    $scope.onChange();
+                };
+
                 if (angular.isDefined($scope.formData.options.formServiceHash)) {
                     $formService.put(
                         $scope.formData.options.formServiceHash,

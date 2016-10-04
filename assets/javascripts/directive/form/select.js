@@ -22,6 +22,16 @@ angular.module('admin42')
                         $scope.elementDataId
                     );
                 }
+                function setValue() {
+                    if ($scope.formData.value.length > 0) {
+                        angular.forEach($scope.options, function(option){
+                            if (option.id == $scope.formData.value) {
+                                $scope.option.selected = option;
+                            }
+                        });
+
+                    }
+                }
 
                 $scope.select = function($item, $model){
                     $scope.formData.errors = [];
@@ -32,14 +42,16 @@ angular.module('admin42')
                     $scope.formData.value = $scope.formData.emptyValue;
                 }
 
-                if ($scope.formData.value.length > 0) {
-                    angular.forEach($scope.options, function(option){
-                        if (option.id == $scope.formData.value) {
-                            $scope.option.selected = option;
-                        }
-                    });
+                $scope.empty = function() {
+                    $scope.formData.value = $scope.formData.emptyValue;
 
-                }
+                    $scope.formData.errors = [];
+                    setValue();
+                };
+
+
+                setValue();
+
             }]
         }
     }]);

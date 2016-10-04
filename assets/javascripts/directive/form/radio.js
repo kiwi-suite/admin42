@@ -17,7 +17,14 @@ angular.module('admin42')
                 $scope.select = function(radioModel) {
                     $scope.formData.value = radioModel;
                     $scope.formData.errors = [];
-                }
+                };
+
+                $scope.preventEnter = function($event) {
+                    if ($event.keyCode != 13) {
+                        return;
+                    }
+                    $event.preventDefault();
+                };
 
                 if (angular.isDefined($scope.formData.options.formServiceHash)) {
                     $formService.put(

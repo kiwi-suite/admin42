@@ -8,7 +8,7 @@ angular.module('admin42')
             scope: {
                 elementDataId: '@elementDataId'
             },
-            controller: ['$scope', 'jsonCache', '$formService', function($scope, jsonCache, $formService) {
+            controller: ['$scope', 'jsonCache', '$formService', '$filter', function($scope, jsonCache, $formService, $filter) {
                 $scope.formData = jsonCache.get($scope.elementDataId);
                 var date = $scope.formData.value;
                 if (date.length > 0) {
@@ -25,6 +25,27 @@ angular.module('admin42')
                     $event.stopPropagation();
                     $scope.popup.opened = true;
                 };
+
+                $scope.preventEnter = function($event) {
+                    if ($event.keyCode != 13) {
+                        return;
+                    }
+                    $event.preventDefault();
+                };
+
+                $scope.empty = function() {
+                    $scope.value = "";
+                };
+
+                $scope.$watch('value',function(newValue, oldValue) {
+                    if(newValue != oldValue) {
+                        if (newValue == "") {
+                            $scope.formData.value = "";
+                            return;
+                        }
+                        $scope.formData.value = $filter('date')(newValue, 'yyyy-MM-dd');
+                    }
+                },true);
 
                 $scope.dateOptions = {
                     formatYear: 'yy',

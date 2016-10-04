@@ -22,7 +22,7 @@ use Admin42\FormElements\Tags;
 use Admin42\FormElements\Text;
 use Admin42\FormElements\Textarea;
 use Admin42\FormElements\Wysiwyg;
-use Admin42\FormElements\YouTube;
+use Admin42\FormElements\Youtube;
 use Core42\Form\Service\ElementFactory;
 
 return [
@@ -36,7 +36,7 @@ return [
             Date::class                 => ElementFactory::class,
             Tags::class                 => ElementFactory::class,
             Wysiwyg::class              => ElementFactory::class,
-            YouTube::class              => ElementFactory::class,
+            Youtube::class              => ElementFactory::class,
             Form::class                 => ElementFactory::class,
             Fieldset::class             => ElementFactory::class,
             Stack::class                => ElementFactory::class,
@@ -57,7 +57,7 @@ return [
             'date'                      => Date::class,
             'tags'                      => Tags::class,
             'wysiwyg'                   => Wysiwyg::class,
-            'youtube'                   => YouTube::class,
+            'youtube'                   => Youtube::class,
             'stack'                     => Stack::class,
             'checkbox'                  => Checkbox::class,
             'multiCheckbox'             => MultiCheckbox::class,

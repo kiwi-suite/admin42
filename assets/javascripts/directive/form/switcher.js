@@ -18,6 +18,13 @@ angular.module('admin42')
                     $scope.formData.errors = [];
                 };
 
+                $scope.preventEnter = function($event) {
+                    if ($event.keyCode != 13) {
+                        return;
+                    }
+                    $event.preventDefault();
+                };
+
                 if (angular.isDefined($scope.formData.options.formServiceHash)) {
                     $formService.put(
                         $scope.formData.options.formServiceHash,

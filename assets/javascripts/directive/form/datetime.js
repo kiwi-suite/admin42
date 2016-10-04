@@ -34,7 +34,33 @@ angular.module('admin42')
                     showWeeks: false
                 };
 
-                $scope.getValue = function(date, time) {
+                $scope.preventEnter = function($event) {
+                    if ($event.keyCode != 13) {
+                        return;
+                    }
+                    $event.preventDefault();
+                };
+
+                $scope.empty = function() {
+                    $scope.date = null;
+                    $scope.time = null;
+                };
+
+                $scope.$watch('date',function(newValue, oldValue) {
+                    if(newValue != oldValue) {
+                        if(newValue != oldValue) {
+                            $scope.formData.value = getValue(newValue, $scope.time);
+                        }
+                    }
+                },true);
+
+                $scope.$watch('time',function(newValue, oldValue) {
+                    if(newValue != oldValue) {
+                        $scope.formData.value = getValue($scope.date, newValue);
+                    }
+                },true);
+
+                function getValue(date, time) {
                     if (date == null || time ==  null) {
                         return "";
                     }

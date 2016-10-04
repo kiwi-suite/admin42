@@ -11,7 +11,7 @@ namespace Admin42\FormElements;
 
 use Zend\Form\Element;
 
-class YouTube extends Element implements AngularAwareInterface
+class Youtube extends Element implements AngularAwareInterface
 {
     use ElementTrait;
 

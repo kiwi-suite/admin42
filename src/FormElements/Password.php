@@ -9,7 +9,11 @@
 
 namespace Admin42\FormElements;
 
-class Password extends \Zend\Form\Element\Password implements AngularAwareInterface
+use Zend\Form\Element;
+use Zend\Form\ElementPrepareAwareInterface;
+use Zend\Form\FormInterface;
+
+class Password extends Element implements AngularAwareInterface, ElementPrepareAwareInterface
 {
     use ElementTrait;
 
@@ -20,5 +24,15 @@ class Password extends \Zend\Form\Element\Password implements AngularAwareInterf
     public function setOptions($options)
     {
         return $this;
+    }
+
+    /**
+     *
+     * @param  FormInterface $form
+     * @return mixed
+     */
+    public function prepareElement(FormInterface $form)
+    {
+        $this->setValue('');
     }
 }

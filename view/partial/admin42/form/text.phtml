@@ -1,13 +1,23 @@
-<div class="form-group" ng-class="{'has-error': formData.errors.length, 'has-feedback': formData.errors.length}">
-    <label for="{{ formData.id }}" class="col-sm-2 control-label">
-        <i ng-if="formData.options.description.length" class="fa fa-question-circle" uib-popover="{{ formData.options.description }}"></i>
-        <abbr ng-if="formData.required" title="">*</abbr>
-        {{ formData.label }}
-    </label>
-    <div class="col-sm-10">
+<div class="form-group" ng-class="{'has-error': formData.errors.length}">
+    <div class="col-sm-3 col-md-2 control-label">
+        <div class="pull-left hidden-sm hidden-xs">
+            <span class="fa fa-fw text-danger" ng-class="{'fa-exclamation-triangle': formData.errors.length}"></span>
+            <a ng-show="formData.value.length > 0" class="text-light" ng-click="empty()">
+                <i class="fa fa-fw fa-trash"></i>
+            </a>
+        </div>
+        <div class="pull-right">
+            <a class="text-muted" ng-if="formData.description != null" uib-popover="{{ formData.description }}" popover-trigger="'mouseenter'">
+                <i class="fa fa-question-circle"></i>
+            </a>
+            <label for="{{ formData.id }}">{{ formData.label }}</label>
+            <span ng-if="formData.required">*</span>
+        </div>
+        <div class="clearfix"></div>
+    </div>
+    <div class="col-sm-9 col-md-10">
         <input type="hidden" name="{{ formData.name }}" value="{{ formData.value }}">
-        <input id="{{ formData.id }}" type="text" class="form-control" ng-model="formData.value" maxlength="{{formData.options.maxLength}}" ng-change="onChange()">
-        <span ng-if="formData.errors.length" class="glyphicon glyphicon-warning-sign form-control-feedback"></span>
+        <input id="{{ formData.id }}" type="text" class="form-control" ng-model="formData.value" maxlength="{{formData.maxLength}}" ng-change="onChange()" ng-keydown="preventEnter($event)" ng-keypress="preventEnter($event)" ng-keyup="preventEnter($event)">
         <ul ng-if="formData.errors.length" class="list-unstyled text-danger">
             <li ng-repeat="message in formData.errors">{{ message }}</li>
         </ul>

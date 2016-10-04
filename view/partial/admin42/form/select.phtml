@@ -1,10 +1,21 @@
 <div class="form-group" ng-class="{'has-error': formData.errors.length}">
-    <label for="{{ formData.id }}" class="col-sm-2 control-label">
-        <i ng-if="formData.options.description.length" class="fa fa-question-circle" uib-popover="{{ formData.options.description }}"></i>
-        <abbr ng-if="formData.required" title="">*</abbr>
-        {{ formData.label }}
-    </label>
-    <div class="col-sm-10">
+    <div class="col-sm-3 col-md-2 control-label">
+        <div class="pull-left hidden-sm hidden-xs">
+            <span class="fa fa-fw text-danger" ng-class="{'fa-exclamation-triangle': formData.errors.length}"></span>
+            <a ng-show="formData.value.length > 0 && formData.emptyValue !== formData.value" class="text-light" ng-click="empty()">
+                <i class="fa fa-fw fa-trash"></i>
+            </a>
+        </div>
+        <div class="pull-right">
+            <a class="text-muted" ng-if="formData.description != null" uib-popover="{{ formData.description }}" popover-trigger="'mouseenter'">
+                <i class="fa fa-question-circle"></i>
+            </a>
+            <label>{{ formData.label }}</label>
+            <span ng-if="formData.required">*</span>
+        </div>
+        <div class="clearfix"></div>
+    </div>
+    <div class="col-sm-9 col-md-10">
         <input type="hidden" name="{{ formData.name }}" value="{{ formData.value }}">
         <ui-select ng-model="option.selected" reset-search-input="false" search-enabled="searchEnabled" on-select="select($item, $model)">
             <ui-select-match placeholder="{{ label }}">

@@ -41,7 +41,7 @@ class FormSelect extends FormHelper
         $elementData['valueOptions'] = $valueOptions;
         $elementData['emptyValue'] = null;
         if ($element->getEmptyValue() !== null) {
-            $elementData['emptyValue'] = array_values($element->getEmptyValue())[0];
+            $elementData['emptyValue'] = array_keys($element->getEmptyValue())[0];
         }
 
         return $elementData;

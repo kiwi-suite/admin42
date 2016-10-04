@@ -42,7 +42,7 @@ class Date extends Element implements StrategyAwareInterface, AngularAwareInterf
     {
         return [
             'name' => $this->getName(),
-            'required' => false,
+            'required' => $this->isRequired(),
             'filters' => [
                 ['name' => StringTrim::class],
                 ['name' => ToNull::class],

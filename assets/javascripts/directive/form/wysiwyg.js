@@ -19,6 +19,10 @@ angular.module('admin42')
                     $scope.$broadcast('$tinyWysiwyg:enable');
                 });
 
+                $scope.empty = function() {
+                    $scope.formData.value = "";
+                };
+
                 if (angular.isDefined($scope.formData.options.formServiceHash)) {
                     $formService.put(
                         $scope.formData.options.formServiceHash,

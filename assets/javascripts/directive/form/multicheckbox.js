@@ -11,7 +11,6 @@ angular.module('admin42')
             controller: ['$scope', 'jsonCache', '$formService', function($scope, jsonCache, $formService) {
                 $scope.formData = jsonCache.get($scope.elementDataId);
                 var initialValues = $scope.formData.value;
-                console.log(initialValues);
                 $scope.values = [];
                 $scope.options = $scope.formData.valueOptions;
                 $scope.checkboxModel = {};
@@ -38,6 +37,20 @@ angular.module('admin42')
                 };
 
                 $scope.select();
+
+                $scope.empty = function() {
+                    angular.forEach($scope.checkboxModel, function(value, index){
+                        $scope.checkboxModel[index] = false;
+                    });
+                    $scope.select();
+                };
+
+                $scope.preventEnter = function($event) {
+                    if ($event.keyCode != 13) {
+                        return;
+                    }
+                    $event.preventDefault();
+                };
 
                 if (angular.isDefined($scope.formData.options.formServiceHash)) {
                     $formService.put(

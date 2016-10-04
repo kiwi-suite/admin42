@@ -32,6 +32,18 @@ angular.module('admin42')
                     return $sce.trustAsResourceUrl("https://www.youtube.com/embed/" + $scope.formData.value);
                 }
 
+                $scope.empty = function() {
+                    $scope.youtubeLink = "";
+                    $scope.changeValue();
+                };
+
+                $scope.preventEnter = function($event) {
+                    if ($event.keyCode != 13) {
+                        return;
+                    }
+                    $event.preventDefault();
+                };
+
                 if (angular.isDefined($scope.formData.options.formServiceHash)) {
                     $formService.put(
                         $scope.formData.options.formServiceHash,

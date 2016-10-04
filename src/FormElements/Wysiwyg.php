@@ -18,7 +18,6 @@ class Wysiwyg extends Element  implements AngularAwareInterface
 
     protected $editorOptions = [
         'trusted' => true,
-        'format' => 'raw',
         'height' => 300,
         'plugins'=> 'paste autolink lists charmap table code link',
         'menubar'=> false,
