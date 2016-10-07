@@ -3,6 +3,7 @@ namespace Admin42;
 
 return [
     'whitelabel' => [
+        'title'                     => 'kiwi42',
         'show-topbar-title'         => true,
         'topbar-title'              => 'kiw<span class="text-r42">i</span>42',
         'logo-icon'                 => 'assets/admin/admin42/images/logo-icon.png', // topbar -> light

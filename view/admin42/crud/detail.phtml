@@ -1,12 +1,8 @@
-<div class="wrapper-md bg-white b-b box-shadow">
-    <h1 class="m-n font-thin h3">
-        <span class="fa <?= $this->icon ?>"></span>
-        <?php
-        $label = $this->params()->fromRoute('isEditMode') == true ? 'Edit' : 'Add';
-        ?>
-        <?= $this->translate($label, 'admin') ?>
-    </h1>
-</div>
+<?php
+$headerTitle = $this->params()->fromRoute('isEditMode') == true ? 'Edit' : 'Add';
+$icon = (!empty($this->icon)) ? 'fa ' . $this->icon : null;
+?>
+<?= $this->pageHeader($this->translate($headerTitle, 'admin'), $icon) ?>
 <div class="wrapper-md">
     <div class="row">
         <div class="col-lg-6">

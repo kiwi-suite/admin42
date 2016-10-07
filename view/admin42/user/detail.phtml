@@ -1,12 +1,10 @@
-<div class="wrapper-md bg-white b-b box-shadow">
-    <h1 class="m-n font-thin h3">
-        <span class="fa fa-user"></span>
-        <?php
-        $label = $this->params()->fromRoute('isEditMode') == true ? 'title.user-edit' : 'title.user-add';
-        ?>
-        <?= $this->translate($label, 'admin') ?>
-    </h1>
-</div>
+<?php
+$headerTitle = $this->translate('title.user-add', 'admin');
+if ($this->params()->fromRoute('isEditMode') == true) {
+    $headerTitle = $this->translate('title.user-edit', 'admin') . ' - ' . $this->user->getEmail();
+}
+?>
+<?= $this->pageHeader($headerTitle, 'fa fa-user') ?>
 <div class="wrapper-md">
     <form class="form-horizontal" role="form" action="<?= $this->url(null, [], [], true) ?>" method="post">
         <div class="panel b-a">

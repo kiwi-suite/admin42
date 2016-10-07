@@ -20,6 +20,7 @@ use Admin42\View\Helper\Form\FormStack;
 use Admin42\View\Helper\Form\FormText;
 use Admin42\View\Helper\Form\FormTextarea;
 use Admin42\View\Helper\Form\FormWysiwyg;
+use Admin42\View\Helper\PageHeader;
 use Admin42\View\Helper\Service\AdminFactory;
 use Admin42\View\Helper\Service\AngularFactory;
 use Admin42\View\Helper\Service\UserFactory;
@@ -50,6 +51,7 @@ return [
     'view_helpers' => [
         'factories'  => [
             'whitelabel'            => WhitelabelFactory::class,
+            PageHeader::class       => InvokableFactory::class,
             Admin::class            => AdminFactory::class,
             Angular::class          => AngularFactory::class,
             User::class             => UserFactory::class,
@@ -75,6 +77,7 @@ return [
             'admin'                 => Admin::class,
             'angular'               => Angular::class,
             'user'                  => User::class,
+            'pageHeader'            => PageHeader::class,
 
             'form'                  => Form::class,
             'formElement'           => FormElement::class,

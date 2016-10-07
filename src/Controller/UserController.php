@@ -84,6 +84,7 @@ class UserController extends AbstractAdminController
 
         $createEditForm = $this->getForm(CreateEditForm::class);
 
+        $user = new User();
         if ($prg !== false) {
             if ($isEditMode === true) {
                 $cmd = $this->getCommand(EditCommand::class);
@@ -150,6 +151,7 @@ class UserController extends AbstractAdminController
 
         return [
             'createEditForm' => $createEditForm,
+            'user' => $user,
         ];
     }
 

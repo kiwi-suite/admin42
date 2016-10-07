@@ -1,9 +1,4 @@
-<div class="wrapper-md bg-white b-b box-shadow">
-    <h1 class="m-n font-thin h3">
-        <span class="fa fa-users"></span>
-        <?= $this->translate('title.users', 'admin') ?>
-    </h1>
-</div>
+<?= $this->pageHeader($this->translate('title.users', 'admin'), 'fa fa-user') ?>
 <div class="wrapper-md">
     <div class="panel panel-default">
         <div class="table-responsive" ng-controller="DataGridController" data-url="<?= $this->url()?>">
