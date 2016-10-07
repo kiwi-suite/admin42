@@ -37,7 +37,6 @@ return [
                         'route/admin/lost-password',
                         'route/admin/recover-password',
                         'route/home',
-                        'route/admin/api/job',
                         'route/admin/permission-denied',
                     ],
                     'options' => [

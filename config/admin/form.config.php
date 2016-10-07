@@ -14,8 +14,10 @@ use Admin42\FormElements\MultiCheckbox;
 use Admin42\FormElements\Password;
 use Admin42\FormElements\Radio;
 use Admin42\FormElements\Select;
+use Admin42\FormElements\Service\ActiveFactory;
 use Admin42\FormElements\Service\CountryFactory;
 use Admin42\FormElements\Service\LinkFactory;
+use Admin42\FormElements\Service\OnlineFactory;
 use Admin42\FormElements\Service\RoleFactory;
 use Admin42\FormElements\Stack;
 use Admin42\FormElements\Switcher;
@@ -31,6 +33,8 @@ return [
         'factories' => [
             'role'                      => RoleFactory::class,
             'country'                   => CountryFactory::class,
+            'onlineSwitcher'            => OnlineFactory::class,
+            'activeSwitcher'            => ActiveFactory::class,
 
             DateTime::class             => ElementFactory::class,
             Date::class                 => ElementFactory::class,

@@ -175,16 +175,6 @@ return [
                                     ],
                                 ],
                             ],
-                            'job' => [
-                                'type' => Segment::class,
-                                'options' => [
-                                    'route' => 'job/',
-                                    'defaults' => [
-                                        'action' => 'run',
-                                        'controller' => __NAMESPACE__ . '\Api\Job',
-                                    ],
-                                ],
-                            ],
                         ],
                     ],
                 ],
