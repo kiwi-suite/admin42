@@ -1,4 +1,15 @@
 <?php
+
+/*
+ * admin42
+ *
+ * @package admin42
+ * @link https://github.com/raum42/admin42
+ * @copyright Copyright (c) 2010 - 2016 raum42 (https://www.raum42.at)
+ * @license MIT License
+ * @author raum42 <kiwi@raum42.at>
+ */
+
 namespace Admin42\Navigation\Service;
 
 use Admin42\Navigation\Page\Page;
@@ -37,7 +48,7 @@ class ContainerFactory implements FactoryInterface
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
-        $this->router = $container->get("Router");
+        $this->router = $container->get('Router');
         $this->routeMatch = $container->get('Application')->getMvcEvent()->getRouteMatch();
 
         $navigation = new Container();

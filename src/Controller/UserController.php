@@ -1,10 +1,13 @@
 <?php
-/**
- * admin42 (www.raum42.at)
+
+/*
+ * admin42
  *
- * @link http://www.raum42.at
- * @copyright Copyright (c) 2010-2014 raum42 OG (http://www.raum42.at)
- *
+ * @package admin42
+ * @link https://github.com/raum42/admin42
+ * @copyright Copyright (c) 2010 - 2016 raum42 (https://www.raum42.at)
+ * @license MIT License
+ * @author raum42 <kiwi@raum42.at>
  */
 
 namespace Admin42\Controller;
@@ -75,7 +78,7 @@ class UserController extends AbstractAdminController
      */
     public function detailAction()
     {
-        $isEditMode = $this->params()->fromRoute("isEditMode");
+        $isEditMode = $this->params()->fromRoute('isEditMode');
 
         $prg = $this->prg();
         if ($prg instanceof Response) {
@@ -88,7 +91,7 @@ class UserController extends AbstractAdminController
         if ($prg !== false) {
             if ($isEditMode === true) {
                 $cmd = $this->getCommand(EditCommand::class);
-                $cmd->setUserId($this->params()->fromRoute("id"));
+                $cmd->setUserId($this->params()->fromRoute('id'));
             } else {
                 $cmd = $this->getCommand(CreateCommand::class);
             }
@@ -96,7 +99,7 @@ class UserController extends AbstractAdminController
             $formCommand = $this->getFormCommand();
             $user = $formCommand->setForm($createEditForm)
                             ->setProtectedData(['password', 'status'])
-                            ->setValueCallback(function($values) {
+                            ->setValueCallback(function ($values) {
                                 $newValues = [
                                     'payload' => [],
                                 ];
@@ -134,7 +137,7 @@ class UserController extends AbstractAdminController
             if ($isEditMode === true) {
                 $user = $this
                     ->getTableGateway(UserTableGateway::class)
-                    ->selectByPrimary((int) $this->params()->fromRoute("id"));
+                    ->selectByPrimary((int) $this->params()->fromRoute('id'));
 
                 if (empty($user) || $user->getStatus() == User::STATUS_INACTIVE) {
                     return $this->redirect()->toRoute('admin/user');
@@ -184,12 +187,12 @@ class UserController extends AbstractAdminController
             ]);
 
             return new JsonModel([
-               'redirect' => $this->url()->fromRoute('admin/user')
+               'redirect' => $this->url()->fromRoute('admin/user'),
             ]);
         }
 
         return new JsonModel([
-            'redirect' => $this->url()->fromRoute('admin/user')
+            'redirect' => $this->url()->fromRoute('admin/user'),
         ]);
     }
 
@@ -319,7 +322,7 @@ class UserController extends AbstractAdminController
         if ($prg !== false) {
             $recoverPassowordCommand = $this->getCommand(RecoverPasswordCommand::class);
             $recoverPassowordCommand->setEmail(urldecode($this->params()->fromRoute('email')));
-            $recoverPassowordCommand->setHash($this->params()->fromRoute("hash"));
+            $recoverPassowordCommand->setHash($this->params()->fromRoute('hash'));
 
             $formCmd = $this->getFormCommand();
             $formCmd->setForm($recoverPasswordForm)
@@ -329,7 +332,7 @@ class UserController extends AbstractAdminController
                 ->run();
 
             if (!$formCmd->hasErrors()) {
-                return $this->redirect()->toRoute("admin/login");
+                return $this->redirect()->toRoute('admin/login');
             }
         }
 
@@ -358,7 +361,7 @@ class UserController extends AbstractAdminController
             $formCmd = $this->getFormCommand();
             $formCmd->setForm($manageForm)
                         ->setData($prg)
-                        ->setValueCallback(function($values) {
+                        ->setValueCallback(function ($values) {
                             $newValues = [
                                 'payload' => [],
                             ];
@@ -373,7 +376,7 @@ class UserController extends AbstractAdminController
                                     'displayName',
                                     'password',
                                     'passwordRepeat',
-                                    'shortName'
+                                    'shortName',
                                 ];
                                 if (in_array($name, $check)) {
                                     $newValues[$name] = $value;
@@ -400,7 +403,7 @@ class UserController extends AbstractAdminController
                 'username' => $this->getIdentity()->getUsername(),
                 'email' => $this->getIdentity()->getEmail(),
                 'shortName' => $this->getIdentity()->getShortName(),
-                'displayName' => $this->getIdentity()->getDisplayName()
+                'displayName' => $this->getIdentity()->getDisplayName(),
             ], $this->getIdentity()->getPayload()));
         }
 

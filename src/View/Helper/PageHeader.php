@@ -1,10 +1,13 @@
 <?php
-/**
- * admin42 (www.raum42.at)
+
+/*
+ * admin42
  *
- * @link http://www.raum42.at
- * @copyright Copyright (c) 2010-2014 raum42 OG (http://www.raum42.at)
- *
+ * @package admin42
+ * @link https://github.com/raum42/admin42
+ * @copyright Copyright (c) 2010 - 2016 raum42 (https://www.raum42.at)
+ * @license MIT License
+ * @author raum42 <kiwi@raum42.at>
  */
 
 namespace Admin42\View\Helper;
@@ -16,7 +19,7 @@ class PageHeader extends AbstractHelper
     /**
      * @var string
      */
-    protected $title = "";
+    protected $title = '';
 
     /**
      * @var string
@@ -68,6 +71,7 @@ class PageHeader extends AbstractHelper
     public function __toString()
     {
         $partialHelper = $this->getView()->plugin('partial');
+
         return (string) $partialHelper('partial/admin42/page-header', [
             'title' => $this->title,
             'icon' => $this->icon,

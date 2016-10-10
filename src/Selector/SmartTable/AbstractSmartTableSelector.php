@@ -1,9 +1,19 @@
 <?php
+
+/*
+ * admin42
+ *
+ * @package admin42
+ * @link https://github.com/raum42/admin42
+ * @copyright Copyright (c) 2010 - 2016 raum42 (https://www.raum42.at)
+ * @license MIT License
+ * @author raum42 <kiwi@raum42.at>
+ */
+
 namespace Admin42\Selector\SmartTable;
 
 use Core42\Db\ResultSet\ResultSet;
 use Core42\Selector\AbstractDatabaseSelector;
-use Core42\Selector\AbstractTableGatewaySelector;
 use Core42\View\Model\JsonModel;
 use Zend\Db\Sql\Predicate\PredicateSet;
 use Zend\Db\Sql\Where;
@@ -50,7 +60,7 @@ abstract class AbstractSmartTableSelector extends AbstractDatabaseSelector
             throw new \Exception("'getDisplayColumns' doesn't return an array");
         }
 
-        $request = $this->getServiceManager()->get("Request");
+        $request = $this->getServiceManager()->get('Request');
 
         $config = Json::decode($request->getContent(), Json::TYPE_ARRAY);
 
@@ -76,7 +86,6 @@ abstract class AbstractSmartTableSelector extends AbstractDatabaseSelector
                 'sort_sequence' => ($config['sort']['reverse'] === true) ? 'DESC' : 'ASC',
             ];
         }
-
     }
 
     /**
@@ -101,9 +110,10 @@ abstract class AbstractSmartTableSelector extends AbstractDatabaseSelector
     {
         if ($this->sort !== null) {
             return [
-                $this->sort['column'] => $this->sort['sort_sequence']
+                $this->sort['column'] => $this->sort['sort_sequence'],
             ];
         }
+
         return [];
     }
 
@@ -113,18 +123,18 @@ abstract class AbstractSmartTableSelector extends AbstractDatabaseSelector
     protected function getWhere()
     {
         if (!is_array($this->search)) {
-            return null;
+            return;
         }
 
         $searchAbleColumns = $this->getSearchAbleColumns();
 
         $searchWhere = [];
         foreach ($this->search as $column => $value) {
-            if ($column == "$") {
+            if ($column == '$') {
                 $globalWhere = [];
                 foreach ($searchAbleColumns as $_column) {
                     $where = new Where();
-                    $where->like($_column, "%" . $value . "%");
+                    $where->like($_column, '%' . $value . '%');
                     $globalWhere[] = $where;
                 }
                 $searchWhere[] = new PredicateSet($globalWhere, PredicateSet::COMBINED_BY_OR);
@@ -137,7 +147,7 @@ abstract class AbstractSmartTableSelector extends AbstractDatabaseSelector
                         continue;
                     }
                     $where = new Where();
-                    $where->like($column . '.' . $_innerCol, "%" . $_innerVal . "%");
+                    $where->like($column . '.' . $_innerCol, '%' . $_innerVal . '%');
                     $searchWhere[] = $where;
                 }
 
@@ -148,15 +158,16 @@ abstract class AbstractSmartTableSelector extends AbstractDatabaseSelector
                 continue;
             }
             $where = new Where();
-            $where->like($column, "%" . $value . "%");
+            $where->like($column, '%' . $value . '%');
             $searchWhere[] = $where;
         }
 
         if (empty($searchWhere)) {
-            return null;
+            return;
         }
 
         $predicateSet = new PredicateSet($searchWhere, PredicateSet::COMBINED_BY_AND);
+
         return $predicateSet;
     }
 
@@ -176,7 +187,7 @@ abstract class AbstractSmartTableSelector extends AbstractDatabaseSelector
             )
         ));
         $paginator->setItemCountPerPage($this->limit);
-        $paginator->setCurrentPageNumber(floor($this->offset/$this->limit) + 1);
+        $paginator->setCurrentPageNumber(floor($this->offset / $this->limit) + 1);
 
         $data = $this->prepareColumns($paginator->getCurrentItems()->getArrayCopy());
 
@@ -184,7 +195,7 @@ abstract class AbstractSmartTableSelector extends AbstractDatabaseSelector
             'data' => $data,
             'meta' => [
                 'displayedPages' => $paginator->count(),
-            ]
+            ],
         ]);
     }
 

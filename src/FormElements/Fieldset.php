@@ -1,4 +1,15 @@
 <?php
+
+/*
+ * admin42
+ *
+ * @package admin42
+ * @link https://github.com/raum42/admin42
+ * @copyright Copyright (c) 2010 - 2016 raum42 (https://www.raum42.at)
+ * @license MIT License
+ * @author raum42 <kiwi@raum42.at>
+ */
+
 namespace Admin42\FormElements;
 
 use Admin42\FormElements\Service\Factory;
@@ -33,13 +44,13 @@ class Fieldset extends \Zend\Form\Fieldset implements AngularAwareInterface
     {
         $name = $this->getName();
 
-        $this->setOption("formServiceHash", $form->getOption("formServiceHash"));
+        $this->setOption('formServiceHash', $form->getOption('formServiceHash'));
 
         foreach ($this->iterator as $elementOrFieldset) {
             if ($elementOrFieldset->getOption('originalName') === null) {
                 $elementOrFieldset->setOption('originalName', $elementOrFieldset->getName());
             }
-            $elementOrFieldset->setOption("formServiceHash", $form->getOption("formServiceHash"));
+            $elementOrFieldset->setOption('formServiceHash', $form->getOption('formServiceHash'));
             $elementOrFieldset->setName($name . '[' . $elementOrFieldset->getName() . ']');
 
             // Recursively prepare elements
@@ -57,6 +68,7 @@ class Fieldset extends \Zend\Form\Fieldset implements AngularAwareInterface
         if (!($this->hydrator instanceof HydratorInterface)) {
             $this->setHydrator($this->prepareHydrator($this));
         }
+
         return parent::getHydrator();
     }
 

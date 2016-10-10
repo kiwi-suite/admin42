@@ -1,4 +1,15 @@
 <?php
+
+/*
+ * admin42
+ *
+ * @package admin42
+ * @link https://github.com/raum42/admin42
+ * @copyright Copyright (c) 2010 - 2016 raum42 (https://www.raum42.at)
+ * @license MIT License
+ * @author raum42 <kiwi@raum42.at>
+ */
+
 namespace Admin42\View\Helper;
 
 use Ramsey\Uuid\Uuid;
@@ -57,15 +68,15 @@ class Angular extends AbstractHelper
             'locale' => \Locale::getDefault(),
             'defaultDateTimeFormat' => 'LLL',
             'timezone' => date_default_timezone_get(),
-            'displayTimezone' => $adminHelper->getTimezone()
+            'displayTimezone' => $adminHelper->getTimezone(),
         ];
 
-        return "var APP;"
-        . "angular.element(document).ready(function(){"
-        . "APP = angular.module('APP', ". Json::encode($this->config['modules']).");"
-        . "APP.constant('appConfig', ".Json::encode($appConfig).");"
+        return 'var APP;'
+        . 'angular.element(document).ready(function(){'
+        . "APP = angular.module('APP', " . Json::encode($this->config['modules']) . ');'
+        . "APP.constant('appConfig', " . Json::encode($appConfig) . ');'
         . "angular.bootstrap(document, ['APP']);"
-        . "});" . PHP_EOL;
+        . '});' . PHP_EOL;
     }
 
     /**
@@ -74,7 +85,7 @@ class Angular extends AbstractHelper
      */
     public function hasJsonTemplate($name)
     {
-        return (isset($this->jsonTemplates[$name]));
+        return isset($this->jsonTemplates[$name]);
     }
 
     /**
@@ -99,7 +110,7 @@ class Angular extends AbstractHelper
      * @param string $prefix
      * @return string
      */
-    public function generateJsonTemplate($value, $prefix = "")
+    public function generateJsonTemplate($value, $prefix = '')
     {
         $name = $prefix . Uuid::uuid4()->toString() . '.json';
         $this->addJsonTemplate($name, $value);
@@ -127,7 +138,7 @@ class Angular extends AbstractHelper
      */
     public function hasHtmlTemplate($name)
     {
-        return (isset($this->htmlTemplates[$name]));
+        return isset($this->htmlTemplates[$name]);
     }
 
     /**
@@ -136,7 +147,7 @@ class Angular extends AbstractHelper
      */
     public function hasHtmlPartial($name)
     {
-        return (isset($this->htmlPartials[$name]));
+        return isset($this->htmlPartials[$name]);
     }
 
     /**
@@ -213,11 +224,11 @@ class Angular extends AbstractHelper
         }
 
         return [
-            'id' => 'form-'.Uuid::uuid4()->toString(),
+            'id' => 'form-' . Uuid::uuid4()->toString(),
             'name' => $element->getName(),
             'label' => $label,
             'value' => $value,
-            'required' => $element->hasAttribute("required"),
+            'required' => $element->hasAttribute('required'),
             'options' => $element->getOptions(),
             'attributes' => $element->getAttributes(),
             'errors' => array_values($element->getMessages()),

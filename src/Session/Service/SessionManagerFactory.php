@@ -1,4 +1,15 @@
 <?php
+
+/*
+ * admin42
+ *
+ * @package admin42
+ * @link https://github.com/raum42/admin42
+ * @copyright Copyright (c) 2010 - 2016 raum42 (https://www.raum42.at)
+ * @license MIT License
+ * @author raum42 <kiwi@raum42.at>
+ */
+
 namespace Admin42\Session\Service;
 
 use Interop\Container\ContainerInterface;
@@ -13,7 +24,6 @@ use Zend\Session\Storage\StorageInterface;
 
 class SessionManagerFactory implements FactoryInterface
 {
-
     /**
      * Create an object
      *
@@ -28,11 +38,11 @@ class SessionManagerFactory implements FactoryInterface
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
-        $config        = null;
-        $storage       = null;
-        $saveHandler   = null;
-        $validators    = [];
-        $options       = [];
+        $config = null;
+        $storage = null;
+        $saveHandler = null;
+        $validators = [];
+        $options = [];
 
         $config = $container->get('Admin42\SessionConfig');
 

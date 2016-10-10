@@ -1,16 +1,18 @@
 <?php
-/**
- * admin42 (www.raum42.at)
+
+/*
+ * admin42
  *
- * @link http://www.raum42.at
- * @copyright Copyright (c) 2010-2014 raum42 OG (http://www.raum42.at)
- *
+ * @package admin42
+ * @link https://github.com/raum42/admin42
+ * @copyright Copyright (c) 2010 - 2016 raum42 (https://www.raum42.at)
+ * @license MIT License
+ * @author raum42 <kiwi@raum42.at>
  */
 
 namespace Admin42\View\Helper\Form;
 
 use Admin42\FormElements\AngularAwareInterface;
-use Zend\Form\ElementInterface;
 
 class FormLink extends FormHelper
 {
@@ -21,7 +23,6 @@ class FormLink extends FormHelper
      */
     public function getElementData(AngularAwareInterface $element, $angularNameRendering = true)
     {
-
         $this
             ->getAngularHelper()
             ->addHtmlPartial(
@@ -34,8 +35,8 @@ class FormLink extends FormHelper
             $linkTypes = $element->getAllLinkTypes();
         }
 
-        foreach($linkTypes as $type) {
-            $this->getAngularHelper()->addHtmlPartial('link/'.$type.'.html', 'link/' . $type);
+        foreach ($linkTypes as $type) {
+            $this->getAngularHelper()->addHtmlPartial('link/' . $type . '.html', 'link/' . $type);
         }
 
         $elementData = parent::getElementData($element, $angularNameRendering);
@@ -44,8 +45,8 @@ class FormLink extends FormHelper
         $urlHelper = $this->getView()->plugin('url');
 
         $availableLinkTypes = [];
-        foreach($linkTypes as $type) {
-            $availableLinkTypes[$type] = $translateHelper('link-type.'.$type, 'admin');
+        foreach ($linkTypes as $type) {
+            $availableLinkTypes[$type] = $translateHelper('link-type.' . $type, 'admin');
         }
         $elementData['availableLinkTypes'] = $availableLinkTypes;
         $elementData['saveUrl'] = $urlHelper('admin/link');

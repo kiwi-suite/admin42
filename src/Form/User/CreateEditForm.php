@@ -1,14 +1,16 @@
 <?php
-/**
- * admin42 (www.raum42.at)
+
+/*
+ * admin42
  *
- * @link      http://www.raum42.at
- * @copyright Copyright (c) 2010-2014 raum42 OG (http://www.raum42.at)
- *
+ * @package admin42
+ * @link https://github.com/raum42/admin42
+ * @copyright Copyright (c) 2010 - 2016 raum42 (https://www.raum42.at)
+ * @license MIT License
+ * @author raum42 <kiwi@raum42.at>
  */
 
 namespace Admin42\Form\User;
-
 
 use Admin42\FormElements\Form;
 
@@ -20,42 +22,42 @@ class CreateEditForm extends Form
     public function init()
     {
         $this->add([
-            'name' => "csrf",
-            "type" => "csrf",
+            'name' => 'csrf',
+            'type' => 'csrf',
         ]);
 
         $this->add([
-            'name' => "username",
-            "type" => "text",
-            "label" => "Username",
+            'name' => 'username',
+            'type' => 'text',
+            'label' => 'Username',
         ]);
 
         $this->add([
-            'name' => "email",
-            "type" => "email",
-            "label" => "Email",
-            "required" => true
+            'name' => 'email',
+            'type' => 'email',
+            'label' => 'Email',
+            'required' => true,
         ]);
 
         $this->add([
-            'name' => "displayName",
-            "type" => "text",
-            "label" => "Display Name"
+            'name' => 'displayName',
+            'type' => 'text',
+            'label' => 'Display Name',
         ]);
 
         $this->add([
-            'name' => "role",
-            "type" => "role",
-            "label" => "Role",
-            "required" => true,
+            'name' => 'role',
+            'type' => 'role',
+            'label' => 'Role',
+            'required' => true,
         ]);
 
 
         $this->add([
-            'name' => "shortName",
-            "type" => "text",
-            "label" => "field.short-name",
-            "maxLength" => 2
+            'name' => 'shortName',
+            'type' => 'text',
+            'label' => 'field.short-name',
+            'maxLength' => 2,
         ]);
     }
 }

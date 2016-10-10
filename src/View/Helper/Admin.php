@@ -1,10 +1,13 @@
 <?php
-/**
- * admin42 (www.raum42.at)
+
+/*
+ * admin42
  *
- * @link http://www.raum42.at
- * @copyright Copyright (c) 2010-2014 raum42 OG (http://www.raum42.at)
- *
+ * @package admin42
+ * @link https://github.com/raum42/admin42
+ * @copyright Copyright (c) 2010 - 2016 raum42 (https://www.raum42.at)
+ * @license MIT License
+ * @author raum42 <kiwi@raum42.at>
  */
 
 namespace Admin42\View\Helper;
@@ -35,7 +38,7 @@ class Admin extends AbstractHelper
      */
     public function getLocale()
     {
-        /** @var Auth $translator */
+        /* @var Auth $translator */
         $auth = $this->getView()->plugin('auth');
 
         if ($auth(AuthenticationService::class)->hasIdentity()) {
@@ -50,7 +53,7 @@ class Admin extends AbstractHelper
      */
     public function getTimezone()
     {
-        /** @var Auth $translator */
+        /* @var Auth $translator */
         $auth = $this->getView()->plugin('auth');
 
         if ($auth(AuthenticationService::class)->hasIdentity()) {
@@ -89,7 +92,7 @@ class Admin extends AbstractHelper
 
             foreach ($messages[$type] as &$_msg) {
                 if (is_string($_msg)) {
-                    $_msg = ['title' => 'toaster.'.$type, 'message' => $_msg];
+                    $_msg = ['title' => 'toaster.' . $type, 'message' => $_msg];
                 }
 
                 $_msg = [
@@ -100,6 +103,6 @@ class Admin extends AbstractHelper
         }
 
 
-        return "var FLASH_MESSAGE = " . json_encode($messages) . ";" . PHP_EOL;
+        return 'var FLASH_MESSAGE = ' . json_encode($messages) . ';' . PHP_EOL;
     }
 }

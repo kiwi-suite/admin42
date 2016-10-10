@@ -1,10 +1,13 @@
 <?php
-/**
- * admin42 (www.raum42.at)
+
+/*
+ * admin42
  *
- * @link      http://www.raum42.at
- * @copyright Copyright (c) 2010-2014 raum42 OG (http://www.raum42.at)
- *
+ * @package admin42
+ * @link https://github.com/raum42/admin42
+ * @copyright Copyright (c) 2010 - 2016 raum42 (https://www.raum42.at)
+ * @license MIT License
+ * @author raum42 <kiwi@raum42.at>
  */
 
 namespace Admin42\Controller;
@@ -40,7 +43,7 @@ class CrudController extends AbstractAdminController
         return $this
             ->getServiceManager()
             ->get(CrudOptionsPluginManager::class)
-            ->get($this->params("crud"));
+            ->get($this->params('crud'));
     }
 
     /**
@@ -50,6 +53,7 @@ class CrudController extends AbstractAdminController
     {
         if ($this->getRequest()->isXmlHttpRequest()) {
             $selector = $this->getSelector($this->getCrudOptions()->getSelectorName());
+
             return $selector->getResult();
         }
 
@@ -74,7 +78,7 @@ class CrudController extends AbstractAdminController
     {
         $model = $this
             ->getTableGateway($this->getCrudOptions()->getTableGatewayName())
-            ->selectByPrimary((int) $this->params()->fromRoute("id"));
+            ->selectByPrimary((int) $this->params()->fromRoute('id'));
 
         $data = $model->toArray();
         foreach ($data as $name => $value) {
@@ -97,7 +101,7 @@ class CrudController extends AbstractAdminController
      */
     public function detailAction()
     {
-        $isEditMode = $this->params()->fromRoute("isEditMode");
+        $isEditMode = $this->params()->fromRoute('isEditMode');
 
         $prg = $this->prg();
         if ($prg instanceof Response) {
@@ -105,23 +109,23 @@ class CrudController extends AbstractAdminController
         }
 
         $currentRoute = $this->getCurrentRoute();
-        $currentRoute = str_replace('/add', "", $currentRoute);
-        $currentRoute = str_replace('/edit', "", $currentRoute);
+        $currentRoute = str_replace('/add', '', $currentRoute);
+        $currentRoute = str_replace('/edit', '', $currentRoute);
 
         $createEditForm = $this->getForm($this->getCrudOptions()->getFormName());
         if ($prg !== false) {
             if ($isEditMode === true) {
                 $cmdName = $this->getCrudOptions()->getEditCommandName();
                 $cmd = $this->getCommand($cmdName);
-                $cmd->setId($this->params()->fromRoute("id"));
+                $cmd->setId($this->params()->fromRoute('id'));
 
-                if (method_exists($cmd, "setTableGatewayName")) {
+                if (method_exists($cmd, 'setTableGatewayName')) {
                     $cmd->setTableGatewayName($this->getCrudOptions()->getTableGatewayName());
                 }
             } else {
                 $cmdName = $this->getCrudOptions()->getCreateCommandName();
                 $cmd = $this->getCommand($cmdName);
-                if (method_exists($cmd, "setTableGatewayName")) {
+                if (method_exists($cmd, 'setTableGatewayName')) {
                     $cmd->setTableGatewayName($this->getCrudOptions()->getTableGatewayName());
                 }
             }
@@ -159,7 +163,8 @@ class CrudController extends AbstractAdminController
             'icon' => $this->getCrudOptions()->getIcon(),
         ]);
 
-        $viewModel->setTemplate("admin42/crud/detail");
+        $viewModel->setTemplate('admin42/crud/detail');
+
         return $viewModel;
     }
 
@@ -172,7 +177,7 @@ class CrudController extends AbstractAdminController
         $cmdName = $this->getCrudOptions()->getDeleteCommandName();
 
         $redirectRoute = $this->getCurrentRoute();
-        $redirectRoute = str_replace("/delete", "", $redirectRoute);
+        $redirectRoute = str_replace('/delete', '', $redirectRoute);
 
         if ($this->getRequest()->isDelete()) {
             $deleteCmd = $this->getCommand($cmdName);
@@ -182,7 +187,7 @@ class CrudController extends AbstractAdminController
 
             $deleteCmd->setId((int) $deleteParams['id']);
 
-            if (method_exists($deleteCmd, "setTableGatewayName")) {
+            if (method_exists($deleteCmd, 'setTableGatewayName')) {
                 $deleteCmd->setTableGatewayName($this->getCrudOptions()->getTableGatewayName());
             }
 
@@ -196,7 +201,7 @@ class CrudController extends AbstractAdminController
 
             $deleteCmd->setId((int) $this->params()->fromPost('id'));
 
-            if (method_exists($deleteCmd, "setTableGatewayName")) {
+            if (method_exists($deleteCmd, 'setTableGatewayName')) {
                 $deleteCmd->setTableGatewayName($this->getCrudOptions()->getTableGatewayName());
             }
 
@@ -208,12 +213,12 @@ class CrudController extends AbstractAdminController
             ]);
 
             return new JsonModel([
-                'redirect' => $this->url()->fromRoute($redirectRoute)
+                'redirect' => $this->url()->fromRoute($redirectRoute),
             ]);
         }
 
         return new JsonModel([
-            'redirect' => $this->url()->fromRoute($redirectRoute)
+            'redirect' => $this->url()->fromRoute($redirectRoute),
         ]);
     }
 }

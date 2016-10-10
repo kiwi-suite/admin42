@@ -1,4 +1,15 @@
 <?php
+
+/*
+ * admin42
+ *
+ * @package admin42
+ * @link https://github.com/raum42/admin42
+ * @copyright Copyright (c) 2010 - 2016 raum42 (https://www.raum42.at)
+ * @license MIT License
+ * @author raum42 <kiwi@raum42.at>
+ */
+
 namespace Admin42\FormElements\Service;
 
 use Admin42\FormElements\AngularAwareInterface;
@@ -9,7 +20,6 @@ use Zend\Form\FieldsetInterface;
 
 class Factory extends \Core42\Form\Service\Factory
 {
-
     /**
      * Create an element
      *
@@ -109,7 +119,7 @@ class Factory extends \Core42\Form\Service\Factory
      */
     public function configureFieldset(FieldsetInterface $fieldset, $spec)
     {
-        $spec     = $this->validateSpecification($spec, __METHOD__);
+        $spec = $this->validateSpecification($spec, __METHOD__);
         $fieldset = $this->configureElement($fieldset, $spec);
 
         if (isset($spec['elements'])) {

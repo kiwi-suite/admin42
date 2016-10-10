@@ -1,10 +1,13 @@
 <?php
-/**
- * admin42 (www.raum42.at)
+
+/*
+ * admin42
  *
- * @link http://www.raum42.at
- * @copyright Copyright (c) 2010-2014 raum42 OG (http://www.raum42.at)
- *
+ * @package admin42
+ * @link https://github.com/raum42/admin42
+ * @copyright Copyright (c) 2010 - 2016 raum42 (https://www.raum42.at)
+ * @license MIT License
+ * @author raum42 <kiwi@raum42.at>
  */
 
 namespace Admin42\FormElements;
@@ -27,7 +30,6 @@ class Csrf extends Element implements AngularAwareInterface, InputProviderInterf
 
     /**
      * @var CsrfValidator
-     *
      */
     protected $csrfValidator;
 
@@ -59,6 +61,7 @@ class Csrf extends Element implements AngularAwareInterface, InputProviderInterf
     public function setCsrfValidatorOptions(array $options)
     {
         $this->csrfValidatorOptions = $options;
+
         return $this;
     }
 
@@ -71,7 +74,6 @@ class Csrf extends Element implements AngularAwareInterface, InputProviderInterf
     }
 
     /**
-     *
      * @return CsrfValidator
      */
     public function getCsrfValidator()
@@ -81,11 +83,11 @@ class Csrf extends Element implements AngularAwareInterface, InputProviderInterf
             $csrfOptions = array_merge($csrfOptions, ['name' => $this->getName()]);
             $this->csrfValidator = new CsrfValidator($csrfOptions);
         }
+
         return $this->csrfValidator;
     }
 
     /**
-     *
      * @return array
      */
     public function getInputSpecification()
@@ -103,12 +105,12 @@ class Csrf extends Element implements AngularAwareInterface, InputProviderInterf
     }
 
     /**
-     *
      * @return string
      */
     public function getValue()
     {
         $validator = $this->getCsrfValidator();
+
         return $validator->getHash();
     }
 }

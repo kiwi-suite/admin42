@@ -1,10 +1,13 @@
 <?php
-/**
- * admin42 (www.raum42.at)
+
+/*
+ * admin42
  *
- * @link http://www.raum42.at
- * @copyright Copyright (c) 2010-2014 raum42 OG (http://www.raum42.at)
- *
+ * @package admin42
+ * @link https://github.com/raum42/admin42
+ * @copyright Copyright (c) 2010 - 2016 raum42 (https://www.raum42.at)
+ * @license MIT License
+ * @author raum42 <kiwi@raum42.at>
  */
 
 namespace Admin42\Form\User;
@@ -12,7 +15,7 @@ namespace Admin42\Form\User;
 use Admin42\FormElements\Form;
 use Zend\InputFilter\InputFilterProviderInterface;
 
-class ManageForm extends Form  implements InputFilterProviderInterface
+class ManageForm extends Form implements InputFilterProviderInterface
 {
     /**
      *
@@ -20,45 +23,45 @@ class ManageForm extends Form  implements InputFilterProviderInterface
     public function init()
     {
         $this->add([
-            'name' => "csrf",
-            "type" => "csrf",
+            'name' => 'csrf',
+            'type' => 'csrf',
         ]);
 
         $this->add([
-            'name' => "username",
-            "type" => "text",
-            "label" => "field.username"
+            'name' => 'username',
+            'type' => 'text',
+            'label' => 'field.username',
         ]);
 
         $this->add([
-            'name' => "email",
-            "type" => "email",
-            "label" => "field.email"
+            'name' => 'email',
+            'type' => 'email',
+            'label' => 'field.email',
         ]);
 
         $this->add([
-            'name' => "password",
-            "type" => "password",
-            "label" => "field.password"
+            'name' => 'password',
+            'type' => 'password',
+            'label' => 'field.password',
         ]);
 
         $this->add([
-            'name' => "passwordRepeat",
-            "type" => "password",
-            "label" => "field.password-repeat"
+            'name' => 'passwordRepeat',
+            'type' => 'password',
+            'label' => 'field.password-repeat',
         ]);
 
         $this->add([
-            'name' => "displayName",
-            "type" => "text",
-            "label" => "Display Name"
+            'name' => 'displayName',
+            'type' => 'text',
+            'label' => 'Display Name',
         ]);
 
         $this->add([
-            'name' => "shortName",
-            "type" => "text",
-            "label" => "field.short-name",
-            "maxLength" => 2,
+            'name' => 'shortName',
+            'type' => 'text',
+            'label' => 'field.short-name',
+            'maxLength' => 2,
         ]);
     }
 
@@ -77,7 +80,7 @@ class ManageForm extends Form  implements InputFilterProviderInterface
                     [
                         'name' => 'Identical',
                         'options' => [
-                            'token' => 'password'
+                            'token' => 'password',
                         ],
                     ],
                 ],

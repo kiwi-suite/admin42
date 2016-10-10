@@ -1,10 +1,13 @@
 <?php
-/**
- * admin42 (www.raum42.at)
+
+/*
+ * admin42
  *
- * @link http://www.raum42.at
- * @copyright Copyright (c) 2010-2014 raum42 OG (http://www.raum42.at)
- *
+ * @package admin42
+ * @link https://github.com/raum42/admin42
+ * @copyright Copyright (c) 2010 - 2016 raum42 (https://www.raum42.at)
+ * @license MIT License
+ * @author raum42 <kiwi@raum42.at>
  */
 
 namespace Admin42\FormElements;
@@ -106,7 +109,7 @@ class Stack extends Fieldset
             if ($fieldset->getOption('originalName') === null) {
                 $fieldset->setOption('originalName', $fieldset->getName());
             }
-            $fieldset->setOption("formServiceHash", $form->getOption("formServiceHash"));
+            $fieldset->setOption('formServiceHash', $form->getOption('formServiceHash'));
             $fieldset->setName($name . '[' . $fieldset->getName() . ']');
 
             if ($fieldset instanceof ElementPrepareAwareInterface) {
@@ -137,11 +140,11 @@ class Stack extends Fieldset
             if ($value1['__index__'] == $value2['__index__']) {
                 return 0;
             }
+
             return ($value1['__index__'] < $value2['__index__']) ? -1 : 1;
         });
 
         foreach ($data as $key => $value) {
-
             if (!array_key_exists('__type__', $value)) {
                 throw new \Exception(sprintf(
                     '%s expects array items with an attribute "__type__"',
@@ -206,7 +209,7 @@ class Stack extends Fieldset
             ));
         }
 
-        $fieldset->setOption("stackType", $type);
+        $fieldset->setOption('stackType', $type);
 
         $fieldset->add(
             $factory->create(['name' => '__index__', 'type' => Hidden::class])
@@ -245,7 +248,7 @@ class Stack extends Fieldset
     {
         $stack = [];
         foreach ($values as $name => $value) {
-            if (!isset($value['__deleted__']) || $value['__deleted__'] == "true") {
+            if (!isset($value['__deleted__']) || $value['__deleted__'] == 'true') {
                 continue;
             }
             $element = $this->get($name);

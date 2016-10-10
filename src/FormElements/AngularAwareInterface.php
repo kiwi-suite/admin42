@@ -1,4 +1,15 @@
 <?php
+
+/*
+ * admin42
+ *
+ * @package admin42
+ * @link https://github.com/raum42/admin42
+ * @copyright Copyright (c) 2010 - 2016 raum42 (https://www.raum42.at)
+ * @license MIT License
+ * @author raum42 <kiwi@raum42.at>
+ */
+
 namespace Admin42\FormElements;
 
 use Zend\Form\ElementInterface;
@@ -6,12 +17,12 @@ use Zend\Form\ElementInterface;
 interface AngularAwareInterface extends ElementInterface
 {
     /**
-     * @return boolean
+     * @return bool
      */
     public function isReadonly();
 
     /**
-     * @param boolean $readonly
+     * @param bool $readonly
      * @return ElementTrait
      */
     public function setReadonly($readonly);
@@ -39,12 +50,12 @@ interface AngularAwareInterface extends ElementInterface
     public function setDescription($description);
 
     /**
-     * @return boolean
+     * @return bool
      */
     public function isRequired();
 
     /**
-     * @param boolean $required
+     * @param bool $required
      * @return ElementTrait
      */
     public function setRequired($required);
