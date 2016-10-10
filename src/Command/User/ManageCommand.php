@@ -1,10 +1,13 @@
 <?php
-/**
- * admin42 (www.raum42.at)
+
+/*
+ * admin42
  *
- * @link http://www.raum42.at
- * @copyright Copyright (c) 2010-2014 raum42 OG (http://www.raum42.at)
- *
+ * @package admin42
+ * @link https://github.com/raum42/admin42
+ * @copyright Copyright (c) 2010 - 2016 raum42 (https://www.raum42.at)
+ * @license MIT License
+ * @author raum42 <kiwi@raum42.at>
  */
 
 namespace Admin42\Command\User;
@@ -169,37 +172,37 @@ class ManageCommand extends AbstractCommand
         }
 
         if (!($this->user instanceof User)) {
-            $this->addError("user", "invalid user");
+            $this->addError('user', 'invalid user');
         }
 
         if (empty($this->email)) {
-            $this->addError("email", "email can't be empty");
+            $this->addError('email', "email can't be empty");
         } else {
             $check = $this->getTableGateway(UserTableGateway::class)->select([
                 'email' => $this->email,
-                new Operator('id', Operator::OPERATOR_NOT_EQUAL_TO, $this->user->getId())
+                new Operator('id', Operator::OPERATOR_NOT_EQUAL_TO, $this->user->getId()),
             ]);
             if ($check->count() > 0) {
-                $this->addError("email", "duplicate email");
+                $this->addError('email', 'duplicate email');
             }
         }
 
         $emailValidator = new EmailAddress();
 
         if (!$emailValidator->isValid($this->email)) {
-            $this->addError("email", "invalid email address");
+            $this->addError('email', 'invalid email address');
         }
 
         if (!empty($this->username)) {
             if ($emailValidator->isValid($this->username)) {
-                $this->addError("username", "Username can't be an email");
+                $this->addError('username', "Username can't be an email");
             } else {
                 $check = $this->getTableGateway(UserTableGateway::class)->select([
                     'username' => $this->username,
-                    new Operator('id', Operator::OPERATOR_NOT_EQUAL_TO, $this->user->getId())
+                    new Operator('id', Operator::OPERATOR_NOT_EQUAL_TO, $this->user->getId()),
                 ]);
                 if ($check->count() > 0) {
-                    $this->addError("username", "duplicate username");
+                    $this->addError('username', 'duplicate username');
                 }
             }
         }
@@ -212,7 +215,7 @@ class ManageCommand extends AbstractCommand
         if (empty($this->shortName)) {
             $this->shortName = strtoupper(substr($this->email, 0, 1));
             if (!empty($this->displayName)) {
-                $parts = explode(" ", $this->displayName);
+                $parts = explode(' ', $this->displayName);
                 $this->shortName = strtoupper($parts[0]);
                 if (count($parts) > 1) {
                     $this->shortName .= $parts[1];
@@ -220,7 +223,6 @@ class ManageCommand extends AbstractCommand
             }
         }
     }
-
 
     /**
      *

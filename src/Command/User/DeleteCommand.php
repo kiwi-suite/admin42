@@ -1,10 +1,13 @@
 <?php
-/**
- * admin42 (www.raum42.at)
+
+/*
+ * admin42
  *
- * @link http://www.raum42.at
- * @copyright Copyright (c) 2010-2014 raum42 OG (http://www.raum42.at)
- *
+ * @package admin42
+ * @link https://github.com/raum42/admin42
+ * @copyright Copyright (c) 2010 - 2016 raum42 (https://www.raum42.at)
+ * @license MIT License
+ * @author raum42 <kiwi@raum42.at>
  */
 
 namespace Admin42\Command\User;
@@ -57,7 +60,7 @@ class DeleteCommand extends AbstractCommand
         }
 
         if (!($this->user instanceof User)) {
-            $this->addError("user", "invalid user");
+            $this->addError('user', 'invalid user');
         }
     }
 
@@ -70,11 +73,11 @@ class DeleteCommand extends AbstractCommand
         $this->user->setStatus(User::STATUS_INACTIVE)
             ->setEmail(json_encode([
                 $this->user->getEmail(),
-                $dateTime->format('Y-m-d H:i:s')
+                $dateTime->format('Y-m-d H:i:s'),
             ]))
             ->setUsername(json_encode([
                 $this->user->getUsername(),
-                $dateTime->format('Y-m-d H:i:s')
+                $dateTime->format('Y-m-d H:i:s'),
             ]))
             ->setUpdated($dateTime);
         $this->getTableGateway(UserTableGateway::class)->update($this->user);

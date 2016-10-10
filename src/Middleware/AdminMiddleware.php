@@ -1,4 +1,15 @@
 <?php
+
+/*
+ * admin42
+ *
+ * @package admin42
+ * @link https://github.com/raum42/admin42
+ * @copyright Copyright (c) 2010 - 2016 raum42 (https://www.raum42.at)
+ * @license MIT License
+ * @author raum42 <kiwi@raum42.at>
+ */
+
 namespace Admin42\Middleware;
 
 use Admin42\Authentication\AuthenticationService;
@@ -47,6 +58,7 @@ class AdminMiddleware
             if (!$hasIdentity) {
                 $url = $router->assemble([], ['name' => 'admin/login']);
             }
+
             return new RedirectResponse($url);
         }
 
@@ -56,7 +68,7 @@ class AdminMiddleware
             $this->setupJavascript(($spec['js']) ? $spec['js'] : []);
         }
 
-        $this->getServiceManager()->get('FormElementManager')->addInitializer(function($container, $element){
+        $this->getServiceManager()->get('FormElementManager')->addInitializer(function ($container, $element) {
             if (method_exists($element, 'setHydratorPrototype')) {
                 $element->setHydratorPrototype($container->get('HydratorManager')->get(BaseHydrator::class));
             }

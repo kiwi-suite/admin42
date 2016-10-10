@@ -1,4 +1,15 @@
 <?php
+
+/*
+ * admin42
+ *
+ * @package admin42
+ * @link https://github.com/raum42/admin42
+ * @copyright Copyright (c) 2010 - 2016 raum42 (https://www.raum42.at)
+ * @license MIT License
+ * @author raum42 <kiwi@raum42.at>
+ */
+
 namespace Admin42\Link;
 
 use Admin42\Link\Adapter\AdapterInterface;
@@ -68,7 +79,7 @@ class LinkProvider
     public function assemble($name, $value)
     {
         if (!isset($this->adapter[$name])) {
-            return "";
+            return '';
         }
 
         return $this->adapter[$name]->assemble($value);
@@ -82,7 +93,7 @@ class LinkProvider
     public function getDisplayName($name, $value)
     {
         if (!isset($this->adapter[$name])) {
-            return "";
+            return '';
         }
 
         return $this->adapter[$name]->getDisplayName($value);
@@ -113,13 +124,13 @@ class LinkProvider
     public function assembleById($id)
     {
         if (empty($id)) {
-            return "";
+            return '';
         }
 
         $link = $this->getLink($id);
 
         if (empty($link)) {
-            return "";
+            return '';
         }
 
         return $this->assemble($link->getType(), $link->getValue());

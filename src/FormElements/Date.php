@@ -1,10 +1,13 @@
 <?php
-/**
- * admin42 (www.raum42.at)
+
+/*
+ * admin42
  *
- * @link http://www.raum42.at
- * @copyright Copyright (c) 2010-2014 raum42 OG (http://www.raum42.at)
- *
+ * @package admin42
+ * @link https://github.com/raum42/admin42
+ * @copyright Copyright (c) 2010 - 2016 raum42 (https://www.raum42.at)
+ * @license MIT License
+ * @author raum42 <kiwi@raum42.at>
  */
 
 namespace Admin42\FormElements;
@@ -21,7 +24,6 @@ class Date extends Element implements StrategyAwareInterface, AngularAwareInterf
     use ElementTrait;
 
     /**
-     *
      * @var string
      */
     protected $format = 'Y-m-d';
@@ -52,8 +54,8 @@ class Date extends Element implements StrategyAwareInterface, AngularAwareInterf
                     'name' => \Zend\Validator\Date::class,
                     'options' => [
                         'format' => $this->getFormat(),
-                    ]
-                ]
+                    ],
+                ],
             ],
         ];
     }
@@ -77,6 +79,7 @@ class Date extends Element implements StrategyAwareInterface, AngularAwareInterf
             return $value;
         }
         $format = $this->getFormat();
+
         return $value->format($format);
     }
 

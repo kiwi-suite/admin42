@@ -1,10 +1,13 @@
 <?php
-/**
- * admin42 (www.raum42.at)
+
+/*
+ * admin42
  *
- * @link http://www.raum42.at
- * @copyright Copyright (c) 2010-2014 raum42 OG (http://www.raum42.at)
- *
+ * @package admin42
+ * @link https://github.com/raum42/admin42
+ * @copyright Copyright (c) 2010 - 2016 raum42 (https://www.raum42.at)
+ * @license MIT License
+ * @author raum42 <kiwi@raum42.at>
  */
 
 namespace Admin42\View\Helper\Form;
@@ -32,14 +35,14 @@ class FormStack extends FormHelper
 
         $protoTypes = [];
         /** @var FieldsetInterface $fieldset */
-        foreach($element->getProtoTypes() as $fieldset) {
+        foreach ($element->getProtoTypes() as $fieldset) {
             $name = (new \ReflectionClass($fieldset))->getShortName();
 
-            if (!$this->getView()->getHelperPluginManager()->has('form'.$name)) {
+            if (!$this->getView()->getHelperPluginManager()->has('form' . $name)) {
                 continue;
             }
 
-            $formHelper = $this->getView()->plugin('form'.$name);
+            $formHelper = $this->getView()->plugin('form' . $name);
             if (!($formHelper instanceof AngularHelperInterface)) {
                 continue;
             }
@@ -74,10 +77,10 @@ class FormStack extends FormHelper
         foreach ($element->getIterator() as $fieldset) {
             $name = (new \ReflectionClass($fieldset))->getShortName();
 
-            if (!$this->getView()->getHelperPluginManager()->has('form'.$name)) {
+            if (!$this->getView()->getHelperPluginManager()->has('form' . $name)) {
                 continue;
             }
-            $formHelper = $this->getView()->plugin('form'.$name);
+            $formHelper = $this->getView()->plugin('form' . $name);
             if (!($formHelper instanceof AngularHelperInterface)) {
                 continue;
             }
@@ -87,14 +90,14 @@ class FormStack extends FormHelper
 
             $value = $fieldset->get('__name__')->getValue();
             if (empty($value)) {
-                $value = "";
+                $value = '';
             }
             $fieldset->setOption('fieldsetName', $value);
             $fieldset->remove('__name__');
 
 
             $value = $fieldset->get('__deleted__')->getValue();
-            $value = ($value == "true");
+            $value = ($value == 'true');
             $fieldset->setOption('fieldsetDeleted', $value);
             $fieldset->remove('__deleted__');
 

@@ -1,10 +1,13 @@
 <?php
-/**
- * admin42 (www.raum42.at)
+
+/*
+ * admin42
  *
- * @link http://www.raum42.at
- * @copyright Copyright (c) 2010-2014 raum42 OG (http://www.raum42.at)
- *
+ * @package admin42
+ * @link https://github.com/raum42/admin42
+ * @copyright Copyright (c) 2010 - 2016 raum42 (https://www.raum42.at)
+ * @license MIT License
+ * @author raum42 <kiwi@raum42.at>
  */
 
 namespace Admin42\Command\User;
@@ -90,7 +93,7 @@ class LostPasswordCommand extends AbstractCommand
         }
 
         if (!($this->user instanceof User)) {
-            $this->addError("user", "invalid user");
+            $this->addError('user', 'invalid user');
 
             return;
         }
@@ -122,8 +125,8 @@ class LostPasswordCommand extends AbstractCommand
         $mailModel = new MailModel([
             'recoverUrl' => $url,
         ]);
-        $mailModel->setHtmlTemplate("mail/admin42/scripts/lost-password.html.phtml");
-        $mailModel->setPlainTemplate("mail/admin42/scripts/lost-password.plain.phtml");
+        $mailModel->setHtmlTemplate('mail/admin42/scripts/lost-password.html.phtml');
+        $mailModel->setPlainTemplate('mail/admin42/scripts/lost-password.plain.phtml');
 
         /** @var SendCommand $mailSending */
         $mailSending = $this->getCommand(SendCommand::class);

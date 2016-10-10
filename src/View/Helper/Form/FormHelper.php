@@ -1,4 +1,15 @@
 <?php
+
+/*
+ * admin42
+ *
+ * @package admin42
+ * @link https://github.com/raum42/admin42
+ * @copyright Copyright (c) 2010 - 2016 raum42 (https://www.raum42.at)
+ * @license MIT License
+ * @author raum42 <kiwi@raum42.at>
+ */
+
 namespace Admin42\View\Helper\Form;
 
 use Admin42\FormElements\AngularAwareInterface;
@@ -8,9 +19,7 @@ use Zend\View\Helper\AbstractHelper;
 
 class FormHelper extends AbstractHelper implements AngularHelperInterface
 {
-
     /**
-     *
      * @var string
      */
     protected $defaultHelper = 'formHelper';
@@ -35,6 +44,7 @@ class FormHelper extends AbstractHelper implements AngularHelperInterface
     public function render(AngularAwareInterface $element)
     {
         $angularDirective = $this->getAngularDirective($element);
+
         return sprintf(
             '<%s element-data-id="%s" template="%s"></%s>',
             $angularDirective,
@@ -64,7 +74,7 @@ class FormHelper extends AbstractHelper implements AngularHelperInterface
     {
         $value = $element->getValue();
         if (!is_string($value)) {
-            $value = "";
+            $value = '';
         }
 
         return $value;
@@ -77,7 +87,6 @@ class FormHelper extends AbstractHelper implements AngularHelperInterface
      */
     public function getElementData(AngularAwareInterface $element, $angularNameRendering = true)
     {
-
         $translateHelper = $this->getView()->plugin('translate');
 
         $label = $element->getLabel();
@@ -86,7 +95,7 @@ class FormHelper extends AbstractHelper implements AngularHelperInterface
         }
 
         return [
-            'id' => 'form-'.Uuid::uuid4()->toString(),
+            'id' => 'form-' . Uuid::uuid4()->toString(),
             'name' => $element->getName(),
             'label' => $label,
             'value' => $this->getValue($element),

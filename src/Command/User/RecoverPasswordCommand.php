@@ -1,10 +1,13 @@
 <?php
-/**
- * admin42 (www.raum42.at)
+
+/*
+ * admin42
  *
- * @link http://www.raum42.at
- * @copyright Copyright (c) 2010-2014 raum42 OG (http://www.raum42.at)
- *
+ * @package admin42
+ * @link https://github.com/raum42/admin42
+ * @copyright Copyright (c) 2010 - 2016 raum42 (https://www.raum42.at)
+ * @license MIT License
+ * @author raum42 <kiwi@raum42.at>
  */
 
 namespace Admin42\Command\User;
@@ -85,14 +88,14 @@ class RecoverPasswordCommand extends AbstractCommand
     {
         $emailValidator = new EmailAddress();
         if (!$emailValidator->isValid($this->email)) {
-            $this->addError("email", "invalid email address");
+            $this->addError('email', 'invalid email address');
         }
         if (empty($this->hash)) {
-            $this->addError("hash", "invalid hash");
+            $this->addError('hash', 'invalid hash');
         }
 
         if (empty($this->password)) {
-            $this->addError("password", "invalid password");
+            $this->addError('password', 'invalid password');
         }
 
         if ($this->hasErrors()) {
@@ -105,7 +108,7 @@ class RecoverPasswordCommand extends AbstractCommand
         ])->current();
 
         if (!($this->user instanceof User)) {
-            $this->addError("user", "invalid user");
+            $this->addError('user', 'invalid user');
         }
     }
 
@@ -119,7 +122,7 @@ class RecoverPasswordCommand extends AbstractCommand
 
         $this->user->setPassword($cryptedPassword);
         $this->user->setHash(null);
-        
+
         $this->getTableGateway(UserTableGateway::class)->update($this->user);
     }
 }

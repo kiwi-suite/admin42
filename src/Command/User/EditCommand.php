@@ -1,10 +1,13 @@
 <?php
-/**
- * admin42 (www.raum42.at)
+
+/*
+ * admin42
  *
- * @link http://www.raum42.at
- * @copyright Copyright (c) 2010-2014 raum42 OG (http://www.raum42.at)
- *
+ * @package admin42
+ * @link https://github.com/raum42/admin42
+ * @copyright Copyright (c) 2010 - 2016 raum42 (https://www.raum42.at)
+ * @license MIT License
+ * @author raum42 <kiwi@raum42.at>
  */
 
 namespace Admin42\Command\User;
@@ -169,7 +172,7 @@ class EditCommand extends AbstractCommand
         }
 
         if (!($this->user instanceof User)) {
-            $this->addError("user", "invalid user");
+            $this->addError('user', 'invalid user');
 
             return;
         }
@@ -178,40 +181,40 @@ class EditCommand extends AbstractCommand
         $this->displayName = (empty($this->displayName)) ? null : $this->displayName;
 
         if (empty($this->email)) {
-            $this->addError("email", "email can't be empty");
+            $this->addError('email', "email can't be empty");
         }
 
         if (empty($this->role)) {
-            $this->addError("role", "invalid role");
+            $this->addError('role', 'invalid role');
         }
 
         $emailValidator = new EmailAddress();
 
         if (!$emailValidator->isValid($this->email)) {
-            $this->addError("email", "invalid email address");
+            $this->addError('email', 'invalid email address');
         }
 
         $userSelect = function (Select $select) {
             $select->where(function (Where $where) {
-                    $where->equalTo('email', $this->email);
-                    $where->notEqualTo('id', $this->user->getId());
+                $where->equalTo('email', $this->email);
+                $where->notEqualTo('id', $this->user->getId());
             });
         };
 
         if ($this->getTableGateway(UserTableGateway::class)->select($userSelect)->count() > 0) {
-            $this->addError("email", "Email already taken");
+            $this->addError('email', 'Email already taken');
         }
 
         if (!empty($this->username)) {
             if ($emailValidator->isValid($this->username)) {
-                $this->addError("username", "Username can't be an email");
+                $this->addError('username', "Username can't be an email");
             }
         }
 
         if (empty($this->shortName)) {
             $this->shortName = strtoupper(substr($this->email, 0, 1));
             if (!empty($this->displayName)) {
-                $parts = explode(" ", $this->displayName);
+                $parts = explode(' ', $this->displayName);
                 $this->shortName = strtoupper($parts[0]);
                 if (count($parts) > 1) {
                     $this->shortName .= $parts[1];

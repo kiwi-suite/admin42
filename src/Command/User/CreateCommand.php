@@ -1,10 +1,13 @@
 <?php
-/**
- * admin42 (www.raum42.at)
+
+/*
+ * admin42
  *
- * @link http://www.raum42.at
- * @copyright Copyright (c) 2010-2014 raum42 OG (http://www.raum42.at)
- *
+ * @package admin42
+ * @link https://github.com/raum42/admin42
+ * @copyright Copyright (c) 2010 - 2016 raum42 (https://www.raum42.at)
+ * @license MIT License
+ * @author raum42 <kiwi@raum42.at>
  */
 
 namespace Admin42\Command\User;
@@ -181,17 +184,17 @@ class CreateCommand extends AbstractCommand
     protected function preExecute()
     {
         if (empty($this->email)) {
-            $this->addError("email", "email can't be empty");
+            $this->addError('email', "email can't be empty");
         }
 
         if (empty($this->role)) {
-            $this->addError("role", "invalid role");
+            $this->addError('role', 'invalid role');
         }
 
         if ($this->status === null) {
             $this->status = User::STATUS_ACTIVE;
         } elseif (!in_array($this->status, [User::STATUS_INACTIVE, User::STATUS_ACTIVE])) {
-            $this->addError("status", "invalid status '{$this->status}'");
+            $this->addError('status', "invalid status '{$this->status}'");
         }
 
         $this->username = (empty($this->username)) ? null : $this->username;
@@ -200,12 +203,12 @@ class CreateCommand extends AbstractCommand
         $emailValidator = new EmailAddress();
 
         if (!$emailValidator->isValid($this->email)) {
-            $this->addError("email", "invalid email address");
+            $this->addError('email', 'invalid email address');
         }
 
         if (!empty($this->username)) {
             if ($emailValidator->isValid($this->username)) {
-                $this->addError("username", "Username can't be an email");
+                $this->addError('username', "Username can't be an email");
             }
         }
 
@@ -218,7 +221,7 @@ class CreateCommand extends AbstractCommand
 
         $this->shortName = strtoupper(substr($this->email, 0, 1));
         if (!empty($this->displayName)) {
-            $parts = explode(" ", $this->displayName);
+            $parts = explode(' ', $this->displayName);
             $this->shortName = strtoupper($parts[0]);
             if (count($parts) > 1) {
                 $this->shortName .= $parts[1];
@@ -263,8 +266,8 @@ class CreateCommand extends AbstractCommand
                 'password' => $this->password,
                 'loginUrl' => $httpRouter->assemble([], ['name' => 'admin/login']),
             ]);
-            $mailViewModel->setHtmlTemplate("mail/admin42/scripts/create-account.html.phtml");
-            $mailViewModel->setPlainTemplate("mail/admin42/scripts/create-account.plain.phtml");
+            $mailViewModel->setHtmlTemplate('mail/admin42/scripts/create-account.html.phtml');
+            $mailViewModel->setPlainTemplate('mail/admin42/scripts/create-account.plain.phtml');
 
             /** @var SendCommand $mailSending */
             $mailSending = $this->getCommand(SendCommand::class);
@@ -284,12 +287,12 @@ class CreateCommand extends AbstractCommand
     public function consoleSetup(Route $route)
     {
         $this->hydrate([
-            'username' => $route->getMatchedParam("username"),
-            'password' => $route->getMatchedParam("password"),
-            'email' => $route->getMatchedParam("email"),
-            'status' => $route->getMatchedParam("status"),
-            'displayName' => $route->getMatchedParam("displayName"),
-            'role' => $route->getMatchedParam("role"),
+            'username' => $route->getMatchedParam('username'),
+            'password' => $route->getMatchedParam('password'),
+            'email' => $route->getMatchedParam('email'),
+            'status' => $route->getMatchedParam('status'),
+            'displayName' => $route->getMatchedParam('displayName'),
+            'role' => $route->getMatchedParam('role'),
         ]);
     }
 }

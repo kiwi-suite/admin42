@@ -1,4 +1,15 @@
 <?php
+
+/*
+ * admin42
+ *
+ * @package admin42
+ * @link https://github.com/raum42/admin42
+ * @copyright Copyright (c) 2010 - 2016 raum42 (https://www.raum42.at)
+ * @license MIT License
+ * @author raum42 <kiwi@raum42.at>
+ */
+
 namespace Admin42\FormElements;
 
 use Admin42\FormElements\Service\Factory;
@@ -37,7 +48,7 @@ class Form extends \Zend\Form\Form
 
         $this->getInputFilter();
 
-        $this->setOption("formServiceHash", Uuid::uuid4()->toString());
+        $this->setOption('formServiceHash', Uuid::uuid4()->toString());
 
         if ($this->wrapElements()) {
             $this->prepareElement($this);
@@ -46,7 +57,7 @@ class Form extends \Zend\Form\Form
                 if ($elementOrFieldset->getOption('originalName') === null) {
                     $elementOrFieldset->setOption('originalName', $elementOrFieldset->getName());
                 }
-                $elementOrFieldset->setOption('formServiceHash', $this->getOption("formServiceHash"));
+                $elementOrFieldset->setOption('formServiceHash', $this->getOption('formServiceHash'));
 
                 if ($elementOrFieldset instanceof FormInterface) {
                     $elementOrFieldset->prepare();
@@ -57,6 +68,7 @@ class Form extends \Zend\Form\Form
         }
 
         $this->isPrepared = true;
+
         return $this;
     }
 
@@ -73,7 +85,7 @@ class Form extends \Zend\Form\Form
                 if ($elementOrFieldset->getOption('originalName') === null) {
                     $elementOrFieldset->setOption('originalName', $elementOrFieldset->getName());
                 }
-                $elementOrFieldset->setOption('formServiceHash', $this->getOption("formServiceHash"));
+                $elementOrFieldset->setOption('formServiceHash', $this->getOption('formServiceHash'));
                 $elementOrFieldset->setName($name . '[' . $elementOrFieldset->getName() . ']');
             }
 
@@ -92,11 +104,11 @@ class Form extends \Zend\Form\Form
         if (!($this->hydrator instanceof HydratorInterface)) {
             $this->setHydrator($this->prepareHydrator($this));
         }
+
         return parent::getHydrator();
     }
 
     /**
-     *
      * @return Factory
      */
     public function getFormFactory()

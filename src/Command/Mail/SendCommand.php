@@ -1,25 +1,22 @@
 <?php
-/**
- * admin42 (www.raum42.at)
+
+/*
+ * admin42
  *
- * @link http://www.raum42.at
- * @copyright Copyright (c) 2010-2014 raum42 OG (http://www.raum42.at)
- *
+ * @package admin42
+ * @link https://github.com/raum42/admin42
+ * @copyright Copyright (c) 2010 - 2016 raum42 (https://www.raum42.at)
+ * @license MIT License
+ * @author raum42 <kiwi@raum42.at>
  */
 
 namespace Admin42\Command\Mail;
 
-use Core42\Command\AbstractCommand;
 use Core42\View\Model\MailModel;
 use Zend\I18n\Translator\TranslatorInterface;
-use Zend\Mail\Message;
-use Zend\Mime\Mime;
-use Zend\Mime\Part;
-use Zend\View\Renderer\PhpRenderer;
 
 class SendCommand extends \Core42\Command\Mail\SendCommand
 {
-
     /**
      *
      */
@@ -28,8 +25,7 @@ class SendCommand extends \Core42\Command\Mail\SendCommand
         $this->getServiceManager()->get(TranslatorInterface::class)->setLocale('en-US');
 
         $this->layout = new MailModel();
-        $this->layout->setHtmlTemplate("mail/admin42/layout.html.phtml");
-        $this->layout->setPlainTemplate("mail/admin42/layout.plain.phtml");
-
+        $this->layout->setHtmlTemplate('mail/admin42/layout.html.phtml');
+        $this->layout->setPlainTemplate('mail/admin42/layout.plain.phtml');
     }
 }

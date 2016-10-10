@@ -1,10 +1,13 @@
 <?php
-/**
- * admin42 (www.raum42.at)
+
+/*
+ * admin42
  *
- * @link http://www.raum42.at
- * @copyright Copyright (c) 2010-2014 raum42 OG (http://www.raum42.at)
- *
+ * @package admin42
+ * @link https://github.com/raum42/admin42
+ * @copyright Copyright (c) 2010 - 2016 raum42 (https://www.raum42.at)
+ * @license MIT License
+ * @author raum42 <kiwi@raum42.at>
  */
 
 namespace Admin42\Command\User;
@@ -87,7 +90,7 @@ class LoginCommand extends AbstractCommand
         }
 
         if (empty($this->password)) {
-            $this->addError("password", "Can't be empty");
+            $this->addError('password', "Can't be empty");
         }
 
         $emailValidator = new EmailAddress();
@@ -96,15 +99,15 @@ class LoginCommand extends AbstractCommand
         $userTableGateway = $this->getTableGateway(UserTableGateway::class);
 
         $resultSet = $userTableGateway->select([
-            $this->identityType => $this->identity
+            $this->identityType => $this->identity,
         ]);
 
         $bCrypt = new Bcrypt();
 
         if ($resultSet->count() != 1) {
-            $bCrypt->create("test");
+            $bCrypt->create('test');
 
-            $this->addError("identity", "Invalid username or password");
+            $this->addError('identity', 'Invalid username or password');
 
             return;
         }
@@ -112,13 +115,13 @@ class LoginCommand extends AbstractCommand
         /** @var User $user */
         $user = $resultSet->current();
         if (!$bCrypt->verify($this->password, $user->getPassword())) {
-            $this->addError("identity", "Invalid username or password");
+            $this->addError('identity', 'Invalid username or password');
 
             return;
         }
 
         if (!in_array($user->getStatus(), [User::STATUS_ACTIVE])) {
-            $this->addError("identity", "Invalid username or password");
+            $this->addError('identity', 'Invalid username or password');
 
             return;
         }

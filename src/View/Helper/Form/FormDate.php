@@ -1,10 +1,13 @@
 <?php
-/**
- * admin42 (www.raum42.at)
+
+/*
+ * admin42
  *
- * @link http://www.raum42.at
- * @copyright Copyright (c) 2010-2014 raum42 OG (http://www.raum42.at)
- *
+ * @package admin42
+ * @link https://github.com/raum42/admin42
+ * @copyright Copyright (c) 2010 - 2016 raum42 (https://www.raum42.at)
+ * @license MIT License
+ * @author raum42 <kiwi@raum42.at>
  */
 
 namespace Admin42\View\Helper\Form;
@@ -21,22 +24,22 @@ class FormDate extends FormHelper
     {
         $value = $element->getValue(false);
         if (empty($value)) {
-            $value = "";
+            $value = '';
         } elseif (is_string($value)) {
             try {
                 $adminHelper = $this->getView()->plugin('admin');
                 $value = new \DateTime($value);
                 $value->setTimezone(new \DateTimeZone($adminHelper->getTimezone()));
-                $value = $value->format("Y-m-d");
+                $value = $value->format('Y-m-d');
             } catch (\Exception $e) {
-                $value = "";
+                $value = '';
             }
         } elseif ($value instanceof \DateTime) {
             $adminHelper = $this->getView()->plugin('admin');
             $value->setTimezone(new \DateTimeZone($adminHelper->getTimezone()));
-            $value = $value->format("Y-m-d");
+            $value = $value->format('Y-m-d');
         } else {
-            $value = "";
+            $value = '';
         }
 
         return $value;

@@ -1,25 +1,21 @@
 <?php
-/**
- * admin42 (www.raum42.at)
+
+/*
+ * admin42
  *
- * @link http://www.raum42.at
- * @copyright Copyright (c) 2010-2014 raum42 OG (http://www.raum42.at)
- *
+ * @package admin42
+ * @link https://github.com/raum42/admin42
+ * @copyright Copyright (c) 2010 - 2016 raum42 (https://www.raum42.at)
+ * @license MIT License
+ * @author raum42 <kiwi@raum42.at>
  */
 
 namespace Admin42\Command\Crud;
 
-use Admin42\Command\Mail\SendCommand;
 use Admin42\Crud\CrudEvent;
 use Admin42\Model\User;
 use Core42\Command\AbstractCommand;
-use Core42\Command\ConsoleAwareTrait;
 use Core42\Model\ModelInterface;
-use Core42\View\Model\MailModel;
-use Zend\Crypt\Password\Bcrypt;
-use Zend\Json\Json;
-use Zend\Validator\EmailAddress;
-use ZF\Console\Route;
 
 class EditCommand extends AbstractCommand
 {
@@ -81,7 +77,7 @@ class EditCommand extends AbstractCommand
      */
     protected function set($name, $value)
     {
-        $this->data[$name] =  $value;
+        $this->data[$name] = $value;
 
         return $this;
     }
@@ -95,7 +91,7 @@ class EditCommand extends AbstractCommand
     public function __call($method, $params)
     {
         $variableName = lcfirst(substr($method, 3));
-        if (strncasecmp($method, "set", 3) === 0) {
+        if (strncasecmp($method, 'set', 3) === 0) {
             return $this->set($variableName, $params[0]);
         }
 
@@ -110,7 +106,7 @@ class EditCommand extends AbstractCommand
         $this->model = $this->getTableGateway($this->tableGatewayName)->selectByPrimary((int) $this->id);
 
         if (!($this->model instanceof ModelInterface)) {
-            $this->addError("model", "invalid model");
+            $this->addError('model', 'invalid model');
 
             return;
         }
@@ -123,12 +119,11 @@ class EditCommand extends AbstractCommand
     {
         $this->model->populate($this->data);
         if ($this->model->hasChanged()) {
-
-            if (method_exists($this->model, "getProperties")) {
+            if (method_exists($this->model, 'getProperties')) {
                 $dateTime = new \DateTime();
                 $properties = $this->model->getProperties();
 
-                if (in_array("updated", $properties) && !array_key_exists("updated", $this->data)) {
+                if (in_array('updated', $properties) && !array_key_exists('updated', $this->data)) {
                     $this->model->setUpdated($dateTime);
                 }
             }
@@ -144,7 +139,6 @@ class EditCommand extends AbstractCommand
                 ->getServiceManager()
                 ->get('Admin42\Crud\EventManager')
                 ->trigger(CrudEvent::EVENT_EDIT_POST, $this->model);
-
         }
 
         return $this->model;
