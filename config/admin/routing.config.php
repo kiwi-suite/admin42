@@ -166,15 +166,7 @@ return [
                         ],
                         'may_terminate' => true,
                         'child_routes' => [
-                            'tag-suggest' => [
-                                'type' => Literal::class,
-                                'options' => [
-                                    'route' => 'tag-suggest',
-                                    'defaults' => [
-                                        'action' => 'tagSuggest'
-                                    ],
-                                ],
-                            ],
+
                         ],
                     ],
                 ],
