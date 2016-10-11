@@ -3,9 +3,13 @@ namespace Admin42;
 
 return [
     'assets' => [
-        __NAMESPACE__ => [
-            'target' => 'public/assets/admin/admin42',
-            'source' =>  'vendor/fruit42/admin42/assets/dist/',
+        'directories' => [
+            'admin42' => [
+                'target'    => 'public/assets/admin/admin42',
+                'source'    => 'vendor/fruit42/admin42/assets/dist/',
+                'base_url'  => '/assets/admin/admin42',
+            ],
         ],
+
     ],
 ];

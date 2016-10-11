@@ -64,8 +64,8 @@ class AdminMiddleware
 
         $assetsConfig = $this->getServiceManager()->get('config')['admin']['assets'];
         foreach ($assetsConfig as $namespace => $spec) {
-            $this->setupStylesheets(($spec['css']) ? $spec['css'] : []);
-            $this->setupJavascript(($spec['js']) ? $spec['js'] : []);
+            $this->setupStylesheets(($spec['css']) ? $spec['css'] : [], $namespace);
+            $this->setupJavascript(($spec['js']) ? $spec['js'] : [], $namespace);
         }
 
         $this->getServiceManager()->get('FormElementManager')->addInitializer(function ($container, $element) {
@@ -86,27 +86,29 @@ class AdminMiddleware
 
     /**
      * @param array $stylesheets
+     * @param $namespace
      */
-    protected function setupStylesheets(array $stylesheets)
+    protected function setupStylesheets(array $stylesheets, $namespace)
     {
         $headLink = $this->getServiceManager()->get('ViewHelperManager')->get('headLink');
         $assetUrl = $this->getServiceManager()->get('ViewHelperManager')->get('assetUrl');
 
         foreach ($stylesheets as $css) {
-            $headLink->appendStylesheet($assetUrl($css));
+            $headLink->appendStylesheet($assetUrl($css, $namespace));
         }
     }
 
     /**
      * @param array $javaScripts
+     * @param $namespace
      */
-    protected function setupJavascript(array $javaScripts)
+    protected function setupJavascript(array $javaScripts, $namespace)
     {
         $headScript = $this->getServiceManager()->get('ViewHelperManager')->get('headScript');
         $assetUrl = $this->getServiceManager()->get('ViewHelperManager')->get('assetUrl');
 
         foreach ($javaScripts as $js) {
-            $headScript->appendFile($assetUrl($js));
+            $headScript->appendFile($assetUrl($js, $namespace));
         }
     }
 }
