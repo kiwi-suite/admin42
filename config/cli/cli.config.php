@@ -6,6 +6,7 @@ use Admin42\Command\User\CreateCommand;
 return [
     'cli' => [
         'admin-create-user' => [
+            'group'                     => '*',
             'route'                     => 'admin-create-user --email= --role='
                 .' [--username=] [--password=] [--status=] [--displayName=]',
             'command-name'              => CreateCommand::class,
