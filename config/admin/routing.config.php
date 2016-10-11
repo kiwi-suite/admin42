@@ -1,6 +1,10 @@
 <?php
 namespace Admin42;
 
+use Admin42\Controller\Api\ApiController;
+use Admin42\Controller\EnvironmentController;
+use Admin42\Controller\LinkController;
+use Admin42\Controller\UserController;
 use Admin42\Middleware\AdminMiddleware;
 use Core42\Mvc\Router\Http\AngularSegment;
 use Zend\Router\Http\Literal;
@@ -15,7 +19,7 @@ return [
                     'route' => '/admin[/]',
                     'defaults' => [
                         'middleware' => AdminMiddleware::class,
-                        'controller' => __NAMESPACE__ . '\User',
+                        'controller' => UserController::class,
                         'action' => 'dashboard',
                     ],
                 ],
@@ -26,7 +30,7 @@ return [
                         'options' => [
                             'route' => 'home/',
                             'defaults' => [
-                                'controller' => __NAMESPACE__ . '\User',
+                                'controller' => UserController::class,
                                 'action' => 'home',
                             ],
                         ],
@@ -36,7 +40,7 @@ return [
                         'options' => [
                             'route' => 'permission-denied/',
                             'defaults' => [
-                                'controller' => __NAMESPACE__ . '\User',
+                                'controller' => UserController::class,
                                 'action' => 'permission-denied',
                             ],
                         ],
@@ -46,7 +50,7 @@ return [
                         'options' => [
                             'route' => 'login/',
                             'defaults' => [
-                                'controller' => __NAMESPACE__ . '\User',
+                                'controller' => UserController::class,
                                 'action' => 'login',
                             ],
                         ],
@@ -56,7 +60,7 @@ return [
                         'options' => [
                             'route' => 'lost-password/',
                             'defaults' => [
-                                'controller' => __NAMESPACE__ . '\User',
+                                'controller' => UserController::class,
                                 'action' => 'lost-password',
                             ],
                         ],
@@ -66,7 +70,7 @@ return [
                         'options' => [
                             'route' => 'recover-password/:email/:hash/',
                             'defaults' => [
-                                'controller' => __NAMESPACE__ . '\User',
+                                'controller' => UserController::class,
                                 'action' => 'recover-password',
                             ],
                         ],
@@ -76,7 +80,7 @@ return [
                         'options' => [
                             'route' => 'logout/',
                             'defaults' => [
-                                'controller' => __NAMESPACE__ . '\User',
+                                'controller' => UserController::class,
                                 'action' => 'logout',
                             ],
                         ],
@@ -86,7 +90,7 @@ return [
                         'options' => [
                             'route' => 'user/',
                             'defaults' => [
-                                'controller' => __NAMESPACE__ . '\User',
+                                'controller' => UserController::class,
                                 'action' => 'index'
                             ],
                         ],
@@ -134,13 +138,13 @@ return [
                             ],
                         ],
                     ],
-                    'file-dialog' => [
+                    'environment' => [
                         'type' => Literal::class,
                         'options' => [
-                            'route' => 'file-dialog/',
+                            'route' => 'environment/',
                             'defaults' => [
-                                'controller' => __NAMESPACE__ . '\FileDialog',
-                                'action' => 'fileDialog'
+                                'controller' =>  EnvironmentController::class,
+                                'action' => 'index'
                             ],
                         ],
                         'may_terminate' => true,
@@ -150,7 +154,7 @@ return [
                         'options' => [
                             'route' => 'link/',
                             'defaults' => [
-                                'controller' => __NAMESPACE__ . '\Link',
+                                'controller' => LinkController::class,
                                 'action' => 'save'
                             ],
                         ],
@@ -161,7 +165,7 @@ return [
                         'options' => [
                             'route' => 'api/',
                             'defaults' => [
-                                'controller' => __NAMESPACE__ . '\Api\Api',
+                                'controller' => ApiController::class,
                             ]
                         ],
                         'may_terminate' => true,

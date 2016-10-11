@@ -89,4 +89,11 @@ return [
 
     'label.link-type-selector'      => 'Link Type',
     'link-type.external'            => 'Exterernal Link',
+
+
+    'label.environment'             => 'Environment',
+    'title.environment'             => 'Environment',
+    'title.environment-repository'  => 'Repository',
+    'title.environment-packages'    => 'Packages',
+    'title.environment-ini'         => 'PHP INI Settings',
 ];

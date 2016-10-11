@@ -53,7 +53,7 @@ class ContainerFactory implements FactoryInterface
 
         $navigation = new Container();
 
-        foreach ($container->get('config')['navigation']['containers']['admin42'] as $pageSpec) {
+        foreach ($container->get('config')['navigation']['containers'][$requestedName] as $pageSpec) {
             $navigation->addPage($this->createPage($pageSpec));
         }
         $navigation->sort();
