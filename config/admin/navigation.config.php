@@ -28,11 +28,26 @@ return [
                     ]
                 ]
             ],
+            'admin42-top' => [
+                'profile' => [
+                    'label' => 'label.profile',
+                    'route' => 'admin/user/manage',
+                    'icon' => 'fa fa-user fa-fw',
+                    'order' => 1000,
+                ],
+                'environment' => [
+                    'label' => 'label.environment',
+                    'route' => 'admin/environment',
+                    'icon' => 'fa fa-code fa-fw',
+                    'order' => 2000,
+                ],
+            ],
         ],
 
         'service_manager' => [
             'factories' => [
                 'admin42' => ContainerFactory::class,
+                'admin42-top' => ContainerFactory::class,
             ],
         ],
         'filter_manager' => [

@@ -1,0 +1,30 @@
+<?php
+if (iterator_count($this->iterator) == 0) {
+    return;
+}
+$html = [];
+$prevDepth = -1;
+
+/** @var \Admin42\Navigation\Page\Page $page */
+foreach ($this->iterator as $page){
+    $depth = $this->iterator->getDepth();
+    if ($depth == $this->minDepth) {
+        $prevDepth = $depth;
+        continue;
+    }
+
+    $icon = '<i class="fa fa-fw"></i>';
+    if (strlen($page->getIcon())) {
+        $icon = '<i class="'.$page->getIcon().'"></i>';
+    }
+
+    $label = $this->translate($page->getLabel(), 'admin');
+
+    $href = $page->getHref();
+
+    $html[] = '<li><a href="'.$href.'">'.$icon . ' ' . $label.'</a></li>';
+
+    $prevDepth = $depth;
+}
+
+echo implode(PHP_EOL, $html);

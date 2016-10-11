@@ -35,14 +35,11 @@
                     <b class="caret text-lt"></b>
                 </a>
                 <ul class="dropdown-menu w" uib-dropdown-menu>
-                    <li>
-                        <a href="<?= $this->url('admin/user/manage') ?>">
-                            <?= $this->translate('label.profile', 'admin') ?>
-                        </a>
-                    </li>
+                    <?= $this->menu('partial/admin42/top-menu', 'admin42-top')->enableFilter('adminPermission')->setMaxDepth(1) ?>
                     <li class="divider"></li>
                     <li>
                         <a href="<?= $this->url('admin/logout') ?>">
+                            <i class="fa fa-fw fa-sign-out"></i>
                             <?= $this->translate('label.logout', 'admin') ?>
                         </a>
                     </li>
