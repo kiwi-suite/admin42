@@ -13,8 +13,13 @@ angular.module('admin42')
 
                 $scope.model = ($scope.formData.value == $scope.formData.checkedValue);
 
-                $scope.onChange = function () {
+                function setValue() {
                     $scope.formData.value = ($scope.model == true) ? $scope.formData.checkedValue : $scope.formData.uncheckedValue;
+                }
+                setValue();
+
+                $scope.onChange = function () {
+                    setValue();
                     $scope.formData.errors = [];
                 };
 
