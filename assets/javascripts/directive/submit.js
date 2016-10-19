@@ -11,6 +11,11 @@ angular.module('admin42')
                     scope.icon = attrs.icon;
                 }
 
+                scope.btnClass = "btn-primary";
+                if (!angular.isUndefined(attrs.btnClass)) {
+                    scope.btnClass = attrs.btnClass;
+                }
+
                 scope.submitText = "Save";
                 if (!angular.isUndefined(attrs.submitText)) {
                     scope.submitText = attrs.submitText;

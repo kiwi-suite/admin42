@@ -1,6 +1,6 @@
 <?php
 $submitContent = <<<EOT
-<button class="btn btn-primary btn-addon" ng-class="submitLoading ? 'disabled' : ''" type="submit">
+<button class="btn btn-addon {{ btnClass }}" ng-class="submitLoading ? 'disabled' : ''" type="submit">
     <i><span ng-class="submitLoading ? 'fa fa-spin fa-refresh' : icon"></span></i>
     {{ submitText }}
 </button>
