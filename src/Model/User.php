@@ -14,6 +14,7 @@ namespace Admin42\Model;
 
 use Core42\Model\AbstractModel;
 use Core42\Permission\IdentityRoleProviderInterface;
+use Core42\Stdlib\DateTime;
 
 /**
  * @method User setId() setId(int $id)
@@ -35,16 +36,16 @@ use Core42\Permission\IdentityRoleProviderInterface;
  * @method string getStatus() getStatus()
  * @method User setPayload() setPayload(array $payload)
  * @method array getPayload() getPayload()
- * @method User setLastLogin() setLastLogin(\DateTime $lastLogin)
- * @method \DateTime getLastLogin() getLastLogin()
+ * @method User setLastLogin() setLastLogin(DateTime $lastLogin)
+ * @method DateTime getLastLogin() getLastLogin()
  * @method User setLocale() setLocale($locale)
  * @method string getLocale() getLocale()
  * @method User setTimezone() setTimezone($timezone)
  * @method string getTimezone() getTimezone()
- * @method User setUpdated() setUpdated(\DateTime $updated)
- * @method \DateTime getUpdated() getUpdated()
- * @method User setCreated() setCreated(\DateTime $created)
- * @method \DateTime getCreated() getCreated()
+ * @method User setUpdated() setUpdated(DateTime $updated)
+ * @method DateTime getUpdated() getUpdated()
+ * @method User setCreated() setCreated(DateTime $created)
+ * @method DateTime getCreated() getCreated()
  */
 class User extends AbstractModel implements IdentityRoleProviderInterface
 {

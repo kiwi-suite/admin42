@@ -15,6 +15,7 @@ namespace Admin42\Command\User;
 use Admin42\Model\User;
 use Admin42\TableGateway\UserTableGateway;
 use Core42\Command\AbstractCommand;
+use Core42\Stdlib\DateTime;
 use Zend\Db\Sql\Select;
 use Zend\Db\Sql\Where;
 use Zend\Validator\EmailAddress;
@@ -228,7 +229,7 @@ class EditCommand extends AbstractCommand
      */
     protected function execute()
     {
-        $dateTime = new \DateTime();
+        $dateTime = new DateTime();
 
         $this->user->setUsername($this->username)
                 ->setEmail($this->email)

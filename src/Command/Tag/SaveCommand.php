@@ -15,6 +15,7 @@ namespace Admin42\Command\Tag;
 use Admin42\Model\Tag;
 use Admin42\TableGateway\TagTableGateway;
 use Core42\Command\AbstractCommand;
+use Core42\Stdlib\DateTime;
 
 class SaveCommand extends AbstractCommand
 {
@@ -44,7 +45,7 @@ class SaveCommand extends AbstractCommand
             if ($result->count() == 0) {
                 $newTag = new Tag();
                 $newTag->setTag($tag);
-                $newTag->setCreated(new \DateTime());
+                $newTag->setCreated(new DateTime());
                 $tagsTableGateway->insert($newTag);
             }
         }

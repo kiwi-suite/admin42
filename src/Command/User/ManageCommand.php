@@ -15,6 +15,7 @@ namespace Admin42\Command\User;
 use Admin42\Model\User;
 use Admin42\TableGateway\UserTableGateway;
 use Core42\Command\AbstractCommand;
+use Core42\Stdlib\DateTime;
 use Zend\Crypt\Password\Bcrypt;
 use Zend\Db\Sql\Predicate\Operator;
 use Zend\Validator\EmailAddress;
@@ -240,7 +241,7 @@ class ManageCommand extends AbstractCommand
         }
 
         if ($this->user->hasChanged()) {
-            $this->user->setUpdated(new \DateTime());
+            $this->user->setUpdated(new DateTime());
         }
 
         $this->getTableGateway(UserTableGateway::class)->update($this->user);

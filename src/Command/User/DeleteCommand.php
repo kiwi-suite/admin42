@@ -15,6 +15,7 @@ namespace Admin42\Command\User;
 use Admin42\Model\User;
 use Admin42\TableGateway\UserTableGateway;
 use Core42\Command\AbstractCommand;
+use Core42\Stdlib\DateTime;
 
 class DeleteCommand extends AbstractCommand
 {
@@ -69,7 +70,7 @@ class DeleteCommand extends AbstractCommand
      */
     protected function execute()
     {
-        $dateTime = new \DateTime();
+        $dateTime = new DateTime();
         $this->user->setStatus(User::STATUS_INACTIVE)
             ->setEmail(json_encode([
                 $this->user->getEmail(),

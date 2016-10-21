@@ -16,6 +16,7 @@ use Admin42\Command\Mail\SendCommand;
 use Admin42\Model\User;
 use Admin42\TableGateway\UserTableGateway;
 use Core42\Command\AbstractCommand;
+use Core42\Stdlib\DateTime;
 use Core42\View\Model\MailModel;
 
 class LostPasswordCommand extends AbstractCommand
@@ -113,7 +114,7 @@ class LostPasswordCommand extends AbstractCommand
     protected function execute()
     {
         $this->user->setHash($this->hash)
-            ->setUpdated(new \DateTime());
+            ->setUpdated(new DateTime());
 
         $this->getTableGateway(UserTableGateway::class)->update($this->user);
 

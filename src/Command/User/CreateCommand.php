@@ -17,6 +17,7 @@ use Admin42\Model\User;
 use Admin42\TableGateway\UserTableGateway;
 use Core42\Command\AbstractCommand;
 use Core42\Command\ConsoleAwareTrait;
+use Core42\Stdlib\DateTime;
 use Core42\View\Model\MailModel;
 use Zend\Crypt\Password\Bcrypt;
 use Zend\Validator\EmailAddress;
@@ -237,7 +238,7 @@ class CreateCommand extends AbstractCommand
      */
     protected function execute()
     {
-        $dateTime = new \DateTime();
+        $dateTime = new DateTime();
 
         $user = new User();
         $user->setUsername($this->username)

@@ -13,12 +13,13 @@
 namespace Admin42\View\Helper\Form;
 
 use Admin42\FormElements\AngularAwareInterface;
+use Core42\Stdlib\Date;
 
 class FormDate extends FormHelper
 {
     /**
      * @param AngularAwareInterface $element
-     * @return \DateTime|mixed|string
+     * @return string
      */
     public function getValue(AngularAwareInterface $element)
     {
@@ -28,7 +29,7 @@ class FormDate extends FormHelper
         } elseif (is_string($value)) {
             try {
                 $adminHelper = $this->getView()->plugin('admin');
-                $value = new \DateTime($value);
+                $value = new Date($value);
                 $value->setTimezone(new \DateTimeZone($adminHelper->getTimezone()));
                 $value = $value->format('Y-m-d');
             } catch (\Exception $e) {

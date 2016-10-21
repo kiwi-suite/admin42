@@ -15,6 +15,7 @@ namespace Admin42\Command\Crud;
 use Admin42\Crud\CrudEvent;
 use Admin42\Model\User;
 use Core42\Command\AbstractCommand;
+use Core42\Stdlib\DateTime;
 
 class CreateCommand extends AbstractCommand
 {
@@ -84,7 +85,7 @@ class CreateCommand extends AbstractCommand
         $model = $this->getTableGateway($this->tableGatewayName)->getModel();
 
         if (method_exists($model, 'getProperties')) {
-            $dateTime = new \DateTime();
+            $dateTime = new DateTime();
             $properties = $model->getProperties();
 
             if (in_array('updated', $properties) && !array_key_exists('updated', $this->data)) {

@@ -126,7 +126,7 @@ class Factory extends \Core42\Form\Service\Factory
             $this->prepareAndInjectElements($spec['elements'], $fieldset, __METHOD__);
         }
 
-        $this->prepareAndInjectFactory($this, $fieldset, __METHOD__);
+        //$this->prepareAndInjectFactory($this, $fieldset, __METHOD__);
 
         return $fieldset;
     }

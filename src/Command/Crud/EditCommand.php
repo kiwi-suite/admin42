@@ -16,6 +16,7 @@ use Admin42\Crud\CrudEvent;
 use Admin42\Model\User;
 use Core42\Command\AbstractCommand;
 use Core42\Model\ModelInterface;
+use Core42\Stdlib\DateTime;
 
 class EditCommand extends AbstractCommand
 {
@@ -120,7 +121,7 @@ class EditCommand extends AbstractCommand
         $this->model->populate($this->data);
         if ($this->model->hasChanged()) {
             if (method_exists($this->model, 'getProperties')) {
-                $dateTime = new \DateTime();
+                $dateTime = new DateTime();
                 $properties = $this->model->getProperties();
 
                 if (in_array('updated', $properties) && !array_key_exists('updated', $this->data)) {

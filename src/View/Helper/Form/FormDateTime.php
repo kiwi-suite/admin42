@@ -13,12 +13,13 @@
 namespace Admin42\View\Helper\Form;
 
 use Admin42\FormElements\AngularAwareInterface;
+use Core42\Stdlib\DateTime;
 
 class FormDateTime extends FormHelper
 {
     /**
      * @param AngularAwareInterface $element
-     * @return \DateTime|mixed|string
+     * @return string
      */
     public function getValue(AngularAwareInterface $element)
     {
@@ -27,7 +28,7 @@ class FormDateTime extends FormHelper
             $value = '';
         } elseif (is_string($value)) {
             try {
-                $value = new \DateTime($value);
+                $value = new DateTime($value);
                 $value = $value->format('Y-m-d H:i:s');
             } catch (\Exception $e) {
                 $value = '';
