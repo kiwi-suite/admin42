@@ -20,5 +20,10 @@
         "psr-4": {
             "Admin42\\": "src/"
         }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Admin42Test\\": "src/"
+        }
     }
 }
