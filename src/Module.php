@@ -24,6 +24,7 @@ use Zend\ModuleManager\Feature\InitProviderInterface;
 use Zend\ModuleManager\ModuleEvent;
 use Zend\ModuleManager\ModuleManagerInterface;
 use Zend\Stdlib\ArrayUtils;
+use Zend\Stdlib\Glob;
 
 class Module implements
     ConfigProviderInterface,
@@ -106,6 +107,14 @@ class Module implements
      */
     public function getCliConfig()
     {
-        return include_once __DIR__ . '/../config/cli/cli.config.php';
+        $config = [];
+        $configPath = dirname((new \ReflectionClass($this))->getFileName()) . '/../config/cli/*.config.php';
+
+        $entries = Glob::glob($configPath);
+        foreach ($entries as $file) {
+            $config = ArrayUtils::merge($config, include_once $file);
+        }
+
+        return $config;
     }
 }
