@@ -17,17 +17,7 @@ $this->loginForm->prepare();
                             <span class="input-group-addon">
                                 <span class="fa fa-user fa-fw"></span>
                             </span>
-                            <?= $this->formText(
-                                $this->loginForm->get('identity')->setAttributes(
-                                    [
-                                        'class'       => 'form-control',
-                                        'placeholder' => $this->translate(
-                                            $this->loginForm->get('identity')->getLabel(),
-                                            'admin'
-                                        )
-                                    ]
-                                )
-                            ) ?>
+                            <?= $this->formText($this->loginForm->get('identity')) ?>
                         </div>
                         <?php if (count($this->loginForm->get('identity')->getMessages())): ?>
                             <span class="glyphicon glyphicon-warning-sign form-control-feedback"></span>
@@ -47,17 +37,7 @@ $this->loginForm->prepare();
                             <span class="input-group-addon">
                                 <span class="fa fa-lock fa-fw"></span>
                             </span>
-                            <?= $this->formPassword(
-                                $this->loginForm->get('password')->setAttributes(
-                                    [
-                                        'class'       => 'form-control',
-                                        'placeholder' => $this->translate(
-                                            $this->loginForm->get('password')->getLabel(),
-                                            'admin'
-                                        )
-                                    ]
-                                )
-                            ) ?>
+                            <?= $this->formPassword($this->loginForm->get('password')) ?>
                         </div>
                         <?php if (count($this->loginForm->get('password')->getMessages())): ?>
                             <span class="glyphicon glyphicon-warning-sign form-control-feedback"></span>
