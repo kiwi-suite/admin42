@@ -23,18 +23,18 @@ class EnvironmentController extends AbstractAdminController
     public function indexAction()
     {
         $revision = [];
-        if (file_exists('data/version/revision.json')) {
+        if (file_exists('resources/version/revision.json')) {
             try {
-                $revision = Json::decode(file_get_contents('data/version/revision.json'), Json::TYPE_ARRAY);
+                $revision = Json::decode(file_get_contents('resources/version/revision.json'), Json::TYPE_ARRAY);
             } catch (\Exception $e){
 
             }
         }
 
         $packages = [];
-        if (file_exists('data/version/packages.json')) {
+        if (file_exists('resources/version/packages.json')) {
             try {
-                $packages = Json::decode(file_get_contents('data/version/packages.json'), Json::TYPE_ARRAY);
+                $packages = Json::decode(file_get_contents('resources/version/packages.json'), Json::TYPE_ARRAY);
             } catch (\Exception $e){
 
             }
