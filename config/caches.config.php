@@ -5,7 +5,7 @@ return [
     'cache' => [
         'caches' => [
             'link' => [
-                'driver' => 'ephemeral',
+                'driver' => (DEVELOPMENT_MODE === true) ? 'development' : 'production',
                 'namespace' =>  'link',
             ],
         ],
