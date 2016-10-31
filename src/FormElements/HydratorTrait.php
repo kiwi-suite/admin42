@@ -38,6 +38,9 @@ trait HydratorTrait
     protected function prepareHydrator(FieldsetInterface $fieldset)
     {
         $strategies = [];
+
+        $hydrator = clone $this->hydratorPrototype;
+
         foreach ($fieldset->getIterator() as $elementOrFieldset) {
             if ($elementOrFieldset instanceof FieldsetInterface) {
                 continue;
@@ -49,8 +52,8 @@ trait HydratorTrait
             $strategies[$elementOrFieldset->getName()] = $strategy;
         }
 
-        $this->hydratorPrototype->addStrategies($strategies);
+        $hydrator->addStrategies($strategies);
 
-        return $this->hydratorPrototype;
+        return $hydrator;
     }
 }
