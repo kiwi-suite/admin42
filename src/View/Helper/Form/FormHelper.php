@@ -128,7 +128,7 @@ class FormHelper extends AbstractHelper implements AngularHelperInterface
         $template = $element->getTemplate();
 
         if (empty($template)) {
-            $template = 'partial/admin42/form/' . $this->getType($element);
+            $template = 'partial/admin42/form/' . strtolower($this->getType($element));
         }
 
         $templateName = 'element/form/' . md5($template) . '.html';
