@@ -48,9 +48,10 @@ class CreateUserSetupCommand extends AbstractCommand
             100
         );
 
-        $password = Password::prompt(
+        $password = Line::prompt(
             'Password: ',
-            false
+            false,
+            100
         );
 
         $config = [
