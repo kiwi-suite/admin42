@@ -15,13 +15,13 @@ namespace Admin42\Command\User;
 use Admin42\Authentication\AuthenticationService;
 use Admin42\Model\User;
 use Admin42\TableGateway\UserTableGateway;
-use Core42\Command\Migration\AbstractCommand;
+use Core42\Command\AbstractCommand;
 use Core42\Stdlib\DateTime;
 use Zend\Authentication\Result;
 use Zend\Crypt\Password\Bcrypt;
 use Zend\Validator\EmailAddress;
 
-class LoginCommand extends AbstractCommand
+class LoginCommand extends AbstractCommand 
 {
     /**
      * @var AuthenticationService
