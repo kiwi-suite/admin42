@@ -13,6 +13,7 @@
 namespace Admin42\FormElements;
 
 use Core42\Hydrator\Strategy\ArrayStrategy;
+use Zend\Filter\Callback;
 use Zend\Form\Element;
 use Zend\Hydrator\Strategy\StrategyInterface;
 use Zend\InputFilter\InputProviderInterface;
@@ -73,6 +74,20 @@ class MultiCheckbox extends Element implements AngularAwareInterface, InputProvi
         return [
             'name' => $this->getName(),
             'required' => $this->isRequired(),
+            'filters' => [
+                [
+                    'name' => Callback::class,
+                    'options' => [
+                        'callback' => function($value) {
+                            if (!is_array($value)) {
+                                return [];
+                            }
+
+                            return $value;
+                        }
+                    ]
+                ]
+            ],
             'validators' => [
                 [
                     'name' => Explode::class,
@@ -87,6 +102,21 @@ class MultiCheckbox extends Element implements AngularAwareInterface, InputProvi
 
             ],
         ];
+    }
+
+    /**
+     * @param array $value
+     * @return $this
+     */
+    public function setValue($value)
+    {
+        if (!is_array($value)) {
+            $value = [];
+        }
+
+        $this->value = array_values($value);
+
+        return $this;
     }
 
     /**

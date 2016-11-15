@@ -16,6 +16,7 @@
         <div class="clearfix"></div>
     </div>
     <div class="col-sm-9 col-md-10">
+        <input ng-if="values.length == 0" type="hidden" name="{{ formData.name }}" value="">
         <input ng-repeat="value in values" type="hidden" name="{{ formData.name }}[]" value="{{value}}">
         <div ng-repeat="option in options">
             <label class="i-checks">
