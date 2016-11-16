@@ -168,15 +168,14 @@ class Stack extends Fieldset
     /**
      * @param $type
      * @param $name
-     * @return FieldsetInterface
-     * @throws \Exception
+     * @return FieldsetInterface|false
      */
     public function attachFieldset($type, $name)
     {
         $this->shouldCreateChildrenOnPrepareElement = false;
 
         if (!isset($this->protoTypes[$type])) {
-            throw new \Exception(sprintf("Type '%s' is not registered as prototype", $type));
+            return false;
         }
 
         $fieldset = clone $this->protoTypes[$type];
