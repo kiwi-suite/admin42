@@ -38,10 +38,11 @@ class StackStrategy implements StrategyInterface
             if (!isset($set['name'])) {
                 continue;
             }
-            if (empty($set['elements'])) {
-                continue;
+            $elements = [];
+            if (is_array($set['elements'])) {
+                $elements = $set['elements'];
             }
-            $prototypes[$set['name']] = $set['elements'];
+            $prototypes[$set['name']] = $elements;
         }
 
         $stack = [];
