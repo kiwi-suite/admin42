@@ -96,4 +96,7 @@ return [
     'title.environment-repository'  => 'Repository',
     'title.environment-packages'    => 'Packages',
     'title.environment-ini'         => 'PHP INI Settings',
+
+    'stack.no-name'                 => 'No name given',
+    'stack.no-name-enter'           => 'Click to enter name',
 ];
