@@ -34,6 +34,7 @@ return [
                 'guest' => [
                     'permissions' => [
                         'route/admin/login',
+                        'route/admin/captcha',
                         'route/admin/lost-password',
                         'route/admin/recover-password',
                         'route/home',

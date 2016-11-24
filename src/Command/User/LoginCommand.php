@@ -13,20 +13,23 @@
 namespace Admin42\Command\User;
 
 use Admin42\Authentication\AuthenticationService;
+use Admin42\Model\LoginHistory;
 use Admin42\Model\User;
+use Admin42\TableGateway\LoginHistoryTableGateway;
 use Admin42\TableGateway\UserTableGateway;
 use Core42\Command\AbstractCommand;
 use Core42\Stdlib\DateTime;
 use Zend\Authentication\Result;
 use Zend\Crypt\Password\Bcrypt;
+use Zend\Session\Container;
 use Zend\Validator\EmailAddress;
 
-class LoginCommand extends AbstractCommand 
+class LoginCommand extends AbstractCommand
 {
     /**
      * @var AuthenticationService
      */
-    private $authenticationService;
+    protected $authenticationService;
 
     /**
      * @var string
@@ -46,7 +49,12 @@ class LoginCommand extends AbstractCommand
     /**
      * @var User
      */
-    private $user;
+    protected $user;
+
+    /**
+     * @var string
+     */
+    private $ip;
 
     /**
      * @param string $identity
@@ -71,12 +79,30 @@ class LoginCommand extends AbstractCommand
     }
 
     /**
+     * @param string $ip
+     * @return $this
+     */
+    public function setIp($ip)
+    {
+        $this->ip = $ip;
+
+        return $this;
+    }
+
+    /**
      * @param array $values
      */
     public function hydrate(array $values)
     {
-        $this->setPassword((isset($values['password'])) ? $values['password'] : null);
-        $this->setIdentity((isset($values['identity'])) ? $values['identity'] : null);
+        if (isset($values['password'])) {
+            $this->setPassword($values['password']);
+        }
+        if (isset($values['identity'])) {
+            $this->setIdentity($values['identity']);
+        }
+        if (isset($values['ip'])) {
+            $this->setIp($values['ip']);
+        }
     }
 
     /**
@@ -107,24 +133,66 @@ class LoginCommand extends AbstractCommand
 
         if ($resultSet->count() != 1) {
             $bCrypt->create('test');
-
             $this->addError('identity', 'Invalid username or password');
 
             return;
         }
 
+        $config = $this->getServiceManager()->get('Config');
+
+        $login = true;
+        
         /** @var User $user */
         $user = $resultSet->current();
         if (!$bCrypt->verify($this->password, $user->getPassword())) {
             $this->addError('identity', 'Invalid username or password');
-
-            return;
+            $this->createLoginHistory($user->getId(), LoginHistory::STATUS_FAIL);
+            
+            $login = false;
         }
 
-        if (!in_array($user->getStatus(), [User::STATUS_ACTIVE])) {
+        if ($login && !in_array($user->getStatus(), [User::STATUS_ACTIVE])) {
             $this->addError('identity', 'Invalid username or password');
+            $this->createLoginHistory($user->getId(), LoginHistory::STATUS_FAIL);
 
-            return;
+            $login = false;
+        }
+        
+        $forceCaptcha = false;
+        if ($config['project']['admin_login_captcha'] === true) {
+
+            $loginHistoryTableGateway = $this->getTableGateway(LoginHistoryTableGateway::class);
+            $select = $loginHistoryTableGateway->getSql()->select();
+            $select->where->equalTo('userId', $user->getId());
+            $select->order('created desc');
+            $select->limit(5);
+
+            $result = $loginHistoryTableGateway->selectWith($select);
+
+            if ($result->count() == 5) {
+                $failCount = 0;
+                foreach ($result as $loginHistory) {
+                    /** @var LoginHistory $loginHistory */
+                    if ($loginHistory->getStatus() === LoginHistory::STATUS_SUCCESS) {
+                        break;
+                    }
+                    $failCount++;
+                }
+                if ($failCount === 5) {
+                    $forceCaptcha = true;
+                }
+            }
+
+            if ($forceCaptcha) {
+
+                $this->addError('captcha', 'force captcha');
+                
+                $container = new Container('login');
+                $container->success = $login;
+                $container->user_id = $user->getId();
+                
+                return;
+            }
         }
 
         $this->user = $user;
@@ -145,5 +213,27 @@ class LoginCommand extends AbstractCommand
 
         $this->user->setLastLogin(new DateTime());
         $this->getTableGateway(UserTableGateway::class)->update($this->user);
+
+        $this->createLoginHistory($this->user->getId(), LoginHistory::STATUS_SUCCESS);
     }
+
+    /**
+     * @param int $userId
+     * @param string $status
+     */
+    protected function createLoginHistory($userId, $status)
+    {
+        $history = new LoginHistory();
+        $history->setUserId($userId)
+            ->setStatus($status)
+            ->setCreated(new \DateTime());
+
+        if (!empty($this->ip)) {
+            $history->setIp($this->ip);
+        }
+
+        $this->getTableGateway(LoginHistoryTableGateway::class)->insert($history);
+    }
+
+    
 }

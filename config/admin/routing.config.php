@@ -55,6 +55,16 @@ return [
                             ],
                         ],
                     ],
+                    'captcha' => [
+                        'type' => Literal::class,
+                        'options' => [
+                            'route' => 'captcha/',
+                            'defaults' => [
+                                'controller' => UserController::class,
+                                'action' => 'captcha',
+                            ],
+                        ],
+                    ],
                     'lost-password' => [
                         'type' => Literal::class,
                         'options' => [

@@ -15,6 +15,7 @@ namespace Admin42\Controller;
 use Admin42\Command\User\CreateCommand;
 use Admin42\Command\User\DeleteCommand;
 use Admin42\Command\User\EditCommand;
+use Admin42\Command\User\LoginCaptchaCommand;
 use Admin42\Command\User\LoginCommand;
 use Admin42\Command\User\LogoutCommand;
 use Admin42\Command\User\LostPasswordCommand;
@@ -229,29 +230,56 @@ class UserController extends AbstractAdminController
         if ($this->getRequest()->isPost()) {
             $formCmd = $this->getFormCommand();
 
+            $loginCmd = $this->getCommand(LoginCommand::class);
+            $loginCmd->setIp($_SERVER['REMOTE_ADDR']);
+
             $formCmd->setForm($loginForm)
-                ->setCommand($this->getCommand(LoginCommand::class))
+                ->setCommand($loginCmd)
                 ->run();
 
             if (!$formCmd->hasErrors()) {
-                if ($this->params()->fromQuery('redirectTo', null) !== null) {
-                    return $this->redirect()->toUrl($this->params()->fromQuery('redirectTo'));
-                } else {
-                    $identityRole = $this->getPermissionService()->getRole($this->getIdentity()->getRole());
-
-                    $roleOptions = $identityRole->getOptions();
-
-                    if (empty($roleOptions['redirect_after_login'])) {
-                        return $this->redirect()->toRoute('admin/user/manage');
-                    }
-
-                    return $this->redirect()->toRoute($roleOptions['redirect_after_login']);
+                return $this->redirectAfterLogin();
+            } else {
+                $errors = $formCmd->getErrors();
+                if (!empty($errors['captcha'])) {
+                    return $this->redirect()->toRoute('admin/captcha');
                 }
             }
         }
 
         return [
             'loginForm' => $loginForm,
+        ];
+    }
+
+    public function captchaAction()
+    {
+        $this->layout('admin/layout/layout-min');
+
+        if ($this->getRequest()->isPost()) {
+
+            $post = $this->getRequest()->getPost()->toArray();
+
+            /** @var LoginCaptchaCommand $loginCmd */
+            $loginCmd = $this->getCommand(LoginCaptchaCommand::class);
+            $loginCmd->setCaptcha($post['g-recaptcha-response']);
+            $loginCmd->run();
+
+            if ($loginCmd->hasErrors()) {
+                return $this->redirect()->toRoute('admin/login');
+            } else {
+                return $this->redirectAfterLogin();
+            }
+        }
+        
+        $config = $this->getServiceManager()->get('Config');
+        
+        if (empty($config['project']['admin_login_captcha_options']['sitekey'])) {
+            throw new \Exception('no captcha sitekey defined');
+        }
+        
+        return [
+            'sitekey' => $config['project']['admin_login_captcha_options']['sitekey']
         ];
     }
 
@@ -286,6 +314,7 @@ class UserController extends AbstractAdminController
         $lostPasswordForm = $this->getForm(LostPasswordForm::class);
 
         if ($prg !== false) {
+            /** @var LostPasswordCommand $lostPasswordCommand */
             $lostPasswordCommand = $this->getCommand(LostPasswordCommand::class);
 
             $formCmd = $this->getFormCommand();
@@ -410,5 +439,25 @@ class UserController extends AbstractAdminController
         return [
             'manageForm' => $manageForm,
         ];
+    }
+
+    /**
+     * @return \Zend\Http\Response
+     */
+    protected function redirectAfterLogin()
+    {
+        if ($this->params()->fromQuery('redirectTo', null) !== null) {
+            return $this->redirect()->toUrl($this->params()->fromQuery('redirectTo'));
+        } else {
+            $identityRole = $this->getPermissionService()->getRole($this->getIdentity()->getRole());
+
+            $roleOptions = $identityRole->getOptions();
+
+            if (empty($roleOptions['redirect_after_login'])) {
+                return $this->redirect()->toRoute('admin/user/manage');
+            }
+
+            return $this->redirect()->toRoute($roleOptions['redirect_after_login']);
+        }
     }
 }
