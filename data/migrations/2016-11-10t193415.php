@@ -14,7 +14,7 @@ class Migration20161110193415
   INDEX `admin42_user_idx` (`userId` ASC),
   CONSTRAINT `admin42_user`
     FOREIGN KEY (`userId`)
-    REFERENCES admin42_user` (`id`)
+    REFERENCES `admin42_user` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB DEFAULT CHARACTER SET = utf8;";
