@@ -53,4 +53,14 @@ class ExternalLink implements AdapterInterface
 
         return $value['type'] . $value['url'];
     }
+
+    /**
+     * @return array
+     */
+    public function getPartials()
+    {
+        return [
+            'link/external.html' => 'link/external',
+        ];
+    }
 }

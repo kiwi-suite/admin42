@@ -49,11 +49,17 @@ class LinkFactory implements FactoryInterface
             $options = $options['options'];
         }
 
+        /** @var LinkProvider $linkProvider */
         $linkProvider = $container->get(LinkProvider::class);
 
         $link = new Link($name, $options);
-
         $link->setAllLinkTypes($linkProvider->getAvailableAdapters());
+
+        $partialList = [];
+        foreach ($linkProvider->getAvailableAdapters() as $adapterName) {
+            $partialList[$adapterName] = $linkProvider->getAdapter($adapterName)->getPartials();
+        }
+        $link->setLinkPartials($partialList);
 
         return $link;
     }

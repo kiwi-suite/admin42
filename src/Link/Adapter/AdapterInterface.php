@@ -26,4 +26,9 @@ interface AdapterInterface
      * @return string
      */
     public function getDisplayName($value);
+
+    /**
+     * @return array
+     */
+    public function getPartials();
 }

@@ -28,6 +28,11 @@ class Link extends Element implements AngularAwareInterface
     protected $allLinkTypes;
 
     /**
+     * @var array
+     */
+    protected $linkPartials = [];
+
+    /**
      * @param array $linkTypes
      */
     public function setLinkTypes(array $linkTypes)
@@ -57,6 +62,34 @@ class Link extends Element implements AngularAwareInterface
     public function getAllLinkTypes()
     {
         return $this->allLinkTypes;
+    }
+
+    /**
+     * @param array $linkPartials
+     * @return $this
+     */
+    public function setLinkPartials(array $linkPartials)
+    {
+        $this->linkPartials = $linkPartials;
+
+        return $this;
+    }
+
+    /**
+     * @param null|string $name
+     * @return array
+     */
+    public function getLinkPartial($name = null)
+    {
+        if ($name === null) {
+            return $this->linkPartials;
+        }
+
+        if (!isset($this->linkPartials[$name])) {
+            return [];
+        }
+
+        return $this->linkPartials[$name];
     }
 
     /**

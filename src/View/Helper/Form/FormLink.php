@@ -36,7 +36,9 @@ class FormLink extends FormHelper
         }
 
         foreach ($linkTypes as $type) {
-            $this->getAngularHelper()->addHtmlPartial('link/' . $type . '.html', 'link/' . $type);
+            foreach ($element->getLinkPartial($type) as $angularName => $partialName) {
+                $this->getAngularHelper()->addHtmlPartial($angularName, $partialName);
+            }
         }
 
         $elementData = parent::getElementData($element, $angularNameRendering);

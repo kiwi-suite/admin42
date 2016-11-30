@@ -64,6 +64,15 @@ class LinkProvider
     }
 
     /**
+     * @param string $name
+     * @return AdapterInterface
+     */
+    public function getAdapter($name)
+    {
+        return $this->adapter[$name];
+    }
+
+    /**
      * @return array
      */
     public function getAvailableAdapters()
