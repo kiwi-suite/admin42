@@ -13,7 +13,7 @@
 namespace Admin42\Link\Service;
 
 use Admin42\Link\LinkProvider;
-use Admin42\TableGateway\LinkTableGateway;
+use Admin42\Selector\LinkSelector;
 use Interop\Container\ContainerInterface;
 use Interop\Container\Exception\ContainerException;
 use Zend\ServiceManager\Exception\ServiceNotCreatedException;
@@ -39,8 +39,7 @@ class LinkProviderFactory implements FactoryInterface
         $config = $container->get('config')['link'];
 
         $linkProvider = new LinkProvider(
-            $container->get('TableGateway')->get(LinkTableGateway::class),
-            $container->get('Cache')->get('link')
+            $container->get('Selector')->get(LinkSelector::class)
         );
 
         foreach ($config['adapter'] as $name => $service) {

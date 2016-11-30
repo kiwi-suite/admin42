@@ -14,6 +14,7 @@ namespace Admin42\Link;
 
 use Admin42\Link\Adapter\AdapterInterface;
 use Admin42\Model\Link;
+use Admin42\Selector\LinkSelector;
 use Admin42\TableGateway\LinkTableGateway;
 use Psr\Cache\CacheItemPoolInterface;
 
@@ -23,27 +24,20 @@ class LinkProvider
      * @var AdapterInterface[]
      */
     protected $adapter = [];
-
     /**
-     * @var LinkTableGateway
+     * @var LinkSelector
      */
-    protected $linkTableGateway;
+    private $linkSelector;
 
-    /**
-     * @var CacheItemPoolInterface
-     */
-    protected $cache;
 
     /**
      * LinkProvider constructor.
-     * @param LinkTableGateway $linkTableGateway
-     * @param CacheItemPoolInterface $cache
+     * @param LinkSelector $linkSelector
      */
-    public function __construct(LinkTableGateway $linkTableGateway, CacheItemPoolInterface $cache)
+    public function __construct(LinkSelector $linkSelector)
     {
-        $this->linkTableGateway = $linkTableGateway;
 
-        $this->cache = $cache;
+        $this->linkSelector = $linkSelector;
     }
 
     /**
@@ -114,15 +108,7 @@ class LinkProvider
      */
     public function getLink($id)
     {
-        $cacheItem = $this->cache->getItem($id);
-        $link = $cacheItem->get();
-        if (!$cacheItem->isHit()) {
-            $link = $this->linkTableGateway->selectByPrimary((int) $id);
-            $cacheItem->set($link);
-            $this->cache->save($cacheItem);
-        }
-
-        return $link;
+        return $this->linkSelector->setLinkId($id)->getResult();
     }
 
     /**
