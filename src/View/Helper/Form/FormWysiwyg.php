@@ -26,6 +26,10 @@ class FormWysiwyg extends FormHelper
         $elementData = parent::getElementData($element, $angularNameRendering);
         $elementData['editorOptions'] = $element->getEditorOptions();
 
+        $urlHelper = $this->getView()->plugin('url');
+        $elementData['editorOptions']['link_url'] = $urlHelper('admin/link/wysiwyg');
+        $elementData['editorOptions']['link_save_url'] = $urlHelper('admin/link');
+
         return $elementData;
     }
 }

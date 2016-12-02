@@ -22,9 +22,9 @@ class Wysiwyg extends Element implements AngularAwareInterface
     protected $editorOptions = [
         'trusted' => true,
         'height' => 300,
-        'plugins' => 'paste autolink lists charmap table code link',
+        'plugins' => 'paste autolink lists charmap table code link42',
         'menubar' => false,
-        'toolbar' => 'undo redo paste | styleselect | bold italic | link unlink | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | table code | ',
+        'toolbar' => 'undo redo paste | styleselect | bold italic | link42 unlink42 | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | table code | ',
         'skin' => 'lightgray',
         'theme' => 'modern',
         'elementpath' => false,

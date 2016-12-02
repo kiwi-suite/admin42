@@ -12,7 +12,7 @@ module.exports = function(grunt) {
         },
 
         concurrent: {
-            all: ['compile-vendor-js', 'compile-app-js', 'less:app', 'copy']
+            all: ['compile-vendor-js', 'compile-app-js', 'compile-tinymce', 'less:app']
         },
 
         concat: {
@@ -52,8 +52,7 @@ module.exports = function(grunt) {
                     'javascripts/filter/*.js',
                     'javascripts/controller/*.js',
                     'javascripts/controller/link/*.js',
-                    'javascripts/service/*.js',
-                    'javascripts/tinymcePlugins/**/*.js'
+                    'javascripts/service/*.js'
                 ],
                 dest: '<%= dist %>/js/admin42.js'
             }
@@ -66,6 +65,10 @@ module.exports = function(grunt) {
             app: {
                 src: '<%= dist %>/js/admin42.js',
                 dest: '<%= dist %>/js/admin42.min.js'
+            },
+            tinymcelink42: {
+                src: 'tinymce/link42/plugin.js',
+                dest: 'tinymce/link42/plugin.min.js'
             }
         },
 
@@ -121,13 +124,24 @@ module.exports = function(grunt) {
                     }
                 ]
             },
-            images: {
+            tinymce: {
                 files: [
                     {
                         expand: true,
-                        cwd: 'images/',
+                        cwd: '<%= vendor_dir %>/tinymce-dist/',
                         src: '**',
-                        dest: '<%= dist %>/images/'
+                        dest: '<%= dist %>/tinymce/'
+                    }
+                ]
+            },
+            tinymcelink: {
+                files: [
+                    {
+                        expand: true,
+                        flatten: true,
+                        src: ['tinymce/link42/*'],
+                        dest: '<%= dist %>/tinymce/plugins/link42/',
+                        filter: 'isFile'
                     }
                 ]
             },
@@ -152,13 +166,16 @@ module.exports = function(grunt) {
         },
 
         clean: {
-            all: ['<%= dist %>/fonts/', '<%= dist %>/css/', '<%= dist %>/js/', '<%= dist %>/images/'],
+            all: ['<%= dist %>/fonts/', '<%= dist %>/css/', '<%= dist %>/js/', '<%= dist %>/tinymce/', '<%= dist %>/flags/'],
 
             vendorjs: [
                 '<%= dist %>/js/vendor.js'
             ],
             appjs: [
                 '<%= dist %>/js/admin42.js'
+            ],
+            tinymce: [
+                '<%= dist %>/tinymce/'
             ]
         },
 
@@ -175,14 +192,19 @@ module.exports = function(grunt) {
             less: {
                 files: ['less/*.less', 'less/**/*.less'],
                 tasks: ['compile-css']
+            },
+            tinymce: {
+                files: ['tinymce/**/*.js'],
+                tasks: ['compile-tinymce']
             }
         }
     });
 
-    grunt.registerTask('default', ['bower', 'concurrent:all']);
+    grunt.registerTask('default', ['bower', 'clean:all', 'concurrent:all', 'copy']);
     grunt.registerTask('compile-vendor-js', ['concat:vendor', 'clean:vendorjs']);
     grunt.registerTask('compile-app-js', ['concat:app', 'uglify:app', 'clean:appjs']);
     grunt.registerTask('compile-css', ['less:app']);
+    grunt.registerTask('compile-tinymce', ['clean:tinymce', 'uglify:tinymcelink42', 'copy:tinymce', 'copy:tinymcelink']);
     grunt.registerTask('clear', ['clean:all']);
 
 

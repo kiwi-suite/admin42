@@ -169,6 +169,17 @@ return [
                             ],
                         ],
                         'may_terminate' => true,
+                        'child_routes' => [
+                            'wysiwyg' => [
+                                'type' => Segment::class,
+                                'options' => [
+                                    'route' => 'wysiwyg/[:id/]',
+                                    'defaults' => [
+                                        'action' => 'wysiwyg',
+                                    ],
+                                ],
+                            ],
+                        ]
                     ],
                     'api' => [
                         'type' => Literal::class,
