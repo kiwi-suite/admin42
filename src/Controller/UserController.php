@@ -149,6 +149,7 @@ class UserController extends AbstractAdminController
                     'displayName' => $user->getDisplayName(),
                     'role' => $user->getRole(),
                     'shortName' => $user->getShortName(),
+                    'locale' => $user->getLocale(),
                 ], $user->getPayload()));
             }
         }
@@ -433,6 +434,7 @@ class UserController extends AbstractAdminController
                 'email' => $this->getIdentity()->getEmail(),
                 'shortName' => $this->getIdentity()->getShortName(),
                 'displayName' => $this->getIdentity()->getDisplayName(),
+                'locale' => $this->getIdentity()->getLocale(),
             ], $this->getIdentity()->getPayload()));
         }
 

@@ -30,52 +30,57 @@ class CreateCommand extends AbstractCommand
     /**
      * @var string
      */
-    private $username;
+    protected $username;
 
     /**
      * @var string
      */
-    private $password;
+    protected $password;
 
     /**
      * @var string
      */
-    private $status;
+    protected $status;
 
     /**
      * @var string
      */
-    private $displayName;
+    protected $displayName;
 
     /**
      * @var string
      */
-    private $cryptedPassword;
+    protected $cryptedPassword;
 
     /**
      * @var string
      */
-    private $email;
+    protected $email;
 
     /**
      * @var string
      */
-    private $role;
+    protected $role;
 
     /**
      * @var string
      */
-    private $shortName;
+    protected $shortName;
 
     /**
      * @var array
      */
-    private $payload = [];
+    protected $payload = [];
 
     /**
      * @var bool
      */
-    private $enablePasswordEmail = true;
+    protected $enablePasswordEmail = true;
+
+    /**
+     * @var string
+     */
+    protected $locale = "en-US";
 
     /**
      * @param $username
@@ -177,6 +182,17 @@ class CreateCommand extends AbstractCommand
     }
 
     /**
+     * @param string $locale
+     * @return $this
+     */
+    public function setLocale($locale)
+    {
+        $this->locale = $locale;
+
+        return $this;
+    }
+
+    /**
      * @param array $values
      */
     public function hydrate(array $values)
@@ -189,6 +205,7 @@ class CreateCommand extends AbstractCommand
         $this->setRole(array_key_exists('role', $values) ? $values['role'] : null);
         $this->setPayload(array_key_exists('payload', $values) ? $values['payload'] : []);
         $this->setShortName(array_key_exists('shortName', $values) ? $values['shortName'] : null);
+        $this->setLocale(array_key_exists('locale', $values) ? $values['locale'] : 'en-US');
     }
 
     /**
@@ -267,7 +284,7 @@ class CreateCommand extends AbstractCommand
                 ->setStatus($this->status)
                 ->setShortName($this->shortName)
                 ->setPayload($this->payload)
-                ->setLocale('en-US')
+                ->setLocale($this->locale)
                 ->setTimezone('Europe/Vienna')
                 ->setUpdated($dateTime)
                 ->setCreated($dateTime);

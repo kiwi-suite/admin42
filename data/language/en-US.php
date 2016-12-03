@@ -17,7 +17,6 @@ return [
     'button.remove'                 => 'Remove',
     'button.browse'                 => 'Browse',
     'button.add'                    => 'Add',
-    'button.preview'                => 'Preview',
 
     'label.profile'                 => 'Profile',
     'label.logout'                  => 'Logout',
@@ -46,6 +45,7 @@ return [
     'field.progress'                => 'Progress',
     'field.status'                  => 'Status',
     'field.short-name'              => 'Short Name',
+    'field.language'                => 'Language',
 
     'title.user-manage'             => 'Manage your profile settings',
     'title.users'                   => 'User management',
@@ -81,15 +81,11 @@ return [
     'toaster.user.manage.title.success'     => 'Profile saved',
     'toaster.user.manage.message.success'   => 'Profile is successfully saved',
 
-    'toaster.media.delete.title.success'    => 'Media deleted',
-    'toaster.media.delete.message.success'  => 'Media is successfully deleted',
-
     'item.modal.delete.title'       => 'Delete Item',
     'item.modal.delete.content'     => 'Really delete this item?',
 
     'label.link-type-selector'      => 'Link Type',
     'link-type.external'            => 'Exterernal Link',
-
 
     'label.environment'             => 'Environment',
     'title.environment'             => 'Environment',

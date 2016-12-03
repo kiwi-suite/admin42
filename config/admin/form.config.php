@@ -15,6 +15,7 @@ use Admin42\FormElements\Password;
 use Admin42\FormElements\Radio;
 use Admin42\FormElements\Select;
 use Admin42\FormElements\Service\ActiveFactory;
+use Admin42\FormElements\Service\AdminLanguageFactory;
 use Admin42\FormElements\Service\CountryFactory;
 use Admin42\FormElements\Service\LinkFactory;
 use Admin42\FormElements\Service\OnlineFactory;
@@ -35,6 +36,7 @@ return [
             'country'                   => CountryFactory::class,
             'onlineSwitcher'            => OnlineFactory::class,
             'activeSwitcher'            => ActiveFactory::class,
+            'adminLanguage'             => AdminLanguageFactory::class,
 
             DateTime::class             => ElementFactory::class,
             Date::class                 => ElementFactory::class,

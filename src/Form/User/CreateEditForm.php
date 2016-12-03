@@ -29,26 +29,26 @@ class CreateEditForm extends Form
         $this->add([
             'name' => 'username',
             'type' => 'text',
-            'label' => 'Username',
+            'label' => 'field.username',
         ]);
 
         $this->add([
             'name' => 'email',
             'type' => 'email',
-            'label' => 'Email',
+            'label' => 'field.email',
             'required' => true,
         ]);
 
         $this->add([
             'name' => 'displayName',
             'type' => 'text',
-            'label' => 'Display Name',
+            'label' => 'field.display-name',
         ]);
 
         $this->add([
             'name' => 'role',
             'type' => 'role',
-            'label' => 'Role',
+            'label' => 'field.role',
             'required' => true,
         ]);
 
@@ -58,6 +58,12 @@ class CreateEditForm extends Form
             'type' => 'text',
             'label' => 'field.short-name',
             'maxLength' => 2,
+        ]);
+
+        $this->add([
+            'name' => 'locale',
+            'type' => 'adminLanguage',
+            'label' => 'field.language',
         ]);
     }
 }

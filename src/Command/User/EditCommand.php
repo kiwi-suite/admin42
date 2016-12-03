@@ -25,42 +25,47 @@ class EditCommand extends AbstractCommand
     /**
      * @var string
      */
-    private $username;
+    protected $username;
 
     /**
      * @var string
      */
-    private $displayName;
+    protected $displayName;
 
     /**
      * @var string
      */
-    private $email;
+    protected $email;
 
     /**
      * @var string
      */
-    private $role;
+    protected $role;
 
     /**
      * @var User
      */
-    private $user;
+    protected $user;
 
     /**
      * @var int
      */
-    private $userId;
+    protected $userId;
 
     /**
      * @var string
      */
-    private $shortName;
+    protected $shortName;
 
     /**
      * @var array
      */
-    private $payload = [];
+    protected $payload = [];
+
+    /**
+     * @var string
+     */
+    protected $locale = "en-US";
 
     /**
      * @param User $user
@@ -151,6 +156,17 @@ class EditCommand extends AbstractCommand
     }
 
     /**
+     * @param string $locale
+     * @return $this
+     */
+    public function setLocale($locale)
+    {
+        $this->locale = $locale;
+
+        return $this;
+    }
+
+    /**
      * @param array $values
      */
     public function hydrate(array $values)
@@ -161,6 +177,7 @@ class EditCommand extends AbstractCommand
         $this->setRole(array_key_exists('role', $values) ? $values['role'] : null);
         $this->setShortName(array_key_exists('shortName', $values) ? $values['shortName'] : null);
         $this->setPayload(array_key_exists('payload', $values) ? $values['payload'] : []);
+        $this->setLocale(array_key_exists('locale', $values) ? $values['locale'] : 'en-US');
     }
 
     /**
@@ -237,6 +254,7 @@ class EditCommand extends AbstractCommand
                 ->setRole($this->role)
                 ->setShortName($this->shortName)
                 ->setPayload($this->payload)
+                ->setLocale($this->locale)
                 ->setUpdated($dateTime);
 
 

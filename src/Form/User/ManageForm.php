@@ -54,7 +54,7 @@ class ManageForm extends Form implements InputFilterProviderInterface
         $this->add([
             'name' => 'displayName',
             'type' => 'text',
-            'label' => 'Display Name',
+            'label' => 'field.display-name',
         ]);
 
         $this->add([
@@ -62,6 +62,12 @@ class ManageForm extends Form implements InputFilterProviderInterface
             'type' => 'text',
             'label' => 'field.short-name',
             'maxLength' => 2,
+        ]);
+
+        $this->add([
+            'name' => 'locale',
+            'type' => 'adminLanguage',
+            'label' => 'field.language',
         ]);
     }
 
