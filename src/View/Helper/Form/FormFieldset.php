@@ -56,6 +56,8 @@ class FormFieldset extends FormHelper
         }
 
         $elementData['elements'] = $elements;
+        $elementData['showLabel'] = $element->getShowLabel();
+        $elementData['collapseAble'] = $element->getCollapseAble();
 
         return $elementData;
     }

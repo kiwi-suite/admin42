@@ -10,6 +10,9 @@ angular.module('admin42')
             },
             controller: ['$scope', 'jsonCache', '$templateCache', '$formService', function($scope, jsonCache, $templateCache, $formService) {
                 var elementData = jsonCache.get($scope.elementDataId);
+                $scope.formData = elementData;
+                $scope.formData.collapse = elementData.collapseAble;
+
                 $scope.elements = [];
 
                 angular.forEach(elementData.elements, function(element){

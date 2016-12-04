@@ -28,11 +28,66 @@ class Fieldset extends \Zend\Form\Fieldset implements AngularAwareInterface
     protected $factory;
 
     /**
+     * @var bool
+     */
+    protected $showLabel = false;
+
+    /**
+     * @var bool
+     */
+    protected $collapseAble = false;
+
+    /**
+     * @return boolean
+     */
+    public function getShowLabel()
+    {
+        return $this->showLabel;
+    }
+
+    /**
+     * @param boolean $showLabel
+     * @return Fieldset
+     */
+    public function setShowLabel($showLabel)
+    {
+        $this->showLabel = $showLabel;
+        return $this;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function getCollapseAble()
+    {
+        return $this->collapseAble;
+    }
+
+    /**
+     * @param boolean $collapseAble
+     * @return Fieldset
+     */
+    public function setCollapseAble($collapseAble)
+    {
+        $this->collapseAble = $collapseAble;
+        return $this;
+    }
+
+
+    /**
      * @param array|\Traversable $options
      * @return $this
      */
     public function setOptions($options)
     {
+        if (array_key_exists('showLabel', $options)) {
+            $this->setShowLabel((bool) $options['showLabel']);
+        }
+
+        if (array_key_exists('collapseAble', $options)) {
+            $this->setCollapseAble((bool) $options['collapseAble']);
+        }
+
         return $this;
     }
 

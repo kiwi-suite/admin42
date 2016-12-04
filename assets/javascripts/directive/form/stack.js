@@ -124,7 +124,7 @@ angular.module('admin42')
                         collapsedState: false,
                         nodes: []
                     });
-                }
+                };
 
                 if (angular.isDefined(elementData.options.formServiceHash)) {
                     $formService.put(

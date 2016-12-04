@@ -78,6 +78,7 @@ return [
             'csrf'                      => Csrf::class,
             'switcher'                  => Switcher::class,
             'link'                      => Link::class,
+            'fieldset'                  => Fieldset::class,
         ]
     ],
 ];
