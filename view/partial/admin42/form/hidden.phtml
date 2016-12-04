@@ -1,1 +1,13 @@
 <input type="hidden" name="{{ formData.name }}" value="{{ formData.value }}">
+<div ng-if="formData.staticControl" class="form-group">
+    <div class="col-sm-3 col-md-2 control-label">
+        <a class="text-muted" ng-if="formData.description != null" uib-popover="{{ formData.description }}" popover-trigger="'mouseenter'">
+            <i class="fa fa-question-circle"></i>
+        </a>
+        <label>{{ formData.label }}</label>
+        <span ng-if="formData.required">*</span>
+    </div>
+    <div class="col-sm-9 col-md-10">
+        <p class="form-control-static">{{ formData.staticControlText }}</p>
+    </div>
+</div>
