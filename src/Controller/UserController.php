@@ -108,7 +108,7 @@ class UserController extends AbstractAdminController
                                     if ($name == 'csrf') {
                                         continue;
                                     }
-                                    if (in_array($name, ['username', 'email', 'displayName', 'role', 'shortName'])) {
+                                    if (in_array($name, ['username', 'email', 'displayName', 'role', 'shortName', 'locale'])) {
                                         $newValues[$name] = $value;
                                         continue;
                                     }
@@ -407,6 +407,7 @@ class UserController extends AbstractAdminController
                                     'password',
                                     'passwordRepeat',
                                     'shortName',
+                                    'locale',
                                 ];
                                 if (in_array($name, $check)) {
                                     $newValues[$name] = $value;
