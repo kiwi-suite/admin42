@@ -87,6 +87,13 @@ class Module implements
             $config = ArrayUtils::merge($config, $adminConfig);
         }
 
+        if (is_dir('config/autoload/admin/')) {
+            $entries = Glob::glob('config/autoload/admin/*.config.php');
+            foreach ($entries as $file) {
+                $config = ArrayUtils::merge($config, include_once $file);
+            }
+        }
+
         $configListener->setMergedConfig($config);
     }
 
