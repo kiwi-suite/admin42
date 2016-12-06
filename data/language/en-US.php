@@ -46,6 +46,7 @@ return [
     'field.status'                  => 'Status',
     'field.short-name'              => 'Short Name',
     'field.language'                => 'Language',
+    'field.captcha'                 => 'Captcha',
 
     'error.empty'                   => 'Can\'t be empty',
 
