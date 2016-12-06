@@ -24,6 +24,7 @@ ENGINE = InnoDB DEFAULT CHARACTER SET = utf8;";
 
     public function down(\Zend\ServiceManager\ServiceManager $serviceManager)
     {
-
+        $sql = "DROP TABLE `admin42_user_loginhistory`;";
+        $serviceManager->get('Db\Master')->query($sql, \Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE);
     }
 }
