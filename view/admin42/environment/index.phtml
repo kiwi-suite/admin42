@@ -1,0 +1,19 @@
+<?= $this->pageHeader($this->translate('title.environment', 'admin'), 'fa fa-code') ?>
+<div class="wrapper-md">
+        <div class="row">
+            <div class="col-sm-12 col-md-8 col-md-offset-2">
+                <h4><?= $this->translate('title.environment-repository', 'admin')?></h4>
+                <pre class="pre-scrollable">
+<?php foreach ($this->revision as $key => $value): ?>[<?= $key ?>] => <?= $value ?><?= PHP_EOL ?><?php endforeach; ?>
+                </pre>
+                <h4><?= $this->translate('title.environment-packages', 'admin')?></h4>
+                <pre class="pre-scrollable">
+<?php foreach ($this->packages as $key => $value): ?>[<?= $key ?>] => <?= $value ?><?= PHP_EOL ?><?php endforeach; ?>
+                </pre>
+                <h4><?= $this->translate('title.environment-ini', 'admin')?></h4>
+                <pre class="pre-scrollable">
+<?php foreach ($this->ini as $key => $value): ?>[<?= $key ?>] => <?php var_export($value['local_value']) ?><?= PHP_EOL ?><?php endforeach; ?>
+                </pre>
+            </div>
+        </div>
+</div>

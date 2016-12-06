@@ -1,20 +1,12 @@
 <?php
+namespace Admin42;
+
 return [
-    'caches' => [
-        'Cache\Media' => [
-            'adapter' => [
-                'name' => 'memory',
-            ],
-            'plugins' => [
-                'Serializer'
-            ],
-        ],
-        'Cache\Link' => [
-            'adapter' => [
-                'name' => 'memory',
-            ],
-            'plugins' => [
-                'Serializer'
+    'cache' => [
+        'caches' => [
+            'link' => [
+                'driver' => (DEVELOPMENT_MODE === true) ? 'development' : 'production',
+                'namespace' =>  'link',
             ],
         ],
     ],

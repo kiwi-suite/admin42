@@ -1,11 +1,14 @@
 <?php
 namespace Admin42;
 
-return array(
-    'assets' => array(
-        __NAMESPACE__ => array(
-            'target' => 'public/assets/admin/core',
-            'source' => 'module/admin42/assets/dist/',
-        ),
-    ),
-);
+return [
+    'assets' => [
+        'directories' => [
+            'admin42' => [
+                'target'    => 'admin/admin42',
+                'source'    => 'vendor/fruit42/admin42/assets/dist/',
+            ],
+        ],
+
+    ],
+];

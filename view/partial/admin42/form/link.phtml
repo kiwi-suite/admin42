@@ -1,0 +1,37 @@
+<div class="form-group" ng-class="{'has-error': formData.errors.length}">
+    <div class="col-sm-3 col-md-2 control-label">
+        <div class="pull-left hidden-sm hidden-xs">
+            <span class="fa fa-fw text-danger" ng-class="{'fa-exclamation-triangle': formData.errors.length}"></span>
+            <a ng-show="formData.value.linkId > 0" class="text-light" ng-click="empty()">
+                <i class="fa fa-fw fa-trash"></i>
+            </a>
+        </div>
+        <div class="pull-right">
+            <a class="text-muted" ng-if="formData.description != null" uib-popover="{{ formData.description }}" popover-trigger="'mouseenter'">
+                <i class="fa fa-question-circle"></i>
+            </a>
+            <label>{{ formData.label }}</label>
+            <span ng-if="formData.required">*</span>
+        </div>
+        <div class="clearfix"></div>
+    </div>
+    <div class="col-sm-9 col-md-10">
+        <input type="hidden" name="{{ formData.name }}" value="{{ formData.value.linkId }}">
+        <div class="input-group">
+            <input type="text" class="form-control" value="{{ formData.value.linkDisplayName }}" disabled>
+            <span class="input-group-btn">
+                <a type="button" class="btn btn-default" ng-click="selectLink()">
+                    <i class="fa fa-check"></i>
+                    <?= $this->translate('button.select', 'admin') ?>
+                </a>
+                <a ng-show="linkData.previewUrl" target="_blank" class="btn btn-default" ng-href="{{ getUrl() }}">
+                    <i class="fa fa-mail-forward"></i>
+                    <?= $this->translate('button.preview', 'admin') ?>
+                </a>
+            </span>
+        </div>
+        <ul ng-if="formData.errors.length" class="list-unstyled text-danger">
+            <li ng-repeat="message in formData.errors">{{ message }}</li>
+        </ul>
+    </div>
+</div>

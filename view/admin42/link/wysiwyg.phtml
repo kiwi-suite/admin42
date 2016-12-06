@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="none">
+
+    <?= $this->headTitle()->setSeparator('::')->prepend($this->whitelabel()->getTitle()) ?>
+
+    <link rel="apple-touch-icon" sizes="57x57" href="<?= $this->assetUrl('/images/favicon/apple-touch-icon-57x57.png', 'admin42') ?>">
+    <link rel="apple-touch-icon" sizes="60x60" href="<?= $this->assetUrl('/images/favicon/apple-touch-icon-60x60.png', 'admin42') ?>">
+    <link rel="apple-touch-icon" sizes="72x72" href="<?= $this->assetUrl('/images/favicon/apple-touch-icon-72x72.png', 'admin42') ?>">
+    <link rel="apple-touch-icon" sizes="76x76" href="<?= $this->assetUrl('/images/favicon/apple-touch-icon-76x76.png', 'admin42') ?>">
+    <link rel="apple-touch-icon" sizes="114x114" href="<?= $this->assetUrl('/images/favicon/apple-touch-icon-114x114.png', 'admin42') ?>">
+    <link rel="apple-touch-icon" sizes="120x120" href="<?= $this->assetUrl('/images/favicon/apple-touch-icon-120x120.png', 'admin42') ?>">
+    <link rel="apple-touch-icon" sizes="144x144" href="<?= $this->assetUrl('/images/favicon/apple-touch-icon-144x144.png', 'admin42') ?>">
+    <link rel="apple-touch-icon" sizes="152x152" href="<?= $this->assetUrl('/images/favicon/apple-touch-icon-152x152.png', 'admin42') ?>">
+    <link rel="apple-touch-icon" sizes="180x180" href="<?= $this->assetUrl('/images/favicon/apple-touch-icon-180x180.png', 'admin42') ?>">
+    <link rel="icon" type="image/png" href="<?= $this->assetUrl('/images/favicon/favicon-32x32.png', 'admin42') ?>" sizes="32x32">
+    <link rel="icon" type="image/png" href="<?= $this->assetUrl('/images/favicon/android-chrome-192x192.png', 'admin42') ?>" sizes="192x192">
+    <link rel="icon" type="image/png" href="<?= $this->assetUrl('/images/favicon/favicon-96x96.png', 'admin42') ?>" sizes="96x96">
+    <link rel="icon" type="image/png" href="<?= $this->assetUrl('/images/favicon/favicon-16x16.png', 'admin42') ?>" sizes="16x16">
+    <link rel="manifest" href="<?= $this->assetUrl('/images/favicon/manifest.json', 'admin42') ?>">
+    <link rel="mask-icon" href="<?= $this->assetUrl('/images/favicon/safari-pinned-tab.svg', 'admin42') ?>" color="#5bbad5">
+    <link rel="shortcut icon" href="<?= $this->assetUrl('/images/favicon/favicon.ico', 'admin42') ?>">
+    <meta name="msapplication-TileColor" content="#da532c">
+    <meta name="msapplication-TileImage" content="<?= $this->assetUrl('/images/favicon/mstile-144x144.png', 'admin42') ?>">
+    <meta name="msapplication-config" content="<?= $this->assetUrl('/images/favicon/browserconfig.xml', 'admin42') ?>">
+    <meta name="theme-color" content="#ffffff">
+
+    <?= $this->headLink() ?>
+
+    <?= $this->headScript() ?>
+
+    <script>
+        <?= $this->angular()->angularBootstrap() ?>
+    </script>
+</head>
+
+<body class="bg-white" ng-cloak>
+<?php foreach ($this->linkPartialList as $template => $partial): ?>
+    <?php $this->angular()->addHtmlPartial($template, $partial) ?>
+<?php endforeach; ?>
+
+<?php $this->angular()->addJsonTemplate('link/availableAdapters.json', $this->availableAdapters) ?>
+<?php $this->angular()->addJsonTemplate('link/linkData.json', $this->linkData) ?>
+
+<div class="container">
+    <form class="form-horizontal m-t" role="form" ng-controller="LinkController">
+        <input type="hidden" name="linkSelection" id="linkSelection" value="{{ linkData | json }}">
+        <div class="form-group">
+            <label class="col-xs-2 control-label">
+                <?= $this->translate('label.link-type-selector', 'admin') ?>
+            </label>
+            <div class="col-xs-10">
+                <select ng-model="linkData.linkType" class="form-control" ng-change="change()">
+                    <option ng-repeat="(type, label) in availableLinkTypes" value="{{type}}">{{label}}</option>
+                </select>
+            </div>
+        </div>
+        <hr>
+        <div ng-repeat="item in includeArray">
+            <div ng-include="item"></div>
+        </div>
+    </form>
+</div>
+
+
+<?= $this->angular()->getHtmlTemplates() ?>
+
+<?= $this->angular()->getJsonTemplates() ?>
+
+<?= $this->inlineScript() ?>
+
+</body>
+
+</html>

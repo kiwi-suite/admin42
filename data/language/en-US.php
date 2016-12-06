@@ -1,6 +1,6 @@
 <?php
 
-return array(
+return [
     'button.save'                   => 'Save',
     'button.ok'                     => 'Ok',
     'button.cancel'                 => 'Cancel',
@@ -16,10 +16,6 @@ return array(
     'button.select'                 => 'Select',
     'button.remove'                 => 'Remove',
     'button.browse'                 => 'Browse',
-    'button.upload'                 => 'Upload',
-    'button.upload_all'             => 'Upload All',
-    'button.cancel_all'             => 'Cancel All',
-    'button.remove_all'             => 'Remove All',
     'button.add'                    => 'Add',
 
     'label.profile'                 => 'Profile',
@@ -29,7 +25,6 @@ return array(
     'label.users'                   => 'Users',
     'label.user-add'                => 'Add User',
     'label.user-edit'               => 'Edit User',
-    'label.media'                   => 'Media',
     'label.title'                   => 'Title',
     'label.description'             => 'Description',
     'label.keywords'                => 'Keywords',
@@ -50,13 +45,16 @@ return array(
     'field.progress'                => 'Progress',
     'field.status'                  => 'Status',
     'field.short-name'              => 'Short Name',
+    'field.language'                => 'Language',
+    'field.captcha'                 => 'Captcha',
+
+    'error.empty'                   => 'Can\'t be empty',
 
     'title.user-manage'             => 'Manage your profile settings',
     'title.users'                   => 'User management',
     'title.user-edit'               => 'Edit user',
     'title.user-add'                => 'Add user',
 
-    'title.media'                   => 'Media management',
     'title.link'                    => 'Link',
 
     'search.id'                     => 'Search for #ID',
@@ -68,6 +66,8 @@ return array(
     'text.login-description'        => 'Enter username/email and password to continue.',
     'text.lostpw-description'       => 'To reset your password, enter the email address you use to sign in.',
 
+    'login.error.failure'           => 'Invalid username or password',
+    
     'toaster.item.edit.title.success'     => 'Item saved',
     'toaster.item.edit.message.success'   => 'Item was saved successfully',
     'toaster.item.edit.title.error'       => 'Item not saved',
@@ -86,29 +86,18 @@ return array(
     'toaster.user.manage.title.success'     => 'Profile saved',
     'toaster.user.manage.message.success'   => 'Profile is successfully saved',
 
-    'media.modal.delete.title'      => 'Delete Media',
-    'media.modal.delete.content'    => 'Really delete mediafile?',
-
-    'toaster.media.delete.title.success'    => 'Media deleted',
-    'toaster.media.delete.message.success'  => 'Media is successfully deleted',
-
     'item.modal.delete.title'       => 'Delete Item',
     'item.modal.delete.content'     => 'Really delete this item?',
 
-    'start.upload'                  => 'Click here to start an upload',
-    'title.upload'                  => 'Upload',
-    'media.info-dropzone'           => 'Drag your files into this area',
-    'media.maxfilesize'             => 'maximal file size:',
-    'media.error.filesize'          => 'At least one of your files exceeds the max. file size of ',
-    'media.warning.image-too-small' => 'Image too small',
-
     'label.link-type-selector'      => 'Link Type',
-    'link-type.extern'              => 'Externer Link',
-    'link-type.media'               => 'Media Link',
+    'link-type.external'            => 'Exterernal Link',
 
-    'media.category.default'        => 'Default',
+    'label.environment'             => 'Environment',
+    'title.environment'             => 'Environment',
+    'title.environment-repository'  => 'Repository',
+    'title.environment-packages'    => 'Packages',
+    'title.environment-ini'         => 'PHP INI Settings',
 
-    'label.google-maps.address'     => 'Address',
-    'label.google-maps.latitude'    => 'Latitude',
-    'label.google-maps.longitude'   => 'Longitude',
-);
+    'stack.no-name'                 => 'No name given',
+    'stack.no-name-enter'           => 'Click to enter name',
+];

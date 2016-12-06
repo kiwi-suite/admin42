@@ -1,0 +1,15 @@
+<div ng-if="formData.showLabel" class="form-group">
+    <div class="col-sm-3 col-md-2 control-label">
+        <a ng-if="formData.collapseAble" class="btn btn-link btn-xs text-default" ng-click="formData.collapse = !formData.collapse" ng-class="{'text-danger' : formData.errors.length}">
+            <i class="fa fa-fw" ng-class="{'fa-chevron-down': !formData.collapse, 'fa-chevron-right': formData.collapse}"></i>
+            {{ formData.label }}
+        </a>
+        <span ng-if="!formData.collapseAble" ng-class="{'text-danger' : formData.errors.length}">
+            {{ formData.label }}
+        </span>
+    </div>
+</div>
+
+<fieldset uib-collapse="formData.collapse">
+    <ng-include ng-repeat="element in elements" src="element.template"></ng-include>
+</fieldset>

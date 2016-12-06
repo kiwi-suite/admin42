@@ -1,0 +1,39 @@
+<div class="form-group" ng-class="{'has-error': formData.errors.length}">
+    <div class="col-sm-3 col-md-2 control-label">
+        <div class="pull-left hidden-sm hidden-xs">
+            <span class="fa fa-fw text-danger" ng-class="{'fa-exclamation-triangle': formData.errors.length}"></span>
+            <a ng-show="formData.value" class="text-light" ng-click="empty()">
+                <i class="fa fa-fw fa-trash"></i>
+            </a>
+        </div>
+        <div class="pull-right">
+            <a class="text-muted" ng-if="formData.description != null" uib-popover="{{ formData.description }}" popover-trigger="'mouseenter'">
+                <i class="fa fa-question-circle"></i>
+            </a>
+            <label>{{ formData.label }}</label>
+            <span ng-if="formData.required">*</span>
+        </div>
+        <div class="clearfix"></div>
+    </div>
+    <div class="col-sm-9 col-md-10">
+        <div class="input-group w-md">
+            <input type="hidden" name="{{ formData.name }}" value="{{ formData.value }}">
+            <input
+                type="hidden"
+                ng-model="value"
+                uib-datepicker-popup="yyyy-MM-dd"
+                is-open="popup.opened"
+                datepicker-options="dateOptions"
+            >
+            <input type="text" class="form-control" value="{{ formData.value }}" disabled ng-keydown="preventEnter($event)" ng-keypress="preventEnter($event)" ng-keyup="preventEnter($event)">
+            <span class="input-group-btn">
+                <button type="button" class="btn" ng-class="{'btn-default': !formData.errors.length, 'btn-danger': formData.errors.length}" ng-click="open($event)">
+                    <i class="fa fa-calendar"></i>
+                </button>
+            </span>
+        </div>
+        <ul ng-if="formData.errors.length" class="list-unstyled text-danger">
+            <li ng-repeat="message in formData.errors">{{ message }}</li>
+        </ul>
+    </div>
+</div>

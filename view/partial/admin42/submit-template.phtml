@@ -1,8 +1,8 @@
 <?php
 $submitContent = <<<EOT
-<button class="btn btn-primary" ng-class="submitLoading ? 'disabled' : ''" type="submit">
-    <span ng-class="submitLoading ? 'fa fa-spin fa-refresh' : icon"></span>
+<button class="btn btn-addon {{ btnClass }}" ng-class="submitLoading ? 'disabled' : ''" type="submit">
+    <i><span ng-class="submitLoading ? 'fa fa-spin fa-refresh' : icon"></span></i>
     {{ submitText }}
 </button>
 EOT;
-$this->admin()->addHtmlTemplate("element/submit.html", $submitContent);
+$this->angular()->addHtmlTemplate("element/submit.html", $submitContent);

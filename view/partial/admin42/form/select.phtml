@@ -1,0 +1,32 @@
+<div class="form-group" ng-class="{'has-error': formData.errors.length}">
+    <div class="col-sm-3 col-md-2 control-label">
+        <div class="pull-left hidden-sm hidden-xs">
+            <span class="fa fa-fw text-danger" ng-class="{'fa-exclamation-triangle': formData.errors.length}"></span>
+            <a ng-show="formData.value.length > 0 && formData.emptyValue !== formData.value" class="text-light" ng-click="empty()">
+                <i class="fa fa-fw fa-trash"></i>
+            </a>
+        </div>
+        <div class="pull-right">
+            <a class="text-muted" ng-if="formData.description != null" uib-popover="{{ formData.description }}" popover-trigger="'mouseenter'">
+                <i class="fa fa-question-circle"></i>
+            </a>
+            <label>{{ formData.label }}</label>
+            <span ng-if="formData.required">*</span>
+        </div>
+        <div class="clearfix"></div>
+    </div>
+    <div class="col-sm-9 col-md-10">
+        <input type="hidden" name="{{ formData.name }}" value="{{ formData.value }}">
+        <ui-select ng-model="option.selected" reset-search-input="false" search-enabled="searchEnabled" on-select="select($item, $model)">
+            <ui-select-match placeholder="{{ label }}">
+                {{$select.selected.label}}
+            </ui-select-match>
+            <ui-select-choices repeat="option in options | filter: $select.search">
+                <div ng-bind-html="option.label | highlight: $select.search"></div>
+            </ui-select-choices>
+        </ui-select>
+        <ul ng-if="formData.errors.length" class="list-unstyled text-danger">
+            <li ng-repeat="message in formData.errors">{{ message }}</li>
+        </ul>
+    </div>
+</div>

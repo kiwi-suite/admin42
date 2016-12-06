@@ -6,16 +6,16 @@
                 <li class="m-t-sm text-muted text-sm identity">
                     <a href="<?= $this->url('admin/user/manage') ?>">
                         <span class="m-l m-r-xs shortname-container">
-                            <?= $this->auth('Admin42\Authentication')->getIdentity()->getShortName() ?>
+                            <?= $this->auth(\Admin42\Authentication\AuthenticationService::class)->getIdentity()->getShortName() ?>
                         </span>
                         <div class="hidden-folded">
                             <div class="m-t-xs font-bold text-lt">
-                                <?= $this->admin()->getUserDisplayName(
-                                    $this->auth('Admin42\Authentication')->getIdentity()
+                                <?= $this->user()->getDisplayName(
+                                    $this->auth(\Admin42\Authentication\AuthenticationService::class)->getIdentity()
                                 ) ?>
                             </div>
                             <div class="text-muted text-xs role">
-                                <?= $this->auth('Admin42\Authentication')->getIdentity()->getRole() ?>
+                                <?= $this->auth(\Admin42\Authentication\AuthenticationService::class)->getIdentity()->getRole() ?>
                             </div>
                         </div>
                     </a>
@@ -24,20 +24,18 @@
 
             <nav ui-nav class="navi clearfix">
 
-                <?= $this->menu('partial/admin42/main-menu', 'admin42')->setMaxDepth(1) ?>
+                <?= $this->menu('partial/admin42/main-menu', 'admin42')->enableFilter('adminPermission')->setMaxDepth(1) ?>
 
                 <ul class="nav m-b-lg">
                     <li class="line bg-dark"></li>
                     <li class="m-b-sm text-muted" style="cursor: default;">
-                        <a href="<?= !empty($this->admin()->getWhitelabelOption('sidebar-bottom-link')) ? $this->admin()
-                            ->getWhitelabelOption('sidebar-bottom-link') : '#' ?>" target="_blank"
-                           title="<?= $this->admin()->getWhitelabelOption('sidebar-bottom-link-title') ?>">
+                        <a href="<?= !empty($this->whitelabel()->getSidebarBottomLink()) ? $this->whitelabel()->getSidebarBottomLink() : '#' ?>" target="_blank" title="<?= $this->whitelabel()->getSidebarBottomLinkTitle() ?>">
                             <i class="icon fa fa-fw">
                                 <img class="icon icon-kiwi img-responsive inline"
-                                     src="<?= $this->basePath($this->admin()->getWhitelabelOption('logo-xs')); ?>">
+                                     src="<?= $this->assetUrl($this->whitelabel()->getLogoXs()); ?>">
                             </i>
                             <span class="hidden-folded text-xs">
-                                <?= trim($this->admin()->getWhitelabelOption('sidebar-bottom-text')) ?>
+                                <?= trim($this->whitelabel()->getSidebarBottomText()) ?>
                             </span>
                         </a>
                     </li>

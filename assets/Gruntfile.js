@@ -12,7 +12,7 @@ module.exports = function(grunt) {
         },
 
         concurrent: {
-            all: ['compile-vendor-js', 'compile-app-js', 'less:app', 'copy']
+            all: ['compile-vendor-js', 'compile-app-js', 'compile-tinymce', 'less:app']
         },
 
         concat: {
@@ -21,68 +21,38 @@ module.exports = function(grunt) {
             },
             vendor: {
                 src: [
-                    '<%= vendor_dir %>/jquery/dist/jquery.js',
+                    '<%= vendor_dir %>/jquery/dist/jquery.min.js',
 
-                    '<%= vendor_dir %>/lodash/dist/lodash.js',
+                    '<%= vendor_dir %>/angular/angular.min.js',
+                    '<%= vendor_dir %>/angular-animate/angular-animate.min.js',
+                    '<%= vendor_dir %>/angular-sanitize/angular-sanitize.min.js',
+                    '<%= vendor_dir %>/angular-ui-validate/dist/validate.min.js',
+                    '<%= vendor_dir %>/angular-ui-select/dist/select.min.js',
+                    '<%= vendor_dir %>/angular-ui-tree/dist/angular-ui-tree.min.js',
+                    '<%= vendor_dir %>/ngstorage/ngStorage.min.js',
+                    '<%= vendor_dir %>/angularjs-toaster/toaster.min.js',
+                    '<%= vendor_dir %>/angular-smart-table/dist/smart-table.min.js',
 
-                    '<%= vendor_dir %>/jquery-ui/ui/core.js',
-                    '<%= vendor_dir %>/jquery-ui/ui/widget.js',
-                    '<%= vendor_dir %>/jquery-ui/ui/mouse.js',
-                    '<%= vendor_dir %>/jquery-ui/ui/sortable.js',
+                    '<%= vendor_dir %>/angular-bootstrap/ui-bootstrap.min.js',
+                    '<%= vendor_dir %>/angular-bootstrap/ui-bootstrap-tpls.min.js',
 
-                    '<%= vendor_dir %>/angular/angular.js',
+                    '<%= vendor_dir %>/magnific-popup/dist/jquery.magnific-popup.min.js',
 
-                    '<%= vendor_dir %>/angular-bootstrap/ui-bootstrap.js',
-                    '<%= vendor_dir %>/angular-bootstrap/ui-bootstrap-tpls.js',
-                    '<%= vendor_dir %>/bootstrap-ui-datetime-picker/dist/datetime-picker.js',
-                    '<%= vendor_dir %>/bootstrap-ui-datetime-picker/dist/datetime-picker.tpls.js',
-                    '<%= vendor_dir %>/angular-animate/angular-animate.js',
-                    '<%= vendor_dir %>/angular-sanitize/angular-sanitize.js',
-                    '<%= vendor_dir %>/angular-smart-table/dist/smart-table.js',
-
-                    '<%= vendor_dir %>/angular-ui-scroll/dist/ui-scroll.js',
-                    '<%= vendor_dir %>/angular-ui-scrollpoint/dist/scrollpoint.js',
-                    '<%= vendor_dir %>/angular-ui-validate/dist/validate.js',
-                    '<%= vendor_dir %>/angular-ui-indeterminate/dist/indeterminate.js',
-                    '<%= vendor_dir %>/angular-ui-uploader/dist/uploader.js',
-                    '<%= vendor_dir %>/angular-ui-event/dist/event.js',
-                    '<%= vendor_dir %>/angular-ui-mask/dist/mask.js',
-                    '<%= vendor_dir %>/angular-ui-utils/index.js',
-
-                    '<%= vendor_dir %>/angular-ui-sortable/sortable.js',
-
-                    '<%= vendor_dir %>/angular-ui-select/dist/select.js',
-
-                    '<%= vendor_dir %>/angularjs-toaster/toaster.js',
-
-                    '<%= vendor_dir %>/ngstorage/ngStorage.js',
-
-                    '<%= vendor_dir %>/angular-file-upload/dist/angular-file-upload.min.js',
-
-                    '<%= vendor_dir %>/cropper/dist/cropper.js',
-
-                    '<%= vendor_dir %>/tinymce-dist/tinymce.js',
-
-                    '<%= vendor_dir %>/angular-simple-logger/dist/angular-simple-logger.js',
-
-                    '<%= vendor_dir %>/angular-google-maps/dist/angular-google-maps.js',
-
-                    '<%= vendor_dir %>/magnific-popup/src/js/core.js',
-                    '<%= vendor_dir %>/magnific-popup/src/js/image.js',
-
-                    '<%= vendor_dir %>/moment/min/moment-with-locales.js',
-                    '<%= vendor_dir %>/moment-timezone/builds/moment-timezone-with-data.js'
+                    '<%= vendor_dir %>/moment/min/moment-with-locales.min.js',
+                    '<%= vendor_dir %>/moment-timezone/builds/moment-timezone-with-data.min.js'
                 ],
-                dest: '<%= dist %>/js/vendor.js'
+                dest: '<%= dist %>/js/vendor.min.js'
             },
             app: {
                 src: [
                     'javascripts/*.js',
+                    'javascripts/service/*.js',
                     'javascripts/directive/*.js',
+                    'javascripts/directive/form/*.js',
                     'javascripts/filter/*.js',
                     'javascripts/controller/*.js',
-                    'javascripts/service/*.js',
-                    'javascripts/tinymcePlugins/**/*.js'
+                    'javascripts/controller/link/*.js',
+                    'javascripts/service/*.js'
                 ],
                 dest: '<%= dist %>/js/admin42.js'
             }
@@ -92,13 +62,13 @@ module.exports = function(grunt) {
             options: {
                 mangle: false
             },
-            vendor: {
-                src: '<%= dist %>/js/vendor.js',
-                dest: '<%= dist %>/js/vendor.min.js'
-            },
             app: {
                 src: '<%= dist %>/js/admin42.js',
                 dest: '<%= dist %>/js/admin42.min.js'
+            },
+            tinymcelink42: {
+                src: 'tinymce/link42/plugin.js',
+                dest: 'tinymce/link42/plugin.min.js'
             }
         },
 
@@ -112,7 +82,6 @@ module.exports = function(grunt) {
                     '<%= dist %>/css/admin42.min.css': [
                         '<%= vendor_dir %>/animate.css/animate.css',
                         '<%= vendor_dir %>/angularjs-toaster/toaster.css',
-                        '<%= vendor_dir %>/cropper/dist/cropper.css',
                         'less/main.less',
                         '<%= vendor_dir %>/angular-ui-select/dist/select.css',
                         '<%= vendor_dir %>/magnific-popup/dist/magnific-popup.css'
@@ -155,13 +124,24 @@ module.exports = function(grunt) {
                     }
                 ]
             },
-            images: {
+            tinymce: {
                 files: [
                     {
                         expand: true,
-                        cwd: 'images/',
+                        cwd: '<%= vendor_dir %>/tinymce-dist/',
                         src: '**',
-                        dest: '<%= dist %>/images/'
+                        dest: '<%= dist %>/tinymce/'
+                    }
+                ]
+            },
+            tinymcelink: {
+                files: [
+                    {
+                        expand: true,
+                        flatten: true,
+                        src: ['tinymce/link42/*'],
+                        dest: '<%= dist %>/tinymce/plugins/link42/',
+                        filter: 'isFile'
                     }
                 ]
             },
@@ -183,39 +163,19 @@ module.exports = function(grunt) {
                     }
                 ]
             }
-            // wtf does not work if not flattened -> manual copy
-            //tinymce: {
-            //    files: [
-            //        {
-            //            expand: true,
-            //            flatten: false,
-            //            src: '<%= vendor_dir %>/tinymce-dist/plugins/**/*',
-            //            dest: '<%= dist %>/js/tinymce/plugins/.'
-            //        },
-            //        {
-            //            expand: true,
-            //            flatten: false,
-            //            src: '<%= vendor_dir %>/tinymce-dist/skins/**',
-            //            dest: '<%= dist %>/js/tinymce/skins/'
-            //        },
-            //        {
-            //            cdw: '<%= vendor_dir %>/tinymce-dist/',
-            //            src: ['**/*'],
-            //            dest: '<%= dist %>/js/tinymce/',
-            //            expand: true
-            //        }
-            //    ]
-            //}
         },
 
         clean: {
-            all: ['<%= dist %>/fonts/', '<%= dist %>/css/', '<%= dist %>/js/', '<%= dist %>/images/'],
+            all: ['<%= dist %>/fonts/', '<%= dist %>/css/', '<%= dist %>/js/', '<%= dist %>/tinymce/', '<%= dist %>/flags/'],
 
             vendorjs: [
-                //'<%= dist %>/js/vendor.js'
+                '<%= dist %>/js/vendor.js'
             ],
             appjs: [
-                //'<%= dist %>/js/admin42.js'
+                '<%= dist %>/js/admin42.js'
+            ],
+            tinymce: [
+                '<%= dist %>/tinymce/'
             ]
         },
 
@@ -232,14 +192,19 @@ module.exports = function(grunt) {
             less: {
                 files: ['less/*.less', 'less/**/*.less'],
                 tasks: ['compile-css']
+            },
+            tinymce: {
+                files: ['tinymce/**/*.js'],
+                tasks: ['compile-tinymce']
             }
         }
     });
 
-    grunt.registerTask('default', ['bower', 'concurrent:all']);
-    grunt.registerTask('compile-vendor-js', ['concat:vendor', 'uglify:vendor', 'clean:vendorjs']);
+    grunt.registerTask('default', ['bower', 'clean:all', 'concurrent:all', 'copy']);
+    grunt.registerTask('compile-vendor-js', ['concat:vendor', 'clean:vendorjs']);
     grunt.registerTask('compile-app-js', ['concat:app', 'uglify:app', 'clean:appjs']);
     grunt.registerTask('compile-css', ['less:app']);
+    grunt.registerTask('compile-tinymce', ['clean:tinymce', 'uglify:tinymcelink42', 'copy:tinymce', 'copy:tinymcelink']);
     grunt.registerTask('clear', ['clean:all']);
 
 

@@ -35,16 +35,16 @@ body {
     }
 }
 
-.app-header-fixed {
+.app-header-fixed{
     padding-top: @app-header-height;
-    .app-header {
+    .app-header{
         position: fixed;
         top: 0;
         width: 100%;
     }
 }
 
-.app-header {
+.app-header{
     z-index: 1025;
     border-radius: 0;
 }
@@ -67,7 +67,7 @@ body {
     }
 }
 
-.app-aside-footer {
+.app-aside-footer{
     position: absolute;
     bottom: 0;
     width: 100%;
@@ -76,7 +76,7 @@ body {
     .app-aside-folded & {
         max-width: @app-aside-folded-width;
     }
-    ~ div {
+    ~ div{
         padding-bottom: 50px;
     }
 }
@@ -91,7 +91,7 @@ body {
     .clearfix();
 }
 
-.app-content-full {
+.app-content-full{
     position: absolute;
     top: @app-header-height;
     bottom: @app-header-height;
@@ -100,7 +100,7 @@ body {
     padding: 0 !important;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
-    &.h-full {
+    &.h-full{
         bottom: 0;
         height: auto;
     }

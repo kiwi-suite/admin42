@@ -1,0 +1,42 @@
+<?php
+$this->headscript()->appendFile('https://www.google.com/recaptcha/api.js', 'text/javascript', ['async', 'defer']);
+?>
+<div class="login-container container w-xxl w-auto-xs">
+    <div id="login-header">
+        <img class="img-responsive" src="<?= $this->assetUrl($this->whitelabel()->getLogoLg()); ?>" id="logo" border="0" alt="kiwi42">
+    </div>
+    <div class="panel">
+        <div class="panel-body">
+            <p class="text-left">
+                <?= $this->translate('field.captcha', 'admin' ) ?>
+            </p>
+            <form role="form" class="form-horizontal" method="post" action="<?= $this->url() ?>">
+                <div class="m-t m-b">
+                    <div class="g-recaptcha" data-sitekey="<?= $this->sitekey ?>"></div>
+                </div>
+
+                <div class="col-sm-12">
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary pull-left btn-addon">
+                            <i class="fa fa-mail-forward"></i>
+                            <?= $this->translate('button.login', 'admin')?>
+                        </button>
+
+                        <a href="<?= $this->url('admin/login')?>" class="pull-right btn btn-default">
+                            <?= $this->translate('button.cancel', 'admin') ?>
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="box-bottom"></div>
+</div>
+<div class="bottomline">
+    <a href="<?= !empty($this->whitelabel()->getSidebarBottomLink()) ? $this->whitelabel()->getSidebarBottomLink() : '#' ?>" target="_blank" title="<?= $this->whitelabel()->getSidebarBottomLinkTitle() ?>">
+        <small class="text-muted">
+            <img class="icon icon-kiwi img-responsive inline" src="<?= $this->assetUrl($this->whitelabel()->getLogoXsDark()); ?>"><br>
+            <?= trim($this->whitelabel()->getSidebarBottomText()) ?>
+        </small>
+    </a>
+</div>

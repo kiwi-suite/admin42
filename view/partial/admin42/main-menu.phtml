@@ -2,17 +2,16 @@
 if (iterator_count($this->iterator) == 0) {
     return;
 }
-$html = array();
+$html = [];
 $prevDepth = -1;
 
-/** @var \Core42\Navigation\Page\Page $page */
+/** @var \Admin42\Navigation\Page\Page $page */
 foreach ($this->iterator as $page){
     $depth = $this->iterator->getDepth();
     if ($depth == $this->minDepth) {
         $prevDepth = $depth;
         continue;
     }
-
     if ($depth > $prevDepth) {
         if($prevDepth == $this->minDepth) {
             $html[] = '<ul class="nav">';
@@ -32,30 +31,32 @@ foreach ($this->iterator as $page){
     }
 
     $icon = '<i class="icon text-success"></i>';
-    if (strlen($page->getOption("icon"))) {
-        $icon = '<i class="icon '.$page->getOption("icon").'"></i>';
+    if (strlen($page->getIcon())) {
+        $icon = '<i class="icon '.$page->getIcon().'"></i>';
     }
 
-    $label = $this->translate($page->getOption('label'), 'admin');
+    $label = $this->translate($page->getLabel(), 'admin');
 
-    $isActive = $this->navigation->isActive($page);
-    $href = $this->navigation->getHref($page);
+    $isActive = $page->isActive();
+    $href = $page->getHref();
 
     if($page->hasChildren() && $depth == 0 && empty($href)) {
-        $html[] = '<li class="hidden-folded padder m-t m-b-sm text-muted text-xs" style="cursor: default;">' .$label .'</li>';
+        $html[] = '<li class="hidden-folded padder m-t m-b-sm text-muted text-xs" style="cursor: default;">' .$label;
     } elseif($page->hasChildren() && $depth == 1 && empty($href)) {
-        $html[] = '<li class="'.(($isActive) ? " active" : "").'">';
+        $html[] = '<li class="' . (($isActive) ? " active" : "") . '">';
         $html[] = '<a>';
         $html[] = '<span class="pull-right text-muted">';
         $html[] = '<i class="fa fa-fw fa-angle-right text"></i>';
         $html[] = '<i class="fa fa-fw fa-angle-down text-active"></i>';
         $html[] = '</span>';
         $html[] = $icon;
-        $html[] = '<span class="font-bold">'.$label.'</span>';
+        $html[] = '<span class="font-bold">' . $label . '</span>';
         $html[] = '</a>';
-    } else {
+    } elseif (!empty($href)) {
         $html[] = '<li'.(($isActive) ? ' class="active"' : "").'>';
         $html[] = '<a href="'.$href.'" target="_self">'. $icon .'<span class="'.(($depth == 1) ? "font-bold" : "").'">' . $label . '</span></a>';
+    } else {
+        $html[] = '<li style="display:none;">';
     }
 
     $prevDepth = $depth;

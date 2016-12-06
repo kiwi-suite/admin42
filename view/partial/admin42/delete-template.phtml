@@ -1,10 +1,10 @@
 <?php
 $deleteContent = <<<EOT
-<button ng-if="size == 'lg'" class="btn btn-danger" type="button" ng-click="delete()" ng-disabled="deleteLoading">
+<button ng-if="size == 'lg'" class="btn btn-danger btn-addon" type="button" ng-click="delete()" ng-disabled="deleteLoading">
     <i ng-class="deleteLoading ? 'fa fa-spin fa-refresh' : icon"></i>
     {$this->translate('button.delete', 'admin')}
 </button>
-<button ng-if="size == 'sm'" class="btn btn-sm btn-danger" type="button" ng-click="delete()" ng-disabled="deleteLoading">
+<button ng-if="size == 'sm'" class="btn btn-sm btn-danger btn-addon" type="button" ng-click="delete()" ng-disabled="deleteLoading">
     <i ng-class="deleteLoading ? 'fa fa-spin fa-refresh' : icon"></i>
     {$this->translate('button.delete', 'admin')}
 </button>
@@ -12,7 +12,7 @@ $deleteContent = <<<EOT
     <i ng-class="deleteLoading ? 'fa fa-spin fa-refresh' : icon"></i>
 </button>
 EOT;
-$this->admin()->addHtmlTemplate("element/delete.html", $deleteContent);
+$this->angular()->addHtmlTemplate("element/delete.html", $deleteContent);
 
 
 $deleteContent = <<<EOT
@@ -23,11 +23,11 @@ $deleteContent = <<<EOT
     {{ content }}
 </div>
 <div class="modal-footer">
-    <button class="btn btn-danger" ng-click="ok()" ng-disabled="deleteLoading">
-        <span ng-class="deleteLoading ? 'fa fa-spin fa-refresh' : icon"></span>
+    <button class="btn btn-danger btn-addon" ng-click="ok()" ng-disabled="deleteLoading">
+        <i ng-class="deleteLoading ? 'fa fa-spin fa-refresh' : icon"></i>
         {$this->translate('button.delete', 'admin')}
     </button>
     <button ng-disabled="deleteLoading" class="btn btn-default" ng-click="cancel()">{$this->translate('button.cancel', 'admin')}</button>
 </div>
 EOT;
-$this->admin()->addHtmlTemplate("element/delete-modal.html", $deleteContent);
+$this->angular()->addHtmlTemplate("element/delete-modal.html", $deleteContent);

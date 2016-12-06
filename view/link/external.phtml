@@ -1,0 +1,13 @@
+<div ng-controller="LinkExternController">
+<div class="col-xs-3">
+    <select ng-model="externType" class="form-control" ng-change="change()">
+        <option value="http://">http://</option>
+        <option value="https://">https://</option>
+        <option value="mailto:">mailto</option>
+        <option value="tel:">tel</option>
+    </select>
+</div>
+<div class="col-xs-9">
+    <input type=text class="form-control" ng-model="externUrl" ng-change="change()">
+</div>
+</div>

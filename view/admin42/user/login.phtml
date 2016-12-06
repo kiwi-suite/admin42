@@ -1,12 +1,14 @@
+<?php
+$this->loginForm->prepare();
+?>
 <div class="login-container container w-xxl w-auto-xs">
     <div id="login-header">
-        <img class="img-responsive" src="<?= $this->basePath($this->admin()->getWhitelabelOption('logo-lg')); ?>"
-             id="logo" border="0" alt="kiwi42">
+        <img class="img-responsive" src="<?= $this->assetUrl($this->whitelabel()->getLogoLg()); ?>" id="logo" border="0" alt="kiwi42">
     </div>
     <!--<div id="login-subheader" class="subheader bold color-1"><h4>Login</h4></div>-->
     <div class="panel">
         <div class="panel-body">
-            <form role="form" class="form-horizontal" method="post" action="<?= $this->url() ?>">
+            <form role="form" class="form-horizontal" method="post" action="<?= $this->url('admin/login') ?>">
                 <?= $this->formRow($this->loginForm->get('csrf')) ?>
                 <div class="form-group<?= (count($this->loginForm->get('identity')->getMessages()))
                     ? ' has-error has-feedback' : '' ?>">
@@ -15,23 +17,13 @@
                             <span class="input-group-addon">
                                 <span class="fa fa-user fa-fw"></span>
                             </span>
-                            <?= $this->formInput(
-                                $this->loginForm->get('identity')->setAttributes(
-                                    [
-                                        'class'       => 'form-control',
-                                        'placeholder' => $this->translate(
-                                            $this->loginForm->get('identity')->getLabel(),
-                                            'admin'
-                                        )
-                                    ]
-                                )
-                            ) ?>
+                            <?= $this->formText($this->loginForm->get('identity')) ?>
                         </div>
                         <?php if (count($this->loginForm->get('identity')->getMessages())): ?>
                             <span class="glyphicon glyphicon-warning-sign form-control-feedback"></span>
                             <ul class="list-unstyled text-danger">
                                 <?php foreach ($this->loginForm->get('identity')->getMessages() as $message): ?>
-                                    <li><?= $message ?></li>
+                                    <li><?= $this->translate($message, 'admin') ?></li>
                                 <?php endforeach; ?>
                             </ul>
                         <?php endif; ?>
@@ -45,23 +37,13 @@
                             <span class="input-group-addon">
                                 <span class="fa fa-lock fa-fw"></span>
                             </span>
-                            <?= $this->formPassword(
-                                $this->loginForm->get('password')->setAttributes(
-                                    [
-                                        'class'       => 'form-control',
-                                        'placeholder' => $this->translate(
-                                            $this->loginForm->get('password')->getLabel(),
-                                            'admin'
-                                        )
-                                    ]
-                                )
-                            ) ?>
+                            <?= $this->formPassword($this->loginForm->get('password')) ?>
                         </div>
                         <?php if (count($this->loginForm->get('password')->getMessages())): ?>
                             <span class="glyphicon glyphicon-warning-sign form-control-feedback"></span>
                             <ul class="list-unstyled text-danger">
                                 <?php foreach ($this->loginForm->get('password')->getMessages() as $message): ?>
-                                    <li><?= $message ?></li>
+                                    <li><?= $this->translate($message, 'admin') ?></li>
                                 <?php endforeach; ?>
                             </ul>
                         <?php endif; ?>
@@ -70,8 +52,8 @@
 
                 <div class="form-group no-margin">
                     <div class="col-sm-12 text-center">
-                        <button type="submit" class="btn btn-block btn-primary">
-                            <span class="fa fa-sign-in"></span>
+                        <button type="submit" class="btn btn-block btn-primary btn-addon">
+                            <i class="fa fa-sign-in"></i>
                             <?= $this->translate('button.login', 'admin') ?>
                         </button>
                     </div>
@@ -90,13 +72,10 @@
     <div class="box-bottom"></div>
 </div>
 <div class="bottomline">
-    <a href="<?= !empty($this->admin()->getWhitelabelOption('sidebar-bottom-link')) ? $this->admin()
-        ->getWhitelabelOption('sidebar-bottom-link') : '#' ?>" target="_blank"
-       title="<?= $this->admin()->getWhitelabelOption('sidebar-bottom-link-title') ?>">
+    <a href="<?= !empty($this->whitelabel()->getSidebarBottomLink()) ? $this->whitelabel()->getSidebarBottomLink() : '#' ?>" target="_blank" title="<?= $this->whitelabel()->getSidebarBottomLinkTitle() ?>">
         <small class="text-muted">
-            <img class="icon icon-kiwi img-responsive inline"
-                 src="<?= $this->basePath($this->admin()->getWhitelabelOption('logo-xs-dark')); ?>"><br>
-            <?= trim($this->admin()->getWhitelabelOption('sidebar-bottom-text')) ?>
+            <img class="icon icon-kiwi img-responsive inline" src="<?= $this->assetUrl($this->whitelabel()->getLogoXsDark()); ?>"><br>
+            <?= trim($this->whitelabel()->getSidebarBottomText()) ?>
         </small>
     </a>
 </div>

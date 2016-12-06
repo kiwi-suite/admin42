@@ -7,9 +7,9 @@
             <i class="glyphicon glyphicon-align-justify"></i>
         </button>
         <a href="<?= $this->url('admin/home') ?>" class="navbar-brand">
-            <img src="<?= $this->basePath($this->admin()->getWhitelabelOption('logo-icon')); ?>" class="img-responsive">
-            <?php if(!empty(trim($this->admin()->getWhitelabelOption('topbar-title'))) && !empty($this->admin()->getWhitelabelOption('show-topbar-title'))): ?>
-                <span class="hidden-folded m-l-xs"><?= $this->admin()->getWhitelabelOption('topbar-title') ?></span>
+            <img src="<?= $this->assetUrl($this->whitelabel()->getLogoIcon()); ?>" class="img-responsive">
+            <?php if(!empty(trim($this->whitelabel()->getTopbarTitle())) && !empty($this->whitelabel()->getShowTopbarTitle())): ?>
+                <span class="hidden-folded m-l-xs"><?= $this->whitelabel()->getTopbarTitle() ?></span>
             <?php endif ?>
         </a>
     </div>
@@ -22,62 +22,24 @@
         </div>
 
         <ul class="nav navbar-nav navbar-right">
-            <?php /*
-            <li class="dropdown" dropdown ng-controller="NotificationController" data-notification-url="<?= $this->url('admin/api/notification/list')?>">
-
-                <a href class="dropdown-toggle" dropdown-toggle>
-                    <i class="icon-bell fa-fw font-bold"></i>
-                    <span class="visible-xs-inline">Notifications</span>
-                    <span class="badge badge-sm up pull-right-xs" ng-class="{'bg-danger': notifications.length > 0}">{{ notifications.length }}</span>
-                </a>
-                <div class="dropdown-menu w-xl">
-                    <div class="panel bg-white">
-                        <div class="panel-heading b-light bg-light">
-                            <strong><?= sprintf($this->translate('You have %s notifications'), '{{ notifications.length }}')?></strong>
-                        </div>
-                        <div class="list-group">
-                            <div ng-repeat="notification in notifications">
-                                <a ng-href="{{notification.link}}" class="media list-group-item">
-                                    <span class="media-body block m-b-none">
-                                      {{notification.text}}<br>
-                                      <small class="text-muted">{{notification.created}}</small>
-                                    </span>
-                                </a>
-                            </div>
-                        </div>
-                        <div ng-if="notifications.length > 0" class="panel-footer text-sm">
-                            <a href ng-click="clearNotifications('<?= $this->url('admin/api/notification/clear')?>')" class="pull-right">
-                                <i class="fa fa-trash"></i>
-                            </a>
-                            <a href ng-click="clearNotifications('<?= $this->url('admin/api/notification/clear')?>')" data-toggle="class:show animated fadeInRight">
-                                Clear all the notifications
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </li>
-            */ ?>
             <li class="dropdown" uib-dropdown>
                 <a href class="dropdown-toggle clear" uib-dropdown-toggle>
                     <span class="m-r-xs shortname-container-xs">
-                        <?= $this->auth('Admin42\Authentication')->getIdentity()->getShortName() ?>
+                        <?= $this->auth(\Admin42\Authentication\AuthenticationService::class)->getIdentity()->getShortName() ?>
                     </span>
                     <span class="font-bold text-lt">
-                        <?= $this->admin()->getUserDisplayName(
-                            $this->auth('Admin42\Authentication')->getIdentity()
+                        <?= $this->user()->getDisplayName(
+                            $this->auth(\Admin42\Authentication\AuthenticationService::class)->getIdentity()
                         ) ?>
                     </span>
                     <b class="caret text-lt"></b>
                 </a>
                 <ul class="dropdown-menu w" uib-dropdown-menu>
-                    <li>
-                        <a href="<?= $this->url('admin/user/manage') ?>">
-                            <?= $this->translate('label.profile', 'admin') ?>
-                        </a>
-                    </li>
+                    <?= $this->menu('partial/admin42/top-menu', 'admin42-top')->enableFilter('adminPermission')->setMaxDepth(1) ?>
                     <li class="divider"></li>
                     <li>
                         <a href="<?= $this->url('admin/logout') ?>">
+                            <i class="fa fa-fw fa-sign-out"></i>
                             <?= $this->translate('label.logout', 'admin') ?>
                         </a>
                     </li>

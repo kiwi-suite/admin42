@@ -1,0 +1,28 @@
+<div class="form-group" ng-class="{'has-error': formData.errors.length}">
+    <div class="col-sm-3 col-md-2 control-label">
+        <div class="pull-left hidden-sm hidden-xs">
+            <span class="fa fa-fw text-danger" ng-class="{'fa-exclamation-triangle': formData.errors.length}"></span>
+        </div>
+        <div class="pull-right">
+            <a class="text-muted" ng-if="formData.description != null" uib-popover="{{ formData.description }}" popover-trigger="'mouseenter'">
+                <i class="fa fa-question-circle"></i>
+            </a>
+            <label>{{ formData.label }}</label>
+            <span ng-if="formData.required">*</span>
+        </div>
+        <div class="clearfix"></div>
+    </div>
+    <div class="col-sm-9 col-md-10">
+        <input type="hidden" name="{{ formData.name }}" value="{{ formData.value }}">
+        <div class="checkbox" ng-repeat="option in options">
+            <label class="i-checks">
+                <input name="{{ formData.id }}" ng-model="radioModel" type="radio" ng-value="option.id" ng-change="select(radioModel)" ng-keydown="preventEnter($event)" ng-keypress="preventEnter($event)" ng-keyup="preventEnter($event)">
+                <i></i>
+                {{ option.label }}
+            </label>
+        </div>
+        <ul ng-if="formData.errors.length" class="list-unstyled text-danger">
+            <li ng-repeat="message in formData.errors">{{ message }}</li>
+        </ul>
+    </div>
+</div>
