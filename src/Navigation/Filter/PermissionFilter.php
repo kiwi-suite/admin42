@@ -49,6 +49,6 @@ class PermissionFilter extends AbstractFilter
             return true;
         }
 
-        return $this->permission->isGranted($this->current()->getPermission());
+        return $this->permission->authorized($this->current()->getPermission());
     }
 }

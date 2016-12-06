@@ -52,7 +52,7 @@ class AdminMiddleware
 
         $hasIdentity = $this->serviceManager->get(AuthenticationService::class)->hasIdentity();
 
-        if (!$permission->isGranted($routeName)) {
+        if (!$permission->authorized($routeName)) {
             $router = $this->getServiceManager()->get('Router');
             $url = $router->assemble([], ['name' => 'admin/permission-denied']);
             if (!$hasIdentity) {

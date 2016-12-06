@@ -23,7 +23,7 @@
                     <input type="hidden" name="{{ element.formName }}[__type__]" value="{{ element.type }}">
                     <div class="row">
                         <div class="col-xs-6" ng-show="sortingMode">
-                            <?php if ($this->permission('admin42')->isGranted('dynamic/manage/sort')): ?>
+                            <?php if ($this->permission('admin42')->authorized('dynamic/manage/sort')): ?>
                                 <a class="btn btn-xs btn-info" ui-tree-handle>
                                     <i class="fa fa-fw fa-sort"></i>
                                 </a>
@@ -65,7 +65,7 @@
                             </div>
                         </div>
                         <div class="col-xs-6 text-right">
-                            <?php if ($this->permission('admin42')->isGranted('dynamic/manage/delete')): ?>
+                            <?php if ($this->permission('admin42')->authorized('dynamic/manage/delete')): ?>
                                 <button class="btn btn-xs btn-danger" type="button" ng-click="element.deleted = !element.deleted">
                                 <span ng-show="element.deleted" class="fa-stack">
                                     <i class="fa fa-fw fa-trash fa-stack-1x"></i>
@@ -84,7 +84,7 @@
         </div>
     </div>
 </fieldset>
-<?php if ($this->permission('admin42')->isGranted('dynamic/manage/add')): ?>
+<?php if ($this->permission('admin42')->authorized('dynamic/manage/add')): ?>
     <div class="form-group">
         <div class="col-sm-offset-9 col-sm-2 text-right">
             <select ng-if="protoTypes.length > 1" class="form-control" ng-model="data.selectedProtoType" ng-options="prototype.label for prototype in protoTypes"></select>
