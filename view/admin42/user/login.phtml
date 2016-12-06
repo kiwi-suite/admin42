@@ -8,7 +8,7 @@ $this->loginForm->prepare();
     <!--<div id="login-subheader" class="subheader bold color-1"><h4>Login</h4></div>-->
     <div class="panel">
         <div class="panel-body">
-            <form role="form" class="form-horizontal" method="post" action="<?= $this->url() ?>">
+            <form role="form" class="form-horizontal" method="post" action="<?= $this->url('admin/login') ?>">
                 <?= $this->formRow($this->loginForm->get('csrf')) ?>
                 <div class="form-group<?= (count($this->loginForm->get('identity')->getMessages()))
                     ? ' has-error has-feedback' : '' ?>">

@@ -233,7 +233,7 @@ class UserController extends AbstractAdminController
             $formCmd = $this->getFormCommand();
 
             $loginCmd = $this->getCommand(LoginCommand::class);
-            $loginCmd->setIp($_SERVER['REMOTE_ADDR']);
+            $loginCmd->setIp($this->getRequest()->getServer('REMOTE_ADDR'));
 
             $formCmd->setForm($loginForm)
                 ->setCommand($loginCmd)

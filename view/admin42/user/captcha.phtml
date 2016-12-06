@@ -11,7 +11,7 @@ $this->headscript()->appendFile('https://www.google.com/recaptcha/api.js', 'text
                 <?= $this->translate('text.captcha-description', 'admin' ) ?>
             </p>
             <form role="form" class="form-horizontal" method="post" action="<?= $this->url() ?>">
-                <div>
+                <div class="m-t m-b">
                     <div class="g-recaptcha" data-sitekey="<?= $this->sitekey ?>"></div>
                 </div>
 
