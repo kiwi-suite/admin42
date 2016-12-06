@@ -33,6 +33,7 @@ use Admin42\TableGateway\UserTableGateway;
 use Core42\View\Model\JsonModel;
 use Zend\Http\PhpEnvironment\Response;
 use Zend\Stdlib\ArrayUtils;
+use Zend\View\Model\ViewModel;
 
 class UserController extends AbstractAdminController
 {
@@ -267,7 +268,22 @@ class UserController extends AbstractAdminController
             $loginCmd->run();
 
             if ($loginCmd->hasErrors()) {
-                return $this->redirect()->toRoute('admin/login');
+
+                $loginForm = $this->getForm(LoginForm::class);
+                foreach ($loginCmd->getErrors() as $elementName => $errorList) {
+                    if (!$loginForm->has($elementName)) {
+                        continue;
+                    }
+
+                    $loginForm->get($elementName)->setMessages($errorList);
+                }
+
+                $viewModel = new ViewModel();
+                $viewModel->setTemplate('admin42/user/login');
+
+                $viewModel->loginForm = $loginForm;
+
+                return $viewModel;
             } else {
                 return $this->redirectAfterLogin();
             }
@@ -275,12 +291,12 @@ class UserController extends AbstractAdminController
         
         $config = $this->getServiceManager()->get('Config');
         
-        if (empty($config['project']['admin_login_captcha_options']['sitekey'])) {
+        if (empty($config['admin']['login_captcha_options']['sitekey'])) {
             throw new \Exception('no captcha sitekey defined');
         }
         
         return [
-            'sitekey' => $config['project']['admin_login_captcha_options']['sitekey']
+            'sitekey' => $config['admin']['login_captcha_options']['sitekey']
         ];
     }
 

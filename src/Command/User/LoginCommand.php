@@ -113,11 +113,11 @@ class LoginCommand extends AbstractCommand
         $this->authenticationService = $this->getServiceManager()->get(AuthenticationService::class);
 
         if (empty($this->identity)) {
-            $this->addError('identity', "Can't be empty");
+            $this->addError('identity', 'error.empty');
         }
 
         if (empty($this->password)) {
-            $this->addError('password', "Can't be empty");
+            $this->addError('password', 'error.empty');
         }
 
         $emailValidator = new EmailAddress();
@@ -133,7 +133,7 @@ class LoginCommand extends AbstractCommand
 
         if ($resultSet->count() != 1) {
             $bCrypt->create('test');
-            $this->addError('identity', 'Invalid username or password');
+            $this->addError('identity', 'login.error.failure');
 
             return;
         }
@@ -145,21 +145,21 @@ class LoginCommand extends AbstractCommand
         /** @var User $user */
         $user = $resultSet->current();
         if (!$bCrypt->verify($this->password, $user->getPassword())) {
-            $this->addError('identity', 'Invalid username or password');
+            $this->addError('identity', 'login.error.failure');
             $this->createLoginHistory($user->getId(), LoginHistory::STATUS_FAIL);
             
             $login = false;
         }
 
         if ($login && !in_array($user->getStatus(), [User::STATUS_ACTIVE])) {
-            $this->addError('identity', 'Invalid username or password');
+            $this->addError('identity', 'login.error.failure');
             $this->createLoginHistory($user->getId(), LoginHistory::STATUS_FAIL);
 
             $login = false;
         }
         
         $forceCaptcha = false;
-        if ($config['project']['admin_login_captcha'] === true) {
+        if ($config['admin']['login_captcha'] === true) {
 
             $loginHistoryTableGateway = $this->getTableGateway(LoginHistoryTableGateway::class);
             $select = $loginHistoryTableGateway->getSql()->select();

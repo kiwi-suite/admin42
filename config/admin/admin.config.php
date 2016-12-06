@@ -18,5 +18,8 @@ return [
                 ],
             ],
         ],
+
+        'login_captcha' => false,
+        'login_captcha_options' => ['sitekey' => '', 'secret' => '']
     ],
 ];

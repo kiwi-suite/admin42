@@ -7,8 +7,5 @@ return [
         'email_subject_prefix' => __NAMESPACE__ . ': ',
         'email_from' => 'developer@raum42.at',
         'project_base_url' => '',
-
-        'admin_login_captcha' => false,
-        'admin_login_captcha_options' => ['sitekey' => '', 'secret' => '']
     ],
 ];

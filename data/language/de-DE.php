@@ -47,6 +47,8 @@ return [
     'field.short-name'              => 'Kurzname',
     'field.language'                => 'Sprache',
 
+    'error.empty'                   => 'Darf nicht leer sein',
+
     'title.user-manage'             => 'Profileinstellungen',
     'title.users'                   => 'Benutzerverwaltung',
     'title.user-edit'               => 'Benutzer bearbeiten',
@@ -63,6 +65,8 @@ return [
     'text.login-description'        => 'Bitte Benutzernamen/Email und Passwort eingeben',
     'text.lostpw-description'       => 'Um das Passwort zurückzusetzen, bitte die Email eingeben',
 
+    'login.error.failure'           => 'Ungültiger Benutzername oder Password',
+    
     'toaster.item.edit.title.success'     => 'Eintrag gespeichert',
     'toaster.item.edit.message.success'   => 'Eintrag erfolgreich gespeichert',
     'toaster.item.edit.title.error'       => 'Eintrag nicht gespeichert',

@@ -50,12 +50,12 @@ class LoginCaptchaCommand extends LoginCommand
         $config = $this->getServiceManager()->get('Config');
 
         if (empty($this->captcha)) {
-            $this->addError('captcha', 'Invalid username or password');
+            $this->addError('identity', 'login.error.failure');
             return;
         }
 
-        if (!$this->checkCaptcha($this->captcha, $config['project']['admin_login_captcha_options']['secret'])) {
-            $this->addError('captcha', 'Invalid username or password');
+        if (!$this->checkCaptcha($this->captcha, $config['admin']['login_captcha_options']['secret'])) {
+            $this->addError('identity', 'login.error.failure');
             return;
         }
 
@@ -63,7 +63,7 @@ class LoginCaptchaCommand extends LoginCommand
         if ($container->success === true) {
             $this->user = $this->getTableGateway(UserTableGateway::class)->selectByPrimary($container->user_id);
         } else {
-            $this->addError('identity', 'Invalid username or password');
+            $this->addError('identity', 'login.error.failure');
         }
         $container->getManager()->getStorage()->clear('login');
     }

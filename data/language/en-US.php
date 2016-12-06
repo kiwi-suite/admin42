@@ -47,6 +47,8 @@ return [
     'field.short-name'              => 'Short Name',
     'field.language'                => 'Language',
 
+    'error.empty'                   => 'Can\'t be empty',
+
     'title.user-manage'             => 'Manage your profile settings',
     'title.users'                   => 'User management',
     'title.user-edit'               => 'Edit user',
@@ -63,6 +65,8 @@ return [
     'text.login-description'        => 'Enter username/email and password to continue.',
     'text.lostpw-description'       => 'To reset your password, enter the email address you use to sign in.',
 
+    'login.error.failure'           => 'Invalid username or password',
+    
     'toaster.item.edit.title.success'     => 'Item saved',
     'toaster.item.edit.message.success'   => 'Item was saved successfully',
     'toaster.item.edit.title.error'       => 'Item not saved',
