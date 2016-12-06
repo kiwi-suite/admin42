@@ -24,7 +24,7 @@ class LoginHistory extends AbstractModel
     /**
      * @var array
      */
-    public $properties = [
+    protected $properties = [
         'id',
         'userId',
         'status',

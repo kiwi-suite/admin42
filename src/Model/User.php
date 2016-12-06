@@ -54,7 +54,7 @@ class User extends AbstractModel implements IdentityRoleProviderInterface
     /**
      * @var array
      */
-    public $properties = [
+    protected $properties = [
         'id',
         'username',
         'password',
