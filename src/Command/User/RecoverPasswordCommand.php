@@ -83,6 +83,17 @@ class RecoverPasswordCommand extends AbstractCommand
     }
 
     /**
+     * @param bool $disableHashValidation
+     * @return $this
+     */
+    public function setDisableHashValidation($disableHashValidation)
+    {
+        $this->disableHashValidation = $disableHashValidation;
+
+        return $this;
+    }
+
+    /**
      * @param array $values
      */
     public function hydrate(array $values)
@@ -146,6 +157,6 @@ class RecoverPasswordCommand extends AbstractCommand
     {
         $this->email = $route->getMatchedParam('email');
         $this->password = $route->getMatchedParam('password');
-        $this->disableHashValidation = true;
+        $this->setDisableHashValidation(true);
     }
 }
