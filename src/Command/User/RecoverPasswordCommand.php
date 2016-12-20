@@ -15,30 +15,39 @@ namespace Admin42\Command\User;
 use Admin42\Model\User;
 use Admin42\TableGateway\UserTableGateway;
 use Core42\Command\AbstractCommand;
+use Core42\Command\ConsoleAwareTrait;
 use Zend\Crypt\Password\Bcrypt;
 use Zend\Validator\EmailAddress;
+use ZF\Console\Route;
 
 class RecoverPasswordCommand extends AbstractCommand
 {
-    /**
-     * @var string
-     */
-    private $email;
+    use ConsoleAwareTrait;
 
     /**
      * @var string
      */
-    private $hash;
+    protected $email;
 
     /**
      * @var string
      */
-    private $password;
+    protected $hash;
+
+    /**
+     * @var string
+     */
+    protected $password;
 
     /**
      * @var User
      */
-    private $user;
+    protected $user;
+
+    /**
+     * @var bool
+     */
+    protected $disableHashValidation = false;
 
     /**
      * @param string $email
@@ -90,7 +99,7 @@ class RecoverPasswordCommand extends AbstractCommand
         if (!$emailValidator->isValid($this->email)) {
             $this->addError('email', 'invalid email address');
         }
-        if (empty($this->hash)) {
+        if ($this->disableHashValidation === false && empty($this->hash)) {
             $this->addError('hash', 'invalid hash');
         }
 
@@ -104,10 +113,13 @@ class RecoverPasswordCommand extends AbstractCommand
 
         $this->user = $this->getTableGateway(UserTableGateway::class)->select([
             'email' => $this->email,
-            'hash' => $this->hash,
         ])->current();
 
         if (!($this->user instanceof User)) {
+            $this->addError('user', 'invalid user');
+        }
+
+        if ($this->disableHashValidation === false && $this->user->getHash() !== $this->hash) {
             $this->addError('user', 'invalid user');
         }
     }
@@ -124,5 +136,16 @@ class RecoverPasswordCommand extends AbstractCommand
         $this->user->setHash(null);
 
         $this->getTableGateway(UserTableGateway::class)->update($this->user);
+
+        $this->consoleOutput("<info>Password of user {$this->email} updated</info>");
+
+        return $this->user;
+    }
+
+    public function consoleSetup(Route $route)
+    {
+        $this->email = $route->getMatchedParam('email');
+        $this->password = $route->getMatchedParam('password');
+        $this->disableHashValidation = true;
     }
 }

@@ -2,6 +2,7 @@
 namespace Admin42;
 
 use Admin42\Command\User\CreateCommand;
+use Admin42\Command\User\RecoverPasswordCommand;
 
 return [
     'cli' => [
@@ -22,6 +23,17 @@ return [
                 '--password'        => 'password for the given user - if none give, password will be auto-generated',
                 '--status'          => 'status can be active or inactive. Default:active',
                 '--displayName'     => 'set the display name of the user'
+            ],
+        ],
+        'admin-reset-password' => [
+            'group'                     => '*',
+            'route'                     => 'admin-reset-password --email= --password=',
+            'command-name'              => RecoverPasswordCommand::class,
+            'description'               => 'Resets an admin user password',
+            'short_description'         => 'Resets an admin user password',
+            'options_descriptions'      => [
+                '--email'           => 'email of the user',
+                '--password'        => 'new password for the given user',
             ],
         ],
     ],
