@@ -151,6 +151,10 @@ class Stack extends Fieldset
                     __METHOD__
                 ));
             }
+            if (array_key_exists('__deleted__', $value) && $value['__deleted__'] == 'true') {
+                continue;
+            }
+
             $fieldset = $this->attachFieldset($value['__type__'], $key);
 
             if ($fieldset === false) {
