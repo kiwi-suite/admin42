@@ -73,7 +73,7 @@ class FormHelper extends AbstractHelper implements AngularHelperInterface
     public function getValue(AngularAwareInterface $element)
     {
         $value = $element->getValue();
-        if (!is_string($value)) {
+        if (!is_scalar($value)) {
             $value = '';
         }
 

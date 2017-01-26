@@ -23,7 +23,7 @@ angular.module('admin42')
                     );
                 }
                 function setValue() {
-                    if ($scope.formData.value.length > 0) {
+                    if (parseInt($scope.formData.value) > 0 || $scope.formData.value.length > 0 ) {
                         angular.forEach($scope.options, function(option){
                             if (option.id == $scope.formData.value) {
                                 $scope.option.selected = option;
