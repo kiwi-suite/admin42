@@ -126,7 +126,12 @@ class Angular extends AbstractHelper
         $templates = [];
 
         foreach ($this->jsonTemplates as $name => $value) {
-            $templates[] = sprintf('<script id="%s" type="application/json">%s</script>', $name, Json::encode($value));
+            $templates[] = sprintf(
+                '<script id="%s" type="application/json" nonce="%s">%s</script>',
+                $name,
+                $this->view->plugin('csp')->getNonce(),
+                Json::encode($value)
+            );
         }
 
         return implode(PHP_EOL, $templates);
@@ -192,15 +197,21 @@ class Angular extends AbstractHelper
         $templates = [];
 
         foreach ($this->htmlTemplates as $name => $html) {
-            $templates[] = sprintf('<script id="%s" type="text/ng-template">%s</script>', $name, $html);
+            $templates[] = sprintf(
+                '<script id="%s" type="text/ng-template" nonce="%s">%s</script>',
+                $name,
+                $this->view->plugin('csp')->getNonce(),
+                $html
+            );
         }
 
         if (!empty($this->htmlPartials)) {
             $partialHelper = $this->view->plugin('partial');
             foreach ($this->htmlPartials as $name => $partial) {
                 $templates[] = sprintf(
-                    '<script id="%s" type="text/ng-template">%s</script>',
+                    '<script id="%s" type="text/ng-template" nonce="%s">%s</script>',
                     $name,
+                    $this->view->plugin('csp')->getNonce(),
                     $partialHelper($partial)
                 );
             }
