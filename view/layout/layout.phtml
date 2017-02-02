@@ -33,7 +33,7 @@
 
     <?= $this->headScript() ?>
 
-    <script>
+    <script nonce="<?= $this->csp()->getNonce() ?>">
         <?= $this->angular()->angularBootstrap() ?>
 
         <?= $this->admin()->flashMessenger() ?>
@@ -68,7 +68,7 @@
 
 <?= $this->angular()->getJsonTemplates() ?>
 
-<?= $this->inlineScript() ?>
+<?= $this->inlineScript()->appendScript('alert()')->appendScript('alert()')->prependScript('alert()')->setAllowArbitraryAttributes(true) ?>
 
 </body>
 

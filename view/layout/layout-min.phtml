@@ -33,7 +33,7 @@
 
     <?= $this->headScript() ?>
 
-    <script>
+    <script nonce="<?= $this->csp()->getNonce() ?>">
         <?= $this->angular()->angularBootstrap() ?>
     </script>
 </head>
