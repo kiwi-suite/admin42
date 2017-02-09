@@ -13,6 +13,7 @@
 namespace Admin42\View\Helper\Form;
 
 use Admin42\FormElements\AngularAwareInterface;
+use Zend\Stdlib\ArrayUtils;
 
 class FormMultiCheckbox extends FormHelper
 {
@@ -23,7 +24,15 @@ class FormMultiCheckbox extends FormHelper
             $value = [];
         }
 
-        return array_values($value);
+        $value = array_values($value);
+
+        if (ArrayUtils::hasIntegerKeys($element->getValueOptions())) {
+            $value = array_map(function ($value) {
+                return (int) $value;
+            }, $value);
+        }
+
+        return $value;
     }
 
     /**
