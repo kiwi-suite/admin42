@@ -16,6 +16,14 @@ angular.module('admin42')
                 $scope.checkboxModel = {};
 
                 angular.forEach($scope.options, function(option){
+                    if (angular.isArray(initialValues)) {
+                        angular.forEach(initialValues, function(initialValue){
+                            if (parseInt(initialValue) == parseInt(option.id)) {
+                                $scope.checkboxModel[option.id] = true;
+                            }
+                        });
+                        return;
+                    }
                     $scope.checkboxModel[option.id] = (initialValues.indexOf(option.id) != -1);
                 });
 
