@@ -23,7 +23,7 @@ $this->loginForm->prepare();
                             <span class="glyphicon glyphicon-warning-sign form-control-feedback"></span>
                             <ul class="list-unstyled text-danger">
                                 <?php foreach ($this->loginForm->get('identity')->getMessages() as $message): ?>
-                                    <li><?= $this->translate($message, 'admin') ?></li>
+                                    <li><?= $this->escapeHtml($this->translate($message, 'admin')) ?></li>
                                 <?php endforeach; ?>
                             </ul>
                         <?php endif; ?>
@@ -43,7 +43,7 @@ $this->loginForm->prepare();
                             <span class="glyphicon glyphicon-warning-sign form-control-feedback"></span>
                             <ul class="list-unstyled text-danger">
                                 <?php foreach ($this->loginForm->get('password')->getMessages() as $message): ?>
-                                    <li><?= $this->translate($message, 'admin') ?></li>
+                                    <li><?= $this->escapeHtml($this->translate($message, 'admin')) ?></li>
                                 <?php endforeach; ?>
                             </ul>
                         <?php endif; ?>
