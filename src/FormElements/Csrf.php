@@ -94,7 +94,7 @@ class Csrf extends Element implements AngularAwareInterface, InputProviderInterf
     {
         return [
             'name' => $this->getName(),
-            'required' => $this->isRequired(),
+            'required' => true,
             'filters' => [
                 ['name' => StringTrim::class],
             ],

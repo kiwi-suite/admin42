@@ -28,9 +28,9 @@
                         <?= $this->auth(\Admin42\Authentication\AuthenticationService::class)->getIdentity()->getShortName() ?>
                     </span>
                     <span class="font-bold text-lt">
-                        <?= $this->user()->getDisplayName(
+                        <?= $this->escapeHtml($this->user()->getDisplayName(
                             $this->auth(\Admin42\Authentication\AuthenticationService::class)->getIdentity()
-                        ) ?>
+                        )) ?>
                     </span>
                     <b class="caret text-lt"></b>
                 </a>
