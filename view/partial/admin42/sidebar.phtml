@@ -6,13 +6,13 @@
                 <li class="m-t-sm text-muted text-sm identity">
                     <a href="<?= $this->url('admin/user/manage') ?>">
                         <span class="m-l m-r-xs shortname-container">
-                            <?= $this->auth(\Admin42\Authentication\AuthenticationService::class)->getIdentity()->getShortName() ?>
+                            <?= $this->escapeHtml($this->auth(\Admin42\Authentication\AuthenticationService::class)->getIdentity()->getShortName()) ?>
                         </span>
                         <div class="hidden-folded">
                             <div class="m-t-xs font-bold text-lt">
-                                <?= $this->user()->getDisplayName(
+                                <?= $this->escapeHtml($this->user()->getDisplayName(
                                     $this->auth(\Admin42\Authentication\AuthenticationService::class)->getIdentity()
-                                ) ?>
+                                )) ?>
                             </div>
                             <div class="text-muted text-xs role">
                                 <?= $this->auth(\Admin42\Authentication\AuthenticationService::class)->getIdentity()->getRole() ?>
