@@ -2,13 +2,20 @@
 <p>
     Username: <strong><?= $this->username ?></strong>
 </p>
+<?php if ($this->emailType == 'password'):?>
 <p>
     Password: <strong><?= $this->password ?></strong>
 </p>
+<?php endif; ?>
 <table>
     <tr>
         <td class="padding">
-            <p><a href="<?= $this->projectBaseUrl ?><?= $this->loginUrl?>" class="btn-primary">Login</a></p>
+            <?php if ($this->emailType == 'password'):?>
+                <p><a href="<?= $this->projectBaseUrl ?><?= $this->loginUrl?>" class="btn-primary">Login</a></p>
+            <?php else: ?>
+                <p><a href="<?= $this->projectBaseUrl ?><?= $this->resetPasswordUrl?>" class="btn-primary">Set Password</a></p>
+            <?php endif; ?>
+
         </td>
     </tr>
 </table>

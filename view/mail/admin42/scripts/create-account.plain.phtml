@@ -1,3 +1,11 @@
 Username: <?= $this->username ?>
-
+<?php if ($this->emailType == 'password'):?>
 Password: <?= $this->password ?>
+<?php endif; ?>
+
+
+<?php if ($this->emailType == 'password'):?>
+    Login: <?= $this->projectBaseUrl ?><?= $this->loginUrl?>
+<?php else: ?>
+    Set Password: <?= $this->projectBaseUrl ?><?= $this->resetPasswordUrl?>
+<?php endif; ?>

@@ -25,7 +25,11 @@ use ZF\Console\Route;
 
 class CreateCommand extends AbstractCommand
 {
+    const EMAIL_TYPE_PASSWORD = 'password';
+    const EMAIL_TYPE_ACTIVATION = 'activation';
+
     use ConsoleAwareTrait;
+
 
     /**
      * @var string
@@ -75,7 +79,12 @@ class CreateCommand extends AbstractCommand
     /**
      * @var bool
      */
-    protected $enablePasswordEmail = true;
+    protected $enableEmail = true;
+
+    /**
+     * @var string
+     */
+    protected $emailType = self::EMAIL_TYPE_PASSWORD;
 
     /**
      * @var string
@@ -149,12 +158,12 @@ class CreateCommand extends AbstractCommand
     }
 
     /**
-     * @param bool $enablePasswordEmail
+     * @param bool $enableEmail
      * @return $this
      */
-    public function setEnablePasswordEmail($enablePasswordEmail)
+    public function setEnableEmail($enableEmail)
     {
-        $this->enablePasswordEmail = (bool) $enablePasswordEmail;
+        $this->enableEmail = (bool) $enableEmail;
 
         return $this;
     }
@@ -243,6 +252,8 @@ class CreateCommand extends AbstractCommand
         }
 
         if (empty($this->password)) {
+            $this->emailType = self::EMAIL_TYPE_ACTIVATION;
+
             $set = 'abcdefghjkmnpqrstuvwxyzABCDEFGHJKMNPQRSTUVWXYZ0123456789!@#$%&*?';
             for ($i = 0; $i < 12; $i++) {
                 $this->password .= $set[array_rand(str_split($set))];
@@ -289,18 +300,32 @@ class CreateCommand extends AbstractCommand
                 ->setUpdated($dateTime)
                 ->setCreated($dateTime);
 
+        if ($this->emailType === self::EMAIL_TYPE_ACTIVATION) {
+            $hash = sha1($user->getPassword() . $user->getId() . uniqid());
+            $user->setHash($hash);
+        }
 
         $this->getServiceManager()->get('TableGateway')->get(UserTableGateway::class)->insert($user);
 
         $this->consoleOutput("<info>User {$this->email} created</info>");
 
-        if ($this->enablePasswordEmail === true) {
+        if ($this->enableEmail === true) {
             $httpRouter = $this->getServiceManager()->get('HttpRouter');
 
             $mailViewModel = new MailModel([
                 'username' => $this->email,
                 'password' => $this->password,
+                'emailType' => $this->emailType,
                 'loginUrl' => $httpRouter->assemble([], ['name' => 'admin/login']),
+                'resetPasswordUrl' => $httpRouter->assemble(
+                    [
+                        'email' => urlencode($user->getEmail()),
+                        'hash' => (strlen($user->getHash())) ? $user->getHash() : 'unset',
+                    ],
+                    [
+                        'name' => 'admin/recover-password'
+                    ]
+                ),
             ]);
             $mailViewModel->setHtmlTemplate('mail/admin42/scripts/create-account.html.phtml');
             $mailViewModel->setPlainTemplate('mail/admin42/scripts/create-account.plain.phtml');
