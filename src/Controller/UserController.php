@@ -420,6 +420,7 @@ class UserController extends AbstractAdminController
                                     'username',
                                     'email',
                                     'displayName',
+                                    'passwordOld',
                                     'password',
                                     'passwordRepeat',
                                     'shortName',

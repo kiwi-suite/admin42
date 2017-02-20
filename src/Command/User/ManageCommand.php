@@ -50,6 +50,11 @@ class ManageCommand extends AbstractCommand
     /**
      * @var string
      */
+    protected $passwordOld;
+
+    /**
+     * @var string
+     */
     protected $displayName;
 
     /**
@@ -96,6 +101,17 @@ class ManageCommand extends AbstractCommand
     public function setPassword($password)
     {
         $this->password = $password;
+
+        return $this;
+    }
+
+    /**
+     * @param string $passwordOld
+     * @return $this
+     */
+    public function setPasswordOld($passwordOld)
+    {
+        $this->passwordOld = $passwordOld;
 
         return $this;
     }
@@ -173,6 +189,7 @@ class ManageCommand extends AbstractCommand
     {
         $this->setEmail((array_key_exists('email', $values)) ? $values['email'] : null);
         $this->setPassword((array_key_exists('password', $values)) ? $values['password'] : null);
+        $this->setPasswordOld((array_key_exists('passwordOld', $values)) ? $values['passwordOld'] : null);
         $this->setUsername((array_key_exists('username', $values)) ? $values['username'] : null);
         $this->setDisplayName((array_key_exists('displayName', $values)) ? $values['displayName'] : null);
         $this->setShortName(array_key_exists('shortName', $values) ? $values['shortName'] : null);
@@ -225,11 +242,6 @@ class ManageCommand extends AbstractCommand
             }
         }
 
-        if (!empty($this->password)) {
-            $bCrypt = new Bcrypt();
-            $this->password = $bCrypt->create($this->password);
-        }
-
         if (empty($this->shortName)) {
             $this->shortName = strtoupper(substr($this->email, 0, 1));
             if (!empty($this->displayName)) {
@@ -239,6 +251,19 @@ class ManageCommand extends AbstractCommand
                     $this->shortName .= $parts[1];
                 }
             }
+        }
+
+        if (empty($this->user)) {
+            return;
+        }
+
+        if (!empty($this->password)) {
+            $bCrypt = new Bcrypt();
+            if (!$bCrypt->verify($this->passwordOld, $this->user->getPassword())) {
+                $this->addError("passwordOld", "Invalid old password");
+            }
+
+            $this->password = $bCrypt->create($this->password);
         }
     }
 
