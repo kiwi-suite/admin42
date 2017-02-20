@@ -24,10 +24,10 @@
         <ul class="nav navbar-nav navbar-right">
             <li class="dropdown" uib-dropdown>
                 <a href class="dropdown-toggle clear" uib-dropdown-toggle>
-                    <span class="m-r-xs shortname-container-xs">
-                        <?= $this->auth(\Admin42\Authentication\AuthenticationService::class)->getIdentity()->getShortName() ?>
+                    <span class="m-r-xs shortname-container-xs" ng-non-bindable>
+                        <?= $this->escapeHtml($this->auth(\Admin42\Authentication\AuthenticationService::class)->getIdentity()->getShortName()) ?>
                     </span>
-                    <span class="font-bold text-lt">
+                    <span class="font-bold text-lt" ng-non-bindable>
                         <?= $this->escapeHtml($this->user()->getDisplayName(
                             $this->auth(\Admin42\Authentication\AuthenticationService::class)->getIdentity()
                         )) ?>

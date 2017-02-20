@@ -9,12 +9,12 @@
                             <?= $this->escapeHtml($this->auth(\Admin42\Authentication\AuthenticationService::class)->getIdentity()->getShortName()) ?>
                         </span>
                         <div class="hidden-folded">
-                            <div class="m-t-xs font-bold text-lt">
+                            <div class="m-t-xs font-bold text-lt" ng-non-bindable>
                                 <?= $this->escapeHtml($this->user()->getDisplayName(
                                     $this->auth(\Admin42\Authentication\AuthenticationService::class)->getIdentity()
                                 )) ?>
                             </div>
-                            <div class="text-muted text-xs role">
+                            <div class="text-muted text-xs role" ng-non-bindable>
                                 <?= $this->auth(\Admin42\Authentication\AuthenticationService::class)->getIdentity()->getRole() ?>
                             </div>
                         </div>
