@@ -40,6 +40,12 @@ class ManageForm extends Form implements InputFilterProviderInterface
         ]);
 
         $this->add([
+            'name' => 'passwordOld',
+            'type' => 'password',
+            'label' => 'field.password-old',
+        ]);
+
+        $this->add([
             'name' => 'password',
             'type' => 'password',
             'label' => 'field.password',

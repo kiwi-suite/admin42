@@ -166,7 +166,7 @@ class EnsureCommand extends AbstractCommand
                 'displayName' => $this->displayName,
                 'role' => $this->role,
             ]);
-            $cmd->setEnablePasswordEmail(false);
+            $cmd->setEnableEmail(false);
             $user = $cmd->run();
             if ($cmd->hasErrors()) {
                 foreach ($cmd->getErrors() as $error => $message) {

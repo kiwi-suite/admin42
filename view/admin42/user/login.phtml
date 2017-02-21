@@ -5,9 +5,9 @@ $this->loginForm->prepare();
     <div id="login-header">
         <img class="img-responsive" src="<?= $this->assetUrl($this->whitelabel()->getLogoLg()); ?>" id="logo" border="0" alt="kiwi42">
     </div>
-    <!--<div id="login-subheader" class="subheader bold color-1"><h4>Login</h4></div>-->
     <div class="panel">
         <div class="panel-body">
+            <h4 class="text-center"><?= $this->translate('label.login', 'admin') ?></h4>
             <form role="form" class="form-horizontal" method="post" action="<?= $this->url('admin/login') ?>">
                 <?= $this->formRow($this->loginForm->get('csrf')) ?>
                 <div class="form-group<?= (count($this->loginForm->get('identity')->getMessages()))

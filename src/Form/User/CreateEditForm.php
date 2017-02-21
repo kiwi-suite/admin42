@@ -64,6 +64,7 @@ class CreateEditForm extends Form
             'name' => 'locale',
             'type' => 'adminLanguage',
             'label' => 'field.language',
+            'required' => true,
         ]);
     }
 }

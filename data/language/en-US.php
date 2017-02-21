@@ -100,4 +100,7 @@ return [
 
     'stack.no-name'                 => 'No name given',
     'stack.no-name-enter'           => 'Click to enter name',
+
+    'label.login'                   => 'Login',
+    'label.set-password'            => 'Set Password',
 ];
