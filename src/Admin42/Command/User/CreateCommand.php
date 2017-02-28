@@ -145,6 +145,16 @@ class CreateCommand extends AbstractCommand
     }
 
     /**
+     * @param string $shortName
+     * @return $this
+     */
+    public function setShortName($shortName)
+    {
+        $this->shortName = $shortName;
+        return $this;
+    }
+
+    /**
      * @param array $values
      */
     public function hydrate(array $values)
@@ -155,6 +165,7 @@ class CreateCommand extends AbstractCommand
         $this->setStatus(array_key_exists('status', $values) ? $values['status'] : null);
         $this->setDisplayName(array_key_exists('displayName', $values) ? $values['displayName'] : null);
         $this->setRole(array_key_exists('role', $values) ? $values['role'] : null);
+        $this->setShortName(array_key_exists('shortName', $values) ? $values['shortName'] : null);
     }
 
     /**
@@ -198,13 +209,18 @@ class CreateCommand extends AbstractCommand
             }
         }
 
-        $this->shortName = strtoupper(substr($this->email, 0, 1));
-        if (!empty($this->displayName)) {
-            $parts = explode(" ", $this->displayName);
-            $this->shortName = strtoupper($parts[0]);
-            if (count($parts) > 1) {
-                $this->shortName .= $parts[1];
+        if (empty($this->shortName)) {
+            $this->shortName = strtoupper(substr($this->email, 0, 1));
+            if (!empty($this->displayName)) {
+                $parts = explode(' ', $this->displayName);
+                $this->shortName = strtoupper(substr($parts[0], 0, 1));
+                if (count($parts) > 1) {
+                    $this->shortName .= strtoupper(substr($parts[1], 0, 1));
+                }
             }
+        }
+        if (strlen($this->shortName) > 2) {
+            $this->shortName = substr($this->shortName, 0, 2);
         }
 
         $bCrypt = new Bcrypt();
