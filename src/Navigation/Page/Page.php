@@ -5,10 +5,11 @@
  *
  * @package admin42
  * @link https://github.com/raum42/admin42
- * @copyright Copyright (c) 2010 - 2016 raum42 (https://www.raum42.at)
+ * @copyright Copyright (c) 2010 - 2017 raum42 (https://raum42.at)
  * @license MIT License
  * @author raum42 <kiwi@raum42.at>
  */
+
 
 namespace Admin42\Navigation\Page;
 
@@ -112,11 +113,11 @@ class Page extends AbstractPage implements PageInterface
      */
     public function isActive()
     {
-        if (strlen($this->getRoute()) > strlen($this->routeMatch->getMatchedRouteName())) {
+        if (\mb_strlen($this->getRoute()) > \mb_strlen($this->routeMatch->getMatchedRouteName())) {
             return false;
         }
 
-        if (substr($this->routeMatch->getMatchedRouteName(), 0, strlen($this->getRoute())) != $this->getRoute()) {
+        if (\mb_substr($this->routeMatch->getMatchedRouteName(), 0, \mb_strlen($this->getRoute())) != $this->getRoute()) {
             return false;
         }
 

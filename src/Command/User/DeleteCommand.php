@@ -5,10 +5,11 @@
  *
  * @package admin42
  * @link https://github.com/raum42/admin42
- * @copyright Copyright (c) 2010 - 2016 raum42 (https://www.raum42.at)
+ * @copyright Copyright (c) 2010 - 2017 raum42 (https://raum42.at)
  * @license MIT License
  * @author raum42 <kiwi@raum42.at>
  */
+
 
 namespace Admin42\Command\User;
 
@@ -72,11 +73,11 @@ class DeleteCommand extends AbstractCommand
     {
         $dateTime = new DateTime();
         $this->user->setStatus(User::STATUS_INACTIVE)
-            ->setEmail(json_encode([
+            ->setEmail(\json_encode([
                 $this->user->getEmail(),
                 $dateTime->format('Y-m-d H:i:s'),
             ]))
-            ->setUsername(json_encode([
+            ->setUsername(\json_encode([
                 $this->user->getUsername(),
                 $dateTime->format('Y-m-d H:i:s'),
             ]))

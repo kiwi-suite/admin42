@@ -1,4 +1,15 @@
 <?php
+
+/*
+ * admin42
+ *
+ * @package admin42
+ * @link https://github.com/raum42/admin42
+ * @copyright Copyright (c) 2010 - 2017 raum42 (https://raum42.at)
+ * @license MIT License
+ * @author raum42 <kiwi@raum42.at>
+ */
+
 namespace Admin42\Stdlib;
 
 class Stack
@@ -58,14 +69,14 @@ class Stack
     /**
      * @param $method
      * @param $params
-     * @return mixed
      * @throws \Exception
+     * @return mixed
      */
     public function __call($method, $params)
     {
-        $variableName = lcfirst(substr($method, 3));
-        if (strncasecmp($method, 'get', 3) === 0) {
-            if (array_key_exists($variableName, $this->values)) {
+        $variableName = \lcfirst(\mb_substr($method, 3));
+        if (\strncasecmp($method, 'get', 3) === 0) {
+            if (\array_key_exists($variableName, $this->values)) {
                 return $this->values[$variableName];
             }
         }
@@ -88,6 +99,6 @@ class Stack
      */
     public function __isset($name)
     {
-        return array_key_exists($name, $this->values);
+        return \array_key_exists($name, $this->values);
     }
 }

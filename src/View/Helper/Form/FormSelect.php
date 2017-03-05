@@ -5,10 +5,11 @@
  *
  * @package admin42
  * @link https://github.com/raum42/admin42
- * @copyright Copyright (c) 2010 - 2016 raum42 (https://www.raum42.at)
+ * @copyright Copyright (c) 2010 - 2017 raum42 (https://raum42.at)
  * @license MIT License
  * @author raum42 <kiwi@raum42.at>
  */
+
 
 namespace Admin42\View\Helper\Form;
 
@@ -29,7 +30,7 @@ class FormSelect extends FormHelper
 
         $valueOptions = [];
         if ($element->getEmptyValue() !== null) {
-            $id = key($element->getEmptyValue());
+            $id = \key($element->getEmptyValue());
             $valueOptions[] = [
                 'id' => $id,
                 'label' => $translateHelper($element->getEmptyValue()[$id], 'admin'),
@@ -44,7 +45,7 @@ class FormSelect extends FormHelper
         $elementData['valueOptions'] = $valueOptions;
         $elementData['emptyValue'] = null;
         if ($element->getEmptyValue() !== null) {
-            $elementData['emptyValue'] = array_keys($element->getEmptyValue())[0];
+            $elementData['emptyValue'] = \array_keys($element->getEmptyValue())[0];
         }
 
         return $elementData;

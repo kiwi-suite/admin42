@@ -1,4 +1,15 @@
 <?php
+
+/*
+ * admin42
+ *
+ * @package admin42
+ * @link https://github.com/raum42/admin42
+ * @copyright Copyright (c) 2010 - 2017 raum42 (https://raum42.at)
+ * @license MIT License
+ * @author raum42 <kiwi@raum42.at>
+ */
+
 namespace Admin42;
 
 use Admin42\Command\User\CreateCommand;
@@ -10,7 +21,7 @@ return [
         'admin-create-user' => [
             'group'                     => '*',
             'route'                     => 'admin-create-user --email= --role='
-                .' [--username=] [--password=] [--status=] [--displayName=]',
+                . ' [--username=] [--password=] [--status=] [--displayName=]',
             'command-name'              => CreateCommand::class,
             'description'               => 'Creates an admin user',
             'short_description'         => 'Creates an admin user',
@@ -23,7 +34,7 @@ return [
                 '--username'        => 'username for the user. none given, login is only available through email',
                 '--password'        => 'password for the given user - if none give, password will be auto-generated',
                 '--status'          => 'status can be active or inactive. Default:active',
-                '--displayName'     => 'set the display name of the user'
+                '--displayName'     => 'set the display name of the user',
             ],
         ],
         'admin-reset-password' => [
@@ -40,7 +51,7 @@ return [
         'admin-ensure-user' => [
             'group'                     => '*',
             'route'                     => 'admin-ensure-user --email= --role= --password='
-                .' [--username=] [--status=] [--displayName=]',
+                . ' [--username=] [--status=] [--displayName=]',
             'command-name'              => EnsureCommand::class,
             'description'               => 'Ensures an admin user exists',
             'short_description'         => 'Ensures an admin user exists',
@@ -53,7 +64,7 @@ return [
                 '--username'        => 'username for the user',
                 '--password'        => 'password for the given user',
                 '--status'          => 'status can be active or inactive',
-                '--displayName'     => 'set the display name of the user'
+                '--displayName'     => 'set the display name of the user',
             ],
         ],
     ],

@@ -5,10 +5,11 @@
  *
  * @package admin42
  * @link https://github.com/raum42/admin42
- * @copyright Copyright (c) 2010 - 2016 raum42 (https://www.raum42.at)
+ * @copyright Copyright (c) 2010 - 2017 raum42 (https://raum42.at)
  * @license MIT License
  * @author raum42 <kiwi@raum42.at>
  */
+
 
 namespace Admin42\Controller;
 
@@ -35,7 +36,7 @@ class LinkController extends AbstractAdminController
 
         $result = $this->getTableGateway(LinkTableGateway::class)->select([
             'type' => $data['type'],
-            'hash' => md5($encodedValue),
+            'hash' => \md5($encodedValue),
         ]);
 
         if ($result->count() > 0) {
@@ -43,7 +44,7 @@ class LinkController extends AbstractAdminController
         } else {
             $link = new Link();
             $link->setType($data['type'])
-                ->setHash(md5($encodedValue))
+                ->setHash(\md5($encodedValue))
                 ->setValue($data['value']);
 
             $this->getTableGateway(LinkTableGateway::class)->insert($link);
@@ -82,7 +83,7 @@ class LinkController extends AbstractAdminController
 
         $partialList = [];
         foreach ($linkProvider->getAvailableAdapters() as $adapterName) {
-            $partialList = array_merge($linkProvider->getAdapter($adapterName)->getPartials(), $partialList);
+            $partialList = \array_merge($linkProvider->getAdapter($adapterName)->getPartials(), $partialList);
         }
         $viewModel->setVariable('linkPartialList', $partialList);
 

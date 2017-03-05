@@ -5,10 +5,11 @@
  *
  * @package admin42
  * @link https://github.com/raum42/admin42
- * @copyright Copyright (c) 2010 - 2016 raum42 (https://www.raum42.at)
+ * @copyright Copyright (c) 2010 - 2017 raum42 (https://raum42.at)
  * @license MIT License
  * @author raum42 <kiwi@raum42.at>
  */
+
 
 namespace Admin42\Command\User;
 
@@ -206,15 +207,15 @@ class CreateCommand extends AbstractCommand
      */
     public function hydrate(array $values)
     {
-        $this->setUsername(array_key_exists('username', $values) ? $values['username'] : null);
-        $this->setPassword(array_key_exists('password', $values) ? $values['password'] : null);
-        $this->setEmail(array_key_exists('email', $values) ? $values['email'] : null);
-        $this->setStatus(array_key_exists('status', $values) ? $values['status'] : null);
-        $this->setDisplayName(array_key_exists('displayName', $values) ? $values['displayName'] : null);
-        $this->setRole(array_key_exists('role', $values) ? $values['role'] : null);
-        $this->setPayload(array_key_exists('payload', $values) ? $values['payload'] : []);
-        $this->setShortName(array_key_exists('shortName', $values) ? $values['shortName'] : null);
-        $this->setLocale(array_key_exists('locale', $values) ? $values['locale'] : 'en-US');
+        $this->setUsername(\array_key_exists('username', $values) ? $values['username'] : null);
+        $this->setPassword(\array_key_exists('password', $values) ? $values['password'] : null);
+        $this->setEmail(\array_key_exists('email', $values) ? $values['email'] : null);
+        $this->setStatus(\array_key_exists('status', $values) ? $values['status'] : null);
+        $this->setDisplayName(\array_key_exists('displayName', $values) ? $values['displayName'] : null);
+        $this->setRole(\array_key_exists('role', $values) ? $values['role'] : null);
+        $this->setPayload(\array_key_exists('payload', $values) ? $values['payload'] : []);
+        $this->setShortName(\array_key_exists('shortName', $values) ? $values['shortName'] : null);
+        $this->setLocale(\array_key_exists('locale', $values) ? $values['locale'] : 'en-US');
     }
 
     /**
@@ -232,7 +233,7 @@ class CreateCommand extends AbstractCommand
 
         if ($this->status === null) {
             $this->status = User::STATUS_ACTIVE;
-        } elseif (!in_array($this->status, [User::STATUS_INACTIVE, User::STATUS_ACTIVE])) {
+        } elseif (!\in_array($this->status, [User::STATUS_INACTIVE, User::STATUS_ACTIVE])) {
             $this->addError('status', "invalid status '{$this->status}'");
         }
 
@@ -256,22 +257,22 @@ class CreateCommand extends AbstractCommand
 
             $set = 'abcdefghjkmnpqrstuvwxyzABCDEFGHJKMNPQRSTUVWXYZ0123456789!@#$%&*?';
             for ($i = 0; $i < 12; $i++) {
-                $this->password .= $set[array_rand(str_split($set))];
+                $this->password .= $set[\array_rand(\str_split($set))];
             }
         }
 
         if (empty($this->shortName)) {
-            $this->shortName = strtoupper(substr($this->email, 0, 1));
+            $this->shortName = \mb_strtoupper(\mb_substr($this->email, 0, 1));
             if (!empty($this->displayName)) {
-                $parts = explode(' ', $this->displayName);
-                $this->shortName = strtoupper(substr($parts[0], 0, 1));
-                if (count($parts) > 1) {
-                    $this->shortName .= strtoupper(substr($parts[1], 0, 1));
+                $parts = \explode(' ', $this->displayName);
+                $this->shortName = \mb_strtoupper(\mb_substr($parts[0], 0, 1));
+                if (\count($parts) > 1) {
+                    $this->shortName .= \mb_strtoupper(\mb_substr($parts[1], 0, 1));
                 }
             }
         }
-        if (strlen($this->shortName) > 2) {
-            $this->shortName = substr($this->shortName, 0, 2);
+        if (\mb_strlen($this->shortName) > 2) {
+            $this->shortName = \mb_substr($this->shortName, 0, 2);
         }
 
 
@@ -301,7 +302,7 @@ class CreateCommand extends AbstractCommand
                 ->setCreated($dateTime);
 
         if ($this->emailType === self::EMAIL_TYPE_ACTIVATION) {
-            $hash = sha1($user->getPassword() . $user->getId() . uniqid());
+            $hash = \sha1($user->getPassword() . $user->getId() . \uniqid());
             $user->setHash($hash);
         }
 
@@ -319,11 +320,11 @@ class CreateCommand extends AbstractCommand
                 'loginUrl' => $httpRouter->assemble([], ['name' => 'admin/login']),
                 'resetPasswordUrl' => $httpRouter->assemble(
                     [
-                        'email' => urlencode($user->getEmail()),
-                        'hash' => (strlen($user->getHash())) ? $user->getHash() : 'unset',
+                        'email' => \urlencode($user->getEmail()),
+                        'hash' => (\mb_strlen($user->getHash())) ? $user->getHash() : 'unset',
                     ],
                     [
-                        'name' => 'admin/recover-password'
+                        'name' => 'admin/recover-password',
                     ]
                 ),
             ]);

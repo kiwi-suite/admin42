@@ -5,10 +5,11 @@
  *
  * @package admin42
  * @link https://github.com/raum42/admin42
- * @copyright Copyright (c) 2010 - 2016 raum42 (https://www.raum42.at)
+ * @copyright Copyright (c) 2010 - 2017 raum42 (https://raum42.at)
  * @license MIT License
  * @author raum42 <kiwi@raum42.at>
  */
+
 
 namespace Admin42\Command\User;
 
@@ -171,13 +172,13 @@ class EditCommand extends AbstractCommand
      */
     public function hydrate(array $values)
     {
-        $this->setUsername(array_key_exists('username', $values) ? $values['username'] : null);
-        $this->setEmail(array_key_exists('email', $values) ? $values['email'] : null);
-        $this->setDisplayName(array_key_exists('displayName', $values) ? $values['displayName'] : null);
-        $this->setRole(array_key_exists('role', $values) ? $values['role'] : null);
-        $this->setShortName(array_key_exists('shortName', $values) ? $values['shortName'] : null);
-        $this->setPayload(array_key_exists('payload', $values) ? $values['payload'] : []);
-        $this->setLocale(array_key_exists('locale', $values) ? $values['locale'] : 'en-US');
+        $this->setUsername(\array_key_exists('username', $values) ? $values['username'] : null);
+        $this->setEmail(\array_key_exists('email', $values) ? $values['email'] : null);
+        $this->setDisplayName(\array_key_exists('displayName', $values) ? $values['displayName'] : null);
+        $this->setRole(\array_key_exists('role', $values) ? $values['role'] : null);
+        $this->setShortName(\array_key_exists('shortName', $values) ? $values['shortName'] : null);
+        $this->setPayload(\array_key_exists('payload', $values) ? $values['payload'] : []);
+        $this->setLocale(\array_key_exists('locale', $values) ? $values['locale'] : 'en-US');
     }
 
     /**
@@ -230,11 +231,11 @@ class EditCommand extends AbstractCommand
         }
 
         if (empty($this->shortName)) {
-            $this->shortName = strtoupper(substr($this->email, 0, 1));
+            $this->shortName = \mb_strtoupper(\mb_substr($this->email, 0, 1));
             if (!empty($this->displayName)) {
-                $parts = explode(' ', $this->displayName);
-                $this->shortName = strtoupper($parts[0]);
-                if (count($parts) > 1) {
+                $parts = \explode(' ', $this->displayName);
+                $this->shortName = \mb_strtoupper($parts[0]);
+                if (\count($parts) > 1) {
                     $this->shortName .= $parts[1];
                 }
             }

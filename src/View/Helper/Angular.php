@@ -5,10 +5,11 @@
  *
  * @package admin42
  * @link https://github.com/raum42/admin42
- * @copyright Copyright (c) 2010 - 2016 raum42 (https://www.raum42.at)
+ * @copyright Copyright (c) 2010 - 2017 raum42 (https://raum42.at)
  * @license MIT License
  * @author raum42 <kiwi@raum42.at>
  */
+
 
 namespace Admin42\View\Helper;
 
@@ -67,7 +68,7 @@ class Angular extends AbstractHelper
         $appConfig = [
             'locale' => \Locale::getDefault(),
             'defaultDateTimeFormat' => 'LLL',
-            'timezone' => date_default_timezone_get(),
+            'timezone' => \date_default_timezone_get(),
             'displayTimezone' => $adminHelper->getTimezone(),
         ];
 
@@ -126,7 +127,7 @@ class Angular extends AbstractHelper
         $templates = [];
 
         foreach ($this->jsonTemplates as $name => $value) {
-            $templates[] = sprintf(
+            $templates[] = \sprintf(
                 '<script id="%s" type="application/json" nonce="%s">%s</script>',
                 $name,
                 $this->view->plugin('csp')->getNonce(),
@@ -134,7 +135,7 @@ class Angular extends AbstractHelper
             );
         }
 
-        return implode(PHP_EOL, $templates);
+        return \implode(PHP_EOL, $templates);
     }
 
     /**
@@ -197,7 +198,7 @@ class Angular extends AbstractHelper
         $templates = [];
 
         foreach ($this->htmlTemplates as $name => $html) {
-            $templates[] = sprintf(
+            $templates[] = \sprintf(
                 '<script id="%s" type="text/ng-template" nonce="%s">%s</script>',
                 $name,
                 $this->view->plugin('csp')->getNonce(),
@@ -208,7 +209,7 @@ class Angular extends AbstractHelper
         if (!empty($this->htmlPartials)) {
             $partialHelper = $this->view->plugin('partial');
             foreach ($this->htmlPartials as $name => $partial) {
-                $templates[] = sprintf(
+                $templates[] = \sprintf(
                     '<script id="%s" type="text/ng-template" nonce="%s">%s</script>',
                     $name,
                     $this->view->plugin('csp')->getNonce(),
@@ -217,7 +218,7 @@ class Angular extends AbstractHelper
             }
         }
 
-        return implode(PHP_EOL, $templates);
+        return \implode(PHP_EOL, $templates);
     }
 
     /**
@@ -242,7 +243,7 @@ class Angular extends AbstractHelper
             'required' => $element->hasAttribute('required'),
             'options' => $element->getOptions(),
             'attributes' => $element->getAttributes(),
-            'errors' => array_values($element->getMessages()),
+            'errors' => \array_values($element->getMessages()),
         ];
     }
 }

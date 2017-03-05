@@ -5,10 +5,11 @@
  *
  * @package admin42
  * @link https://github.com/raum42/admin42
- * @copyright Copyright (c) 2010 - 2016 raum42 (https://www.raum42.at)
+ * @copyright Copyright (c) 2010 - 2017 raum42 (https://raum42.at)
  * @license MIT License
  * @author raum42 <kiwi@raum42.at>
  */
+
 
 namespace Admin42\FormElements;
 
@@ -34,7 +35,7 @@ class Hidden extends Element implements AngularAwareInterface
      */
     public function setOptions($options)
     {
-        if (array_key_exists('staticControl', $options)) {
+        if (\array_key_exists('staticControl', $options)) {
             $this->setStaticControl((bool) $options['staticControl']);
         }
 
@@ -46,7 +47,7 @@ class Hidden extends Element implements AngularAwareInterface
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
     public function getStaticControl()
     {
@@ -54,7 +55,7 @@ class Hidden extends Element implements AngularAwareInterface
     }
 
     /**
-     * @param boolean $staticControl
+     * @param bool $staticControl
      * @return Hidden
      */
     public function setStaticControl($staticControl)

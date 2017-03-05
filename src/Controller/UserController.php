@@ -5,10 +5,11 @@
  *
  * @package admin42
  * @link https://github.com/raum42/admin42
- * @copyright Copyright (c) 2010 - 2016 raum42 (https://www.raum42.at)
+ * @copyright Copyright (c) 2010 - 2017 raum42 (https://raum42.at)
  * @license MIT License
  * @author raum42 <kiwi@raum42.at>
  */
+
 
 namespace Admin42\Controller;
 
@@ -75,8 +76,8 @@ class UserController extends AbstractAdminController
     }
 
     /**
-     * @return array
      * @throws \Exception
+     * @return array
      */
     public function detailAction()
     {
@@ -109,7 +110,7 @@ class UserController extends AbstractAdminController
                                     if ($name == 'csrf') {
                                         continue;
                                     }
-                                    if (in_array($name, ['username', 'email', 'displayName', 'role', 'shortName', 'locale'])) {
+                                    if (\in_array($name, ['username', 'email', 'displayName', 'role', 'shortName', 'locale'])) {
                                         $newValues[$name] = $value;
                                         continue;
                                     }
@@ -170,7 +171,7 @@ class UserController extends AbstractAdminController
             $deleteCmd = $this->getCommand(DeleteCommand::class);
 
             $deleteParams = [];
-            parse_str($this->getRequest()->getContent(), $deleteParams);
+            \parse_str($this->getRequest()->getContent(), $deleteParams);
 
             $deleteCmd->setUserId((int) $deleteParams['id'])
                 ->run();
@@ -208,8 +209,8 @@ class UserController extends AbstractAdminController
     }
 
     /**
-     * @return array|\Zend\Http\Response
      * @throws \Exception
+     * @return array|\Zend\Http\Response
      */
     public function loginAction()
     {
@@ -259,7 +260,6 @@ class UserController extends AbstractAdminController
         $this->layout('admin/layout/layout-min');
 
         if ($this->getRequest()->isPost()) {
-
             $post = $this->getRequest()->getPost()->toArray();
 
             /** @var LoginCaptchaCommand $loginCmd */
@@ -268,7 +268,6 @@ class UserController extends AbstractAdminController
             $loginCmd->run();
 
             if ($loginCmd->hasErrors()) {
-
                 $loginForm = $this->getForm(LoginForm::class);
                 foreach ($loginCmd->getErrors() as $elementName => $errorList) {
                     if (!$loginForm->has($elementName)) {
@@ -288,21 +287,21 @@ class UserController extends AbstractAdminController
                 return $this->redirectAfterLogin();
             }
         }
-        
+
         $config = $this->getServiceManager()->get('Config');
-        
+
         if (empty($config['admin']['login_captcha_options']['sitekey'])) {
             throw new \Exception('no captcha sitekey defined');
         }
-        
+
         return [
-            'sitekey' => $config['admin']['login_captcha_options']['sitekey']
+            'sitekey' => $config['admin']['login_captcha_options']['sitekey'],
         ];
     }
 
     /**
-     * @return \Zend\Http\Response
      * @throws \Exception
+     * @return \Zend\Http\Response
      */
     public function logoutAction()
     {
@@ -312,8 +311,8 @@ class UserController extends AbstractAdminController
     }
 
     /**
-     * @return array
      * @throws \Exception
+     * @return array
      */
     public function lostPasswordAction()
     {
@@ -347,8 +346,8 @@ class UserController extends AbstractAdminController
     }
 
     /**
-     * @return array|\Zend\Http\Response
      * @throws \Exception
+     * @return array|\Zend\Http\Response
      */
     public function recoverPasswordAction()
     {
@@ -367,7 +366,7 @@ class UserController extends AbstractAdminController
 
         if ($prg !== false) {
             $recoverPassowordCommand = $this->getCommand(RecoverPasswordCommand::class);
-            $recoverPassowordCommand->setEmail(urldecode($this->params()->fromRoute('email')));
+            $recoverPassowordCommand->setEmail(\urldecode($this->params()->fromRoute('email')));
             $recoverPassowordCommand->setHash($this->params()->fromRoute('hash'));
 
             $formCmd = $this->getFormCommand();
@@ -388,8 +387,8 @@ class UserController extends AbstractAdminController
     }
 
     /**
-     * @return array
      * @throws \Exception
+     * @return array
      */
     public function manageAction()
     {
@@ -426,7 +425,7 @@ class UserController extends AbstractAdminController
                                     'shortName',
                                     'locale',
                                 ];
-                                if (in_array($name, $check)) {
+                                if (\in_array($name, $check)) {
                                     $newValues[$name] = $value;
                                     continue;
                                 }

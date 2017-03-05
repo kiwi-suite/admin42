@@ -5,10 +5,11 @@
  *
  * @package admin42
  * @link https://github.com/raum42/admin42
- * @copyright Copyright (c) 2010 - 2016 raum42 (https://www.raum42.at)
+ * @copyright Copyright (c) 2010 - 2017 raum42 (https://raum42.at)
  * @license MIT License
  * @author raum42 <kiwi@raum42.at>
  */
+
 
 namespace Admin42\Session\Service;
 
@@ -30,11 +31,11 @@ class SessionManagerFactory implements FactoryInterface
      * @param  ContainerInterface $container
      * @param  string $requestedName
      * @param  null|array $options
-     * @return object
-     * @throws ServiceNotFoundException if unable to resolve the service.
+     * @throws ServiceNotFoundException if unable to resolve the service
      * @throws ServiceNotCreatedException if an exception is raised when
-     *     creating a service.
+     *     creating a service
      * @throws ContainerException if any other error occurs
+     * @return object
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
@@ -49,11 +50,11 @@ class SessionManagerFactory implements FactoryInterface
         if ($container->has(StorageInterface::class)) {
             $storage = $container->get(StorageInterface::class);
             if (!$storage instanceof StorageInterface) {
-                throw new ServiceNotCreatedException(sprintf(
+                throw new ServiceNotCreatedException(\sprintf(
                     'SessionManager requires that the %s service implement %s; received "%s"',
                     StorageInterface::class,
                     StorageInterface::class,
-                    (is_object($storage) ? get_class($storage) : gettype($storage))
+                    (\is_object($storage) ? \get_class($storage) : \gettype($storage))
                 ));
             }
         }
@@ -61,11 +62,11 @@ class SessionManagerFactory implements FactoryInterface
         if ($container->has(SaveHandlerInterface::class)) {
             $saveHandler = $container->get(SaveHandlerInterface::class);
             if (!$saveHandler instanceof SaveHandlerInterface) {
-                throw new ServiceNotCreatedException(sprintf(
+                throw new ServiceNotCreatedException(\sprintf(
                     'SessionManager requires that the %s service implement %s; received "%s"',
                     SaveHandlerInterface::class,
                     SaveHandlerInterface::class,
-                    (is_object($saveHandler) ? get_class($saveHandler) : gettype($saveHandler))
+                    (\is_object($saveHandler) ? \get_class($saveHandler) : \gettype($saveHandler))
                 ));
             }
         }
