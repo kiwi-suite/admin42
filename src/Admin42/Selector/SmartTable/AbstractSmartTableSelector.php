@@ -52,7 +52,16 @@ abstract class AbstractSmartTableSelector extends AbstractDatabaseSelector
 
         $request = $this->getServiceManager()->get("Request");
 
-        $config = Json::decode($request->getContent(), Json::TYPE_ARRAY);
+        try {
+            $config = Json::decode($request->getContent(), Json::TYPE_ARRAY);
+        } catch (\Exception $e) {
+            $config = [];
+        }
+
+        if (empty($config)) {
+            return;
+        }
+
 
         if (!empty($config['pagination']['number']) && (int) $config['pagination']['number'] > 0) {
             $this->limit = (int) $config['pagination']['number'];
