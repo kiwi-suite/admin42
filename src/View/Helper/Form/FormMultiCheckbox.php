@@ -5,10 +5,11 @@
  *
  * @package admin42
  * @link https://github.com/raum42/admin42
- * @copyright Copyright (c) 2010 - 2016 raum42 (https://www.raum42.at)
+ * @copyright Copyright (c) 2010 - 2017 raum42 (https://raum42.at)
  * @license MIT License
  * @author raum42 <kiwi@raum42.at>
  */
+
 
 namespace Admin42\View\Helper\Form;
 
@@ -20,14 +21,14 @@ class FormMultiCheckbox extends FormHelper
     public function getValue(AngularAwareInterface $element)
     {
         $value = $element->getValue();
-        if (!is_array($value)) {
+        if (!\is_array($value)) {
             $value = [];
         }
 
-        $value = array_values($value);
+        $value = \array_values($value);
 
         if (ArrayUtils::hasIntegerKeys($element->getValueOptions())) {
-            $value = array_map(function ($value) {
+            $value = \array_map(function ($value) {
                 return (int) $value;
             }, $value);
         }

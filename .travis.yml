@@ -3,9 +3,17 @@ sudo: false
 php:
 - '5.6'
 - '7.0'
+- '7.1'
+cache:
+  directories:
+    - $HOME/.composer/cache
 before_script:
-- composer install --prefer-dist --no-interaction
+  - composer install --prefer-dist --no-interaction --dev
+script:
+  - vendor/bin/phpunit
+  - vendor/bin/php-cs-fixer fix --config=.php_cs -v --dry-run --using-cache=no --path-mode=intersection `git diff --name-only --diff-filter=ACMRTUXB $TRAVIS_COMMIT_RANGE`
 notifications:
+  email: false
   slack:
     rooms:
       secure: iOK18PVemsnPM+zfZXnL+eY4FsPi7Kk7h/gCq92DsWha7bMGVlFN6Bm5HAuiuqL6EvXv1OEIbFK5CgZ06C/VdIWlCUJcjQxAG0bw8jzUKqEHroTXW/OTWT5KZiH4hgzKmXg4wpjfklNhVOCqEL1jbB1LzYPRQW0sP3zm/N1U8GiW5fwte164JonqqMWDpuXvn+KHM7cXv2cjre6w2S1JvSUTySE0cqL/IVTiX7nXsAjoCNKU9Z5IL1+s4t77V0m65tq/5CLHcceDChvpVhqZ1f+b3Dd47yavEY7z+pV0x9JjM+6f2uw7uiPIBbdX5FoJlJbI4ncnXxzSKejl7Vbwl/skRX2TqiAwo9vp+cDNo5ID/uqxFUR806urQN5BHhCp59b+vYFrHy4PfCotGwvfjiIpzwLRFnsqVbiAXtUepdmPd3ak0vL+1LcZVh1CxciZZb+FTepiJcjcfVJHQF5YktfLTwR2Ys/4LzsZMKl2I3JeIScWqRc1cgIJno2hxz7c6X95+LOSGdoF8hHllJjb+30kzVGSuGwax+yQbFwiGAB3AGAm5wPm+qB//A3sMXQELL8V4eKY5mfAjPbDDQZDy//eEXMpUiqusr6wS+DLq7C7ikovUbQKF35BZNLK7SRf4NUwu/zh9ENhtWZp4W0RB8xMB26hmBnM1pFoCiJG8M4=

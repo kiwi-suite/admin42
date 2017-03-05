@@ -5,10 +5,11 @@
  *
  * @package admin42
  * @link https://github.com/raum42/admin42
- * @copyright Copyright (c) 2010 - 2016 raum42 (https://www.raum42.at)
+ * @copyright Copyright (c) 2010 - 2017 raum42 (https://raum42.at)
  * @license MIT License
  * @author raum42 <kiwi@raum42.at>
  */
+
 
 namespace Admin42\Command\Crud;
 
@@ -77,13 +78,13 @@ class DeleteCommand extends AbstractCommand
     /**
      * @param $method
      * @param $params
-     * @return $this
      * @throws \Exception
+     * @return $this
      */
     public function __call($method, $params)
     {
-        $variableName = lcfirst(substr($method, 3));
-        if (strncasecmp($method, 'set', 3) === 0) {
+        $variableName = \lcfirst(\mb_substr($method, 3));
+        if (\strncasecmp($method, 'set', 3) === 0) {
             return $this->set($variableName, $params[0]);
         }
 

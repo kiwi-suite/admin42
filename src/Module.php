@@ -5,10 +5,11 @@
  *
  * @package admin42
  * @link https://github.com/raum42/admin42
- * @copyright Copyright (c) 2010 - 2016 raum42 (https://www.raum42.at)
+ * @copyright Copyright (c) 2010 - 2017 raum42 (https://raum42.at)
  * @license MIT License
  * @author raum42 <kiwi@raum42.at>
  */
+
 
 namespace Admin42;
 
@@ -76,7 +77,7 @@ class Module implements
             }
 
             $moduleConfig = $module->getAdminConfig();
-            if (!is_array($moduleConfig)) {
+            if (!\is_array($moduleConfig)) {
                 continue;
             }
 
@@ -87,7 +88,7 @@ class Module implements
             $config = ArrayUtils::merge($config, $adminConfig);
         }
 
-        if (is_dir('config/autoload/admin/')) {
+        if (\is_dir('config/autoload/admin/')) {
             $entries = Glob::glob('config/autoload/admin/*.config.php');
             foreach ($entries as $file) {
                 $config = ArrayUtils::merge($config, include_once $file);
@@ -115,7 +116,7 @@ class Module implements
     public function getCliConfig()
     {
         $config = [];
-        $configPath = dirname((new \ReflectionClass($this))->getFileName()) . '/../config/cli/*.config.php';
+        $configPath = \dirname((new \ReflectionClass($this))->getFileName()) . '/../config/cli/*.config.php';
 
         $entries = Glob::glob($configPath);
         foreach ($entries as $file) {

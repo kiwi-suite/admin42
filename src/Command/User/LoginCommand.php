@@ -5,10 +5,11 @@
  *
  * @package admin42
  * @link https://github.com/raum42/admin42
- * @copyright Copyright (c) 2010 - 2016 raum42 (https://www.raum42.at)
+ * @copyright Copyright (c) 2010 - 2017 raum42 (https://raum42.at)
  * @license MIT License
  * @author raum42 <kiwi@raum42.at>
  */
+
 
 namespace Admin42\Command\User;
 
@@ -141,26 +142,25 @@ class LoginCommand extends AbstractCommand
         $config = $this->getServiceManager()->get('Config');
 
         $login = true;
-        
+
         /** @var User $user */
         $user = $resultSet->current();
         if (!$bCrypt->verify($this->password, $user->getPassword())) {
             $this->addError('identity', 'login.error.failure');
             $this->createLoginHistory($user->getId(), LoginHistory::STATUS_FAIL);
-            
+
             $login = false;
         }
 
-        if ($login && !in_array($user->getStatus(), [User::STATUS_ACTIVE])) {
+        if ($login && !\in_array($user->getStatus(), [User::STATUS_ACTIVE])) {
             $this->addError('identity', 'login.error.failure');
             $this->createLoginHistory($user->getId(), LoginHistory::STATUS_FAIL);
 
             $login = false;
         }
-        
+
         $forceCaptcha = false;
         if ($config['admin']['login_captcha'] === true) {
-
             $loginHistoryTableGateway = $this->getTableGateway(LoginHistoryTableGateway::class);
             $select = $loginHistoryTableGateway->getSql()->select();
             $select->where->equalTo('userId', $user->getId());
@@ -184,13 +184,12 @@ class LoginCommand extends AbstractCommand
             }
 
             if ($forceCaptcha) {
-
                 $this->addError('captcha', 'force captcha');
-                
+
                 $container = new Container('login');
                 $container->success = $login;
                 $container->user_id = $user->getId();
-                
+
                 return;
             }
         }
@@ -234,6 +233,4 @@ class LoginCommand extends AbstractCommand
 
         $this->getTableGateway(LoginHistoryTableGateway::class)->insert($history);
     }
-
-    
 }

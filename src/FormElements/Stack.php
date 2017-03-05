@@ -5,10 +5,11 @@
  *
  * @package admin42
  * @link https://github.com/raum42/admin42
- * @copyright Copyright (c) 2010 - 2016 raum42 (https://www.raum42.at)
+ * @copyright Copyright (c) 2010 - 2017 raum42 (https://raum42.at)
  * @license MIT License
  * @author raum42 <kiwi@raum42.at>
  */
+
 
 namespace Admin42\FormElements;
 
@@ -61,7 +62,7 @@ class Stack extends Fieldset
      */
     public function setOptions($options)
     {
-        if (!empty($options['sets']) && is_array($options['sets'])) {
+        if (!empty($options['sets']) && \is_array($options['sets'])) {
             $this->handleSets($options['sets']);
         }
 
@@ -94,9 +95,9 @@ class Stack extends Fieldset
     public function prepareElement(FormInterface $form)
     {
         if ($this->shouldCreateChildrenOnPrepareElement === true) {
-            if (count($this->initialElements) > 0) {
+            if (\count($this->initialElements) > 0) {
                 $fieldsetName = Uuid::uuid4()->toString();
-                for ($i = 0; $i < count($this->initialElements); $i++) {
+                for ($i = 0; $i < \count($this->initialElements); $i++) {
                     $this->attachFieldset($this->initialElements[$i], $fieldsetName . '-' . $i);
                 }
             }
@@ -124,17 +125,17 @@ class Stack extends Fieldset
      */
     public function populateValues($data)
     {
-        if (!is_array($data) && !$data instanceof \Traversable) {
-            throw new \Exception(sprintf(
+        if (!\is_array($data) && !$data instanceof \Traversable) {
+            throw new \Exception(\sprintf(
                 '%s expects an array or Traversable set of data; received "%s"',
                 __METHOD__,
-                (is_object($data) ? get_class($data) : gettype($data))
+                (\is_object($data) ? \get_class($data) : \gettype($data))
             ));
         }
 
         $this->shouldCreateChildrenOnPrepareElement = false;
-        uasort($data, function ($value1, $value2) {
-            if (!array_key_exists('__index__', $value1) || !array_key_exists('__index__', $value2)) {
+        \uasort($data, function ($value1, $value2) {
+            if (!\array_key_exists('__index__', $value1) || !\array_key_exists('__index__', $value2)) {
                 return 0;
             }
             if ($value1['__index__'] == $value2['__index__']) {
@@ -145,13 +146,13 @@ class Stack extends Fieldset
         });
 
         foreach ($data as $key => $value) {
-            if (!array_key_exists('__type__', $value)) {
-                throw new \Exception(sprintf(
+            if (!\array_key_exists('__type__', $value)) {
+                throw new \Exception(\sprintf(
                     '%s expects array items with an attribute "__type__"',
                     __METHOD__
                 ));
             }
-            if (array_key_exists('__deleted__', $value) && $value['__deleted__'] == 'true') {
+            if (\array_key_exists('__deleted__', $value) && $value['__deleted__'] == 'true') {
                 continue;
             }
 
@@ -193,22 +194,22 @@ class Stack extends Fieldset
     /**
      * @param string $type
      * @param FieldsetInterface|array $fieldset
-     * @return array|\Zend\Form\ElementInterface|FieldsetInterface
      * @throws \Exception
+     * @return array|\Zend\Form\ElementInterface|FieldsetInterface
      */
     public function addProtoType($type, $fieldset)
     {
         $factory = $this->getFormFactory();
-        if (is_array($fieldset) || ($fieldset instanceof \Traversable && !$fieldset instanceof FieldsetInterface)) {
+        if (\is_array($fieldset) || ($fieldset instanceof \Traversable && !$fieldset instanceof FieldsetInterface)) {
             $fieldset = $factory->createFieldset($fieldset);
         }
 
         if (!$fieldset instanceof FieldsetInterface) {
-            throw new \Exception(sprintf(
+            throw new \Exception(\sprintf(
                 '%s requires that $fieldset be an object implementing %s; received "%s"',
                 __METHOD__,
                 FieldsetInterface::class,
-                (is_object($fieldset) ? get_class($fieldset) : gettype($fieldset))
+                (\is_object($fieldset) ? \get_class($fieldset) : \gettype($fieldset))
             ));
         }
 

@@ -5,10 +5,11 @@
  *
  * @package admin42
  * @link https://github.com/raum42/admin42
- * @copyright Copyright (c) 2010 - 2016 raum42 (https://www.raum42.at)
+ * @copyright Copyright (c) 2010 - 2017 raum42 (https://raum42.at)
  * @license MIT License
  * @author raum42 <kiwi@raum42.at>
  */
+
 
 namespace Admin42\FormElements;
 
@@ -69,7 +70,7 @@ class MultiCheckbox extends Element implements AngularAwareInterface, InputProvi
      */
     public function getInputSpecification()
     {
-        $haystack = array_keys($this->getValueOptions());
+        $haystack = \array_keys($this->getValueOptions());
 
         return [
             'name' => $this->getName(),
@@ -78,15 +79,15 @@ class MultiCheckbox extends Element implements AngularAwareInterface, InputProvi
                 [
                     'name' => Callback::class,
                     'options' => [
-                        'callback' => function($value) {
-                            if (!is_array($value)) {
+                        'callback' => function ($value) {
+                            if (!\is_array($value)) {
                                 return [];
                             }
 
                             return $value;
-                        }
-                    ]
-                ]
+                        },
+                    ],
+                ],
             ],
             'validators' => [
                 [
@@ -110,11 +111,11 @@ class MultiCheckbox extends Element implements AngularAwareInterface, InputProvi
      */
     public function setValue($value)
     {
-        if (!is_array($value)) {
+        if (!\is_array($value)) {
             $value = [];
         }
 
-        $this->value = array_values($value);
+        $this->value = \array_values($value);
 
         return $this;
     }

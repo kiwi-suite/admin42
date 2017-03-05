@@ -1,4 +1,15 @@
 <?php
+
+/*
+ * admin42
+ *
+ * @package admin42
+ * @link https://github.com/raum42/admin42
+ * @copyright Copyright (c) 2010 - 2017 raum42 (https://raum42.at)
+ * @license MIT License
+ * @author raum42 <kiwi@raum42.at>
+ */
+
 namespace Admin42;
 
 use Admin42\Controller\Api\ApiController;
@@ -101,7 +112,7 @@ return [
                             'route' => 'user/',
                             'defaults' => [
                                 'controller' => UserController::class,
-                                'action' => 'index'
+                                'action' => 'index',
                             ],
                         ],
                         'may_terminate' => true,
@@ -154,7 +165,7 @@ return [
                             'route' => 'environment/',
                             'defaults' => [
                                 'controller' =>  EnvironmentController::class,
-                                'action' => 'index'
+                                'action' => 'index',
                             ],
                         ],
                         'may_terminate' => true,
@@ -165,7 +176,7 @@ return [
                             'route' => 'link/',
                             'defaults' => [
                                 'controller' => LinkController::class,
-                                'action' => 'save'
+                                'action' => 'save',
                             ],
                         ],
                         'may_terminate' => true,
@@ -179,7 +190,7 @@ return [
                                     ],
                                 ],
                             ],
-                        ]
+                        ],
                     ],
                     'api' => [
                         'type' => Literal::class,
@@ -187,7 +198,7 @@ return [
                             'route' => 'api/',
                             'defaults' => [
                                 'controller' => ApiController::class,
-                            ]
+                            ],
                         ],
                         'may_terminate' => true,
                         'child_routes' => [

@@ -5,10 +5,11 @@
  *
  * @package admin42
  * @link https://github.com/raum42/admin42
- * @copyright Copyright (c) 2010 - 2016 raum42 (https://www.raum42.at)
+ * @copyright Copyright (c) 2010 - 2017 raum42 (https://raum42.at)
  * @license MIT License
  * @author raum42 <kiwi@raum42.at>
  */
+
 
 namespace Admin42\Command\User;
 
@@ -122,12 +123,12 @@ class EnsureCommand extends AbstractCommand
      */
     public function hydrate(array $values)
     {
-        $this->setUsername(array_key_exists('username', $values) ? $values['username'] : null);
-        $this->setPassword(array_key_exists('password', $values) ? $values['password'] : null);
-        $this->setEmail(array_key_exists('email', $values) ? $values['email'] : null);
-        $this->setStatus(array_key_exists('status', $values) ? $values['status'] : null);
-        $this->setDisplayName(array_key_exists('displayName', $values) ? $values['displayName'] : null);
-        $this->setRole(array_key_exists('role', $values) ? $values['role'] : null);
+        $this->setUsername(\array_key_exists('username', $values) ? $values['username'] : null);
+        $this->setPassword(\array_key_exists('password', $values) ? $values['password'] : null);
+        $this->setEmail(\array_key_exists('email', $values) ? $values['email'] : null);
+        $this->setStatus(\array_key_exists('status', $values) ? $values['status'] : null);
+        $this->setDisplayName(\array_key_exists('displayName', $values) ? $values['displayName'] : null);
+        $this->setRole(\array_key_exists('role', $values) ? $values['role'] : null);
     }
 
     /**
@@ -155,7 +156,6 @@ class EnsureCommand extends AbstractCommand
             }
 
             $this->getTableGateway(UserTableGateway::class)->update($user);
-
         } else {
             $cmd = $this->getCommand(CreateCommand::class);
             $cmd->hydrate([

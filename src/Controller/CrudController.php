@@ -5,10 +5,11 @@
  *
  * @package admin42
  * @link https://github.com/raum42/admin42
- * @copyright Copyright (c) 2010 - 2016 raum42 (https://www.raum42.at)
+ * @copyright Copyright (c) 2010 - 2017 raum42 (https://raum42.at)
  * @license MIT License
  * @author raum42 <kiwi@raum42.at>
  */
+
 
 namespace Admin42\Controller;
 
@@ -71,8 +72,8 @@ class CrudController extends AbstractAdminController
     }
 
     /**
-     * @return array
      * @throws \Exception
+     * @return array
      */
     protected function getEditData()
     {
@@ -82,12 +83,12 @@ class CrudController extends AbstractAdminController
 
         $data = $model->toArray();
         foreach ($data as $name => $value) {
-            if (!is_string($value)) {
+            if (!\is_string($value)) {
                 continue;
             }
 
-            $var = json_decode($value, true);
-            if (is_array($var)) {
+            $var = \json_decode($value, true);
+            if (\is_array($var)) {
                 $data[$name] = Json::decode($value, Json::TYPE_ARRAY);
             }
         }
@@ -96,8 +97,8 @@ class CrudController extends AbstractAdminController
     }
 
     /**
-     * @return array|Response|ViewModel
      * @throws \Exception
+     * @return array|Response|ViewModel
      */
     public function detailAction()
     {
@@ -109,8 +110,8 @@ class CrudController extends AbstractAdminController
         }
 
         $currentRoute = $this->getCurrentRoute();
-        $currentRoute = str_replace('/add', '', $currentRoute);
-        $currentRoute = str_replace('/edit', '', $currentRoute);
+        $currentRoute = \str_replace('/add', '', $currentRoute);
+        $currentRoute = \str_replace('/edit', '', $currentRoute);
 
         $createEditForm = $this->getForm($this->getCrudOptions()->getFormName());
         if ($prg !== false) {
@@ -119,13 +120,13 @@ class CrudController extends AbstractAdminController
                 $cmd = $this->getCommand($cmdName);
                 $cmd->setId($this->params()->fromRoute('id'));
 
-                if (method_exists($cmd, 'setTableGatewayName')) {
+                if (\method_exists($cmd, 'setTableGatewayName')) {
                     $cmd->setTableGatewayName($this->getCrudOptions()->getTableGatewayName());
                 }
             } else {
                 $cmdName = $this->getCrudOptions()->getCreateCommandName();
                 $cmd = $this->getCommand($cmdName);
-                if (method_exists($cmd, 'setTableGatewayName')) {
+                if (\method_exists($cmd, 'setTableGatewayName')) {
                     $cmd->setTableGatewayName($this->getCrudOptions()->getTableGatewayName());
                 }
             }
@@ -169,25 +170,25 @@ class CrudController extends AbstractAdminController
     }
 
     /**
-     * @return JsonModel
      * @throws \Exception
+     * @return JsonModel
      */
     public function deleteAction()
     {
         $cmdName = $this->getCrudOptions()->getDeleteCommandName();
 
         $redirectRoute = $this->getCurrentRoute();
-        $redirectRoute = str_replace('/delete', '', $redirectRoute);
+        $redirectRoute = \str_replace('/delete', '', $redirectRoute);
 
         if ($this->getRequest()->isDelete()) {
             $deleteCmd = $this->getCommand($cmdName);
 
             $deleteParams = [];
-            parse_str($this->getRequest()->getContent(), $deleteParams);
+            \parse_str($this->getRequest()->getContent(), $deleteParams);
 
             $deleteCmd->setId((int) $deleteParams['id']);
 
-            if (method_exists($deleteCmd, 'setTableGatewayName')) {
+            if (\method_exists($deleteCmd, 'setTableGatewayName')) {
                 $deleteCmd->setTableGatewayName($this->getCrudOptions()->getTableGatewayName());
             }
 
@@ -201,7 +202,7 @@ class CrudController extends AbstractAdminController
 
             $deleteCmd->setId((int) $this->params()->fromPost('id'));
 
-            if (method_exists($deleteCmd, 'setTableGatewayName')) {
+            if (\method_exists($deleteCmd, 'setTableGatewayName')) {
                 $deleteCmd->setTableGatewayName($this->getCrudOptions()->getTableGatewayName());
             }
 

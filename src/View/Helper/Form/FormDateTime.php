@@ -5,10 +5,11 @@
  *
  * @package admin42
  * @link https://github.com/raum42/admin42
- * @copyright Copyright (c) 2010 - 2016 raum42 (https://www.raum42.at)
+ * @copyright Copyright (c) 2010 - 2017 raum42 (https://raum42.at)
  * @license MIT License
  * @author raum42 <kiwi@raum42.at>
  */
+
 
 namespace Admin42\View\Helper\Form;
 
@@ -26,7 +27,7 @@ class FormDateTime extends FormHelper
         $value = $element->getValue(false);
         if (empty($value)) {
             $value = '';
-        } elseif (is_string($value)) {
+        } elseif (\is_string($value)) {
             try {
                 $value = new DateTime($value);
                 $value = $value->format('Y-m-d H:i:s');

@@ -1,4 +1,15 @@
 <?php
+
+/*
+ * admin42
+ *
+ * @package admin42
+ * @link https://github.com/raum42/admin42
+ * @copyright Copyright (c) 2010 - 2017 raum42 (https://raum42.at)
+ * @license MIT License
+ * @author raum42 <kiwi@raum42.at>
+ */
+
 namespace Admin42;
 
 use Admin42\Navigation\Filter\PermissionFilter;
@@ -12,7 +23,7 @@ return [
                 'content' => [
                     'label' => 'label.content',
                     'order' => 1000,
-                    'pages' => []
+                    'pages' => [],
                 ],
                 'setting' => [
                     'label' => 'label.settings',
@@ -25,8 +36,8 @@ return [
                             'icon' => 'fa fa-users fa-fw',
                             'order' => 10000,
                         ],
-                    ]
-                ]
+                    ],
+                ],
             ],
             'admin42-top' => [
                 'profile' => [
@@ -52,11 +63,11 @@ return [
         ],
         'filter_manager' => [
             'factories' => [
-                PermissionFilter::class => PermissionFilterFactory::class
+                PermissionFilter::class => PermissionFilterFactory::class,
             ],
             'aliases' => [
                 'adminPermission' => PermissionFilter::class,
-            ]
+            ],
         ],
     ],
 ];
