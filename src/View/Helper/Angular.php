@@ -67,7 +67,7 @@ class Angular extends AbstractHelper
 
         $appConfig = [
             'locale' => \Locale::getDefault(),
-            'defaultDateTimeFormat' => 'LLL',
+            'defaultDateTimeFormat' => 'YYYY-MM-DD HH:mm',
             'timezone' => \date_default_timezone_get(),
             'displayTimezone' => $adminHelper->getTimezone(),
         ];
