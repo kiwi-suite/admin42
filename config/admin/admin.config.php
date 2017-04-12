@@ -35,5 +35,13 @@ return [
             'sitekey' => '',
             'secret' => '',
         ],
+
+        'email' => [
+            'email_subject_prefix' => null,
+            'email_from' => null,
+            'project_base_url' => null,
+            'email_layout_html' => 'mail/admin42/layout.html.phtml',
+            'email_layout_plain' => 'mail/admin42/layout.plain.phtml',
+        ],
     ],
 ];
