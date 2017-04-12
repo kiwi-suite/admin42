@@ -49,7 +49,7 @@ class Page extends AbstractPage implements PageInterface
      * @param RouteStackInterface $router
      * @param RouteMatch $routeMatch
      */
-    public function __construct(RouteStackInterface $router, RouteMatch $routeMatch)
+    public function __construct(RouteStackInterface $router, RouteMatch $routeMatch = null)
     {
         $this->router = $router;
         $this->routeMatch = $routeMatch;
@@ -113,6 +113,10 @@ class Page extends AbstractPage implements PageInterface
      */
     public function isActive()
     {
+        if (empty($this->routeMatch)) {
+            return false;
+        }
+
         if (\mb_strlen($this->getRoute()) > \mb_strlen($this->routeMatch->getMatchedRouteName())) {
             return false;
         }

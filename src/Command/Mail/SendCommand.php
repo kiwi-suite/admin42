@@ -23,10 +23,40 @@ class SendCommand extends \Core42\Command\Mail\SendCommand
      */
     protected function init()
     {
+        parent::init();
         $this->getServiceManager()->get(TranslatorInterface::class)->setLocale('en-US');
+    }
 
-        $this->layout = new MailModel();
-        $this->layout->setHtmlTemplate('mail/admin42/layout.html.phtml');
-        $this->layout->setPlainTemplate('mail/admin42/layout.plain.phtml');
+    /**
+     *
+     */
+    protected function configure()
+    {
+        $this->mailMessage = \Swift_Message::newInstance();
+
+        $this->parts = [
+            'plain' => [
+                'type' => 'text/plain',
+            ],
+            'html' => [
+                'type' => 'text/html',
+            ],
+        ];
+
+        $config = $this->getServiceManager()->get("config")['project'];
+
+        $adminConfig = $this->getServiceManager()->get("config")['admin']['email'];
+        foreach ($adminConfig as $key => $value) {
+            if ($value === null) {
+                continue;
+            }
+            $config[$key] = $value;
+        }
+
+        $this->mailModel->normalizeData(
+            $config,
+            $this->enableProjectDefaults,
+            $this->enableSubjectPrefix
+        );
     }
 }
