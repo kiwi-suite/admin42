@@ -59,14 +59,6 @@ class Radio extends Element implements AngularAwareInterface, InputProviderInter
     }
 
     /**
-     * @return bool
-     */
-    public function isRequired()
-    {
-        return true;
-    }
-
-    /**
      * Should return an array specification compatible with
      * {@link Zend\InputFilter\Factory::createInput()}.
      *
