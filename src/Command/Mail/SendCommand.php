@@ -13,7 +13,6 @@
 
 namespace Admin42\Command\Mail;
 
-use Core42\View\Model\MailModel;
 use Zend\I18n\Translator\TranslatorInterface;
 
 class SendCommand extends \Core42\Command\Mail\SendCommand
