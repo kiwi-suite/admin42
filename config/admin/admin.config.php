@@ -30,7 +30,7 @@ return [
             ],
         ],
 
-        'login_captcha' => true,
+        'login_captcha' => false,
         'login_captcha_options' => [
             'sitekey' => '',
             'secret' => '',
