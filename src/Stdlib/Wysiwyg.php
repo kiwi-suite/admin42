@@ -48,8 +48,13 @@ class Wysiwyg
             $this->content = \preg_replace_callback(
                 '/<a(.*?)href="###([0-9]+)###"(.*?)>/i',
                 function ($matches) {
+                    $target = "_self";
                     $href = $this->linkProvider->assembleById((int) $matches[2]);
-                    return '<a' . $matches[1] . 'href="' . $href . '"' . $matches[3] . '>';
+                    $link = $this->linkProvider->getLink((int) $matches[2]);
+                    if ($link instanceof \Admin42\Model\Link && $link->getType() == "external") {
+                        $target = "_blank";
+                    }
+                    return '<a' . $matches[1] . 'href="' . $href . '" target="' . $target .'" ' . $matches[3] . '>';
                 },
                 $this->originalContent
             );
