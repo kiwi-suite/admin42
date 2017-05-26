@@ -54,7 +54,7 @@ class Wysiwyg
                     if ($link instanceof \Admin42\Model\Link && $link->getType() == "external") {
                         $target = "_blank";
                     }
-                    return '<a' . $matches[1] . 'href="' . $href . '" target="' . $target .'" ' . $matches[3] . '>';
+                    return '<a' . $matches[1] . 'href="' . $href . '" target="' . $target . '" ' . $matches[3] . '>';
                 },
                 $this->originalContent
             );
