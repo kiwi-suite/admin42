@@ -2,10 +2,10 @@
     "name": "admin42",
     "version": "2.0.0",
     "authors": [
-        "Thomas Payer <payer@raum42.at>"
+        "kiwi-suite <tech@kiwi-suite.com>"
     ],
     "license": "",
-    "homepage": "http://www.raum42.at",
+    "homepage": "http://www.kiwi-suite.com",
     "private": true,
     "ignore": [
         "**/.*",
