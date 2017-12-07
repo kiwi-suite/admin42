@@ -25,9 +25,9 @@
                 is-open="popup.opened"
                 datepicker-options="dateOptions"
             >
-            <input type="text" class="form-control" value="{{ formData.value }}" disabled ng-keydown="preventEnter($event)" ng-keypress="preventEnter($event)" ng-keyup="preventEnter($event)">
+            <input type="text" class="form-control" value="{{ formData.value }}" readonly ng-keydown="preventEnter($event)" ng-keypress="preventEnter($event)" ng-keyup="preventEnter($event)">
             <span class="input-group-btn">
-                <button type="button" class="btn" ng-class="{'btn-default': !formData.errors.length, 'btn-danger': formData.errors.length}" ng-click="open($event)">
+                <button type="button" class="btn" ng-disabled="formData.readonly" ng-class="{'btn-default': !formData.errors.length, 'btn-danger': formData.errors.length}" ng-click="open($event)">
                     <i class="fa fa-calendar"></i>
                 </button>
             </span>

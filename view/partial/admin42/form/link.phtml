@@ -20,7 +20,7 @@
         <div class="input-group">
             <input type="text" class="form-control" value="{{ formData.value.linkDisplayName }}" disabled>
             <span class="input-group-btn">
-                <a type="button" class="btn btn-default" ng-click="selectLink()">
+                <a type="button" class="btn btn-default" ng-click="selectLink()" ng-disabled="formData.readonly">
                     <i class="fa fa-check"></i>
                     <?= $this->translate('button.select', 'admin') ?>
                 </a>

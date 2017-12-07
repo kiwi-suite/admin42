@@ -26,6 +26,9 @@ class FormWysiwyg extends FormHelper
     {
         $elementData = parent::getElementData($element, $angularNameRendering);
         $elementData['editorOptions'] = $element->getEditorOptions();
+        if ($element->isReadonly()) {
+            $elementData['editorOptions']['readonly'] = 1;
+        }
 
         $urlHelper = $this->getView()->plugin('url');
         $elementData['editorOptions']['link_url'] = $urlHelper('admin/link/wysiwyg');

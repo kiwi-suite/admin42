@@ -14,7 +14,7 @@
         <div class="checkbox">
             <input type="hidden" name="{{ formData.name }}" value="{{ formData.value }}">
             <label class="i-checks">
-                <input type="checkbox" ng-model="model" ng-change="onChange()" ng-keydown="preventEnter($event)" ng-keypress="preventEnter($event)" ng-keyup="preventEnter($event)"><i></i>{{ formData.label }}
+                <input type="checkbox" ng-model="model" ng-change="onChange()" ng-disabled="formData.readonly" ng-keydown="preventEnter($event)" ng-keypress="preventEnter($event)" ng-keyup="preventEnter($event)"><i></i>{{ formData.label }}
             </label>
         </div>
         <ul ng-if="formData.errors.length" class="list-unstyled text-danger">

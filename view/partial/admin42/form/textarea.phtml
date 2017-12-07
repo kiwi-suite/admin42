@@ -17,7 +17,7 @@
     </div>
     <div class="col-sm-9 col-md-10">
         <input type="hidden" name="{{ formData.name }}" value="{{ formData.value }}">
-        <textarea rows="{{ formData.rows }}" maxlength="{{ formData.maxLength }}" class="form-control input-sm" ng-model="formData.value" id="{{ formData.id }}" ng-change="onChange()"></textarea>
+        <textarea rows="{{ formData.rows }}" maxlength="{{ formData.maxLength }}" class="form-control input-sm" ng-model="formData.value" ng-readonly="formData.readonly" id="{{ formData.id }}" ng-change="onChange()"></textarea>
         <ul ng-if="formData.errors.length" class="list-unstyled text-danger">
             <li ng-repeat="message in formData.errors">{{ message }}</li>
         </ul>

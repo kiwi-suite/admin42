@@ -27,16 +27,16 @@
                     datepicker-options="dateOptions"
                 >
                 <div class="input-group w-md">
-                    <input type="text" class="form-control" value="{{ date | datetime:'':'YYYY-MM-DD'}}" disabled>
+                    <input type="text" class="form-control" value="{{ date | datetime:'':'YYYY-MM-DD'}}" readonly>
                     <span class="input-group-btn">
-                        <button type="button" class="btn" ng-class="{'btn-default': !formData.errors.length, 'btn-danger': formData.errors.length}" ng-click="open($event)">
+                        <button type="button" class="btn" ng-disabled="formData.readonly" ng-class="{'btn-default': !formData.errors.length, 'btn-danger': formData.errors.length}" ng-click="open($event)">
                             <i class="fa fa-calendar"></i>
                         </button>
                     </span>
                 </div>
             </div>
             <div class="pull-left m-l-md">
-                <div uib-timepicker ng-model="time" show-spinners="false" show-meridian="false"></div>
+                <div uib-timepicker ng-model="time" show-spinners="false" show-meridian="false" readonly-input="formData.readonly"></div>
             </div>
             <div class="clearfix"></div>
         </div>
