@@ -18,9 +18,11 @@ use Admin42\FormElements\Date;
 use Admin42\FormElements\DateTime;
 use Admin42\FormElements\Email;
 use Admin42\FormElements\Fieldset;
+use Admin42\FormElements\File;
 use Admin42\FormElements\Form;
 use Admin42\FormElements\Hidden;
 use Admin42\FormElements\Link;
+use Admin42\FormElements\Money;
 use Admin42\FormElements\MultiCheckbox;
 use Admin42\FormElements\Password;
 use Admin42\FormElements\Radio;
@@ -56,6 +58,7 @@ return [
             Youtube::class              => ElementFactory::class,
             Form::class                 => ElementFactory::class,
             Fieldset::class             => ElementFactory::class,
+            File::class                 => ElementFactory::class,
             Stack::class                => ElementFactory::class,
             Checkbox::class             => ElementFactory::class,
             MultiCheckbox::class        => ElementFactory::class,
@@ -69,6 +72,7 @@ return [
             Csrf::class                 => ElementFactory::class,
             Switcher::class             => ElementFactory::class,
             Link::class                 => LinkFactory::class,
+            Money::class                => ElementFactory::class,
         ],
         'aliases' => [
             'dateTime'                  => DateTime::class,
@@ -90,6 +94,8 @@ return [
             'switcher'                  => Switcher::class,
             'link'                      => Link::class,
             'fieldset'                  => Fieldset::class,
+            'file'                      => File::class,
+            'money'                     => Money::class,
         ],
     ],
 ];

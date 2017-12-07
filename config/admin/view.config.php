@@ -20,9 +20,11 @@ use Admin42\View\Helper\Form\FormDate;
 use Admin42\View\Helper\Form\FormDateTime;
 use Admin42\View\Helper\Form\FormElement;
 use Admin42\View\Helper\Form\FormFieldset;
+use Admin42\View\Helper\Form\FormFile;
 use Admin42\View\Helper\Form\FormHelper;
 use Admin42\View\Helper\Form\FormHidden;
 use Admin42\View\Helper\Form\FormLink;
+use Admin42\View\Helper\Form\FormMoney;
 use Admin42\View\Helper\Form\FormMultiCheckbox;
 use Admin42\View\Helper\Form\FormRadio;
 use Admin42\View\Helper\Form\FormRow;
@@ -70,6 +72,7 @@ return [
             Form::class             => InvokableFactory::class,
             FormHelper::class       => InvokableFactory::class,
             FormFieldset::class     => InvokableFactory::class,
+            FormFile::class         => InvokableFactory::class,
             FormElement::class      => InvokableFactory::class,
             FormRow::class          => InvokableFactory::class,
             FormWysiwyg::class      => InvokableFactory::class,
@@ -84,6 +87,7 @@ return [
             FormTextarea::class     => InvokableFactory::class,
             FormLink::class         => InvokableFactory::class,
             FormHidden::class       => InvokableFactory::class,
+            FormMoney::class        => InvokableFactory::class,
         ],
         'aliases' => [
             'admin'                 => Admin::class,
@@ -95,6 +99,7 @@ return [
             'formElement'           => FormElement::class,
             'formRow'               => FormRow::class,
             'formFieldset'          => FormFieldset::class,
+            'formFile'              => FormFile::class,
             'formText'              => FormText::class,
             'formCsrf'              => FormHelper::class,
             'formTextarea'          => FormTextarea::class,
@@ -112,6 +117,7 @@ return [
             'formStack'             => FormStack::class,
             'formSwitcher'          => FormCheckbox::class,
             'formLink'              => FormLink::class,
+            'formMoney'             => FormMoney::class,
         ],
     ],
 ];
