@@ -1,15 +1,7 @@
 module.exports = function(grunt) {
     grunt.initConfig({
-        vendor_dir: 'bower_components',
+        vendor_dir: 'node_modules',
         dist: 'dist',
-
-        bower: {
-            install: {
-                options: {
-                    copy: false
-                }
-            }
-        },
 
         concurrent: {
             all: ['compile-vendor-js', 'compile-app-js', 'compile-tinymce', 'less:app']
@@ -27,14 +19,15 @@ module.exports = function(grunt) {
                     '<%= vendor_dir %>/angular-animate/angular-animate.min.js',
                     '<%= vendor_dir %>/angular-sanitize/angular-sanitize.min.js',
                     '<%= vendor_dir %>/angular-ui-validate/dist/validate.min.js',
-                    '<%= vendor_dir %>/angular-ui-select/dist/select.min.js',
+                    '<%= vendor_dir %>/ui-select/dist/select.min.js',
+
                     '<%= vendor_dir %>/angular-ui-tree/dist/angular-ui-tree.min.js',
                     '<%= vendor_dir %>/ngstorage/ngStorage.min.js',
                     '<%= vendor_dir %>/angularjs-toaster/toaster.min.js',
                     '<%= vendor_dir %>/angular-smart-table/dist/smart-table.min.js',
 
-                    '<%= vendor_dir %>/angular-bootstrap/ui-bootstrap.min.js',
-                    '<%= vendor_dir %>/angular-bootstrap/ui-bootstrap-tpls.min.js',
+                    '<%= vendor_dir %>/angular-ui-bootstrap/dist/ui-bootstrap.min.js',
+                    '<%= vendor_dir %>/angular-ui-bootstrap/dist/ui-bootstrap-tpls.min.js',
 
                     '<%= vendor_dir %>/magnific-popup/dist/jquery.magnific-popup.min.js',
 
@@ -83,7 +76,7 @@ module.exports = function(grunt) {
                         '<%= vendor_dir %>/animate.css/animate.css',
                         '<%= vendor_dir %>/angularjs-toaster/toaster.css',
                         'less/main.less',
-                        '<%= vendor_dir %>/angular-ui-select/dist/select.css',
+                        '<%= vendor_dir %>/ui-select/dist/select.css',
                         '<%= vendor_dir %>/magnific-popup/dist/magnific-popup.css'
                     ]
                 }
@@ -128,7 +121,7 @@ module.exports = function(grunt) {
                 files: [
                     {
                         expand: true,
-                        cwd: '<%= vendor_dir %>/tinymce-dist/',
+                        cwd: '<%= vendor_dir %>/tinymce/',
                         src: '**',
                         dest: '<%= dist %>/tinymce/'
                     }
@@ -181,7 +174,7 @@ module.exports = function(grunt) {
 
         watch: {
             grunt: {
-                files: ['Gruntfile.js', 'bower.json'],
+                files: ['Gruntfile.js'],
                 tasks: ['default']
 
             },
@@ -200,7 +193,7 @@ module.exports = function(grunt) {
         }
     });
 
-    grunt.registerTask('default', ['bower', 'clean:all', 'concurrent:all', 'copy']);
+    grunt.registerTask('default', ['clean:all', 'concurrent:all', 'copy']);
     grunt.registerTask('compile-vendor-js', ['concat:vendor', 'clean:vendorjs']);
     grunt.registerTask('compile-app-js', ['concat:app', 'uglify:app', 'clean:appjs']);
     grunt.registerTask('compile-css', ['less:app']);

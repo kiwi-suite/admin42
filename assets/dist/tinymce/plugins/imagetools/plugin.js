@@ -57,8 +57,8 @@ var req = function (ids, callback) {
   var len = ids.length;
   var instances = new Array(len);
   for (var i = 0; i < len; ++i)
-    instances.push(dem(ids[i]));
-  callback.apply(null, callback);
+    instances[i] = dem(ids[i]);
+  callback.apply(null, instances);
 };
 
 var ephox = {};
@@ -76,7 +76,7 @@ ephox.bolt = {
 var define = def;
 var require = req;
 var demand = dem;
-// this helps with minificiation when using a lot of global references
+// this helps with minification when using a lot of global references
 var defineGlobal = function (id, ref) {
   define(id, [], function () { return ref; });
 };
@@ -2782,10 +2782,6 @@ define("tinymce/imagetoolsplugin/Plugin", [
 				id = createId();
 				if (editor.settings.images_reuse_filename) {
 					filename = blobInfo ? blobInfo.filename() : extractFilename(selectedImage.src);
-				}
-
-				if (blobInfo) {
-					blobCache.removeByUri(blobInfo.blobUri());
 				}
 				blobInfo = blobCache.create(id, blob, base64, filename);
 				blobCache.add(blobInfo);
