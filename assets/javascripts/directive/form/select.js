@@ -10,10 +10,9 @@ angular.module('admin42')
             },
             controller: ['$scope', 'jsonCache', '$formService', function($scope, jsonCache, $formService) {
                 $scope.formData = jsonCache.get($scope.elementDataId);
-                $scope.option = {};
-                $scope.options = $scope.formData.valueOptions;
+                $scope.formData.valueOption = {};
 
-                $scope.searchEnabled = $scope.options.length > 5;
+                $scope.searchEnabled = $scope.formData.valueOptions.length > 5;
 
                 if (angular.isDefined($scope.formData.options.formServiceHash)) {
                     $formService.put(
@@ -22,36 +21,38 @@ angular.module('admin42')
                         $scope.elementDataId
                     );
                 }
-                function setValue() {
-                    if (parseInt($scope.formData.value) > 0 || $scope.formData.value.length > 0 ) {
-                        angular.forEach($scope.options, function(option){
-                            if (option.id == $scope.formData.value) {
-                                $scope.option.selected = option;
-                            }
-                        });
 
-                    }
-                }
+                $scope.notEmpty = function() {
+                    return angular.isDefined($scope.formData.value) && $scope.formData.value !== null &&
+                                (angular.isNumber($scope.formData.value) || (angular.isString($scope.formData.value) && $scope.formData.value.length > 0));
+                };
 
                 $scope.select = function($item, $model){
                     $scope.formData.errors = [];
                     $scope.formData.value = $model.id;
                 };
 
-                if ($scope.formData.value.length == 0 && $scope.formData.emptyValue !== null) {
-                    $scope.formData.value = $scope.formData.emptyValue;
-                }
-
                 $scope.empty = function() {
                     $scope.formData.value = $scope.formData.emptyValue;
+                    $scope.formData.valueOption.selected = null;
 
                     $scope.formData.errors = [];
-                    setValue();
                 };
 
+                function setValue() {
+                    if ($scope.notEmpty()) {
+                        angular.forEach($scope.formData.valueOptions, function(option) {
+                            if (option.id == $scope.formData.value) {
+                                $scope.formData.valueOption.selected = option;
+                            }
+                        });
+                    }
+                }
 
+                if (!$scope.notEmpty() && $scope.formData.emptyValue !== null) {
+                    $scope.formData.value = $scope.formData.emptyValue;
+                }
                 setValue();
-
             }]
         }
     }]);

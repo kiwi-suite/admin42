@@ -49,7 +49,9 @@ class Form extends \Zend\Form\Form
 
         $this->getInputFilter();
 
-        $this->setOption('formServiceHash', Uuid::uuid4()->toString());
+        if (empty($this->getOption('formServiceHash'))) {
+            $this->setOption('formServiceHash', Uuid::uuid4()->toString());
+        }
 
         if ($this->wrapElements()) {
             $this->prepareElement($this);

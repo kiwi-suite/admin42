@@ -69,20 +69,20 @@ class AuthenticationService extends \Core42\Authentication\AuthenticationService
         if (empty($identity)) {
             $this->clearIdentity();
 
-            return;
+            return null;
         }
 
         $identity = $this->tableGateway->selectByPrimary($identity);
         if (!($identity instanceof User)) {
             $this->clearIdentity();
 
-            return;
+            return null;
         }
 
         if (!\in_array($identity->getStatus(), [User::STATUS_ACTIVE])) {
             $this->clearIdentity();
 
-            return;
+            return null;
         }
 
         $this->identity = $identity;

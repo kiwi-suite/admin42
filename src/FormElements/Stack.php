@@ -36,29 +36,8 @@ class Stack extends Fieldset
     protected $shouldCreateChildrenOnPrepareElement = true;
 
     /**
-     * Checks if the object can be set in this fieldset
-     *
-     * @param object $object
-     * @return bool
-     */
-    public function allowObjectBinding($object)
-    {
-        return true;
-    }
-
-    /**
-     * Checks if this fieldset can bind data
-     *
-     * @return bool
-     */
-    public function allowValueBinding()
-    {
-        return true;
-    }
-
-    /**
      * @param array|\Traversable $options
-     * @return void|\Zend\Form\Element|\Zend\Form\ElementInterface
+     * @return \Zend\Form\Element|\Zend\Form\ElementInterface
      */
     public function setOptions($options)
     {

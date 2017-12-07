@@ -6,7 +6,7 @@ $html = [];
 $prevDepth = -1;
 
 /** @var \Admin42\Navigation\Page\Page $page */
-foreach ($this->iterator as $page){
+foreach ($this->iterator as $page) {
     $depth = $this->iterator->getDepth();
     if ($depth == $this->minDepth) {
         $prevDepth = $depth;
@@ -17,6 +17,7 @@ foreach ($this->iterator as $page){
             $html[] = '<ul class="nav">';
         } elseif($depth == 1) {
             //$html[] = '<ul>';
+            $html[] = '</li>';
         } else {
             $html[] = '<ul class="nav nav-sub dk">';
         }
@@ -62,7 +63,7 @@ foreach ($this->iterator as $page){
     $prevDepth = $depth;
 }
 
-for ($i = $prevDepth+1; $i > 0; $i--) {
+for ($i = $prevDepth; $i > 0; $i--) {
     $html[] = '</li></ul>';
 }
 

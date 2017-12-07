@@ -2,7 +2,7 @@
     <div class="col-sm-3 col-md-2 control-label">
         <div class="pull-left hidden-sm hidden-xs">
             <span class="fa fa-fw text-danger" ng-class="{'fa-exclamation-triangle': formData.errors.length}"></span>
-            <a ng-show="formData.value.length > 0 && formData.emptyValue !== formData.value" class="text-light" ng-click="empty()">
+            <a ng-show="notEmpty()" class="text-light" ng-click="empty()">
                 <i class="fa fa-fw fa-trash"></i>
             </a>
         </div>
@@ -17,11 +17,11 @@
     </div>
     <div class="col-sm-9 col-md-10">
         <input type="hidden" name="{{ formData.name }}" value="{{ formData.value }}">
-        <ui-select ng-model="option.selected" reset-search-input="false" search-enabled="searchEnabled" on-select="select($item, $model)">
+        <ui-select ng-model="formData.valueOption.selected" ng-disabled="formData.readonly" reset-search-input="false" search-enabled="searchEnabled" on-select="select($item, $model)">
             <ui-select-match placeholder="{{ label }}">
                 {{$select.selected.label}}
             </ui-select-match>
-            <ui-select-choices repeat="option in options | filter: $select.search">
+            <ui-select-choices repeat="option in formData.valueOptions | filter: $select.search">
                 <div ng-bind-html="option.label | highlight: $select.search"></div>
             </ui-select-choices>
         </ui-select>

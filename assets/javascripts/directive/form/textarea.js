@@ -13,7 +13,7 @@ angular.module('admin42')
 
                 $scope.onChange = function () {
                     $scope.formData.errors = [];
-                }
+                };
 
                 $scope.empty = function() {
                     $scope.formData.value = "";

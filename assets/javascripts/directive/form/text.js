@@ -8,11 +8,16 @@ angular.module('admin42')
             scope: {
                 elementDataId: '@'
             },
-            controller: ['$scope', 'jsonCache', '$formService', function($scope, jsonCache, $formService) {
+            controller: ['$scope', '$rootScope', 'jsonCache', '$formService', function($scope, $rootScope, jsonCache, $formService) {
                 $scope.formData = jsonCache.get($scope.elementDataId);
 
-                $scope.onChange = function () {
+                $scope.onChange = function() {
+                    $rootScope.$broadcast('formElementChange', $scope.formData.name);
                     $scope.formData.errors = [];
+                };
+
+                $scope.onBlur = function() {
+                    $rootScope.$broadcast('formElementBlur', $scope.formData.name);
                 };
 
                 $scope.empty = function() {
