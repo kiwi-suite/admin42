@@ -6,7 +6,6 @@ angular.module('smart-table')
             link: function (scope, element, attr, ctrl) {
 
                 return element.bind('click', function() {
-                    console.log('click');
                     return scope.$apply(function() {
                         var tableState;
                         tableState = ctrl.tableState();
