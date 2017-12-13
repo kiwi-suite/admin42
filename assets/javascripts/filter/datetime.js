@@ -30,7 +30,7 @@ angular.module('admin42')
                 return emptyValue;
             }
 
-            dateTime.defineLocale(appConfig.locale);
+            dateTime.locale(appConfig.locale);
             return dateTime.format(format);
         };
     });
