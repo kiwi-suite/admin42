@@ -1,32 +1,36 @@
 {
-  "_from": "tinymce@~4.5.0",
+  "_args": [
+    [
+      "tinymce@4.5.8",
+      "/Users/luchaos/Sites/kiwi/kiwi-v3/vendor/fruit42/admin42/assets"
+    ]
+  ],
+  "_development": true,
+  "_from": "tinymce@4.5.8",
   "_id": "tinymce@4.5.8",
   "_inBundle": false,
   "_integrity": "sha1-OvQu+zHFucJ+SxHvSSDhlvGl/E4=",
   "_location": "/tinymce",
   "_phantomChildren": {},
   "_requested": {
-    "type": "range",
+    "type": "version",
     "registry": true,
-    "raw": "tinymce@~4.5.0",
+    "raw": "tinymce@4.5.8",
     "name": "tinymce",
     "escapedName": "tinymce",
-    "rawSpec": "~4.5.0",
+    "rawSpec": "4.5.8",
     "saveSpec": null,
-    "fetchSpec": "~4.5.0"
+    "fetchSpec": "4.5.8"
   },
   "_requiredBy": [
     "#DEV:/"
   ],
   "_resolved": "https://registry.npmjs.org/tinymce/-/tinymce-4.5.8.tgz",
-  "_shasum": "3af42efb31c5b9c27e4b11ef4920e196f1a5fc4e",
-  "_spec": "tinymce@~4.5.0",
-  "_where": "/Users/befler/develop/susi/vendor/fruit42/admin42/assets",
+  "_spec": "4.5.8",
+  "_where": "/Users/luchaos/Sites/kiwi/kiwi-v3/vendor/fruit42/admin42/assets",
   "bugs": {
     "url": "http://www.tinymce.com/develop/bugtracker.php"
   },
-  "bundleDependencies": false,
-  "deprecated": false,
   "description": "Web based JavaScript HTML WYSIWYG editor control.",
   "keywords": [
     "editor",
