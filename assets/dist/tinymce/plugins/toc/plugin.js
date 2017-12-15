@@ -194,14 +194,8 @@ tinymce.PluginManager.add('toc', function(editor) {
         }
     });
 
-    var isEmptyOrOffscren = function (nodes) {
-        return !nodes.length || editor.dom.getParents(nodes[0], '.mce-offscreen-selection').length > 0;
-    };
-
     editor.addCommand('mceInsertToc', function() {
-        var $tocElm = $('.' + opts.className);
-
-        if (isEmptyOrOffscren($tocElm)) {
+        if (!$('.' + opts.className).length) {
             editor.insertContent(generateTocHtml(opts));
         } else {
             editor.execCommand('mceUpdateToc');

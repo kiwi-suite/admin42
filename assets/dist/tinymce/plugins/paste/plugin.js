@@ -80,7 +80,7 @@
 
 			target[fragments[fragments.length - 1]] = modules[id];
 		}
-
+		
 		// Expose private modules for unit tests
 		if (exports.AMDLC_TESTS) {
 			privateModules = exports.privateModules || {};
@@ -195,21 +195,6 @@ define("tinymce/pasteplugin/Utils", [
 		return text;
 	}
 
-	var getInnerFragment = function (html) {
-		var startFragment = '<!--StartFragment-->';
-		var endFragment = '<!--EndFragment-->';
-		var startPos = html.indexOf(startFragment);
-		if (startPos !== -1) {
-			var fragmentHtml = html.substr(startPos + startFragment.length);
-			var endPos = fragmentHtml.indexOf(endFragment);
-			if (endPos !== -1 && /^<\/(p|h[1-6]|li)>/i.test(fragmentHtml.substr(endPos + endFragment.length, 5))) {
-				return fragmentHtml.substr(0, endPos);
-			}
-		}
-
-		return html;
-	};
-
 	/**
 	 * Trims the specified HTML by removing all WebKit fragments, all elements wrapping the body trailing BR elements etc.
 	 *
@@ -227,8 +212,8 @@ define("tinymce/pasteplugin/Utils", [
 			return '\u00a0';
 		}
 
-		html = filter(getInnerFragment(html), [
-			/^[\s\S]*<body[^>]*>\s*|\s*<\/body[^>]*>[\s\S]*$/ig, // Remove anything but the contents within the BODY element
+		html = filter(html, [
+			/^[\s\S]*<body[^>]*>\s*|\s*<\/body[^>]*>[\s\S]*$/g, // Remove anything but the contents within the BODY element
 			/<!--StartFragment-->|<!--EndFragment-->/g, // Inner fragments (tables from excel on mac)
 			[/( ?)<span class="Apple-converted-space">\u00a0<\/span>( ?)/g, trimSpaces],
 			/<br class="Apple-interchange-newline">/g,
@@ -247,16 +232,11 @@ define("tinymce/pasteplugin/Utils", [
 		};
 	}
 
-	var isMsEdge = function () {
-		return navigator.userAgent.indexOf(' Edge/') !== -1;
-	};
-
 	return {
 		filter: filter,
 		innerText: innerText,
 		trimHtml: trimHtml,
-		createIdGenerator: createIdGenerator,
-		isMsEdge: isMsEdge
+		createIdGenerator: createIdGenerator
 	};
 });
 
@@ -388,11 +368,10 @@ define("tinymce/pasteplugin/Clipboard", [
 	"tinymce/Env",
 	"tinymce/dom/RangeUtils",
 	"tinymce/util/VK",
-	"tinymce/util/Tools",
 	"tinymce/pasteplugin/Utils",
 	"tinymce/pasteplugin/SmartPaste",
 	"tinymce/util/Delay"
-], function(Env, RangeUtils, VK, Tools, Utils, SmartPaste, Delay) {
+], function(Env, RangeUtils, VK, Utils, SmartPaste, Delay) {
 	return function(editor) {
 		var self = this, pasteBinElm, lastRng, keyboardPasteTimeStamp = 0, draggingInternally = false;
 		var pasteBinDefaultContent = '%MCEPASTEBIN%', keyboardPastePlainTextState;
@@ -679,10 +658,7 @@ define("tinymce/pasteplugin/Clipboard", [
 		 * @return {Object} Object with mime types and data for those mime types.
 		 */
 		function getClipboardContent(clipboardEvent) {
-			var content = getDataTransferItems(clipboardEvent.clipboardData || editor.getDoc().dataTransfer);
-
-			// Edge 15 has a broken HTML Clipboard API see https://developer.microsoft.com/en-us/microsoft-edge/platform/issues/11877517/
-			return Utils.isMsEdge() ? Tools.extend(content, {'text/html': ''}) : content;
+			return getDataTransferItems(clipboardEvent.clipboardData || editor.getDoc().dataTransfer);
 		}
 
 		function hasHtmlOrText(content) {
@@ -1576,7 +1552,7 @@ define("tinymce/pasteplugin/WordFilter", [
  * Quirks.js
  *
  * Released under LGPL License.
- * Copyright (c) 1999-2017 Ephox Corp. All rights reserved
+ * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
  *
  * License: http://www.tinymce.com/license
  * Contributing: http://www.tinymce.com/contributing
@@ -1602,12 +1578,6 @@ define("tinymce/pasteplugin/Quirks", [
 		function addPreProcessFilter(filterFunc) {
 			editor.on('BeforePastePreProcess', function(e) {
 				e.content = filterFunc(e.content);
-			});
-		}
-
-		function addPostProcessFilter(filterFunc) {
-			editor.on('PastePostProcess', function(e) {
-				filterFunc(e.node);
 			});
 		}
 
@@ -1727,12 +1697,6 @@ define("tinymce/pasteplugin/Quirks", [
 			return content;
 		}
 
-		function removeUnderlineAndFontInAnchor(root) {
-			editor.$('a', root).find('font,u').each(function(i, node) {
-				editor.dom.remove(node, true);
-			});
-		}
-
 		// Sniff browsers and apply fixes since we can't feature detect
 		if (Env.webkit) {
 			addPreProcessFilter(removeWebKitStyles);
@@ -1740,7 +1704,6 @@ define("tinymce/pasteplugin/Quirks", [
 
 		if (Env.ie) {
 			addPreProcessFilter(removeExplorerBrElementsAfterBlocks);
-			addPostProcessFilter(removeUnderlineAndFontInAnchor);
 		}
 	};
 });
@@ -1890,4 +1853,4 @@ define("tinymce/pasteplugin/Plugin", [
 });
 
 expose(["tinymce/pasteplugin/Utils"]);
-})(window);
+})(this);

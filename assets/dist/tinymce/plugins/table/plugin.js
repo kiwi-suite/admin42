@@ -80,7 +80,7 @@
 
 			target[fragments[fragments.length - 1]] = modules[id];
 		}
-
+		
 		// Expose private modules for unit tests
 		if (exports.AMDLC_TESTS) {
 			privateModules = exports.privateModules || {};
@@ -474,23 +474,6 @@ define("tinymce/tableplugin/TableGrid", [
 			return rows;
 		}
 
-		function countSelectedCols() {
-			var cols = 0;
-
-			each(grid, function(row) {
-				each(row, function(cell) {
-					if (isCellSelected(cell)) {
-						cols++;
-					}
-				});
-				if (cols) {
-					return false;
-				}
-			});
-
-			return cols;
-		}
-
 		function deleteTable() {
 			var rng = dom.createRng();
 
@@ -861,7 +844,7 @@ define("tinymce/tableplugin/TableGrid", [
 				});
 
 				if (before) {
-					return posY === undefined;
+					return !posY;
 				}
 			});
 
@@ -917,13 +900,6 @@ define("tinymce/tableplugin/TableGrid", [
 			}
 		}
 
-		function insertRows(before, num) {
-			num = num || getSelectedRows().length || 1;
-			for (var i = 0; i < num; i++) {
-				insertRow(before);
-			}
-		}
-
 		function insertCol(before) {
 			var posX, lastCell;
 
@@ -940,7 +916,7 @@ define("tinymce/tableplugin/TableGrid", [
 				});
 
 				if (before) {
-					return posX === undefined;
+					return !posX;
 				}
 			});
 
@@ -971,13 +947,6 @@ define("tinymce/tableplugin/TableGrid", [
 					lastCell = cell;
 				}
 			});
-		}
-
-		function insertCols(before, num) {
-			num = num || countSelectedCols() || 1;
-			for (var i = 0; i < num; i++) {
-				insertCol(before);
-			}
 		}
 
 		function getSelectedCells(grid) {
@@ -1358,9 +1327,7 @@ define("tinymce/tableplugin/TableGrid", [
 			split: split,
 			merge: merge,
 			insertRow: insertRow,
-			insertRows: insertRows,
 			insertCol: insertCol,
-			insertCols: insertCols,
 			splitCols: splitCols,
 			deleteCols: deleteCols,
 			deleteRows: deleteRows,
@@ -1760,115 +1727,7 @@ define("tinymce/tableplugin/Quirks", [
 			});
 		}
 
-		/**
-		 * When caption is empty and we continue to delete, caption gets deleted along with the contents.
-		 * So, we take over delete operation (both forward and backward) and once caption is empty, we do
-		 * prevent it from disappearing.
-		 */
-		function handleDeleteInCaption() {
-			var isTableCaptionNode = function(node) {
-				return node && node.nodeName == 'CAPTION' && node.parentNode.nodeName == 'TABLE';
-			};
-
-			var restoreCaretPlaceholder = function(node, insertCaret) {
-				var rng = editor.selection.getRng();
-				var caretNode = node.ownerDocument.createTextNode('\u00a0');
-
-				// we could always append it, but caretNode somehow gets appended before caret,
-				// rather then after it, effectively preventing backspace deletion
-				if (rng.startOffset) {
-					node.insertBefore(caretNode, node.firstChild);
-				} else {
-					node.appendChild(caretNode);
-				}
-
-				if (insertCaret) {
-					// put the caret into the placeholder
-					editor.selection.select(caretNode, true);
-					editor.selection.collapse(true);
-				}
-			};
-
-			var deleteBtnPressed = function(e) {
-				return (e.keyCode == VK.DELETE || e.keyCode == VK.BACKSPACE) && !e.isDefaultPrevented();
-			};
-
-			var getSingleChildNode = function(node) {
-				return node.firstChild === node.lastChild && node.firstChild;
-			};
-
-			var isTextNode = function(node) {
-				return node && node.nodeType === 3;
-			};
-
-			var getSingleChr = function(node) {
-				var childNode = getSingleChildNode(node);
-				return isTextNode(childNode) && childNode.data.length === 1 ? childNode.data : null;
-			};
-
-			var hasNoCaretPlaceholder = function(node) {
-				var childNode = getSingleChildNode(node);
-				var chr = getSingleChr(node);
-				return childNode && !isTextNode(childNode) || chr && !isNBSP(chr);
-			};
-
-			var isEmptyNode = function(node) {
-				return editor.dom.isEmpty(node) || isNBSP(getSingleChr(node));
-			};
-
-			var isNBSP = function(chr) {
-				return chr === '\u00a0';
-			};
-
-			editor.on('keydown', function(e) {
-				if (!deleteBtnPressed(e)) {
-					return;
-				}
-
-				var container = editor.dom.getParent(editor.selection.getStart(), 'caption');
-				if (!isTableCaptionNode(container)) {
-					return;
-				}
-
-				// in IE caption collapses if caret placeholder is deleted (and it is very much possible)
-				if (Env.ie) {
-					if (!editor.selection.isCollapsed()) {
-						// if the whole contents are selected, caret placeholder will be deleted too
-						// and we take over delete operation here to restore it if this happens
-						editor.undoManager.transact(function () {
-							editor.execCommand('Delete');
-
-							if (isEmptyNode(container)) {
-								// caret springs off from the caption (to the first td), we need to bring it back as well
-								restoreCaretPlaceholder(container, true);
-							}
-						});
-
-						e.preventDefault();
-					} else if (hasNoCaretPlaceholder(container)) {
-						// if caret placeholder got accidentally deleted and caption will collapse
-						// after this operation, we need to put placeholder back
-						restoreCaretPlaceholder(container);
-					}
-				}
-
-				// TODO:
-				// 1. in Chrome it is easily possible to select beyond the boundaries of the caption,
-				// currently this results in removal of the contents with the whole caption as well;
-				// 2. we could take over delete operation to address this, but then we will need to adjust
-				// the selection, otherwise delete operation will remove first row of the table too;
-				// 3. current behaviour is logical, so it has sense to leave it like that, until a better
-				// solution
-
-				if (isEmptyNode(container)) {
-					e.preventDefault();
-				}
-			});
-		}
-
-
 		deleteTable();
-		handleDeleteInCaption();
 
 		if (Env.webkit) {
 			moveWebKitSelection();
@@ -4360,19 +4219,19 @@ define("tinymce/tableplugin/Plugin", [
 			},
 
 			mceTableInsertRowBefore: function(grid) {
-				grid.insertRows(true);
+				grid.insertRow(true);
 			},
 
 			mceTableInsertRowAfter: function(grid) {
-				grid.insertRows();
+				grid.insertRow();
 			},
 
 			mceTableInsertColBefore: function(grid) {
-				grid.insertCols(true);
+				grid.insertCol(true);
 			},
 
 			mceTableInsertColAfter: function(grid) {
-				grid.insertCols();
+				grid.insertCol();
 			},
 
 			mceTableDeleteCol: function(grid) {
@@ -4593,4 +4452,4 @@ define("tinymce/tableplugin/Plugin", [
 
 	PluginManager.add('table', Plugin);
 });
-})(window);
+})(this);

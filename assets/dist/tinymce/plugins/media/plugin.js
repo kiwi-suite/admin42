@@ -57,8 +57,8 @@ var req = function (ids, callback) {
   var len = ids.length;
   var instances = new Array(len);
   for (var i = 0; i < len; ++i)
-    instances[i] = dem(ids[i]);
-  callback.apply(null, instances);
+    instances.push(dem(ids[i]));
+  callback.apply(null, callback);
 };
 
 var ephox = {};
@@ -76,19 +76,18 @@ ephox.bolt = {
 var define = def;
 var require = req;
 var demand = dem;
-// this helps with minification when using a lot of global references
+// this helps with minificiation when using a lot of global references
 var defineGlobal = function (id, ref) {
   define(id, [], function () { return ref; });
 };
 /*jsc
-["tinymce.media.Plugin","global!tinymce.PluginManager","tinymce.media.ui.Dialog","tinymce.media.core.Sanitize","tinymce.media.core.UpdateHtml","tinymce.media.core.Nodes","global!tinymce.util.Delay","tinymce.media.core.HtmlToData","global!tinymce.html.Writer","global!tinymce.html.SaxParser","global!tinymce.html.Schema","global!tinymce.dom.DOMUtils.DOM","tinymce.media.core.Size","tinymce.media.core.Service","global!tinymce.util.Tools","global!tinymce.Env","tinymce.media.ui.SizeManager","tinymce.media.core.VideoScript","global!tinymce.html.Node","tinymce.media.core.DataToHtml","global!tinymce.util.Promise","tinymce.media.core.Mime","tinymce.media.core.UrlPatterns"]
+["tinymce.media.Plugin","global!tinymce.PluginManager","tinymce.media.ui.Dialog","tinymce.media.core.Sanitize","tinymce.media.core.UpdateHtml","tinymce.media.core.Nodes","global!tinymce.util.Delay","tinymce.media.core.HtmlToData","global!tinymce.html.Writer","global!tinymce.html.SaxParser","global!tinymce.html.Schema","tinymce.media.core.Service","global!tinymce.util.Tools","global!tinymce.Env","tinymce.media.core.VideoScript","global!tinymce.html.Node","tinymce.media.core.DataToHtml","global!tinymce.util.Promise","tinymce.media.core.Mime","tinymce.media.core.UrlPatterns"]
 jsc*/
 defineGlobal("global!tinymce.PluginManager", tinymce.PluginManager);
 defineGlobal("global!tinymce.util.Delay", tinymce.util.Delay);
 defineGlobal("global!tinymce.util.Tools", tinymce.util.Tools);
 defineGlobal("global!tinymce.html.SaxParser", tinymce.html.SaxParser);
 defineGlobal("global!tinymce.html.Schema", tinymce.html.Schema);
-defineGlobal("global!tinymce.dom.DOMUtils.DOM", tinymce.dom.DOMUtils.DOM);
 define('tinymce.media.core.VideoScript', [
 ], function () {
 	var getVideoScriptMatch = function (prefixes, src) {
@@ -107,55 +106,13 @@ define('tinymce.media.core.VideoScript', [
 		getVideoScriptMatch: getVideoScriptMatch
 	};
 });
-define('tinymce.media.core.Size', [
-], function () {
-	var trimPx = function (value) {
-		return value.replace(/px$/, '');
-	};
-
-	var addPx = function (value) {
-		return /^[0-9.]+$/.test(value) ? (value + 'px') : value;
-	};
-
-	var getSize = function (name) {
-		return function (elm) {
-			return elm ? trimPx(elm.style[name]) : '';
-		};
-	};
-
-	var setSize = function (name) {
-		return function (elm, value) {
-			if (elm) {
-				elm.style[name] = addPx(value);
-			}
-		};
-	};
-
-	return {
-		getMaxWidth: getSize('maxWidth'),
-		getMaxHeight: getSize('maxHeight'),
-		setMaxWidth: setSize('maxWidth'),
-		setMaxHeight: setSize('maxHeight')
-	};
-});
 define('tinymce.media.core.HtmlToData', [
 	'global!tinymce.util.Tools',
 	'global!tinymce.html.SaxParser',
 	'global!tinymce.html.Schema',
-	'global!tinymce.dom.DOMUtils.DOM',
-	'tinymce.media.core.VideoScript',
-	'tinymce.media.core.Size'
-], function (Tools, SaxParser, Schema, DOM, VideoScript, Size) {
-	var getEphoxEmbedIri = function (elm) {
-		return DOM.getAttrib(elm, 'data-ephox-embed-iri');
-	};
-
-	var isEphoxEmbed = function (html) {
-		var fragment = DOM.createFragment(html);
-		return getEphoxEmbedIri(fragment.firstChild) !== '';
-	};
-
-	var htmlToDataSax = function (prefixes, html) {
+	'tinymce.media.core.VideoScript'
+], function (Tools, SaxParser, Schema, VideoScript) {
+	var htmlToData = function (prefixes, html) {
 		var data = {};
 
 		new SaxParser({
@@ -165,6 +122,13 @@ define('tinymce.media.core.HtmlToData', [
 			start: function (name, attrs) {
 				if (!data.source1 && name === "param") {
 					data.source1 = attrs.map.movie;
+				}
+
+				var embed = attrs.map['data-ephox-embed-iri'];
+
+				if (embed) {
+					data.type = 'ephox-embed-iri';
+					data.source1 = embed;
 				}
 
 				if (name === "iframe" || name === "object" || name === "embed" || name === "video" || name === "audio") {
@@ -207,25 +171,18 @@ define('tinymce.media.core.HtmlToData', [
 		data.source2 = data.source2 || '';
 		data.poster = data.poster || '';
 
+		if (data.type === 'ephox-embed-iri') {
+			return Tools.extend({}, {
+				type: data.type,
+				source1: data.source1,
+				source2: '',
+				poster: '',
+				width: data.width,
+				height: data.height
+			});
+		}
+
 		return data;
-	};
-
-	var ephoxEmbedHtmlToData = function (html) {
-		var fragment = DOM.createFragment(html);
-		var div = fragment.firstChild;
-
-		return {
-			type: 'ephox-embed-iri',
-			source1: getEphoxEmbedIri(div),
-			source2: '',
-			poster: '',
-			width: Size.getMaxWidth(div),
-			height: Size.getMaxHeight(div)
-		};
-	};
-
-	var htmlToData = function (prefixes, html) {
-		return isEphoxEmbed(html) ? ephoxEmbedHtmlToData(html) : htmlToDataSax(prefixes, html);
 	};
 
 	return {
@@ -236,10 +193,8 @@ defineGlobal("global!tinymce.html.Writer", tinymce.html.Writer);
 define('tinymce.media.core.UpdateHtml', [
 	'global!tinymce.html.Writer',
 	'global!tinymce.html.SaxParser',
-	'global!tinymce.html.Schema',
-	'global!tinymce.dom.DOMUtils.DOM',
-	'tinymce.media.core.Size'
-], function (Writer, SaxParser, Schema, DOM, Size) {
+	'global!tinymce.html.Schema'
+], function (Writer, SaxParser, Schema) {
 	var setAttributes = function (attrs, updatedAttrs) {
 		var name;
 		var i;
@@ -274,18 +229,11 @@ define('tinymce.media.core.UpdateHtml', [
 			}
 		}
 	};
-
-	var normalizeHtml = function (html) {
-		var writer = new Writer();
-		var parser = new SaxParser(writer);
-		parser.parse(html);
-		return writer.getContent();
-	};
-
-	var updateHtmlSax = function (html, data, updateAll) {
+	var updateHtml = function (html, data, updateAll) {
 		var writer = new Writer();
 		var sourceCount = 0;
 		var hasImage;
+
 
 		new SaxParser({
 			validate: false,
@@ -404,25 +352,6 @@ define('tinymce.media.core.UpdateHtml', [
 		}, new Schema({})).parse(html);
 
 		return writer.getContent();
-	};
-
-	var isEphoxEmbed = function (html) {
-		var fragment = DOM.createFragment(html);
-		return DOM.getAttrib(fragment.firstChild, 'data-ephox-embed-iri') !== '';
-	};
-
-	var updateEphoxEmbed = function (html, data) {
-		var fragment = DOM.createFragment(html);
-		var div = fragment.firstChild;
-
-		Size.setMaxWidth(div, data.width);
-		Size.setMaxHeight(div, data.height);
-
-		return normalizeHtml(div.outerHTML);
-	};
-
-	var updateHtml = function (html, data, updateAll) {
-		return isEphoxEmbed(html) ? updateEphoxEmbed(html, data) : updateHtmlSax(html, data, updateAll);
 	};
 
 	return {
@@ -685,98 +614,14 @@ define('tinymce.media.core.Service', [
 	};
 });
 defineGlobal("global!tinymce.Env", tinymce.Env);
-define('tinymce.media.ui.SizeManager', [
-], function () {
-	var doSyncSize = function (widthCtrl, heightCtrl) {
-		widthCtrl.state.set('oldVal', widthCtrl.value());
-		heightCtrl.state.set('oldVal', heightCtrl.value());
-	};
-	var doSizeControls = function (win, f) {
-		var widthCtrl = win.find('#width')[0];
-		var heightCtrl = win.find('#height')[0];
-		var constrained = win.find('#constrain')[0];
-		if (widthCtrl && heightCtrl && constrained) {
-			f(widthCtrl, heightCtrl, constrained.checked());
-		}
-	};
-
-	var doUpdateSize = function (widthCtrl, heightCtrl, isContrained) {
-		var oldWidth = widthCtrl.state.get('oldVal');
-		var oldHeight = heightCtrl.state.get('oldVal');
-		var newWidth = widthCtrl.value();
-		var newHeight = heightCtrl.value();
-
-		if (isContrained && oldWidth && oldHeight && newWidth && newHeight) {
-			if (newWidth !== oldWidth) {
-				newHeight = Math.round((newWidth / oldWidth) * newHeight);
-
-				if (!isNaN(newHeight)) {
-					heightCtrl.value(newHeight);
-				}
-			} else {
-				newWidth = Math.round((newHeight / oldHeight) * newWidth);
-
-				if (!isNaN(newWidth)) {
-					widthCtrl.value(newWidth);
-				}
-			}
-		}
-
-		doSyncSize(widthCtrl, heightCtrl);
-	};
-
-	var syncSize = function (win) {
-		doSizeControls(win, doSyncSize);
-	};
-
-	var updateSize = function (win) {
-		doSizeControls(win, doUpdateSize);
-	};
-
-	var createUi = function (onChange) {
-		var recalcSize = function () {
-			onChange(function (win) {
-				updateSize(win);
-			});
-		};
-
-		return {
-			type: 'container',
-			label: 'Dimensions',
-			layout: 'flex',
-			align: 'center',
-			spacing: 5,
-			items: [
-				{
-					name: 'width', type: 'textbox', maxLength: 5, size: 5,
-					onchange: recalcSize, ariaLabel: 'Width'
-				},
-				{type: 'label', text: 'x'},
-				{
-					name: 'height', type: 'textbox', maxLength: 5, size: 5,
-					onchange: recalcSize, ariaLabel: 'Height'
-				},
-				{name: 'constrain', type: 'checkbox', checked: true, text: 'Constrain proportions'}
-			]
-		};
-	};
-
-	return {
-		createUi: createUi,
-		syncSize: syncSize,
-		updateSize: updateSize
-	};
-});
 define('tinymce.media.ui.Dialog', [
 	'global!tinymce.util.Delay',
 	'tinymce.media.core.HtmlToData',
 	'tinymce.media.core.UpdateHtml',
 	'tinymce.media.core.Service',
-	'tinymce.media.core.Size',
 	'global!tinymce.util.Tools',
-	'global!tinymce.Env',
-	'tinymce.media.ui.SizeManager'
-], function (Delay, HtmlToData, UpdateHtml, Service, Size, Tools, Env, SizeManager) {
+	'global!tinymce.Env'
+], function (Delay, HtmlToData, UpdateHtml, Service, Tools, Env) {
 	var embedChange = (Env.ie && Env.ie <= 8) ? 'onChange' : 'onInput';
 
 	var handleError = function (editor) {
@@ -793,38 +638,27 @@ define('tinymce.media.ui.Dialog', [
 		var dataEmbed = element.getAttribute('data-ephox-embed-iri');
 
 		if (dataEmbed) {
-			return {
-				source1: dataEmbed,
-				'data-ephox-embed-iri': dataEmbed,
-				width: Size.getMaxWidth(element),
-				height: Size.getMaxHeight(element)
-			};
+			return {source1: dataEmbed, 'data-ephox-embed-iri': dataEmbed};
 		}
-
 		return element.getAttribute('data-mce-object') ?
 			HtmlToData.htmlToData(editor.settings.media_scripts, editor.serializer.serialize(element, {selection: true})) :
 			{};
 	};
-
 	var getSource = function (editor) {
 		var elm = editor.selection.getNode();
 
-		if (elm.getAttribute('data-mce-object') || elm.getAttribute('data-ephox-embed-iri')) {
+		if (elm.getAttribute('data-mce-object')) {
 			return editor.selection.getContent();
 		}
 	};
 
-	var addEmbedHtml = function (win, editor) {
+	var addEmbedHtml = function (ctx, editor) {
 		return function (response) {
 			var html = response.html;
-			var embed = win.find('#embed')[0];
+			ctx.find('#embed').value(html);
 			var data = Tools.extend(HtmlToData.htmlToData(editor.settings.media_scripts, html), {source1: response.url});
-			win.fromJSON(data);
-
-			if (embed) {
-				embed.value(html);
-				SizeManager.updateSize(win);
-			}
+			ctx.fromJSON(data);
+			updateSize(ctx);
 		};
 	};
 
@@ -845,26 +679,30 @@ define('tinymce.media.ui.Dialog', [
 		editor.selection.select(afterObjects[0]);
 	};
 
-	var handleInsert = function (editor, html) {
-		var beforeObjects = editor.dom.select('img[data-mce-object]');
+	var submitForm = function (editor) {
+		return function () {
+			var data = this.toJSON();
 
-		editor.insertContent(html);
-		selectPlaceholder(editor, beforeObjects);
-		editor.nodeChanged();
-	};
-
-	var submitForm = function (win, editor) {
-		var data = win.toJSON();
-
-		data.embed = UpdateHtml.updateHtml(data.embed, data);
-
-		if (data.embed) {
-			handleInsert(editor, data.embed);
-		} else {
 			Service.getEmbedHtml(editor, data)
 				.then(function (response) {
-					handleInsert(editor, response.html);
-				})["catch"](handleError(editor));
+					var beforeObjects = editor.dom.select('img[data-mce-object]');
+					var html = data.embed ? data.embed : response.html;
+
+					editor.insertContent(html);
+
+					selectPlaceholder(editor, beforeObjects);
+					editor.nodeChanged();
+				})
+				.catch(handleError(editor)); // eslint-disable-line
+		};
+	};
+
+	var updateSize = function (window) {
+		var widthCtrl = window.find('#width')[0];
+		var heightCtrl = window.find('#height')[0];
+		if (widthCtrl && heightCtrl) {
+			widthCtrl.state.set('oldVal', widthCtrl.value());
+			heightCtrl.state.set('oldVal', heightCtrl.value());
 		}
 	};
 
@@ -889,16 +727,14 @@ define('tinymce.media.ui.Dialog', [
 				onpaste: function () {
 					setTimeout(function () {
 						Service.getEmbedHtml(editor, win.toJSON())
-							.then(
-								addEmbedHtml(win, editor)
-							)["catch"](handleError(editor));
+							.then(addEmbedHtml(win, editor))
+							.catch(handleError(editor)); // eslint-disable-line
 					}, 1);
 				},
 				onchange: function (e) {
 					Service.getEmbedHtml(editor, win.toJSON())
-						.then(
-							addEmbedHtml(win, editor)
-						)["catch"](handleError(editor));
+						.then(addEmbedHtml(win, editor))
+						.catch(handleError(editor)); // eslint-disable-line
 
 					populateMeta(win, e.meta);
 				},
@@ -908,25 +744,63 @@ define('tinymce.media.ui.Dialog', [
 			}
 		];
 
-		var advancedFormItems = [];
+		var recalcSize = function (e) {
+			var widthCtrl = win.find('#width')[0];
+			var heightCtrl = win.find('#height')[0];
+			var width = widthCtrl.state.get('oldVal');
+			var height = heightCtrl.state.get('oldVal');
 
-		var reserialise = function (update) {
-			update(win);
+			var newWidth = widthCtrl.value();
+			var newHeight = heightCtrl.value();
+
+			if (win.find('#constrain')[0].checked() && width && height && newWidth && newHeight) {
+				if (e.control.name() === widthCtrl.name()) {
+					newHeight = Math.round((newWidth / width) * newHeight);
+
+					if (!isNaN(newHeight)) {
+						heightCtrl.value(newHeight);
+					}
+				} else {
+					newWidth = Math.round((newHeight / height) * newWidth);
+
+					if (!isNaN(newWidth)) {
+						widthCtrl.value(newWidth);
+					}
+				}
+			}
 			data = win.toJSON();
 			win.find('#embed').value(UpdateHtml.updateHtml(data.embed, data));
+			updateSize(win);
 		};
 
 		if (editor.settings.media_alt_source !== false) {
-			advancedFormItems.push({name: 'source2', type: 'filepicker', filetype: 'media', size: 40, label: 'Alternative source'});
+			generalFormItems.push({name: 'source2', type: 'filepicker', filetype: 'media', size: 40, label: 'Alternative source'});
 		}
 
 		if (editor.settings.media_poster !== false) {
-			advancedFormItems.push({name: 'poster', type: 'filepicker', filetype: 'image', size: 40, label: 'Poster'});
+			generalFormItems.push({name: 'poster', type: 'filepicker', filetype: 'image', size: 40, label: 'Poster'});
 		}
 
 		if (editor.settings.media_dimensions !== false) {
-			var control = SizeManager.createUi(reserialise);
-			generalFormItems.push(control);
+			generalFormItems.push({
+				type: 'container',
+				label: 'Dimensions',
+				layout: 'flex',
+				align: 'center',
+				spacing: 5,
+				items: [
+					{
+						name: 'width', type: 'textbox', maxLength: 5, size: 3,
+						onchange: recalcSize, ariaLabel: 'Width'
+					},
+					{type: 'label', text: 'x'},
+					{
+						name: 'height', type: 'textbox', maxLength: 5, size: 3,
+						onchange: recalcSize, ariaLabel: 'Height'
+					},
+					{name: 'constrain', type: 'checkbox', checked: true, text: 'Constrain proportions'}
+				]
+			});
 		}
 
 		data = getData(editor);
@@ -938,7 +812,6 @@ define('tinymce.media.ui.Dialog', [
 			name: 'embed',
 			value: getSource(editor),
 			multiline: true,
-			rows: 5,
 			label: 'Source'
 		};
 
@@ -950,7 +823,7 @@ define('tinymce.media.ui.Dialog', [
 		embedTextBox[embedChange] = updateValueOnChange;
 
 		win = editor.windowManager.open({
-			title: 'Insert/edit media',
+			title: 'Insert/edit video',
 			data: data,
 			bodyType: 'tabpanel',
 			body: [
@@ -976,21 +849,12 @@ define('tinymce.media.ui.Dialog', [
 						},
 						embedTextBox
 					]
-				},
-
-				{
-					title: 'Advanced',
-					type: "form",
-					items: advancedFormItems
 				}
 			],
-			onSubmit: function () {
-				SizeManager.updateSize(win);
-				submitForm(win, editor);
-			}
+			onSubmit: submitForm(editor)
 		});
 
-		SizeManager.syncSize(win);
+		updateSize(win);
 	};
 
 	return {
@@ -1093,7 +957,7 @@ define('tinymce.media.core.Nodes', [
 		return placeHolder;
 	};
 
-	var createPreviewIframeNode = function (editor, node) {
+	var createPreviewNode = function (editor, node) {
 		var previewWrapper;
 		var previewNode;
 		var shimNode;
@@ -1160,20 +1024,11 @@ define('tinymce.media.core.Nodes', [
 		}
 	};
 
-	var isWithinEphoxEmbed = function (node) {
-		while ((node = node.parent)) {
-			if (node.attr('data-ephox-embed-iri')) {
-				return true;
-			}
-		}
-
-		return false;
-	};
-
 	var placeHolderConverter = function (editor) {
 		return function (nodes) {
 			var i = nodes.length;
 			var node;
+			var placeHolder;
 			var videoScript;
 
 			while (i--) {
@@ -1204,20 +1059,17 @@ define('tinymce.media.core.Nodes', [
 				}
 
 				if (node.name === 'iframe' && editor.settings.media_live_embeds !== false && Env.ceFalse) {
-					if (!isWithinEphoxEmbed(node)) {
-						node.replace(createPreviewIframeNode(editor, node));
-					}
+					placeHolder = createPreviewNode(editor, node);
 				} else {
-					if (!isWithinEphoxEmbed(node)) {
-						node.replace(createPlaceholderNode(editor, node));
-					}
+					placeHolder = createPlaceholderNode(editor, node);
 				}
+
+				node.replace(placeHolder);
 			}
 		};
 	};
-
 	return {
-		createPreviewIframeNode: createPreviewIframeNode,
+		createPreviewNode: createPreviewNode,
 		createPlaceholderNode: createPlaceholderNode,
 		placeHolderConverter: placeHolderConverter
 	};
@@ -1383,7 +1235,7 @@ define('tinymce.media.Plugin', [
 		};
 
 		editor.addButton('media', {
-			tooltip: 'Insert/edit media',
+			tooltip: 'Insert/edit video',
 			onclick: this.showDialog,
 			stateSelector: ['img[data-mce-object]', 'span[data-mce-object]', 'div[data-ephox-embed-iri]']
 		});

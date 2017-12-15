@@ -31,7 +31,7 @@
     "moment-timezone": "~0.5.5",
     "ngstorage": "~0.3.11",
     "simple-line-icons": "~2.3.2",
-    "tinymce": "~4.5.0",
+    "tinymce": "4.5.0",
     "ui-select": "~0.19.4"
   }
 }

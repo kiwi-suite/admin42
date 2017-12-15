@@ -57,8 +57,8 @@ var req = function (ids, callback) {
   var len = ids.length;
   var instances = new Array(len);
   for (var i = 0; i < len; ++i)
-    instances[i] = dem(ids[i]);
-  callback.apply(null, instances);
+    instances.push(dem(ids[i]));
+  callback.apply(null, callback);
 };
 
 var ephox = {};
@@ -76,7 +76,7 @@ ephox.bolt = {
 var define = def;
 var require = req;
 var demand = dem;
-// this helps with minification when using a lot of global references
+// this helps with minificiation when using a lot of global references
 var defineGlobal = function (id, ref) {
   define(id, [], function () { return ref; });
 };
@@ -126,8 +126,7 @@ define("tinymce.wordcount.text.UnicodeData", [], function() {
 		FORMAT: 9,
 		KATAKANA: 10,
 		EXTENDNUMLET: 11,
-		AT: 12,
-		OTHER: 13
+		OTHER: 12
 	};
 
 	// RegExp objects generated from code point data. Each regex matches a single
@@ -146,8 +145,7 @@ define("tinymce.wordcount.text.UnicodeData", [], function() {
 		new RegExp(regExps.extend),
 		new RegExp(regExps.format),
 		new RegExp(regExps.katakana),
-		new RegExp(regExps.extendnumlet),
-		new RegExp('@')
+		new RegExp(regExps.extendnumlet)
 	];
 
 	var EMPTY_STRING = '';
@@ -307,7 +305,7 @@ define("tinymce.wordcount.text.WordBoundary", [
 
 		// WB6. Don't break letters across certain punctuation.
 		if (type === ci.ALETTER &&
-						(nextType === ci.MIDLETTER || nextType === ci.MIDNUMLET || nextType === ci.AT) &&
+						(nextType === ci.MIDLETTER || nextType === ci.MIDNUMLET) &&
 						nextNextType === ci.ALETTER) {
 			return false;
 		}
@@ -315,7 +313,7 @@ define("tinymce.wordcount.text.WordBoundary", [
 		prevType = map[index - 1];
 
 		// WB7. Don't break letters across certain punctuation.
-		if ((type === ci.MIDLETTER || type === ci.MIDNUMLET || nextType === ci.AT) &&
+		if ((type === ci.MIDLETTER || type === ci.MIDNUMLET) &&
 						nextType === ci.ALETTER &&
 						prevType === ci.ALETTER) {
 			return false;
@@ -385,10 +383,6 @@ define("tinymce.wordcount.text.WordBoundary", [
 			return false;
 		}
 
-		if (type === ci.AT) {
-			return false;
-		}
-
 		// Break after any character not covered by the rules above.
 		return true;
 	};
@@ -415,39 +409,6 @@ define("tinymce.wordcount.text.WordGetter", [
 	var EMPTY_STRING = UnicodeData.EMPTY_STRING;
 	var WHITESPACE = UnicodeData.WHITESPACE;
 	var PUNCTUATION = UnicodeData.PUNCTUATION;
-
-	var isProtocol = function (word) {
-		return word === 'http' || word === 'https';
-	};
-
-	var findWordEnd = function (string, index) {
-		var i;
-		for (i = index; i < string.length; ++i) {
-			var chr = string.charAt(i);
-
-			if (WHITESPACE.test(chr)) {
-				break;
-			}
-		}
-		return i;
-	};
-
-	var extractUrl = function (word, string, index) {
-		var endIndex = findWordEnd(string, index + 1);
-		var peakedWord = string.substring(index + 1, endIndex);
-		if (peakedWord.substr(0, 3) === '://') {
-			return {
-				word: word + peakedWord,
-				index: endIndex
-			};
-		}
-
-		return {
-			word: word,
-			index: index
-		};
-	};
-
 	var getWords = function (string, options) {
 		var i = 0;
 		var map = StringMapper.classify(string);
@@ -487,13 +448,7 @@ define("tinymce.wordcount.text.WordGetter", [
 				if (word &&
 								(includeWhitespace || !WHITESPACE.test(word)) &&
 								(includePunctuation || !PUNCTUATION.test(word))) {
-					if (isProtocol(word)) {
-						var obj = extractUrl(word, string, i);
-						words.push(obj.word);
-						i = obj.index;
-					} else {
-						words.push(word);
-					}
+					words.push(word);
 				}
 
 				word = [];
@@ -516,6 +471,7 @@ define("tinymce.wordcount.text.WordGetter", [
  * License: http://www.tinymce.com/license
  * Contributing: http://www.tinymce.com/contributing
  */
+/* global tinymce: true */
 
 define("tinymce.wordcount.Plugin", [
 	"global!tinymce.PluginManager",
@@ -540,7 +496,7 @@ define("tinymce.wordcount.Plugin", [
 			var debouncedUpdate = Delay.debounce(update, 300);
 
 			if (statusbar) {
-				Delay.setEditorTimeout(editor, function() {
+				tinymce.util.Delay.setEditorTimeout(editor, function() {
 					statusbar.insert({
 						type: 'label',
 						name: 'wordcount',

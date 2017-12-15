@@ -1,36 +1,32 @@
 {
-  "_args": [
-    [
-      "tinymce@4.5.8",
-      "/Users/luchaos/Sites/kiwi/kiwi-v3/vendor/fruit42/admin42/assets"
-    ]
-  ],
-  "_development": true,
-  "_from": "tinymce@4.5.8",
-  "_id": "tinymce@4.5.8",
+  "_from": "tinymce@4.5.0",
+  "_id": "tinymce@4.5.0",
   "_inBundle": false,
-  "_integrity": "sha1-OvQu+zHFucJ+SxHvSSDhlvGl/E4=",
+  "_integrity": "sha1-Sg5bwrPXrhBVt3CRNRozoN1jDko=",
   "_location": "/tinymce",
   "_phantomChildren": {},
   "_requested": {
     "type": "version",
     "registry": true,
-    "raw": "tinymce@4.5.8",
+    "raw": "tinymce@4.5.0",
     "name": "tinymce",
     "escapedName": "tinymce",
-    "rawSpec": "4.5.8",
+    "rawSpec": "4.5.0",
     "saveSpec": null,
-    "fetchSpec": "4.5.8"
+    "fetchSpec": "4.5.0"
   },
   "_requiredBy": [
     "#DEV:/"
   ],
-  "_resolved": "https://registry.npmjs.org/tinymce/-/tinymce-4.5.8.tgz",
-  "_spec": "4.5.8",
+  "_resolved": "https://registry.npmjs.org/tinymce/-/tinymce-4.5.0.tgz",
+  "_shasum": "4a0e5bc2b3d7ae1055b77091351a33a0dd630e4a",
+  "_spec": "tinymce@4.5.0",
   "_where": "/Users/luchaos/Sites/kiwi/kiwi-v3/vendor/fruit42/admin42/assets",
   "bugs": {
     "url": "http://www.tinymce.com/develop/bugtracker.php"
   },
+  "bundleDependencies": false,
+  "deprecated": false,
   "description": "Web based JavaScript HTML WYSIWYG editor control.",
   "keywords": [
     "editor",
@@ -43,5 +39,5 @@
   "license": "LGPL-2.1",
   "main": "tinymce.js",
   "name": "tinymce",
-  "version": "4.5.8"
+  "version": "4.5.0"
 }

@@ -80,7 +80,7 @@
 
 			target[fragments[fragments.length - 1]] = modules[id];
 		}
-
+		
 		// Expose private modules for unit tests
 		if (exports.AMDLC_TESTS) {
 			privateModules = exports.privateModules || {};
@@ -1305,8 +1305,7 @@ define("tinymce/codesampleplugin/Plugin", [
 		});
 
 		editor.addCommand('codesample', function() {
-			var node = editor.selection.getNode();
-			if (editor.selection.isCollapsed() || Utils.isCodeSample(node)) {
+			if (editor.selection.isCollapsed()) {
 				Dialog.open(editor);
 			} else {
 				editor.formatter.toggle('code');
@@ -1323,4 +1322,4 @@ define("tinymce/codesampleplugin/Plugin", [
 });
 
 expose(["tinymce/codesampleplugin/Prism","tinymce/codesampleplugin/Utils","tinymce/codesampleplugin/Dialog","tinymce/codesampleplugin/Plugin"]);
-})(window);
+})(this);
