@@ -90,7 +90,7 @@ return [
     'item.modal.delete.content'     => 'Really delete this item?',
 
     'label.link-type-selector'      => 'Link Type',
-    'link-type.external'            => 'Exterernal Link',
+    'link-type.external'            => 'External Link',
 
     'label.environment'             => 'Environment',
     'title.environment'             => 'Environment',
