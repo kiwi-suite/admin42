@@ -1,26 +1,27 @@
 <div class="form-group" ng-class="{'has-error': formData.errors.length}">
-    <div class="col-sm-3 col-md-2 control-label">
-        <div class="pull-left hidden-sm hidden-xs">
-            <span class="fa fa-fw text-danger" ng-class="{'fa-exclamation-triangle': formData.errors.length}"></span>
-            <a ng-show="values.length > 0" class="text-light" ng-click="empty()">
-                <i class="fa fa-fw fa-trash"></i>
-            </a>
-        </div>
-        <div class="pull-right">
-            <a class="text-muted" ng-if="formData.description != null" uib-popover="{{ formData.description }}" popover-trigger="'mouseenter'">
-                <i class="fa fa-question-circle"></i>
-            </a>
-            <label>{{ formData.label }}</label>
+    <div class="col-sm-4 col-md-3 control-label">
+        <label for="{{ formData.id }}" uib-popover="{{ formData.description }}" popover-trigger="'mouseenter'">
+            <i class="fa fa-fw fa-question-circle-o text-muted" ng-if="formData.description != null"></i>
+            {{ formData.label }}
             <span ng-if="formData.required">*</span>
-        </div>
-        <div class="clearfix"></div>
+        </label>
+        <i class="fa fa-fw text-danger pull-left" ng-if="formData.errors.length"
+           ng-class="{'fa-exclamation-triangle': formData.errors.length}"></i>
     </div>
-    <div class="col-sm-9 col-md-10">
+    <div class="col-sm-8 col-md-9 col-control">
+        <div class="control-actions">
+            <button type="button" class="btn btn-link" ng-show="values.length > 0 && !formData.readonly"
+                    ng-click="empty()">
+                <i class="fa fa-fw fa-times"></i>
+            </button>
+        </div>
         <input ng-if="values.length == 0" type="hidden" name="{{ formData.name }}" value="">
         <input ng-repeat="value in values" type="hidden" name="{{ formData.name }}[]" value="{{value}}">
-        <div ng-repeat="option in options">
+        <div class="checkbox" ng-repeat="option in options">
             <label class="i-checks">
-                <input ng-model="checkboxModel[option.id]" type="checkbox" ng-change="select()" ng-keydown="preventEnter($event)" ng-keypress="preventEnter($event)" ng-keyup="preventEnter($event)">
+                <input ng-model="checkboxModel[option.id]" type="checkbox" ng-change="select()"
+                       ng-keydown="preventEnter($event)" ng-keypress="preventEnter($event)"
+                       ng-keyup="preventEnter($event)">
                 <i></i>{{ option.label }}
             </label>
         </div>

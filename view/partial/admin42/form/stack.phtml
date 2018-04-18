@@ -1,13 +1,14 @@
 <div class="line line-dashed b-b line-lg"></div>
 <h4>{{ label }}</h4>
 <div ng-show="elements.length > 1">
-    <button class="btn btn-xs btn-default m-b-sm" ng-class="{'btn-default': !sortingMode, 'btn-info': sortingMode}" type="button" ng-click="startSortingMode()">
+    <button class="btn btn-xs btn-default m-b-sm" ng-class="{'btn-default': !sortingMode, 'btn-info': sortingMode}"
+            type="button" ng-click="startSortingMode()">
         <i class="fa fa-fw fa-sort"></i> Sorting
     </button>
-    <button class="btn btn-xs btn-default m-b-sm"  type="button" ng-click="collapse()" ng-hide="sortingMode">
+    <button class="btn btn-xs btn-default m-b-sm" type="button" ng-click="collapse()" ng-hide="sortingMode">
         <i class="fa fa-fw fa-chevron-right"></i> Collapse
     </button>
-    <button class="btn btn-xs btn-default m-b-sm"  type="button" ng-click="expand()" ng-hide="sortingMode">
+    <button class="btn btn-xs btn-default m-b-sm" type="button" ng-click="expand()" ng-hide="sortingMode">
         <i class="fa fa-fw fa-chevron-down"></i> Expand
     </button>
 </div>
@@ -32,7 +33,7 @@
                                 {{ element.name }}
                             </span>
                             <span class="text-muted" ng-hide="element.name.length > 0">
-                                <?= $this->translate('stack.no-name', 'admin')?>
+                                <?= $this->translate('stack.no-name', 'admin') ?>
                             </span>
                             <small class="text-muted">
                                 - {{ element.type }}
@@ -41,13 +42,15 @@
                         <div class="col-xs-6" ng-hide="sortingMode">
                             <div ng-hide="element.nameEditing">
                                 <a class="btn btn-link btn-xs" ng-click="element.collapsed = !element.collapsed">
-                                    <i class="fa fa-fw" ng-class="{'fa-chevron-down': !element.collapsed, 'fa-chevron-right': element.collapsed}"></i>
+                                    <i class="fa fa-fw"
+                                       ng-class="{'fa-chevron-down': !element.collapsed, 'fa-chevron-right': element.collapsed}"></i>
                                 </a>
                                 <a ng-click="element.nameEditing = true" ng-show="element.name.length > 0">
                                     {{ element.name }}
                                 </a>
-                                <a ng-click="element.nameEditing = true" class="text-muted" ng-hide="element.name.length > 0">
-                                    <?= $this->translate('stack.no-name-enter', 'admin')?>
+                                <a ng-click="element.nameEditing = true" class="text-muted"
+                                   ng-hide="element.name.length > 0">
+                                    <?= $this->translate('stack.no-name-enter', 'admin') ?>
                                 </a>
                                 <small class="text-muted">
                                     - {{ element.type }}
@@ -55,9 +58,14 @@
                             </div>
                             <div ng-show="element.nameEditing">
                                 <div class="input-group input-group-sm">
-                                    <input tabindex="-1" ng-keydown="preventEnter(element, $event)" ng-keypress="preventEnter(element, $event)" ng-keyup="preventEnter(element, $event)" type="text" ng-model="element.name" class="form-control" placeholder="<?= $this->translate('stack.no-name', 'admin')?>">
+                                    <input tabindex="-1" ng-keydown="preventEnter(element, $event)"
+                                           ng-keypress="preventEnter(element, $event)"
+                                           ng-keyup="preventEnter(element, $event)" type="text" ng-model="element.name"
+                                           class="form-control"
+                                           placeholder="<?= $this->translate('stack.no-name', 'admin') ?>">
                                     <span class="input-group-btn">
-                                        <button class="btn btn-default" type="button" ng-click="element.nameEditing = false">
+                                        <button class="btn btn-default" type="button"
+                                                ng-click="element.nameEditing = false">
                                             <i class="fa fa-check"></i>
                                         </button>
                                     </span>
@@ -66,7 +74,8 @@
                         </div>
                         <div class="col-xs-6 text-right">
                             <?php if ($this->permission('admin42')->authorized('dynamic/manage/delete')): ?>
-                                <button class="btn btn-xs btn-danger" type="button" ng-click="element.deleted = !element.deleted">
+                                <button class="btn btn-xs btn-danger" type="button"
+                                        ng-click="element.deleted = !element.deleted">
                                 <span ng-show="element.deleted" class="fa-stack">
                                     <i class="fa fa-fw fa-trash fa-stack-1x"></i>
                                     <i class="fa fa-fw fa-ban fa-stack-2x"></i>
@@ -85,15 +94,23 @@
     </div>
 </fieldset>
 <?php if ($this->permission('admin42')->authorized('dynamic/manage/add')): ?>
-    <div class="form-group">
-        <div class="col-sm-offset-9 col-sm-2 text-right">
-            <select ng-if="protoTypes.length > 1" class="form-control" ng-model="data.selectedProtoType" ng-options="prototype.label for prototype in protoTypes"></select>
-        </div>
-        <div class="col-sm-1 text-right">
-            <button class="btn btn-default" ng-click="addTemplate()" type="button">
-                <?= $this->translate('button.add', 'admin')?>
-            </button>
+    <div class="row">
+        <div class="col-sm-4 col-md-3 coontrol-label"></div>
+        <div class="col-sm-8 col-md-9 col-control">
+            <span class="input-group">
+                <span class="input-group-btn">
+                    <button class="btn btn-default" ng-click="addTemplate()" type="button"
+                        uib-popover="<?= $this->translate('button.add', 'admin') ?>" popover-trigger="'mouseenter'">
+                        <span class="fa fa-fw fa-plus text-success"></span>
+                    </button>
+                </span>
+                <span ng-if="protoTypes.length == 1" class="form-control form-control-static " readonly>
+                    {{ protoTypes[0].label }}
+                </span>
+                <select ng-if="protoTypes.length > 1" class="form-control" ng-model="data.selectedProtoType"
+                        ng-options="prototype.label for prototype in protoTypes"></select>
+            </span>
         </div>
     </div>
 <?php endif; ?>
-<div class="line line-dashed b-b line-lg pull-in"></div>
+<div class="line line-dashed b-b line-lg"></div>

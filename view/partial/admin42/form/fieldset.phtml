@@ -1,12 +1,24 @@
 <div ng-if="formData.showLabel" class="form-group">
-    <div class="col-sm-3 col-md-2 control-label">
-        <a ng-if="formData.collapseAble" class="btn btn-link btn-xs text-default" ng-click="formData.collapse = !formData.collapse" ng-class="{'text-danger' : formData.errors.length}">
-            <i class="fa fa-fw" ng-class="{'fa-chevron-down': !formData.collapse, 'fa-chevron-right': formData.collapse}"></i>
+    <div class="col-sm-4 col-md-3 control-label">
+        <span class="pointer"
+              ng-if="formData.collapseAble"
+              ng-click="formData.collapse = !formData.collapse"
+              ng-class="{'text-danger' : formData.errors.length}">
+            <i class="fa fa-fw"
+               ng-class="{'fa-chevron-down': !formData.collapse, 'fa-chevron-right': formData.collapse}"></i>
             {{ formData.label }}
-        </a>
+        </span>
         <span ng-if="!formData.collapseAble" ng-class="{'text-danger' : formData.errors.length}">
             {{ formData.label }}
         </span>
+        <i class="fa fa-fw text-danger pull-left" ng-class="{'fa-exclamation-triangle': formData.errors.length}"></i>
+    </div>
+    <div class="col-sm-8 col-md-9 col-control">
+        <div class="control-actions">
+        </div>
+        <div ng-if="formData.errors.length" class="form-control-static text-danger">
+            Fieldset contains errors
+        </div>
     </div>
 </div>
 

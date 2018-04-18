@@ -1,24 +1,19 @@
 <div class="form-group" ng-class="{'has-error': formData.errors.length}">
-    <div class="col-sm-3 col-md-2 control-label">
-        <div class="pull-left hidden-sm hidden-xs">
-            <span class="fa fa-fw text-danger" ng-class="{'fa-exclamation-triangle': formData.errors.length}"></span>
-        </div>
-        <div class="pull-right">
-            <a class="text-muted" ng-if="formData.description != null" uib-popover="{{ formData.description }}" popover-trigger="'mouseenter'">
-                <i class="fa fa-question-circle"></i>
-            </a>
-            <label for="{{ formData.id }}">{{ formData.label }}</label>
+    <div class="col-sm-4 col-md-3 control-label">
+        <label for="{{ formData.id }}" uib-popover="{{ formData.description }}" popover-trigger="'mouseenter'">
+            <i class="fa fa-fw fa-question-circle-o text-muted" ng-if="formData.description != null"></i>
+            {{ formData.label }}
             <span ng-if="formData.required">*</span>
-        </div>
-        <div class="clearfix"></div>
+        </label>
+        <i class="fa fa-fw text-danger pull-left" ng-if="formData.errors.length"
+           ng-class="{'fa-exclamation-triangle': formData.errors.length}"></i>
     </div>
-    <div class="col-sm-9 col-md-10">
-        <div>
-            <input type="hidden" name="{{ formData.name }}" value="{{ formData.value }}">
-            <label class="i-switch m-t-xs m-r bg-primary">
-                <input type="checkbox" ng-model="model" ng-change="onChange()" ng-keydown="preventEnter($event)" ng-keypress="preventEnter($event)" ng-keyup="preventEnter($event)"><i></i>
-            </label>
-        </div>
+    <div class="col-sm-8 col-md-9 col-control">
+        <input type="hidden" name="{{ formData.name }}" value="{{ formData.value }}">
+        <label class="i-switch m-r bg-primary" style="margin-top: 8px">
+            <input type="checkbox" ng-model="model" ng-change="onChange()" ng-keydown="preventEnter($event)"
+                   ng-keypress="preventEnter($event)" ng-keyup="preventEnter($event)"><i></i>
+        </label>
         <ul ng-if="formData.errors.length" class="list-unstyled text-danger">
             <li ng-repeat="message in formData.errors">{{ message }}</li>
         </ul>

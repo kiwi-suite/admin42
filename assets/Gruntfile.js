@@ -205,7 +205,5 @@ module.exports = function(grunt) {
     grunt.registerTask('compile-tinymce', ['clean:tinymce', 'uglify:tinymcelink42', 'copy:tinymce', 'copy:tinymcelink']);
     grunt.registerTask('clear', ['clean:all']);
 
-
-
     require('load-grunt-tasks')(grunt);
 };

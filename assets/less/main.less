@@ -9,7 +9,6 @@
 @import '@{vendor}/simple-line-icons/less/simple-line-icons.less';
 @import '@{vendor}/flag-icon-css/less/flag-icon.less';
 
-
 /*
     Angulr Theme
 */
@@ -39,9 +38,7 @@
 @import "_magnific.less";
 @import "_tree.less";
 
-
 /* misc */
-
 
 .text-r42 {
     color: @brand-raum42;
@@ -297,4 +294,44 @@
 
 .angular-google-map-container {
     height: 250px;
+}
+
+/* controls */
+
+.col-control {
+    position: relative;
+    padding-right: 60px;
+}
+
+.control-label {
+    .fa-exclamation-triangle {
+        margin-top: 3px;
+    }
+}
+
+.control-actions {
+    position: absolute;
+    right: 15px;
+    top: 0;
+    z-index: 10;
+
+    .btn {
+        color: @text-muted;
+
+        &:hover {
+            color: @link-hover-color;
+        }
+    }
+}
+
+.mce-tinymce {
+    width: 100% !important;
+}
+
+.uib-separator {
+    padding: 0 8px;
+}
+
+.pointer {
+    cursor: pointer;
 }

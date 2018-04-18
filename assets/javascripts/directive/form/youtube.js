@@ -26,11 +26,11 @@ angular.module('admin42')
                     }
 
                     $scope.formData.errors = [];
-                }
+                };
 
                 $scope.videoUrl = function() {
                     return $sce.trustAsResourceUrl("https://www.youtube.com/embed/" + $scope.formData.value);
-                }
+                };
 
                 $scope.empty = function() {
                     $scope.youtubeLink = "";

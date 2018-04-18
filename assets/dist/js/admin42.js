@@ -709,68 +709,70 @@ angular.module('admin42')
     }]);
 ;
 angular.module('admin42')
-    .directive('formDate', [function() {
+    .directive('formDate', [function () {
         return {
             restrict: 'E',
-            templateUrl: function(elem, attrs) {
+            templateUrl: function (elem, attrs) {
                 return attrs.template;
             },
             scope: {
                 elementDataId: '@elementDataId'
             },
-            controller: ['$scope', 'jsonCache', '$formService', '$filter', function($scope, jsonCache, $formService, $filter) {
-                $scope.formData = jsonCache.get($scope.elementDataId);
-                var date = $scope.formData.value;
-                if (date.length > 0) {
-                    $scope.value = moment(date).toDate();
-                } else {
-                    $scope.value = "";
-                }
-                $scope.popup = {
-                    opened: false
-                };
-
-                $scope.open = function($event) {
-                    $event.preventDefault();
-                    $event.stopPropagation();
-                    $scope.popup.opened = true;
-                };
-
-                $scope.preventEnter = function($event) {
-                    if ($event.keyCode != 13) {
-                        return;
+            controller: [
+                '$scope', 'jsonCache', '$formService', '$filter',
+                function ($scope, jsonCache, $formService, $filter) {
+                    $scope.formData = jsonCache.get($scope.elementDataId);
+                    var date = $scope.formData.value;
+                    if (date.length > 0) {
+                        $scope.value = moment(date).toDate();
+                    } else {
+                        $scope.value = "";
                     }
-                    $event.preventDefault();
-                };
+                    $scope.popup = {
+                        opened: false
+                    };
 
-                $scope.empty = function() {
-                    $scope.value = "";
-                };
+                    $scope.open = function ($event) {
+                        $event.preventDefault();
+                        $event.stopPropagation();
+                        $scope.popup.opened = true;
+                    };
 
-                $scope.$watch('value',function(newValue, oldValue) {
-                    if(newValue != oldValue) {
-                        if (newValue == "") {
-                            $scope.formData.value = "";
+                    $scope.preventEnter = function ($event) {
+                        if ($event.keyCode != 13) {
                             return;
                         }
-                        $scope.formData.value = $filter('date')(newValue, 'yyyy-MM-dd');
+                        $event.preventDefault();
+                    };
+
+                    $scope.empty = function () {
+                        $scope.value = "";
+                    };
+
+                    $scope.$watch('value', function (newValue, oldValue) {
+                        if (newValue != oldValue) {
+                            if (newValue == "") {
+                                $scope.formData.value = "";
+                                return;
+                            }
+                            $scope.formData.value = $filter('date')(newValue, 'yyyy-MM-dd');
+                        }
+                    }, true);
+
+                    $scope.dateOptions = {
+                        formatYear: 'yy',
+                        startingDay: 1,
+                        showWeeks: false
+                    };
+
+                    if (angular.isDefined($scope.formData.options.formServiceHash)) {
+                        $formService.put(
+                            $scope.formData.options.formServiceHash,
+                            $scope.formData.name,
+                            $scope.elementDataId
+                        );
                     }
-                },true);
-
-                $scope.dateOptions = {
-                    formatYear: 'yy',
-                    startingDay: 1,
-                    showWeeks: false
-                };
-
-                if (angular.isDefined($scope.formData.options.formServiceHash)) {
-                    $formService.put(
-                        $scope.formData.options.formServiceHash,
-                        $scope.formData.name,
-                        $scope.elementDataId
-                    );
-                }
-            }]
+                }]
         }
     }]);
 ;
@@ -860,42 +862,49 @@ angular.module('admin42')
     }]);
 ;
 angular.module('admin42')
-    .directive('formEmail', [function() {
+    .directive('formEmail', [function () {
         return {
             restrict: 'E',
-            templateUrl: function(elem, attrs) {
+            templateUrl: function (elem, attrs) {
                 return attrs.template;
             },
             scope: {
                 elementDataId: '@elementDataId'
             },
-            controller: ['$scope', 'jsonCache', '$formService', function($scope, jsonCache, $formService) {
-                $scope.formData = jsonCache.get($scope.elementDataId);
+            controller: [
+                '$scope', '$rootScope', 'jsonCache', '$formService',
+                function ($scope, $rootScope, jsonCache, $formService) {
+                    $scope.formData = jsonCache.get($scope.elementDataId);
 
-                $scope.onChange = function () {
-                    $scope.formData.errors = [];
-                };
+                    $scope.onChange = function () {
+                        $rootScope.$broadcast('formElementChange', $scope.formData.name);
+                        $scope.formData.errors = [];
+                    };
 
-                $scope.empty = function() {
-                    $scope.formData.value = "";
-                    $scope.onChange();
-                };
+                    $scope.onBlur = function () {
+                        $rootScope.$broadcast('formElementBlur', $scope.formData.name);
+                    };
 
-                $scope.preventEnter = function($event) {
-                    if ($event.keyCode != 13) {
-                        return;
+                    $scope.empty = function () {
+                        $scope.formData.value = "";
+                        $scope.onChange();
+                    };
+
+                    $scope.preventEnter = function ($event) {
+                        if ($event.keyCode != 13) {
+                            return;
+                        }
+                        $event.preventDefault();
+                    };
+
+                    if (angular.isDefined($scope.formData.options.formServiceHash)) {
+                        $formService.put(
+                            $scope.formData.options.formServiceHash,
+                            $scope.formData.name,
+                            $scope.elementDataId
+                        );
                     }
-                    $event.preventDefault();
-                };
-
-                if (angular.isDefined($scope.formData.options.formServiceHash)) {
-                    $formService.put(
-                        $scope.formData.options.formServiceHash,
-                        $scope.formData.name,
-                        $scope.elementDataId
-                    );
-                }
-            }]
+                }]
         }
     }]);
 ;
@@ -1135,32 +1144,52 @@ angular.module('admin42')
     }]);
 ;
 angular.module('admin42')
-    .directive('formMoney', [function() {
+    .directive('formMoney', [function () {
         return {
             restrict: 'E',
-            templateUrl: function(elem, attrs) {
+            templateUrl: function (elem, attrs) {
                 return attrs.template;
             },
             scope: {
                 elementDataId: '@'
             },
-            controller: ['$scope', 'jsonCache', '$formService', 'appConfig', function($scope, jsonCache, $formService, appConfig) {
-                $scope.formData = jsonCache.get($scope.elementDataId);
+            controller: [
+                '$scope', '$rootScope', 'jsonCache', '$formService', 'appConfig',
+                function ($scope, $rootScope, jsonCache, $formService, appConfig) {
+                    $scope.formData = jsonCache.get($scope.elementDataId);
 
-                $scope.onChange = function () {
-                    $scope.formData.errors = [];
-                };
+                    $scope.onChange = function () {
+                        $rootScope.$broadcast('formElementChange', $scope.formData.name);
+                        $scope.formData.errors = [];
+                    };
 
-                if (angular.isDefined($scope.formData.options.formServiceHash)) {
-                    $formService.put(
-                        $scope.formData.options.formServiceHash,
-                        $scope.formData.name,
-                        $scope.elementDataId
-                    );
-                }
-            }]
+                    $scope.onBlur = function () {
+                        $rootScope.$broadcast('formElementBlur', $scope.formData.name);
+                    };
+
+                    $scope.empty = function () {
+                        $scope.formData.value = "";
+                        $scope.onChange();
+                    };
+
+                    $scope.preventEnter = function ($event) {
+                        if ($event.keyCode != 13) {
+                            return;
+                        }
+                        $event.preventDefault();
+                    };
+
+                    if (angular.isDefined($scope.formData.options.formServiceHash)) {
+                        $formService.put(
+                            $scope.formData.options.formServiceHash,
+                            $scope.formData.name,
+                            $scope.elementDataId
+                        );
+                    }
+                }]
         }
-    }]);;
+    }]);
+;
 angular.module('admin42')
     .directive('formMulticheckbox', [function() {
         return {
@@ -1227,48 +1256,55 @@ angular.module('admin42')
     }]);
 ;
 angular.module('admin42')
-    .directive('formPassword', [function() {
+    .directive('formPassword', [function () {
         return {
             restrict: 'E',
-            templateUrl: function(elem, attrs) {
+            templateUrl: function (elem, attrs) {
                 return attrs.template;
             },
             scope: {
                 elementDataId: '@elementDataId'
             },
-            controller: ['$scope', 'jsonCache', '$formService', function($scope, jsonCache, $formService) {
-                $scope.formData = jsonCache.get($scope.elementDataId);
+            controller: [
+                '$scope', '$rootScope', 'jsonCache', '$formService',
+                function ($scope, $rootScope, jsonCache, $formService) {
+                    $scope.formData = jsonCache.get($scope.elementDataId);
 
-                $scope.showPassword = false;
+                    $scope.showPassword = false;
 
-                $scope.empty = function() {
-                    $scope.formData.value = "";
-                    $scope.onChange();
-                };
+                    $scope.onChange = function () {
+                        $rootScope.$broadcast('formElementChange', $scope.formData.name);
+                        $scope.formData.errors = [];
+                    };
 
-                $scope.preventEnter = function($event) {
-                    if ($event.keyCode != 13) {
-                        return;
+                    $scope.empty = function () {
+                        $scope.formData.value = "";
+                        $scope.onChange();
+                    };
+
+                    $scope.preventEnter = function ($event) {
+                        if ($event.keyCode != 13) {
+                            return;
+                        }
+                        $event.preventDefault();
+                    };
+
+                    $scope.togglePassword = function () {
+                        $scope.showPassword = !$scope.showPassword;
+                    };
+
+                    $scope.getInputType = function () {
+                        return ($scope.showPassword) ? 'text' : 'password';
+                    };
+
+                    if (angular.isDefined($scope.formData.options.formServiceHash)) {
+                        $formService.put(
+                            $scope.formData.options.formServiceHash,
+                            $scope.formData.name,
+                            $scope.elementDataId
+                        );
                     }
-                    $event.preventDefault();
-                };
-
-                $scope.togglePassword = function () {
-                    $scope.showPassword = !$scope.showPassword;
-                };
-                
-                $scope.getInputType = function () {
-                    return ($scope.showPassword) ? 'text' : 'password';
-                };
-
-                if (angular.isDefined($scope.formData.options.formServiceHash)) {
-                    $formService.put(
-                        $scope.formData.options.formServiceHash,
-                        $scope.formData.name,
-                        $scope.elementDataId
-                    );
-                }
-            }]
+                }]
         }
     }]);
 ;
@@ -1553,47 +1589,49 @@ angular.module('admin42')
     }]);
 ;
 angular.module('admin42')
-    .directive('formText', [function() {
+    .directive('formText', [function () {
         return {
             restrict: 'E',
-            templateUrl: function(elem, attrs) {
+            templateUrl: function (elem, attrs) {
                 return attrs.template;
             },
             scope: {
                 elementDataId: '@'
             },
-            controller: ['$scope', '$rootScope', 'jsonCache', '$formService', function($scope, $rootScope, jsonCache, $formService) {
-                $scope.formData = jsonCache.get($scope.elementDataId);
+            controller: [
+                '$scope', '$rootScope', 'jsonCache', '$formService',
+                function ($scope, $rootScope, jsonCache, $formService) {
+                    $scope.formData = jsonCache.get($scope.elementDataId);
 
-                $scope.onChange = function() {
-                    $rootScope.$broadcast('formElementChange', $scope.formData.name);
-                    $scope.formData.errors = [];
-                };
+                    $scope.onChange = function () {
+                        $rootScope.$broadcast('formElementChange', $scope.formData.name);
+                        $scope.formData.errors = [];
+                    };
 
-                $scope.onBlur = function() {
-                    $rootScope.$broadcast('formElementBlur', $scope.formData.name);
-                };
+                    $scope.onBlur = function () {
+                        $rootScope.$broadcast('formElementBlur', $scope.formData.name);
+                    };
 
-                $scope.empty = function() {
-                    $scope.formData.value = "";
-                    $scope.onChange();
-                };
+                    $scope.empty = function () {
+                        $scope.formData.value = "";
+                        $scope.onChange();
+                    };
 
-                $scope.preventEnter = function($event) {
-                    if ($event.keyCode != 13) {
-                        return;
+                    $scope.preventEnter = function ($event) {
+                        if ($event.keyCode != 13) {
+                            return;
+                        }
+                        $event.preventDefault();
+                    };
+
+                    if (angular.isDefined($scope.formData.options.formServiceHash)) {
+                        $formService.put(
+                            $scope.formData.options.formServiceHash,
+                            $scope.formData.name,
+                            $scope.elementDataId
+                        );
                     }
-                    $event.preventDefault();
-                };
-
-                if (angular.isDefined($scope.formData.options.formServiceHash)) {
-                    $formService.put(
-                        $scope.formData.options.formServiceHash,
-                        $scope.formData.name,
-                        $scope.elementDataId
-                    );
-                }
-            }]
+                }]
         }
     }]);
 ;
@@ -1694,11 +1732,11 @@ angular.module('admin42')
                     }
 
                     $scope.formData.errors = [];
-                }
+                };
 
                 $scope.videoUrl = function() {
                     return $sce.trustAsResourceUrl("https://www.youtube.com/embed/" + $scope.formData.value);
-                }
+                };
 
                 $scope.empty = function() {
                     $scope.youtubeLink = "";

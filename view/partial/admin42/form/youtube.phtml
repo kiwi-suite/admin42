@@ -1,30 +1,33 @@
 <div class="form-group" ng-class="{'has-error': formData.errors.length}">
-    <div class="col-sm-3 col-md-2 control-label">
-        <div class="pull-left hidden-sm hidden-xs">
-            <span class="fa fa-fw text-danger" ng-class="{'fa-exclamation-triangle': formData.errors.length}"></span>
-            <a ng-show="formData.value.length > 0" class="text-light" ng-click="empty()">
-                <i class="fa fa-fw fa-trash"></i>
-            </a>
-        </div>
-        <div class="pull-right">
-            <a class="text-muted" ng-if="formData.description != null" uib-popover="{{ formData.description }}" popover-trigger="'mouseenter'">
-                <i class="fa fa-question-circle"></i>
-            </a>
-            <label for="{{ formData.id }}">{{ formData.label }}</label>
+    <div class="col-sm-4 col-md-3 control-label">
+        <label for="{{ formData.id }}" uib-popover="{{ formData.description }}" popover-trigger="'mouseenter'">
+            <i class="fa fa-fw fa-question-circle-o text-muted" ng-if="formData.description != null"></i>
+            {{ formData.label }}
             <span ng-if="formData.required">*</span>
-        </div>
-        <div class="clearfix"></div>
+        </label>
+        <i class="fa fa-fw text-danger pull-right" ng-if="formData.errors.length"
+           ng-class="{'fa-exclamation-triangle': formData.errors.length}"></i>
     </div>
-    <div class="col-sm-9 col-md-10">
+    <div class="col-sm-8 col-md-9 col-control">
+        <div class="control-actions">
+            <button type="button" class="btn btn-link" ng-show="formData.value.length > 0 && !formData.readonly"
+                    ng-click="empty()">
+                <i class="fa fa-fw fa-times"></i>
+            </button>
+        </div>
         <input type="hidden" name="{{ formData.name }}" value="{{ formData.value }}">
-        <div class="row">
-            <div ng-if="formData.value" class="col-sm-4">
-                <div class="videoWrapper">
-                    <iframe ng-src="{{ videoUrl() }}" frameborder="0" allowfullscreen></iframe>
-                </div>
-            </div>
-            <div ng-class="{'col-sm-8': formData.value, 'col-sm-12': !formData.value}">
-                <input type="text" class="form-control" id="{{ formData.id }}" ng-model="youtubeLink" ng-change="changeValue()" ng-readonly="formData.readonly" ng-keydown="preventEnter($event)" ng-keypress="preventEnter($event)" ng-keyup="preventEnter($event)">
+        <div class="input-group">
+            <span class="input-group-addon">
+                <i class="fa fa-fw fa-youtube"></i>
+            </span>
+            <input type="text" class="form-control" id="{{ formData.id }}" ng-model="youtubeLink"
+                   ng-change="changeValue()" ng-readonly="formData.readonly" ng-keydown="preventEnter($event)"
+                   ng-keypress="preventEnter($event)" ng-keyup="preventEnter($event)">
+        </div>
+        <div ng-if="formData.value" class="embed-responsive embed-responsive-16by9">
+            <div class="videoWrapper">
+                <iframe class="embed-responsive-item" ng-src="{{ videoUrl() }}" frameborder="0"
+                        allowfullscreen></iframe>
             </div>
         </div>
         <ul ng-if="formData.errors.length" class="list-unstyled text-danger">

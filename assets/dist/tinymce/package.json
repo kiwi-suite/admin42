@@ -1,4 +1,11 @@
 {
+  "_args": [
+    [
+      "tinymce@4.5.0",
+      "/Users/luchaos/Sites/kiwi/kiwi-v3/vendor/fruit42/admin42/assets"
+    ]
+  ],
+  "_development": true,
   "_from": "tinymce@4.5.0",
   "_id": "tinymce@4.5.0",
   "_inBundle": false,
@@ -19,14 +26,11 @@
     "#DEV:/"
   ],
   "_resolved": "https://registry.npmjs.org/tinymce/-/tinymce-4.5.0.tgz",
-  "_shasum": "4a0e5bc2b3d7ae1055b77091351a33a0dd630e4a",
-  "_spec": "tinymce@4.5.0",
+  "_spec": "4.5.0",
   "_where": "/Users/luchaos/Sites/kiwi/kiwi-v3/vendor/fruit42/admin42/assets",
   "bugs": {
     "url": "http://www.tinymce.com/develop/bugtracker.php"
   },
-  "bundleDependencies": false,
-  "deprecated": false,
   "description": "Web based JavaScript HTML WYSIWYG editor control.",
   "keywords": [
     "editor",

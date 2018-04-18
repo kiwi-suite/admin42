@@ -1,27 +1,46 @@
 angular.module('admin42')
-    .directive('formMoney', [function() {
+    .directive('formMoney', [function () {
         return {
             restrict: 'E',
-            templateUrl: function(elem, attrs) {
+            templateUrl: function (elem, attrs) {
                 return attrs.template;
             },
             scope: {
                 elementDataId: '@'
             },
-            controller: ['$scope', 'jsonCache', '$formService', 'appConfig', function($scope, jsonCache, $formService, appConfig) {
-                $scope.formData = jsonCache.get($scope.elementDataId);
+            controller: [
+                '$scope', '$rootScope', 'jsonCache', '$formService', 'appConfig',
+                function ($scope, $rootScope, jsonCache, $formService, appConfig) {
+                    $scope.formData = jsonCache.get($scope.elementDataId);
 
-                $scope.onChange = function () {
-                    $scope.formData.errors = [];
-                };
+                    $scope.onChange = function () {
+                        $rootScope.$broadcast('formElementChange', $scope.formData.name);
+                        $scope.formData.errors = [];
+                    };
 
-                if (angular.isDefined($scope.formData.options.formServiceHash)) {
-                    $formService.put(
-                        $scope.formData.options.formServiceHash,
-                        $scope.formData.name,
-                        $scope.elementDataId
-                    );
-                }
-            }]
+                    $scope.onBlur = function () {
+                        $rootScope.$broadcast('formElementBlur', $scope.formData.name);
+                    };
+
+                    $scope.empty = function () {
+                        $scope.formData.value = "";
+                        $scope.onChange();
+                    };
+
+                    $scope.preventEnter = function ($event) {
+                        if ($event.keyCode != 13) {
+                            return;
+                        }
+                        $event.preventDefault();
+                    };
+
+                    if (angular.isDefined($scope.formData.options.formServiceHash)) {
+                        $formService.put(
+                            $scope.formData.options.formServiceHash,
+                            $scope.formData.name,
+                            $scope.elementDataId
+                        );
+                    }
+                }]
         }
     }]);
